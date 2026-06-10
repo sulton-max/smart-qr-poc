@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartQr.Common\SmartQr.Common.csproj" />
+        <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
+        <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
+        <ProjectReference Include="..\SmartQr.Codes\SmartQr.Codes.csproj" />
+    </ItemGroup>
+
+</Project>

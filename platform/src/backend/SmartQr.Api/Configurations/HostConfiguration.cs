@@ -1,0 +1,39 @@
+namespace SmartQr.Api.Configurations;
+
+/// <summary>Slim host wiring — <c>Program.cs</c> calls <see cref="Configure(WebApplicationBuilder)"/> then <see cref="Configure(WebApplication)"/>.</summary>
+public static partial class HostConfiguration
+{
+    /// <summary>Configures the application builder (services).</summary>
+    public static WebApplicationBuilder Configure(this WebApplicationBuilder builder)
+    {
+        builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
+
+        builder
+            .AddSettings()
+            .AddPersistence()
+            .AddCodeServices()
+            .AddApplicationServices()
+            .AddCustomCors()
+            .AddControllers();
+
+        return builder;
+    }
+
+    /// <summary>Configures middleware and endpoints.</summary>
+    public static WebApplication Configure(this WebApplication app)
+    {
+        // Serve the built React SPA (frontend `vite build` → wwwroot) so the Api host also serves the UI.
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
+        app.UseCors();
+
+        app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "smart-qr-api" }));
+        app.MapControllers();
+
+        // SPA fallback — any non-API, non-file GET returns index.html (client-side routing).
+        app.MapFallbackToFile("index.html");
+
+        return app;
+    }
+}

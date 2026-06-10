@@ -1,0 +1,18 @@
+# .NET build output
+bin/
+obj/
+*.user
+
+# Frontend build output served by the Api (regenerate via `pnpm -C platform/src/frontend build`)
+platform/src/backend/SmartQr.Api/wwwroot/
+
+# Local config overrides (loaded by HostConfiguration; never committed)
+appsettings.Local.json
+
+# IDE
+.idea/
+.vs/
+*.DS_Store
+
+# Rider/EF tooling
+*.received.*

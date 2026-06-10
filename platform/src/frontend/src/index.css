@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@wow-two-beta/ui/styles.css";
+
+/* Tailwind v4 must scan the lib's compiled output to emit the utility classes it uses. */
+@source "../node_modules/@wow-two-beta/ui/dist";
+
+/* Smart QR brand overrides go here later, e.g.:
+@theme {
+  --color-primary: #6d28d9;
+}
+*/

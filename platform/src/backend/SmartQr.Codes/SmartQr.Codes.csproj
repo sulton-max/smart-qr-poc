@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- QR generation — pure managed, no System.Drawing (SvgQRCode + PngByteQRCode renderers) -->
+        <PackageReference Include="QRCoder" Version="1.*" />
+        <!-- Barcodes — 1D + 2D (Code128, EAN/UPC, DataMatrix, PDF417, Aztec). SVG renderer is managed. -->
+        <PackageReference Include="ZXing.Net" Version="0.16.*" />
+        <!-- Logo compositing onto raster QR — managed, cross-platform. 2.1.x = Apache-2.0 (license-clean). -->
+        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
