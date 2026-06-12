@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Common.Persistence.Migrations;
 using SmartQr.Common.Settings;
 
 namespace SmartQr.Common.Persistence.Extensions;
@@ -35,6 +36,10 @@ public static class ServiceCollectionExtensions
                 .UseNpgsql(dataSource)
                 .UseSnakeCaseNamingConvention();
         });
+
+        // SQL migrator (embedded source) — owns the Postgres schema; EF is a pure mapper over it.
+        // The SQL ships embedded in THIS (product) assembly, so hand the migrator the DbContext's assembly.
+        services.AddSqlMigrations(typeof(SmartQrDbContext).Assembly);
 
         return services;
     }

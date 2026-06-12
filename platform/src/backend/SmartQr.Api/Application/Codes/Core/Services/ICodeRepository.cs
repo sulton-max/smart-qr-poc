@@ -11,8 +11,20 @@ public interface ICodeRepository
     /// <summary>Loads a code (including rules) by id, or null.</summary>
     Task<CodeEntity?> GetByIdAsync(Guid id, CancellationToken ct);
 
-    /// <summary>Lists a owner's codes (including rules), newest first.</summary>
-    Task<IReadOnlyList<CodeEntity>> ListByOwnerAsync(Guid ownerId, CancellationToken ct);
+    /// <summary>Loads a code (including rules) by id only if it belongs to <paramref name="userId"/>; otherwise null.</summary>
+    Task<CodeEntity?> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken ct);
+
+    /// <summary>Lists a user's codes (including rules), newest first. When <paramref name="q"/> is set, filters case-insensitively to codes whose name or fallback URL contains the term.</summary>
+    Task<IReadOnlyList<CodeEntity>> ListByUserAsync(Guid userId, string? q, CancellationToken ct);
+
+    /// <summary>Persists edits to a tracked code and replaces its whole rule set in a single save (orphaned rules cascade-delete). Keeps slug, scan count, and creation timestamp; returns the same code.</summary>
+    Task<CodeEntity> UpdateAsync(CodeEntity code, CancellationToken ct);
+
+    /// <summary>Toggles a code's active flag if it belongs to <paramref name="userId"/>; returns the updated code, or null otherwise.</summary>
+    Task<CodeEntity?> SetActiveAsync(Guid id, Guid userId, bool isActive, CancellationToken ct);
+
+    /// <summary>Hard-deletes a code (its rules cascade) if it belongs to <paramref name="userId"/>; returns whether a row was removed.</summary>
+    Task<bool> DeleteAsync(Guid id, Guid userId, CancellationToken ct);
 
     /// <summary>Returns whether a slug is already taken.</summary>
     Task<bool> SlugExistsAsync(string slug, CancellationToken ct);

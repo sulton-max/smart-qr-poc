@@ -35,7 +35,7 @@ public class RedirectResolutionTests
         {
             Id = id,
             Slug = slug,
-            OwnerId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
             Name = "App",
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,

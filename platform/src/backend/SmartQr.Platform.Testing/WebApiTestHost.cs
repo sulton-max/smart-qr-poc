@@ -1,0 +1,92 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Time.Testing;
+
+namespace SmartQr.IntegrationTests.Harness;
+
+/// <summary>
+/// Test host wrapping <see cref="WebApplicationFactory{TEntryPoint}"/> with conventional defaults:
+/// <list type="bullet">
+///   <item>Environment forced to <c>"Production"</c> (mirrors the SDK CODE — SmartQr startup is not gated on env).</item>
+///   <item><see cref="FakeTimeProvider"/> registered as the default <see cref="TimeProvider"/>.</item>
+///   <item>Hooks for replacing services and tweaking configuration before the host builds.</item>
+///   <item>The container connection string injected into <c>SmartQrDbSettings:ConnectionString</c> when set.</item>
+/// </list>
+/// </summary>
+/// <typeparam name="TEntryPoint">The application entry-point type (typically <c>Program</c>).</typeparam>
+/// <remarks>Mirrors the wow-two backend-beta SDK <c>WebApiTestHost&lt;TEntryPoint&gt;</c> public surface.</remarks>
+public class WebApiTestHost<TEntryPoint> : WebApplicationFactory<TEntryPoint>
+    where TEntryPoint : class
+{
+    /// <summary>
+    /// The fake clock injected as the default <see cref="TimeProvider"/>. Mutate from tests to advance time.
+    /// </summary>
+    public FakeTimeProvider Clock { get; } = new();
+
+    /// <summary>
+    /// PostgreSQL connection string injected as <c>SmartQrDbSettings:ConnectionString</c>. Both the Api and
+    /// Redirect hosts point at the same container DB through this. The matching env var is set process-wide
+    /// by the app fixture (the config loader's env overlay wins).
+    /// </summary>
+    public string? ConnectionString { get; init; }
+
+    /// <summary>
+    /// Adds a service-replacement hook. Called once when the host builds.
+    /// </summary>
+    public Action<IServiceCollection>? ConfigureServicesHook { get; init; }
+
+    /// <summary>
+    /// Adds an additional `IHostBuilder` configuration step. Useful for `UseEnvironment("Production")` overrides.
+    /// </summary>
+    public Action<IHostBuilder>? ConfigureHostHook { get; init; }
+
+    /// <inheritdoc />
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment(Environments.Production); // mirror the SDK CODE — Production, not Testing
+
+        if (ConnectionString is not null)
+        {
+            builder.ConfigureAppConfiguration((_, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["SmartQrDbSettings:ConnectionString"] = ConnectionString,
+                });
+            });
+        }
+
+        builder.ConfigureServices(services =>
+        {
+            // Default: replace TimeProvider with FakeTimeProvider so tests control time.
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton<TimeProvider>(Clock);
+
+            ConfigureServicesHook?.Invoke(services);
+        });
+    }
+
+    /// <inheritdoc />
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        ConfigureHostHook?.Invoke(builder);
+        return base.CreateHost(builder);
+    }
+}
+
+internal static class ServiceCollectionInternalExtensions
+{
+    public static IServiceCollection RemoveAll<TService>(this IServiceCollection services)
+    {
+        for (var i = services.Count - 1; i >= 0; i--)
+        {
+            if (services[i].ServiceType == typeof(TService))
+                services.RemoveAt(i);
+        }
+
+        return services;
+    }
+}

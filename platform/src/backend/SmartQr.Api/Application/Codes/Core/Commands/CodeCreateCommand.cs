@@ -8,8 +8,8 @@ namespace SmartQr.Api.Application.Codes.Core.Commands;
 public sealed record CodeCreateCommand
     : ICommand<ApplicationResult<CodeCreateResult.Success, CodeCreateResult.Failure>>
 {
-    /// <summary>Owning user/workspace.</summary>
-    public required Guid OwnerId { get; init; }
+    /// <summary>Id of the user creating the code.</summary>
+    public required Guid UserId { get; init; }
 
     /// <summary>Display name.</summary>
     public required string Name { get; init; }

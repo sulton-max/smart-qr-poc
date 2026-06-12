@@ -17,8 +17,8 @@ public sealed record CodeEntity : IEntity
     /// <example>a1b2c3</example>
     public required string Slug { get; set; }
 
-    /// <summary>Gets or sets the owning user/workspace id.</summary>
-    public required Guid OwnerId { get; set; }
+    /// <summary>Gets or sets the id of the user who owns this code.</summary>
+    public required Guid UserId { get; set; }
 
     /// <summary>Gets or sets the human-friendly name shown in the dashboard.</summary>
     /// <example>Spring menu table tent</example>

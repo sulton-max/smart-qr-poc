@@ -20,7 +20,7 @@ public sealed class CodeListQueryHandler(
     {
         try
         {
-            var codes = await repository.ListByOwnerAsync(request.OwnerId, ct);
+            var codes = await repository.ListByUserAsync(request.UserId, request.Q, ct);
             var dtos = codes.Select(c => c.ToDto(settings.RedirectBaseUrl)).ToList();
 
             return new ApplicationResult<CodeListResult.Success, CodeListResult.Failure>
@@ -28,7 +28,7 @@ public sealed class CodeListQueryHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "CodeList failed for owner {OwnerId}", request.OwnerId);
+            logger.LogError(ex, "CodeList failed for user {UserId}", request.UserId);
             return new ApplicationResult<CodeListResult.Success, CodeListResult.Failure>
                 .Failure(new CodeListResult.Failure(ex.Message));
         }

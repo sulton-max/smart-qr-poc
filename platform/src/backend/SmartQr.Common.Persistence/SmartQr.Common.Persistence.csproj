@@ -11,11 +11,25 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.*" />
         <PackageReference Include="EFCore.NamingConventions" Version="9.*" />
         <PackageReference Include="Dapper" Version="2.*" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.*" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\SmartQr.Common\SmartQr.Common.csproj" />
         <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
+        <!-- SQL migrator engine (DbConnectionFactory comes transitively via Platform.Migrations → Platform.Core). -->
+        <ProjectReference Include="..\SmartQr.Platform.Migrations\SmartQr.Platform.Migrations.csproj" />
+    </ItemGroup>
+
+    <!--
+      SQL migrations ship two ways from one set of files:
+        • EmbeddedResource → runtime hosts read them from the binary (logical name "Migrations/NNN-name/Apply.sql").
+        • on disk          → the CLI + dev edit/apply them live via FileSystemMigrationSource.
+    -->
+    <ItemGroup>
+        <EmbeddedResource Include="SqlFiles\**\*.sql">
+            <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

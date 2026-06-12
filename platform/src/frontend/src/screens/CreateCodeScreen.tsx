@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, CopyButton } from "@wow-two-beta/ui/actions";
 import { ColorField, FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
 import { Card, Heading } from "@wow-two-beta/ui/display";
+import { Spinner } from "@wow-two-beta/ui/feedback";
+import { ArrowLeft } from "lucide-react";
 import { QrPreview } from "../components/QrPreview";
 import { RuleBuilder } from "../components/RuleBuilder";
-import { codeImageUrl, createCode, REDIRECT_BASE } from "../api";
+import { codeImageUrl, createCode, getCode, updateCode, REDIRECT_BASE } from "../api";
 import { BarcodeFormat, type CodeDto, type RuleDraft } from "../types";
 
 const SYMBOLOGY_LABEL: Record<BarcodeFormat, string> = {
@@ -17,62 +19,151 @@ const SYMBOLOGY_LABEL: Record<BarcodeFormat, string> = {
   UpcA: "UPC-A",
 };
 
-export function CreateCodeScreen() {
+/** Maps a persisted code's rules onto the builder's draft shape (with client-side keys). */
+function toDrafts(code: CodeDto): RuleDraft[] {
+  return code.rules.map((r) => ({
+    id: crypto.randomUUID(),
+    order: r.order,
+    conditionType: r.conditionType,
+    conditionValue: r.conditionValue ?? "",
+    destination: r.destination,
+  }));
+}
+
+export interface CreateCodeScreenProps {
+  /** When set, the builder loads this code and edits it (PUT) instead of creating a new one (POST). */
+  codeId?: string;
+  /** Return to the previous screen (the codes list). */
+  onBack?: () => void;
+  /** Notify the parent that a save succeeded — used to refresh the list on the way back. */
+  onSaved?: () => void;
+}
+
+/**
+ * Code builder — create mode by default, edit mode when `codeId` is provided. Edit mode prefills
+ * every editable field (including the rule set) and submits a full replace via `updateCode`; the
+ * slug is shown read-only because it is printed and immutable.
+ */
+export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenProps) {
+  const isEdit = Boolean(codeId);
+
   const [name, setName] = useState("");
   const [fallbackUrl, setFallbackUrl] = useState("https://example.com");
   const [symbology, setSymbology] = useState<BarcodeFormat>(BarcodeFormat.QrCode);
   const [foreground, setForeground] = useState("#18181b");
   const [background, setBackground] = useState("#ffffff");
   const [rules, setRules] = useState<RuleDraft[]>([]);
-  const [creating, setCreating] = useState(false);
-  const [created, setCreated] = useState<CodeDto | null>(null);
+  const [existing, setExisting] = useState<CodeDto | null>(null);
+
+  const [loading, setLoading] = useState(isEdit);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState<CodeDto | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const previewValue = created?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
-
-  async function handleCreate() {
-    setCreating(true);
+  // Edit mode: load the code once and prefill every field.
+  useEffect(() => {
+    if (!codeId) return;
+    let cancelled = false;
+    setLoading(true);
     setError(null);
-    try {
-      const dto = await createCode({
-        name: name.trim() || "Untitled code",
-        codeType: "Qr",
-        barcodeFormat: symbology,
-        fallbackUrl: fallbackUrl.trim(),
-        rules: rules.map((r) => ({
-          order: r.order,
-          conditionType: r.conditionType,
-          conditionValue: r.conditionValue.trim(),
-          destination: r.destination.trim(),
-        })),
+    getCode(codeId)
+      .then((code) => {
+        if (cancelled) return;
+        setExisting(code);
+        setName(code.name);
+        setFallbackUrl(code.fallbackUrl);
+        setSymbology(code.barcodeFormat);
+        setRules(toDrafts(code));
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load the code");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
-      setCreated(dto);
+    return () => {
+      cancelled = true;
+    };
+  }, [codeId]);
+
+  const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
+
+  async function handleSubmit() {
+    setSaving(true);
+    setError(null);
+    const request = {
+      name: name.trim() || "Untitled code",
+      codeType: "Qr" as const,
+      barcodeFormat: symbology,
+      fallbackUrl: fallbackUrl.trim(),
+      rules: rules.map((r) => ({
+        order: r.order,
+        conditionType: r.conditionType,
+        conditionValue: r.conditionValue.trim(),
+        destination: r.destination.trim(),
+      })),
+    };
+    try {
+      const dto = codeId ? await updateCode(codeId, request) : await createCode(request);
+      setSaved(dto);
+      setExisting(dto);
+      onSaved?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
-      setCreating(false);
+      setSaving(false);
     }
   }
 
   function reset() {
-    setCreated(null);
+    setSaved(null);
     setError(null);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Spinner size="lg" label="Loading code" />
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <Heading level={1} className="text-2xl font-bold">
-          Create a code
-        </Heading>
-        <p className="text-muted-foreground">
-          One code, many destinations — and it never expires.
-        </p>
+      <div className="flex flex-col gap-2">
+        {onBack && (
+          <Button
+            variant="ghost"
+            tone="neutral"
+            size="sm"
+            leadingSlot={<ArrowLeft size={16} />}
+            className="-ml-2 self-start"
+            onClick={onBack}
+          >
+            Back to codes
+          </Button>
+        )}
+        <div>
+          <Heading level={1} className="text-2xl font-bold">
+            {isEdit ? "Edit code" : "Create a code"}
+          </Heading>
+          <p className="text-muted-foreground">
+            {isEdit
+              ? "Update the destination and routing — the printed code keeps working."
+              : "One code, many destinations — and it never expires."}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* ── Builder ── */}
         <Card className="flex flex-col gap-5 p-6">
+          {isEdit && existing && (
+            <FormField label="Short link" helper="Encoded into the printed code — permanent and not editable.">
+              <TextInput value={existing.shortUrl} readOnly disabled />
+            </FormField>
+          )}
+
           <FormField label="Name">
             <TextInput
               value={name}
@@ -122,11 +213,11 @@ export function CreateCodeScreen() {
           <Button
             tone="primary"
             isFullWidth
-            isLoading={creating}
-            loadingText="Creating…"
-            onClick={handleCreate}
+            isLoading={saving}
+            loadingText={isEdit ? "Saving…" : "Creating…"}
+            onClick={handleSubmit}
           >
-            Create code
+            {isEdit ? "Save changes" : "Create code"}
           </Button>
 
           {error && (
@@ -144,29 +235,37 @@ export function CreateCodeScreen() {
             (vector-first).
           </p>
 
-          {created && (
+          {saved && (
             <div className="w-full rounded-lg border border-border bg-muted/30 p-4">
-              <p className="text-sm font-medium">Code created ✓</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground" title={created.shortUrl}>
-                {created.shortUrl}
+              <p className="text-sm font-medium">{isEdit ? "Changes saved ✓" : "Code created ✓"}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground" title={saved.shortUrl}>
+                {saved.shortUrl}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <CopyButton size="sm" text={created.shortUrl} aria-label="Copy short URL">
+                <CopyButton size="sm" text={saved.shortUrl} aria-label="Copy short URL">
                   Copy link
                 </CopyButton>
                 <Button asChild size="sm" variant="outline" tone="neutral">
-                  <a href={codeImageUrl(created.id, "svg")} target="_blank" rel="noreferrer">
+                  <a href={codeImageUrl(saved.id, "svg")} target="_blank" rel="noreferrer">
                     SVG
                   </a>
                 </Button>
                 <Button asChild size="sm" variant="outline" tone="neutral">
-                  <a href={codeImageUrl(created.id, "png")} target="_blank" rel="noreferrer">
+                  <a href={codeImageUrl(saved.id, "png")} target="_blank" rel="noreferrer">
                     PNG
                   </a>
                 </Button>
-                <Button size="sm" variant="ghost" tone="neutral" onClick={reset}>
-                  Create another
-                </Button>
+                {isEdit ? (
+                  onBack && (
+                    <Button size="sm" variant="ghost" tone="neutral" onClick={onBack}>
+                      Done
+                    </Button>
+                  )
+                ) : (
+                  <Button size="sm" variant="ghost" tone="neutral" onClick={reset}>
+                    Create another
+                  </Button>
+                )}
               </div>
             </div>
           )}

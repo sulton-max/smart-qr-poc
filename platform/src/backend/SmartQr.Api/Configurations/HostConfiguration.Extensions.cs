@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using SmartQr.Api.Application.Codes.Core.Services;
+using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Services;
+using SmartQr.Api.Infrastructure.Identity.Services;
 using SmartQr.Api.Persistence.Repositories;
 using SmartQr.Api.Settings;
 using SmartQr.Codes;
@@ -43,6 +45,15 @@ public static partial class HostConfiguration
         builder.Services.AddSmartQrMediator(typeof(HostConfiguration).Assembly);
         builder.Services.AddScoped<ICodeRepository, CodeRepository>();
         builder.Services.AddSingleton<ISlugGenerator, SlugGenerator>();
+        return builder;
+    }
+
+    /// <summary>Registers the identity seam — read-only current-user view + guest provisioning.</summary>
+    private static WebApplicationBuilder AddIdentity(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICurrentUser, CookieCurrentUser>();
+        builder.Services.AddScoped<IGuestSession, CookieGuestSession>();
         return builder;
     }
 

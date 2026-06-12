@@ -35,7 +35,7 @@ public sealed class CodeCreateCommandHandler(
             {
                 Id = codeId,
                 Slug = slug,
-                OwnerId = request.OwnerId,
+                UserId = request.UserId,
                 Name = request.Name,
                 CodeType = request.CodeType,
                 BarcodeFormat = request.BarcodeFormat,
@@ -60,7 +60,7 @@ public sealed class CodeCreateCommandHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "CodeCreate failed for owner {OwnerId}", request.OwnerId);
+            logger.LogError(ex, "CodeCreate failed for user {UserId}", request.UserId);
             return new ApplicationResult<CodeCreateResult.Success, CodeCreateResult.Failure>
                 .Failure(new CodeCreateResult.Failure(ex.Message));
         }

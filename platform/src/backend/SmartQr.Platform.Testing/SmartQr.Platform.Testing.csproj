@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <!--
+      Generic web-API integration-test harness — host-agnostic over a TEntryPoint.
+      No ProjectReference to SmartQr.Api / SmartQr.Redirect: the product test project
+      wires the concrete hosts (extern alias) and references this for the base types.
+      Versions mirror the pins in SmartQr.IntegrationTests.csproj.
+    -->
+    <ItemGroup>
+        <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0" />
+        <PackageReference Include="Testcontainers" Version="4.0.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0" />
+        <PackageReference Include="Respawn" Version="6.2.1" />
+        <PackageReference Include="Npgsql" Version="9.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+</Project>

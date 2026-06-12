@@ -1,3 +1,5 @@
+using SmartQr.Common.Persistence.Extensions;
+
 namespace SmartQr.Api.Configurations;
 
 /// <summary>Slim host wiring — <c>Program.cs</c> calls <see cref="Configure(WebApplicationBuilder)"/> then <see cref="Configure(WebApplication)"/>.</summary>
@@ -13,15 +15,19 @@ public static partial class HostConfiguration
             .AddPersistence()
             .AddCodeServices()
             .AddApplicationServices()
+            .AddIdentity()
             .AddCustomCors()
             .AddControllers();
 
         return builder;
     }
 
-    /// <summary>Configures middleware and endpoints.</summary>
+    /// <summary>Runs startup tasks, then configures middleware and endpoints.</summary>
     public static WebApplication Configure(this WebApplication app)
     {
+        // Ensure the database exists + apply pending migrations before serving (blocks once at startup; idempotent).
+        app.Services.MigrateSmartQrDatabaseAsync().GetAwaiter().GetResult();
+
         // Serve the built React SPA (frontend `vite build` → wwwroot) so the Api host also serves the UI.
         app.UseDefaultFiles();
         app.UseStaticFiles();
@@ -33,6 +39,11 @@ public static partial class HostConfiguration
 
         // SPA fallback — any non-API, non-file GET returns index.html (client-side routing).
         app.MapFallbackToFile("index.html");
+
+        Console.WriteLine("🚀 SmartQr.Api starting...");
+        Console.WriteLine("   Identity:  GET /api/identity/me, POST /api/identity/guest");
+        Console.WriteLine("   Codes:     POST /api/codes, GET /api/codes, GET /api/codes/{id}, GET /api/codes/{id}/image");
+        Console.WriteLine("   Health:    /health");
 
         return app;
     }

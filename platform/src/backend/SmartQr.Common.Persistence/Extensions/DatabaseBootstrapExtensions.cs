@@ -1,57 +1,41 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Npgsql;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Common.Persistence.Migrations;
 using SmartQr.Common.Settings;
 
 namespace SmartQr.Common.Persistence.Extensions;
 
-/// <summary>Runtime database bootstrap.</summary>
+/// <summary>Runtime database bootstrap — ensure the database exists, then apply pending SQL migrations.</summary>
 public static class DatabaseBootstrapExtensions
 {
     /// <summary>
-    /// POC runtime schema bootstrap — creates the database (if missing) then the tables (if missing). Idempotent.
-    /// Runs at startup so the app works against a fresh Postgres.
+    /// POC startup bootstrap: create the database if missing, then apply all pending migrations (auto-apply).
+    /// The SQL migrator owns the schema — EF no longer calls <c>EnsureCreated</c>. Idempotent.
     /// </summary>
     /// <remarks>
-    /// Two steps because EF's <c>EnsureCreated</c> can't create the database when configured with a fixed
-    /// <see cref="NpgsqlDataSource"/> (it's pinned to the target DB): we first <c>CREATE DATABASE</c> via the
-    /// <c>postgres</c> maintenance DB, then let EF create the tables. Enums are stored as text, so there are
-    /// no PG enum types to create. Switch to EF Migrations once the schema starts evolving.
+    /// Auto-apply-on-startup is a dev/POC convenience. For real deploys, run migrations as a separate step
+    /// (the <c>smart-qr-migrate</c> CLI or an init container) and leave this off. The advisory lock in the
+    /// runner makes concurrent startups safe regardless.
     /// </remarks>
-    public static async Task EnsureSmartQrDatabaseAsync(this IServiceProvider services)
+    public static async Task MigrateSmartQrDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {
         using var scope = services.CreateScope();
 
+        var logger = scope.ServiceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("SmartQr.Common.Persistence.DatabaseBootstrap");
+
         var settings = scope.ServiceProvider.GetRequiredService<SmartQrDbSettings>();
-        await EnsureDatabaseExistsAsync(settings.ConnectionString);
+        var databaseName = new NpgsqlConnectionStringBuilder(settings.ConnectionString).Database;
 
-        var db = scope.ServiceProvider.GetRequiredService<SmartQrDbContext>();
-        await db.Database.EnsureCreatedAsync();
-    }
+        var created = await DatabaseBootstrap.EnsureDatabaseExistsAsync(settings.ConnectionString, ct);
+        if (created)
+            logger.LogInformation("Created database {Database}.", databaseName);
+        else
+            logger.LogInformation("Database {Database} already exists.", databaseName);
 
-    /// <summary>Connects to the <c>postgres</c> maintenance database and creates the target database if it doesn't exist.</summary>
-    private static async Task EnsureDatabaseExistsAsync(string connectionString)
-    {
-        var builder = new NpgsqlConnectionStringBuilder(connectionString);
-        var databaseName = builder.Database;
-        if (string.IsNullOrWhiteSpace(databaseName))
-            return;
-
-        builder.Database = "postgres"; // maintenance DB
-
-        await using var connection = new NpgsqlConnection(builder.ConnectionString);
-        await connection.OpenAsync();
-
-        await using var check = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", connection);
-        check.Parameters.AddWithValue("name", databaseName);
-        var exists = await check.ExecuteScalarAsync() is not null;
-
-        if (!exists)
-        {
-            // CREATE DATABASE can't be parameterized; the name comes from our own config, not user input.
-            await using var create = new NpgsqlCommand($"CREATE DATABASE \"{databaseName}\"", connection);
-            await create.ExecuteNonQueryAsync();
-        }
+        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+        await runner.ApplyPendingAsync("startup", ct);
     }
 }

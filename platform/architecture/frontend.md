@@ -1,10 +1,10 @@
 # Architecture — Frontend
 
-*Last updated: 2026-06-03*
+*Last updated: 2026-06-12*
 
 ## Purpose
 
-React web app for Smart QR, built on the `@wow-two-beta/ui` component library. First screen: the **Create-Code builder** (form + live QR preview + rule builder).
+React web app for Smart QR, built on the `@wow-two-beta/ui` component library. Two surfaces in one SPA: a **public marketing site** (landing · pricing · blog) and the **guest-gated app** (codes list + Create-Code builder), split by route.
 
 ## Stack
 
@@ -28,13 +28,38 @@ React web app for Smart QR, built on the `@wow-two-beta/ui` component library. F
 
 ```
 platform/src/frontend/
-├── src/screens/        page-level screens (CreateCodeScreen)
-├── src/components/      in-project domain components (QrPreview, RuleBuilder)
-├── src/api.ts          management API client (SmartQr.Api)
-├── src/types.ts        frontend mirror of the backend contract (enums + DTOs)
-├── src/index.css       Tailwind v4 + lib styles
+├── src/App.tsx          react-router route table (marketing + /app/*)
+├── src/main.tsx         <BrowserRouter> root
+├── src/marketing/       public surface — pages + kit + blog (no API calls)
+│   ├── MarketingLayout.tsx     header + footer shell (<Outlet/>)
+│   ├── LandingPage / PricingPage / BlogIndexPage / BlogPostPage / NotFoundPage
+│   ├── components.tsx          presentational kit (Logo, Section, PricingCards, FaqList, …)
+│   ├── data.ts                 single source: pricing · features · comparison · FAQs
+│   └── blog/                   typed post registry (index.tsx) + one .tsx per post
+├── src/app/             the app surface
+│   ├── AppLayout.tsx           identity gate (getMe → guest gate / Outlet)
+│   └── routes.tsx              thin adapters injecting router nav into the screens
+├── src/screens/         page-level screens (Codes list, Create/Edit builder, Login gate)
+├── src/components/       in-project domain components (QrPreview, RuleBuilder)
+├── src/lib/             usePageMeta (title/meta/OG) · ScrollToTop
+├── src/api.ts           management API client (SmartQr.Api)
+├── src/types.ts         frontend mirror of the backend contract (enums + DTOs)
+├── src/index.css        Tailwind v4 + lib styles + violet brand @theme + .prose
 └── vite.config.ts
 ```
+
+## Routing & surfaces
+
+`react-router-dom` (v7). Two areas under one `<BrowserRouter>`; the backend's `MapFallbackToFile("index.html")` makes every deep link resolve to the client router.
+
+| Route | Element | Auth | API calls |
+|---|---|---|---|
+| `/` · `/pricing` · `/blog` · `/blog/:slug` | `MarketingLayout` → page | public | none |
+| `/app` · `/app/new` · `/app/:id/edit` | `AppLayout` → screen | guest gate | yes |
+
+- **Marketing pages are backend-independent** — they render (and stay shareable for SEO) even with the API down. SEO is client-rendered via `usePageMeta`; a prerender/SSG step (vite-ssg) is the future upgrade and would bake exactly those per-page strings.
+- **The app screens are untouched** — `app/routes.tsx` wraps each in a thin adapter that turns the screens' callback props (`onCreate`/`onEdit`/`onBack`) into `useNavigate` calls. `AppLayout` keeps the verified guest-first identity gate (`getMe` → anonymous shows `LoginScreen`, else the `<Outlet/>`).
+- **Brand**: violet primary overrides the lib's blue via an `@theme` block in `index.css`; semantic tokens (`bg-primary`, `bg-primary-soft`, …) flow through automatically.
 
 ## Components used from the lib
 

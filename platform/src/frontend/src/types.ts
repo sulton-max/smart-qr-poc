@@ -41,6 +41,17 @@ export interface CreateCodeRequest {
   }>;
 }
 
+/**
+ * Body for `PUT /api/codes/{id}` — full replace of the editable fields plus the entire rule set.
+ * Mirrors `CreateCodeRequest`; the slug, scan count, and creation time are server-preserved.
+ */
+export type UpdateCodeRequest = CreateCodeRequest;
+
+/** Body for `PATCH /api/codes/{id}/active` — toggles only `is_active`. */
+export interface SetActiveRequest {
+  isActive: boolean;
+}
+
 export interface CodeDto {
   id: string;
   slug: string;
@@ -64,4 +75,18 @@ export interface CodeDto {
 /** Backend `ApiResponse<T>.Success` envelope (camelCased). */
 export interface ApiSuccess<T> {
   data: T;
+}
+
+// Identity
+export type UserKind = "Anonymous" | "Guest" | "User";
+
+export interface UserSummary {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface Me {
+  kind: UserKind;
+  user: UserSummary | null;
 }

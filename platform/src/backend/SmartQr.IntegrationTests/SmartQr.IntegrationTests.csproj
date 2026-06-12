@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
+        <PackageReference Include="xunit" Version="2.9.2"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
+        <PackageReference Include="coverlet.collector" Version="6.0.2"/>
+        <PackageReference Include="Testcontainers" Version="4.0.0"/>
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0"/>
+        <PackageReference Include="Respawn" Version="6.2.1"/>
+        <PackageReference Include="Npgsql" Version="9.0.5"/>
+        <PackageReference Include="AwesomeAssertions" Version="9.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <!--
+      Both SmartQr.Api and SmartQr.Redirect expose a top-level `Program` in the GLOBAL namespace.
+      Referencing both assemblies makes the bare `Program` type ambiguous, so each is pulled in
+      under an extern alias (`apihost` / `redirecthost`). Tests select the host via the alias.
+    -->
+    <ItemGroup>
+        <!-- Generic web-API integration-test harness (base types, fixtures, Postgres container, web host). -->
+        <ProjectReference Include="..\SmartQr.Platform.Testing\SmartQr.Platform.Testing.csproj"/>
+        <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" Aliases="apihost"/>
+        <ProjectReference Include="..\SmartQr.Redirect\SmartQr.Redirect.csproj" Aliases="redirecthost"/>
+    </ItemGroup>
+
+</Project>

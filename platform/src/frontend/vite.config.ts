@@ -1,17 +1,21 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import mkcert from "vite-plugin-mkcert";
 import path from "node:path";
 
 // Smart QR web — Vite + React 19 + Tailwind v4, consuming @wow-two-beta/ui.
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  // mkcert → HTTPS dev server (locally-trusted cert). Keeps `Secure` auth cookies + secure-context
+  // working; convention: frontend/project-structure.md §Dev server.
+  plugins: [react(), tailwindcss(), mkcert()],
   server: {
     port: 7025,
-    // Dev: proxy API calls to the running SmartQr.Api (http endpoint, bound by both launch profiles).
+    // Proxy /api to the backend's single HTTP port (TLS is terminated upstream in prod — see
+    // backend/launch-profiles.md). changeOrigin:false preserves the dev origin end-to-end.
     proxy: {
-      "/api": { target: "http://localhost:7021", changeOrigin: true, secure: false },
-      "/health": { target: "http://localhost:7021", changeOrigin: true, secure: false },
+      "/api": { target: "http://localhost:7020", changeOrigin: false, secure: false },
+      "/health": { target: "http://localhost:7020", changeOrigin: false, secure: false },
     },
   },
   // Prod-ish: build straight into the Api's wwwroot so the backend serves the SPA.

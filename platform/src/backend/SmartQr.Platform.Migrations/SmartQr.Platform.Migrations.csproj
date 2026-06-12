@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.*" />
+        <PackageReference Include="Npgsql" Version="9.*" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
+    </ItemGroup>
+
+    <!-- DbConnectionFactory lives in Platform.Core; the migrator engine has no embedded SQL of its own. -->
+    <ItemGroup>
+        <ProjectReference Include="..\SmartQr.Platform.Core\SmartQr.Platform.Core.csproj" />
+    </ItemGroup>
+
+</Project>

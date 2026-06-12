@@ -5,9 +5,6 @@ namespace SmartQr.Api.Requests;
 /// <summary>Inbound shape for creating a code.</summary>
 public sealed record CreateCodeRequest
 {
-    /// <summary>Owning user/workspace. Optional in the POC (defaults to a demo owner).</summary>
-    public Guid? OwnerId { get; init; }
-
     /// <summary>Display name.</summary>
     public required string Name { get; init; }
 

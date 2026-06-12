@@ -15,7 +15,7 @@
 
 | File | Content |
 |---|---|
-| `smart-qr-planning.md` | Roadmap, feature log, component tracker, decisions, backlog, open questions |
+| `smart-qr-planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions, log |
 
 ## Platform — Architecture (`platform/architecture/`)
 
@@ -32,8 +32,7 @@
 
 | File | Content |
 |---|---|
-| `v1.0/v1.0.md` | v1.0 (Essential / Launch) — 7 iterations: manage codes, accounts, scan insights, paid plans, prod readiness, trust & safety, brandable codes |
-| `v2.0/v2.0.md` | v2.0 (Ecosystem migration) — 4 iterations: adopt shared backend, publish reusable parts, adopt published UI, become a first-class app |
+| `v1.0/v1.0.md` | v1.0 (Manage codes — guest-first) — 2 iterations: manage codes (owner key + edit propagation), management UI |
 
 ## Platform — Source (`platform/src/backend/`)
 
@@ -53,8 +52,12 @@
 
 | Area | What |
 |---|---|
-| `src/screens/` | Page screens (`CreateCodeScreen`) |
+| `src/App.tsx` · `src/main.tsx` | `react-router` route table + `<BrowserRouter>` root |
+| `src/marketing/` | Public surface — landing/pricing/blog pages, `components.tsx` kit, `data.ts` (pricing/features/FAQ source), `blog/` (typed post registry + per-post `.tsx`) |
+| `src/app/` | App surface — `AppLayout` (identity gate), `routes.tsx` (nav adapters for the screens) |
+| `src/screens/` | Page screens (Codes list, Create/Edit builder, Login gate) |
 | `src/components/` | In-project domain components (`QrPreview`, `RuleBuilder`) |
+| `src/lib/` | `usePageMeta` (title/meta/OG) · `ScrollToTop` |
 | `src/api.ts` · `src/types.ts` | API client + backend-contract mirror |
 
 ## External (not in this repo)

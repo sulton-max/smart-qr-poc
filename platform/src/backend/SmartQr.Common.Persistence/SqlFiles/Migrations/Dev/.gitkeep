@@ -1,0 +1,2 @@
+# In-flight migrations live here as flat *.sql files while you iterate.
+# Promote them to numbered NNN-name/{Apply,Rollback}.sql pairs with: smart-qr-migrate merge

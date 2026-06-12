@@ -13,6 +13,7 @@ namespace SmartQr.Redirect.Infrastructure.Routing;
 /// Default hot store: IMemoryCache over the DB. The redirect hits memory on the happy path; a miss reads the DB once
 /// (no-tracking) and caches for a short TTL. Production swaps this for <see cref="RedisRedirectConfigStore"/>.
 /// </summary>
+// Currently UNWIRED pending the caching backlog item — DbRedirectConfigStore is the active non-Redis default. Kept for the later re-enable.
 public sealed class CachedRedirectConfigStore(
     IServiceScopeFactory scopeFactory,
     IMemoryCache cache,

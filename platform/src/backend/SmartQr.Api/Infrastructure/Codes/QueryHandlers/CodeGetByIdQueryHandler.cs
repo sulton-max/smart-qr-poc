@@ -20,7 +20,7 @@ public sealed class CodeGetByIdQueryHandler(
     {
         try
         {
-            var code = await repository.GetByIdAsync(request.Id, ct);
+            var code = await repository.GetByIdForUserAsync(request.Id, request.UserId, ct);
 
             if (code is null)
                 return new ApplicationResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>

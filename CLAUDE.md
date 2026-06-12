@@ -37,11 +37,15 @@ Two top-level layers (mirrors Haven):
 
 | Project | Role |
 |---|---|
-| `SmartQr.Common` / `.Common.Domain` / `.Common.Persistence` | shared libs (mediator, entities, EF Core) |
+| `SmartQr.Common` / `.Common.Domain` / `.Common.Persistence` | product shared libs (settings · entities · EF Core + SQL migrations) |
+| `SmartQr.Platform.*` (`Core` · `Migrations` · `Testing`) | **SDK-bound infra** — mediator/result/config/conn-factory · migrator engine · generic E2E harness; extracts to backend-beta |
 | `SmartQr.Codes` | code generation library |
-| `SmartQr.Api` | management API (https 7020) |
-| `SmartQr.Redirect` | redirect hot path (https 7022) |
-| `SmartQr.Tests` | xUnit |
+| `SmartQr.Api` | management API (http 7020) |
+| `SmartQr.Redirect` | redirect hot path (http 7022) |
+| `SmartQr.Tests` | xUnit — pure-logic units (generation, routing) + SQLite repo |
+| `SmartQr.IntegrationTests` | E2E — both hosts over HTTP vs real Postgres (Testcontainers); needs Docker |
+
+> `SmartQr.sln` solution folders: `platform/` (the extractable `Platform.*` libs) · `services/` (Api + Redirect) · `libraries/` (product libs) · `tools/` (CLI) · `tests/`. Refs go product → platform, never reverse.
 
 ## Key Terms
 
@@ -58,7 +62,7 @@ Two top-level layers (mirrors Haven):
 
 - **Code conventions** (XML docs, file-per-type, result pattern, etc.) live in `wow-two-ws/conventions/` — follow them, never duplicate here.
 - Clean Arch mirrors Haven; the API/presentation layer (`Controllers/`, `Configurations/`) sits at each host root (the project is already `.Api` / `.Redirect`).
-- **Ports:** HTTPS even, HTTP = +1 (Api 7020/7021, Redirect 7022/7023).
+- **Ports:** http-only, one even port per service (Api 7020, Redirect 7022); TLS terminated upstream in prod.
 - **Docs:** every doc has `*Last updated: YYYY-MM-DD*`; architecture docs **point to code paths, never restate code**.
 - Timestamps + general working style per the 10x-ws root `CLAUDE.md`.
 

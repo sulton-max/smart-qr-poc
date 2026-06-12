@@ -36,7 +36,9 @@ public static partial class HostConfiguration
         builder.Services.AddSingleton<IDeviceDetector, UserAgentDeviceDetector>();
         builder.Services.AddSingleton<IGeoResolver, NoopGeoResolver>();
 
-        // Hot config store: Redis when configured, else in-memory cache over the DB.
+        // Hot config store: Redis when configured, else read route config directly from the DB per scan.
+        // Caching is deferred to a later iteration (see the caching backlog item); CachedRedirectConfigStore
+        // stays in the repo, currently unwired, ready to re-enable then.
         var settings = ConfigurationLoader.Load<RedirectSettings>(builder.Configuration);
         if (!string.IsNullOrWhiteSpace(settings.RedisConnectionString))
         {
@@ -46,7 +48,7 @@ public static partial class HostConfiguration
         }
         else
         {
-            builder.Services.AddSingleton<IRedirectConfigStore, CachedRedirectConfigStore>();
+            builder.Services.AddSingleton<IRedirectConfigStore, DbRedirectConfigStore>();
         }
 
         // Async analytics: one recorder (producer) + one hosted flusher (consumer).

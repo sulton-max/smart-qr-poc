@@ -67,22 +67,33 @@ public class SmartQrDbContext(DbContextOptions<SmartQrDbContext> options) : DbCo
         foreach (var entry in ChangeTracker.Entries())
         {
             if (entry.State == EntityState.Added)
-                SetPropertyIfExists(entry, "CreatedAt", now);
-
-            if (entry.State == EntityState.Modified)
-                SetPropertyIfExists(entry, "UpdatedAt", now);
+            {
+                SetIfDefault(entry, "CreatedAt", now);
+                SetAlways(entry, "UpdatedAt", now);
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                // Always refresh on every edit — not just the first (a once-only guard would freeze UpdatedAt).
+                SetAlways(entry, "UpdatedAt", now);
+            }
         }
     }
 
-    private static void SetPropertyIfExists(EntityEntry entry, string propertyName, DateTimeOffset value)
+    /// <summary>Stamps a timestamp only when the caller left it unset — preserves an explicitly-provided value.</summary>
+    private static void SetIfDefault(EntityEntry entry, string propertyName, DateTimeOffset value)
     {
         var property = entry.Properties.FirstOrDefault(p => p.Metadata.Name == propertyName);
 
-        if (property is null)
-            return;
+        if (property?.CurrentValue is DateTimeOffset current && current == default)
+            property.CurrentValue = value;
+    }
 
-        // Only set if the value is default (not explicitly assigned by caller)
-        if (property.CurrentValue is DateTimeOffset current && current == default)
+    /// <summary>Always sets the timestamp; no-op when the entity has no such property (e.g. rules / scan events).</summary>
+    private static void SetAlways(EntityEntry entry, string propertyName, DateTimeOffset value)
+    {
+        var property = entry.Properties.FirstOrDefault(p => p.Metadata.Name == propertyName);
+
+        if (property is not null)
             property.CurrentValue = value;
     }
 }

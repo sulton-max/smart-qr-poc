@@ -9,4 +9,7 @@ public sealed record CodeGetByIdQuery
 {
     /// <summary>Code id.</summary>
     public required Guid Id { get; init; }
+
+    /// <summary>The user the code must belong to — scopes the lookup so callers see only their own codes.</summary>
+    public required Guid UserId { get; init; }
 }

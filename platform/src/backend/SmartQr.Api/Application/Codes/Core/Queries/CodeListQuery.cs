@@ -7,6 +7,9 @@ namespace SmartQr.Api.Application.Codes.Core.Queries;
 public sealed record CodeListQuery
     : IQuery<ApplicationResult<CodeListResult.Success, CodeListResult.Failure>>
 {
-    /// <summary>Owning user/workspace.</summary>
-    public required Guid OwnerId { get; init; }
+    /// <summary>Id of the user whose codes to list.</summary>
+    public required Guid UserId { get; init; }
+
+    /// <summary>Optional case-insensitive filter — matches codes whose name or fallback URL contains the term.</summary>
+    public string? Q { get; init; }
 }

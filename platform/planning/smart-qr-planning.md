@@ -1,8 +1,44 @@
 # Smart QR — Platform Planning
 
-*Last updated: 2026-06-03*
+*Last updated: 2026-06-12*
 
-Roadmap, feature log, decisions, and backlog for the technical platform. Business roadmap → `business/business-context.md`. Strategy → `wow-two-ws/ideas/smart-qr-spec.md`.
+Durable roadmap + backlog for the technical platform — the standing plan that version docs pull from
+and return to. Business roadmap → `business/business-context.md`. Strategy →
+`wow-two-ws/ideas/smart-qr-spec.md`. Doc shape → `wow-two-ws/conventions/planning/`.
+
+## Versions
+
+Release roadmap. Per-version detail in `versions/v{X.Y}/v{X.Y}.md`. Bump: pre-MVP `+0.1` per
+capability; post-MVP minor = feature batch, major = milestone. **Timebox: ≤1 week per version.**
+Shipped + the active/next version only — future work lives in the ordered backlog.
+
+| Version | Theme | Deliverables | Status |
+|---|---|---|---|
+| v0.1 | POC — backend + frontend + runtime DB | Clean-arch backend, code generation, routing engine, redirect hot path, Create-Code builder, runtime DB; verified e2e vs Postgres; 16 tests | ✅ |
+| v1.0 | Manage codes (guest-first) | — | ⏳ |
+
+> Work hierarchy (Version → Iteration → Task), lifecycle, and numbering → `wow-two-ws/conventions/planning/`.
+
+## Decisions
+
+| Decision | Rationale |
+|---|---|
+| Guest-first (no auth in v1.0); auth added later as a claim flow | Guest creation is the funnel entry; an auth-agnostic user key now makes auth additive, not a rewrite. Fits "traffic from day 1". |
+| Identity = a **User** (guest or, later, registered); a code's `UserId` is the ownership role | "Owner" only made sense relative to codes — the principal is just a user. One vocabulary across guest + auth. |
+| Guest identity = an unguessable `user-id` cookie (HttpOnly + Secure); **no device/IP fingerprint** | Fingerprints collide (→ cross-guest code leak) and drift, and are tracking (anti-GWDNBM). Lost-cookie recovery comes later via the auth claim flow, not a footprint. |
+| `GET /identity/me` read-only (never mints); guests minted explicitly via `POST /identity/guest` | Side-effect-free identity read; no junk guests for pure browsers; no cookie before the user acts. |
+| POC-first over shared template | Validate the crowded-market wedge before shared infra. |
+| Two services (Api + Redirect) | Isolate the only thing that scales (the redirect) as a slim, stateless, horizontally-scalable process. |
+| Minimal API for Redirect, controllers for Api | Lean hot path; familiar CRUD surface for management. |
+| ImageSharp (2.1, Apache-2.0) for logo, not SkiaSharp | Fully managed, no native-asset friction, license-clean. QR core (QRCoder) needs no native deps. |
+| API-layer folders at host root (no `Api/` wrapper) | Avoids `SmartQr.Api.Api.*`; the project name already says `.Api`. |
+| ~~In-memory config store default~~ → **redirect reads Postgres directly** for v1.0; Redis swap via settings | Edits hit the next scan with **zero invalidation logic**. Cache (in-memory/Redis) deferred — `CachedRedirectConfigStore` kept but unwired; re-enable when scan volume warrants (backlog). |
+| Enums as **text** (not native PG enums) | Removes runtime-migration gotchas; easier schema evolution; consistent across Postgres + SQLite tests. |
+| ~~Runtime schema bootstrap (`EnsureCreated` on startup)~~ → **bespoke SQL migrator** | `EnsureCreated` never alters → stale-schema 500 on `user_id`. Replaced with raw-`.sql` Apply/Rollback migrator, auto-applied at startup. EF becomes a pure mapper (schema-first). |
+| Bespoke SQL migrator over EF Migrations / DbUp / Grate | Schema-first, easy squash, Apply/Rollback symmetry, normalized-checksum drift guard, host-agnostic engine reused by a CLI + (later) HTTP endpoint. Also the **proving ground** for the wow-two backend-beta SDK migrator (extract once stable). |
+| Marketing integrated into the SPA (not a separate site) + `react-router-dom` | Public landing/pricing/blog need crawlable, shareable URLs (SEO) the hand-rolled view state-machine couldn't give. One build, backend already serves SPA at root w/ fallback, same `@wow-two-beta/ui` design system → no second deploy, no brand split. App moved under `/app/*`; existing screens wrapped untouched in thin route adapters. Marketing routes make **zero API calls** (render with the backend down). |
+| Tests = **E2E** (real Postgres via Testcontainers, both hosts over HTTP) over unit / mock-heavy integration | smart-qr has ~no external APIs to mock → E2E mocks nothing and covers the real flow incl. the two-host wedge. Catches PG/serialization/auth/ownership bugs units miss. Harness mirrors the backend-beta SDK testing scaffold (extract later). |
+| SDK-bound infra split into `SmartQr.Platform.*` libs (`Core` · `Migrations` · `Testing`) + solution folders | **Sanitary separation**: the generic infra (mediator/result/config/conn-factory, migrator engine, generic E2E harness) lives in clearly-named libs referenced by product projects — so the eventual lift to backend-beta is obvious + cheap (move + rename namespaces at lift). Refs go product → platform only. |
 
 ## Component Tracker
 
@@ -10,91 +46,140 @@ Roadmap, feature log, decisions, and backlog for the technical platform. Busines
 |---|---|
 | `SmartQr.Common` (mediator, result, ApiResponse, config) | ✅ built |
 | `SmartQr.Common.Domain` (entities + enums) | ✅ built |
-| `SmartQr.Common.Persistence` (EF Core, Npgsql enum-mapped) | ✅ built (no migrations yet) |
+| `SmartQr.Common.Persistence` (EF Core, Npgsql) | ✅ built — EF mapper + SQL migrator engine in `Migrations/` |
 | `SmartQr.Codes` (QR/barcode/logo generation) | ✅ built + tested |
-| `SmartQr.Api` (management API) | ✅ built (needs DB to exercise) |
-| `SmartQr.Redirect` (hot path + async analytics) | ✅ built (in-memory store) |
-| `SmartQr.Tests` | ✅ 16 green — unit (generation, routing) + **SQLite integration** (persistence, create handler, redirect resolution) |
-| DB schema / migrations | ✅ runtime bootstrap (`EnsureSmartQrDatabaseAsync`) — creates the DB + tables on startup (enums as text). Verified create → persist → render against real Postgres. EF Migrations later when schema evolves |
+| `SmartQr.Api` (management API) | ✅ create + manage (edit / toggle / delete / search) |
+| `SmartQr.Redirect` (hot path + async analytics) | ✅ built — direct-DB config read (cache deferred; `CachedRedirectConfigStore` unwired) |
+| `SmartQr.Tests` | ✅ 20 green — pure-logic units (generation, routing) + SQLite repo/redirect |
+| `SmartQr.IntegrationTests` | ✅ 18 green — **E2E over real Postgres** (Testcontainers): identity · codes CRUD/search · ownership edges · render · two-host wedge. Needs Docker. |
+| `SmartQr.Migrations.Cli` (`smart-qr-migrate`) | ✅ built — `status·apply·rollback·verify·new·merge` (dev CLI over the engine) |
+| DB schema / migrations | ✅ bespoke SQL migrator — `001-baseline`, `migration_history`, advisory lock, FileSystem + Embedded sources |
+| User identity (guest cookie + `/identity/me` + `/identity/guest`) | ✅ `ICurrentUser`, `user-id` cookie |
+| Edit → hot-path propagation | ✅ edits land in Postgres; redirect reads DB directly per scan |
 | Geo resolver (MaxMind) | ⛔ stub (`NoopGeoResolver`) |
-| Redis config writer (API side) | ⛔ read side done, write side TODO |
-| Frontend (React) | ✅ Create-Code builder — Vite + React 19 + Tailwind v4 on `@wow-two-beta/ui`; builds + renders (no console errors). Other screens (codes list, analytics) pending |
-
-## Feature Log
-
-| Date | Feature |
-|---|---|
-| 2026-06-09 | Runtime DB bootstrap — startup `CREATE DATABASE` (maintenance conn) + `EnsureCreated` for tables. Switched enums from native PG types to **text** (dodges the enum type-cache/label gotchas). Verified end-to-end vs real Postgres: POST /api/codes → persisted → SVG/PNG render. |
-| 2026-06-03 | Frontend MVP — Create-Code builder (Vite + React 19 + Tailwind v4) consuming `@wow-two-beta/ui` via file-link. In-project domain components: `QrPreview` (qrcode.react live), `RuleBuilder` (composed from lib Select/TextInput/Button). Builds + renders verified. See `architecture/frontend.md`. |
-| 2026-06-03 | SQLite in-memory integration tests — `CodeRepository`, create-command handler, and the redirect resolution path (config store → evaluator). 16 tests green. Added a SQLite-only `DateTimeOffset` converter for test parity. |
-| 2026-06-03 | Backend scaffold: Clean Arch, code generation, routing engine, redirect hot path, async scan analytics, unit tests. |
-
-## Versions
-
-Release milestones. Per-version detail in `versions/v{X.Y}/v{X.Y}.md`. The feature roadmap below *feeds* these — milestones and feature tiers are separate axes.
-
-| Version | Theme | Status |
-|---|---|---|
-| v0.1 | POC — backend + frontend + runtime DB, verified end-to-end | ✅ |
-| **v1.0** | Essential / launch | ⏳ |
-| **v2.0** | Ecosystem migration | ⏳ |
-
-### Work hierarchy (Version → Iteration → Task)
-
-- **Version** — a release milestone (epic scale): v1.0, v2.0. **Strictly sequential.** → `versions/smart-qr-vX.Y.md`.
-- **Iteration** — a coherent batch of tasks completed as a unit. **Scope-boxed, not time-boxed** — done when its tasks are done (*not* a sprint). Named by capability ("Auth & accounts"), optionally ordered. Lives as a `### Iteration N — {name}` section in the version doc; status ⏳ planned · 🚧 active · ✅ done. Reorderable; ~one active at a time.
-- **Task** — one concrete change: a checkbox under an iteration (and a `{abbr}-t-{NNN}` row in `pln-tasks.md` if it needs cross-domain tracking).
-
-> Don't confuse **Iteration** (task grouping, structure) with **Phase** (lifecycle stage, process — below).
-
-### Lifecycle (scaled from Haven's iteration-guide)
-
-1. **Plan** — create `versions/smart-qr-vX.Y.md`; scope deliverables.
-2. **Implement** — build; log sessions + decisions inline in the version doc.
-3. **Verify** — end-to-end (build + tests + manual).
-4. **Consolidate** — move enduring decisions → `architecture/`; trim the version doc to a summary.
-5. **Close** — mark ✅ in the table above. One version at a time.
-
-**Numbering:** major = milestone (v1.0 launch · v2.0 migration); minor = feature batch (v1.1, v1.2).
-
-## Feature roadmap (feeds versions)
-
-- **MVP** — dynamic QR + editable redirect, device/time/country/language rules, custom domain, scan analytics, never-expire promise, password links.
-- **V2** — barcodes (GS1 Digital Link), content-type templates (vCard/WiFi/app-store/menu), link-in-bio, expiring/one-time links, bulk gen, **animated/GIF export**, logo/pfp knockout + frames.
-- **V3** — advanced rules (AND/OR, A/B weighting, scheduling), public API, white-label, webhooks.
-
-## Decisions
-
-| Decision | Rationale |
-|---|---|
-| POC-first over shared template | Validate crowded-market wedge before shared infra. |
-| Two services (Api + Redirect) | Isolate the only thing that scales (the redirect) as a slim, stateless, horizontally-scalable process. |
-| Minimal API for Redirect, controllers for Api | Lean hot path; familiar CRUD surface for management. |
-| ImageSharp (2.1, Apache-2.0) for logo, not SkiaSharp | Fully managed, no native-asset friction, license-clean. QR core (QRCoder) needs no native deps at all. |
-| API-layer folders at host root (no `Api/` wrapper) | Avoids `SmartQr.Api.Api.*`; project name already says `.Api`. |
-| In-memory config store default, Redis swap via settings | POC runs without Redis; production flips one setting. |
-| Enums as **text** (not native PG enums) | Removes runtime-migration gotchas (`CREATE TYPE`, label translation, NpgsqlDataSource type-cache reload); easier schema evolution; consistent across Postgres + SQLite tests. |
-| Runtime schema bootstrap (`EnsureCreated` on startup) | Zero-tooling DB + table creation, idempotent. Switch to EF Migrations when the schema evolves. |
+| Frontend — codes builder + management | ✅ create + codes list + edit (toggle / delete / search) |
+| Frontend — marketing surface (landing · pricing · blog) | ✅ built — public pages at `/`, `/pricing`, `/blog/*` on `react-router`; app moved under `/app/*`; per-page meta/OG; 4 SEO seed posts |
 
 ## Backlog
 
-Anything not in the active version (convention types: `feature` · `issue` · `check` · `idea`). Cut items land here; pull back into an iteration when it's their turn.
+Anything not in the active version — **ordered, top = next to pull**. Grouped by theme; order within.
+Type: `feature` · `issue` · `check` · `idea`. Pull items into an iteration when it's their turn;
+strike-through + ✅ when done (kept for traceability).
+
+### Accounts & ownership (next)
+
+| Item | Type | Notes |
+|---|---|---|
+| Sign up / log in | feature | accounts so codes have a durable owner |
+| Claim guest codes into an account | feature | attach the anonymous owner key's codes to the new user — additive over v1.0 |
+| Cross-device management | feature | manage your codes from any device once signed in |
+
+### Scan insights
+
+| Item | Type | Notes |
+|---|---|---|
+| Scan analytics | feature | scans over time; unique vs total; by device / country / OS; top hours |
+
+### Production readiness
+
+| Item | Type | Notes |
+|---|---|---|
+| Re-enable redirect config cache (+ invalidation) | feature | v1.0 reads Postgres directly per scan; restore IMemoryCache/Redis with edit-invalidation when scan volume warrants. `CachedRedirectConfigStore` is kept for this. |
+| Redis as prod config store | feature | flip from direct-DB; harden the write side |
+| Geo (MaxMind GeoLite2) activation | feature | turns on country routing (resolver is a Noop stub today) |
+| ~~EF Migrations~~ → bespoke SQL migrator | check | ✅ 2026-06-11 — SQL migrator + `smart-qr-migrate` CLI replaced `EnsureCreated`. Follow-up: extract engine → backend-beta SDK |
+| CDN + TLS (Cloudflare) | feature | serve redirects behind a CDN with TLS |
+| Redirect load test (viral burst) | check | gate before charging / scale |
+
+### Expiration & link primitives
+
+| Item | Type | Notes |
+|---|---|---|
+| Expiring / scan-capped / one-time links | feature | self-destruct + cap primitives |
+| Password-locked links | feature | interstitial gate |
+
+### Trust & safety
+
+| Item | Type | Notes |
+|---|---|---|
+| Malicious-link screening | feature | screen destinations |
+| Rate-limit abusive traffic | feature | throttle |
+| Report + takedown | feature | accept reports, take codes down |
+
+### Monetization & traffic
+
+| Item | Type | Notes |
+|---|---|---|
+| ~~Blog / content engine~~ | feature | ✅ 2026-06-12 — `/blog` index + 4 SEO seed posts (never-expire · smart-routing · best-practices · dynamic-vs-static), `.prose` typography. Authored as typed TSX registry; MDX/SSG + content-type long-tail pages (`/vcard`, `/wifi-qr-code`) + `sitemap.xml` are the next layer. |
+| ~~Landing + pricing pages~~ | feature | ✅ 2026-06-12 — public landing (hero · features · how-it-works · routing demo · pricing teaser · comparison · FAQ · CTA) + dedicated `/pricing` (tiers + incumbent comparison + FAQ). |
+| Paywall + plan limits + billing (Stripe) | feature | subscribe, enforce per-plan limits |
+| Never-deactivate-on-downgrade | feature | codes keep resolving when a plan lapses (core promise) |
+
+### Custom domain
+
+| Item | Type | Notes |
+|---|---|---|
+| Custom domain | feature | CNAME + per-domain TLS + host→code resolution; the $5-tier wedge (heaviest infra) |
+
+### Styling & export depth
+
+| Item | Type | Notes |
+|---|---|---|
+| Logo UI wiring | feature | compositing already built in `SmartQr.Codes`; expose it in the builder |
+| Module shapes + gradients | feature | rounded / dots, foreground gradient |
+| Frames + captions | feature | border, badge, CTA handle |
+| PDF export | feature | alongside SVG + PNG |
+
+### Code & content breadth
+
+| Item | Type | Notes |
+|---|---|---|
+| Barcodes UI | feature | Code128 / EAN / UPC / DataMatrix / PDF417 / Aztec (engine exists) |
+| Content-type templates | feature | vCard / WiFi / geo / email-SMS / calendar / app-store / menu |
+| Link-in-bio | feature | one code → mini link hub |
+| Bulk generation | feature | CSV in → ZIP out |
+| Animated / GIF export | feature | viral angle; heavy Tier-0, async/queued (spec §5c) |
+
+### Later / aspirational
+
+| Item | Type | Notes |
+|---|---|---|
+| GS1 Digital Link | idea | 2027 retail sunrise |
+| Public REST API + keys | idea | developer tier |
+| White-label / agency workspaces | idea | client workspaces, per-client domains |
+| Advanced rules (A/B weighting, AND/OR, scheduling) | idea | routing power |
+
+### Ecosystem migration (future)
+
+*Was a v2.0 doc; dissolved here per "plan only the next version".*
+
+| Item | Type | Notes |
+|---|---|---|
+| Adopt the shared backend SDK | idea | replace the hand-rolled platform layer |
+| Extract code-generation + routing into shared packages | idea | publish + consume |
+| Adopt the published UI package | idea | drop the local file-link; contribute generic parts upstream |
+| Become a first-class app | idea | products org + shared CI/CD |
+
+### Pre-launch checks
 
 | Item | Type | Notes |
 |---|---|---|
 | Validate the wedge (never-expire + cheap routing) | check | scan r/smallbusiness, r/restaurateur, IndieHackers for hostage-code complaints |
 | Name + domain decision (`Permacode`?) | check | before launch |
-| Redirect load test (viral burst) | check | gate for v1.0 prod readiness |
-| Geo (MaxMind GeoLite2) → activate country rules | feature | v1.0 prod or v1.x |
-| Barcodes UI | feature | v1.x |
-| Content-type templates (vCard / WiFi / app-store / menu) | feature | v1.x |
-| Link-in-bio | feature | v1.x |
-| Expiring / one-time links | feature | v1.x |
-| Bulk generation | feature | v1.x |
-| Animated / GIF export | feature | v1.x — see spec §5c |
-| GS1 Digital Link | feature | later (2027 retail sunrise) |
-| Public API · white-label · advanced rules (A/B, AND/OR, scheduling) | feature | later (v3.0) |
 
 ## Open Questions
 
-(From spec §13) Name/domain · launch wedge feature · single vs custom-domain-first · UZ vs global · abuse-moderation depth · edge redirect timing · self-host edition.
+(From spec §13) Name/domain · launch wedge feature · single vs custom-domain-first · UZ vs global ·
+abuse-moderation depth · edge redirect timing · self-host edition.
+
+## Log
+
+- **2026-06-12:** Platform separation — extracted SDK-bound infra into 3 libs `SmartQr.Platform.{Core,Migrations,Testing}` (mediator/result/config/conn-factory · migrator engine · generic E2E harness), **keeping namespaces** (zero `using` churn). Surfaced + fixed 2 couplings: `AddSqlMigrations(assembly)` (SQL stays embedded in the product assembly) + `DatabaseBootstrap` split; plus a CORS decouple (`CorsSettings` stays in `Common`). Organized `SmartQr.sln` into solution folders: `platform/` · `services/` · `libraries/` · `tools/` · `tests/`. Verified: build 0/0 · **20 unit + 18 E2E** still green. Convention captured at `conventions/development/backend/testing.md`.
+- **2026-06-12:** Tests → **E2E suite** (`SmartQr.IntegrationTests`). Real Postgres via Testcontainers + `WebApplicationFactory` for **both** hosts + Respawn reset; **18 scenarios** incl. the two-host wedge (create → scan → edit → re-scan new dest). Harness mirrors the backend-beta SDK testing scaffold (it's net10/unpublished → mirrored inline; later swap is mechanical). Retired the SQLite handler tests; kept routing/rendering units. Decision: E2E over mock-heavy integration (no external APIs to mock). Built via recon + build workflows (adversarial review caught an `Npgsql` downgrade NU1605). Green: **20 unit + 18 E2E**. Needs Docker — see `SmartQr.IntegrationTests/README.md`.
+- **2026-06-12:** Marketing surface — public **landing**, **pricing** page, and **blog** (index + 4 SEO seed posts) added to the SPA on `react-router-dom`; the existing guest app moved under `/app/*` (screens untouched — wrapped in thin route adapters + an identity-gated `AppLayout`). Violet brand override, per-page `<title>`/meta/OG tags, `.prose` blog typography, mobile-responsive header. Marketing pages make **no API calls** (render with the backend down). Single-source `marketing/data.ts` feeds pricing/features/comparison/FAQ across landing + pricing. Verified: typecheck clean · vite build green (1655 modules → `wwwroot`) · browser preview of landing / pricing / blog / post / `/app` gate + mobile, **0 console errors**. New dep: `react-router-dom@7`.
+- **2026-06-11:** v1.0 manage-codes — backend edit/toggle/delete/search (`PUT /api/codes/{id}` · `PATCH /{id}/active` · `DELETE /{id}` · `GET ?q=`, owner-scoped CQRS + repo), redirect now reads Postgres **directly** per scan (cache deferred → backlog), frontend codes-list + edit-in-builder + nav. Built via a 3-agent workflow (backend · redirect · frontend), each adversarially reviewed; fixed `UpdatedAt` re-stamp (fired once) + the `@wow-two-beta/ui` AlertDialog API. Verified: backend 0/0 · **30 tests** · frontend build clean. Pending live test.
+- **2026-06-11:** Persistence — replaced startup `EnsureCreated` (which never alters → stale-schema 500 on `user_id`) with a **bespoke SQL migrator**. Engine in `SmartQr.Common.Persistence/Migrations/` (FileSystem + Embedded sources, `NNN-name` Apply/Rollback, normalized-SHA-256 `migration_history`, `pg_advisory_lock`, per-file txn, `-- @no-transaction`) + `001-baseline` + `smart-qr-migrate` CLI (`status·apply·rollback·verify·new·merge`). Verified: build 0/0 · 17 tests · CLI apply/rollback/re-apply · Api on a fresh DB embedded-migrates at startup → `POST /api/codes` **200** (was 500). Design + per-iteration deltas live in backend-beta SDK `src/Data/Migrations/Sql/README.md`. Next: extract engine to the SDK (gated on the `IDbConnectionFactory` → BCL-only `Data.Abstractions` split).
+- **2026-06-10:** Identity foundation — renamed owner→**user** (`ICurrentUser`, `CodeEntity.UserId`, `user-id` cookie). Added `GET /api/identity/me` (read-only, 3-case: anonymous/guest/user) + `POST /api/identity/guest` (idempotent mint). Management endpoints 401 when anonymous. Frontend: temp login gate (dummy inputs + "Continue as guest") routes via `/me`. Backend 0/0, 17 tests green; frontend builds. (Backend + frontend split across two agents.)
+- **2026-06-10:** Adopted weekly-timebox + plan-only-next-version conventions. Re-scoped v1.0 from 7 iterations → **Manage codes (guest-first)**, 2 iterations; accounts, analytics, paid plans, prod readiness, trust & safety, custom domain, styling → ordered backlog. Decided guest-first (auth later as a claim flow). Dissolved the v2.0 doc → "Ecosystem migration (future)" backlog group.
+- **2026-06-09:** Runtime DB bootstrap — startup `CREATE DATABASE` + `EnsureCreated`; enums switched native PG → text. Verified e2e vs Postgres (POST /api/codes → persisted → SVG/PNG).
+- **2026-06-03:** Frontend MVP — Create-Code builder (Vite + React 19 + Tailwind v4) on `@wow-two-beta/ui`; `QrPreview`, `RuleBuilder`. SQLite integration tests; 16 green. Backend scaffold (clean arch, generation, routing, redirect, async analytics).
