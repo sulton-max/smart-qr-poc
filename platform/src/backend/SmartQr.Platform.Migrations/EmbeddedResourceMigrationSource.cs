@@ -2,13 +2,12 @@ using System.Reflection;
 
 namespace SmartQr.Common.Persistence.Migrations;
 
-/// <summary>
-/// Reads migrations embedded as assembly resources (logical name <c>Migrations/NNN-name/Apply.sql</c>).
-/// Used at runtime so the schema ships inside the binary — no filesystem dependency at deploy.
-/// </summary>
+/// <summary>Provides migrations embedded as assembly resources (logical name <c>Migrations/NNN-name/Apply.sql</c>).</summary>
+/// <remarks>Use at runtime so the schema ships inside the binary — no filesystem dependency at deploy.</remarks>
 public sealed class EmbeddedResourceMigrationSource(Assembly assembly, string folderPrefix = "Migrations/") : IMigrationSource
 {
     /// <inheritdoc />
+    /// <exception cref="InvalidOperationException">A migration is missing its embedded Rollback resource, or a resource stream cannot be opened.</exception>
     public IReadOnlyList<RawMigration> Read()
     {
         var apply = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -29,16 +28,28 @@ public sealed class EmbeddedResourceMigrationSource(Assembly assembly, string fo
             var folder = relative[..slash];
             var file = relative[(slash + 1)..];
 
-            if (file.Equals("Apply.sql", StringComparison.OrdinalIgnoreCase))
+            // Bucket each resource by folder into apply / rollback.
+            if (file.Equals(MigrationConventions.ApplyFileName, StringComparison.OrdinalIgnoreCase))
                 apply[folder] = ReadResource(resourceName);
-            else if (file.Equals("Rollback.sql", StringComparison.OrdinalIgnoreCase))
+            else if (file.Equals(MigrationConventions.RollbackFileName, StringComparison.OrdinalIgnoreCase))
                 rollback[folder] = ReadResource(resourceName);
         }
 
         return apply
-            .Select(kv => new RawMigration(kv.Key, kv.Value, rollback.GetValueOrDefault(kv.Key)))
+            .Select(kv => new RawMigration
+            {
+                Name = kv.Key,
+                ApplySql = kv.Value,
+                RollbackSql = GetRollbackOrThrow(rollback, kv.Key),
+            })
             .ToList();
     }
+
+    private static string GetRollbackOrThrow(IReadOnlyDictionary<string, string> rollback, string folder) =>
+        rollback.TryGetValue(folder, out var sql)
+            ? sql
+            : throw new InvalidOperationException(
+                $"Migration '{folder}' is missing {MigrationConventions.RollbackFileName} — every migration must ship a rollback.");
 
     private string ReadResource(string name)
     {

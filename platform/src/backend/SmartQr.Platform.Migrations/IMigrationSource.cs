@@ -1,11 +1,10 @@
 namespace SmartQr.Common.Persistence.Migrations;
 
-/// <summary>
-/// A provider of migration SQL. The engine is source-agnostic: the CLI + dev use a filesystem source
-/// (editable, no rebuild); the runtime uses an embedded-resource source (self-contained deploy).
-/// </summary>
+/// <summary>Defines the contract for reading raw migration SQL from a backing store.</summary>
+/// <remarks>Use a filesystem source for the CLI and dev; use an embedded-resource source for self-contained runtime deploys.</remarks>
 public interface IMigrationSource
 {
-    /// <summary>Reads every numbered migration (folders matching <c>NNN-name</c>) with its Apply/Rollback SQL.</summary>
+    /// <summary>Reads every numbered migration (folders matching <c>NNN-name</c>) with its Apply and Rollback SQL.</summary>
+    /// <exception cref="InvalidOperationException">A migration is missing its Rollback script.</exception>
     IReadOnlyList<RawMigration> Read();
 }

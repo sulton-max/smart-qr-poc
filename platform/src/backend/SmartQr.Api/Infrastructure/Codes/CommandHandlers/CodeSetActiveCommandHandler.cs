@@ -4,7 +4,9 @@ using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Common.Mediator;
+using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Infrastructure.Codes.CommandHandlers;
 
@@ -13,9 +15,10 @@ public sealed class CodeSetActiveCommandHandler(
     ICodeRepository repository,
     ApiSettings settings,
     ILogger<CodeSetActiveCommandHandler> logger)
-    : ICommandHandler<CodeSetActiveCommand, ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>>
+    : ICommandHandler<CodeSetActiveCommand, AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>>
 {
-    public async Task<ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>> Handle(
+    /// <inheritdoc />
+    public async ValueTask<AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>> HandleAsync(
         CodeSetActiveCommand request, CancellationToken ct)
     {
         try
@@ -23,17 +26,17 @@ public sealed class CodeSetActiveCommandHandler(
             var code = await repository.SetActiveAsync(request.Id, request.UserId, request.IsActive, ct);
 
             if (code is null)
-                return new ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
-                    .Failure(new CodeSetActiveResult.Failure("Code not found", NotFound: true));
+                return new AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
+                    .Failure(new CodeSetActiveResult.Failure("Code not found", FailureCategory.NotFound));
 
-            return new ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
+            return new AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
                 .Success(new CodeSetActiveResult.Success(code.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeSetActive failed for {CodeId} user {UserId}", request.Id, request.UserId);
-            return new ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
-                .Failure(new CodeSetActiveResult.Failure(ex.Message));
+            return new AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
+                .Failure(new CodeSetActiveResult.Failure(ex.Message, FailureCategory.Unexpected));
         }
     }
 }

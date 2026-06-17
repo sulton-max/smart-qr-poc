@@ -37,9 +37,19 @@ export function AppLayout() {
           <Link to="/" aria-label="Smart QR home">
             <Logo />
           </Link>
-          <Link to="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            ← Back to site
-          </Link>
+          <nav className="flex items-center gap-5 text-sm">
+            {status === "ready" && (
+              <Link
+                to="/app/billing"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Billing
+              </Link>
+            )}
+            <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
+              ← Back to site
+            </Link>
+          </nav>
         </div>
       </header>
 

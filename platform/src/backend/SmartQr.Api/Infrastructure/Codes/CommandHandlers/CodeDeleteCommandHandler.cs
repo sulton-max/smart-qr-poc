@@ -2,7 +2,9 @@ using Microsoft.Extensions.Logging;
 using SmartQr.Api.Application.Codes.Core.Commands;
 using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
-using SmartQr.Common.Mediator;
+using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Infrastructure.Codes.CommandHandlers;
 
@@ -10,9 +12,10 @@ namespace SmartQr.Api.Infrastructure.Codes.CommandHandlers;
 public sealed class CodeDeleteCommandHandler(
     ICodeRepository repository,
     ILogger<CodeDeleteCommandHandler> logger)
-    : ICommandHandler<CodeDeleteCommand, ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>>
+    : ICommandHandler<CodeDeleteCommand, AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>>
 {
-    public async Task<ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>> Handle(
+    /// <inheritdoc />
+    public async ValueTask<AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>> HandleAsync(
         CodeDeleteCommand request, CancellationToken ct)
     {
         try
@@ -20,17 +23,17 @@ public sealed class CodeDeleteCommandHandler(
             var deleted = await repository.DeleteAsync(request.Id, request.UserId, ct);
 
             if (!deleted)
-                return new ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>
-                    .Failure(new CodeDeleteResult.Failure("Code not found", NotFound: true));
+                return new AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>
+                    .Failure(new CodeDeleteResult.Failure("Code not found", FailureCategory.NotFound));
 
-            return new ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>
+            return new AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>
                 .Success(new CodeDeleteResult.Success());
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeDelete failed for {CodeId} user {UserId}", request.Id, request.UserId);
-            return new ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>
-                .Failure(new CodeDeleteResult.Failure(ex.Message));
+            return new AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>
+                .Failure(new CodeDeleteResult.Failure(ex.Message, FailureCategory.Unexpected));
         }
     }
 }

@@ -182,8 +182,8 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
           <FormField label="Code type">
             <Select<BarcodeFormat>
-              selected={symbology}
-              onChange={(opt) => opt && setSymbology(opt.itemKey)}
+              value={symbology}
+              onValueChange={(opt) => opt && setSymbology(opt.itemKey)}
             >
               <Select.Trigger>
                 <Select.Value />
@@ -198,10 +198,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Foreground">
-              <ColorField value={foreground} onChange={(hex) => setForeground(hex ?? "#000000")} />
+              <ColorField value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
             </FormField>
             <FormField label="Background">
-              <ColorField value={background} onChange={(hex) => setBackground(hex ?? "#ffffff")} />
+              <ColorField value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
             </FormField>
           </div>
 

@@ -1,4 +1,5 @@
-using SmartQr.Common.Mediator;
+using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Application.Codes.Core.Models;
 
@@ -10,6 +11,6 @@ public abstract record CodeGetByIdResult
     /// <summary>Found.</summary>
     public sealed record Success(CodeDto Code) : CodeGetByIdResult, ISuccessResult;
 
-    /// <summary>Not found or errored. <paramref name="NotFound"/> distinguishes 404 from 500.</summary>
-    public sealed record Failure(string ErrorMessage, bool NotFound = false) : CodeGetByIdResult, IFailureResult;
+    /// <summary>Not found or errored — <see cref="ISmartQrFailure.Category"/> maps the status (NotFound → 404).</summary>
+    public sealed record Failure(string ErrorMessage, FailureCategory Category) : CodeGetByIdResult, ISmartQrFailure;
 }

@@ -1,11 +1,12 @@
 using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Common.Mediator;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Application.Codes.Core.Queries;
 
 /// <summary>Lists all codes owned by a user/workspace, newest first.</summary>
 public sealed record CodeListQuery
-    : IQuery<ApplicationResult<CodeListResult.Success, CodeListResult.Failure>>
+    : IQuery<AppResult<CodeListResult.Success, CodeListResult.Failure>>
 {
     /// <summary>Id of the user whose codes to list.</summary>
     public required Guid UserId { get; init; }

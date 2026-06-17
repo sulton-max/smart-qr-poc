@@ -28,4 +28,7 @@ public interface ICodeRepository
 
     /// <summary>Returns whether a slug is already taken.</summary>
     Task<bool> SlugExistsAsync(string slug, CancellationToken ct);
+
+    /// <summary>Counts how many codes a user currently owns — drives the per-plan create-time cap.</summary>
+    Task<int> CountByUserAsync(Guid userId, CancellationToken ct);
 }

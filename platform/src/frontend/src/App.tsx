@@ -7,7 +7,7 @@ import { BlogIndexPage } from "./marketing/BlogIndexPage";
 import { BlogPostPage } from "./marketing/BlogPostPage";
 import { NotFoundPage } from "./marketing/NotFoundPage";
 import { AppLayout } from "./app/AppLayout";
-import { CodesListRoute, CreateCodeRoute, EditCodeRoute } from "./app/routes";
+import { BillingRoute, CodesListRoute, CreateCodeRoute, EditCodeRoute } from "./app/routes";
 
 /**
  * Top-level router. Two areas:
@@ -25,6 +25,7 @@ export function App() {
         <Route path="/app" element={<AppLayout />}>
           <Route index element={<CodesListRoute />} />
           <Route path="new" element={<CreateCodeRoute />} />
+          <Route path="billing" element={<BillingRoute />} />
           <Route path=":id/edit" element={<EditCodeRoute />} />
         </Route>
 

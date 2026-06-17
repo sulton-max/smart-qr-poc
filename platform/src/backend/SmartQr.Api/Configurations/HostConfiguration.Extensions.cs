@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
+using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
+using SmartQr.Api.Infrastructure.Billing.Services;
 using SmartQr.Api.Infrastructure.Codes.Services;
 using SmartQr.Api.Infrastructure.Identity.Services;
 using SmartQr.Api.Persistence.Repositories;
@@ -8,9 +10,10 @@ using SmartQr.Api.Settings;
 using SmartQr.Codes;
 using SmartQr.Common.Configuration;
 using SmartQr.Common.Extensions;
-using SmartQr.Common.Mediator;
 using SmartQr.Common.Persistence.Extensions;
 using SmartQr.Common.Settings;
+using WoW.Two.Sdk.Backend.Beta.Mediator;
+using BillingSettings = SmartQr.Api.Settings.Billing;
 
 namespace SmartQr.Api.Configurations;
 
@@ -21,6 +24,7 @@ public static partial class HostConfiguration
     {
         builder.Services.AddSingleton(ConfigurationLoader.Load<SmartQrDbSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
+        builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration));
         return builder;
     }
 
@@ -42,7 +46,7 @@ public static partial class HostConfiguration
     /// <summary>Registers the mediator (handler scanning) + application services.</summary>
     private static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSmartQrMediator(typeof(HostConfiguration).Assembly);
+        builder.Services.AddMediator(typeof(HostConfiguration).Assembly);
         builder.Services.AddScoped<ICodeRepository, CodeRepository>();
         builder.Services.AddSingleton<ISlugGenerator, SlugGenerator>();
         return builder;
@@ -54,6 +58,14 @@ public static partial class HostConfiguration
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ICurrentUser, CookieCurrentUser>();
         builder.Services.AddScoped<IGuestSession, CookieGuestSession>();
+        return builder;
+    }
+
+    /// <summary>Registers the billing seam — subscription repository + swappable Stripe gateway.</summary>
+    private static WebApplicationBuilder AddBilling(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        builder.Services.AddScoped<IBillingGateway, StripeBillingGateway>();
         return builder;
     }
 

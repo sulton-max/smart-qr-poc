@@ -24,6 +24,7 @@
 | `code-generation.md` | QR/barcode → SVG/PNG rendering, vector-first, logo + animation |
 | `routing-engine.md` | Rule model, evaluation order, conditions, never-expire gating |
 | `redirect-and-scaling.md` | Redirect hot path, config store (cache/Redis), async analytics, caching philosophy |
+| `billing.md` | Stripe billing (hosted Checkout + Portal + webhook + `/me`), `UserId`-keyed subscription, `002-billing` migration, `PlanLimits` create-time 402 gate, config, tests, frontend wiring |
 | `frontend.md` | React+TS+Tailwind4 frontend — beta-UI consumption pattern, missing-component workflow, Create-Code builder |
 
 ## Platform — Versions (`platform/versions/`)
@@ -54,8 +55,8 @@
 |---|---|
 | `src/App.tsx` · `src/main.tsx` | `react-router` route table + `<BrowserRouter>` root |
 | `src/marketing/` | Public surface — landing/pricing/blog pages, `components.tsx` kit, `data.ts` (pricing/features/FAQ source), `blog/` (typed post registry + per-post `.tsx`) |
-| `src/app/` | App surface — `AppLayout` (identity gate), `routes.tsx` (nav adapters for the screens) |
-| `src/screens/` | Page screens (Codes list, Create/Edit builder, Login gate) |
+| `src/app/` | App surface — `AppLayout` (identity gate + header nav incl. Billing), `routes.tsx` (nav adapters: codes, builder, `BillingRoute`) |
+| `src/screens/` | Page screens (Codes list, Create/Edit builder, Login gate, `BillingScreen`) |
 | `src/components/` | In-project domain components (`QrPreview`, `RuleBuilder`) |
 | `src/lib/` | `usePageMeta` (title/meta/OG) · `ScrollToTop` |
 | `src/api.ts` · `src/types.ts` | API client + backend-contract mirror |

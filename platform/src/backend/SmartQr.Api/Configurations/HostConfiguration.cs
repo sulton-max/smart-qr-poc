@@ -16,6 +16,7 @@ public static partial class HostConfiguration
             .AddCodeServices()
             .AddApplicationServices()
             .AddIdentity()
+            .AddBilling()
             .AddCustomCors()
             .AddControllers();
 

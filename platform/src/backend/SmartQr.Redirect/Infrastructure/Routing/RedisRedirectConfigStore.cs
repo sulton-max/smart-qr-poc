@@ -21,6 +21,6 @@ public sealed class RedisRedirectConfigStore(IConnectionMultiplexer redis) : IRe
 
         return value.IsNullOrEmpty
             ? null
-            : JsonSerializer.Deserialize<CodeRouteConfig>(value!, Json);
+            : JsonSerializer.Deserialize<CodeRouteConfig>((string)value!, Json);
     }
 }

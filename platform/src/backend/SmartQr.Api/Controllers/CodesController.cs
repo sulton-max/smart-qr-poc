@@ -6,22 +6,26 @@ using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Api.Requests;
 using SmartQr.Common.Domain.Codes.Enums;
-using SmartQr.Common.Mediator;
 using SmartQr.Common.Models;
+using WoW.Two.Sdk.Backend.Beta.Mediator;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Controllers;
 
-/// <summary>Management API for dynamic codes — create, read, list, and render images. Every action is scoped to the calling user.</summary>
+/// <summary>Manages codes.</summary>
 [ApiController]
 [Route("api/codes")]
-public class CodesController(
-    IMediator mediator,
+public sealed class CodesController(
+    ISender sender,
     ICodeRepository repository,
     ICodeImageService imageService,
     ICurrentUser currentUser) : ControllerBase
 {
-    /// <summary>Creates a dynamic code with an optional ordered rule set, owned by the calling user.</summary>
+    /// <summary>Creates a code.</summary>
     [HttpPost]
+    [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
     public async Task<IActionResult> Create([FromBody] CreateCodeRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
@@ -45,52 +49,52 @@ public class CodesController(
                 .ToList(),
         };
 
-        var result = await mediator.SendAsync(command, ct);
+        var result = await sender.SendAsync(command, ct);
 
-        return result is ApplicationResult<CodeCreateResult.Success, CodeCreateResult.Failure>.Success success
-            ? Ok(ApiResponse<CodeDto>.Ok(success.Data.Code))
-            : Problem(
-                detail: (result as ApplicationResult<CodeCreateResult.Success, CodeCreateResult.Failure>.Failure)?.Error.ErrorMessage,
-                statusCode: StatusCodes.Status500InternalServerError);
+        return result.Match<CodeCreateResult.Success, CodeCreateResult.Failure, IActionResult>(
+            ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
+            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Returns one of the caller's codes with its rules (401 if anonymous, 404 if not theirs).</summary>
+    /// <summary>Gets a code by id.</summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await mediator.SendAsync(new CodeGetByIdQuery { Id = id, UserId = userId }, ct);
+        var result = await sender.SendAsync(new CodeGetByIdQuery { Id = id, UserId = userId }, ct);
 
-        if (result is ApplicationResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>.Success success)
-            return Ok(ApiResponse<CodeDto>.Ok(success.Data.Code));
-
-        var failure = (result as ApplicationResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>.Failure)?.Error;
-        return failure?.NotFound == true
-            ? NotFound()
-            : Problem(detail: failure?.ErrorMessage, statusCode: StatusCodes.Status500InternalServerError);
+        return result.Match<CodeGetByIdResult.Success, CodeGetByIdResult.Failure, IActionResult>(
+            ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
+            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Lists the caller's codes, newest first (401 if anonymous). Optional <c>?q=</c> filters case-insensitively on name or fallback URL.</summary>
+    /// <summary>Gets all of the caller's codes. Optional <c>?q=</c> filters case-insensitively on name or fallback URL.</summary>
     [HttpGet]
-    public async Task<IActionResult> List(CancellationToken ct, [FromQuery] string? q = null)
+    [ProducesResponseType<ApiResponse<IReadOnlyList<CodeDto>>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Get(CancellationToken ct, [FromQuery] string? q = null)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await mediator.SendAsync(new CodeListQuery { UserId = userId, Q = q }, ct);
+        var result = await sender.SendAsync(new CodeListQuery { UserId = userId, Q = q }, ct);
 
-        return result is ApplicationResult<CodeListResult.Success, CodeListResult.Failure>.Success success
-            ? Ok(ApiResponse<IReadOnlyList<CodeDto>>.Ok(success.Data.Codes))
-            : Problem(
-                detail: (result as ApplicationResult<CodeListResult.Success, CodeListResult.Failure>.Failure)?.Error.ErrorMessage,
-                statusCode: StatusCodes.Status500InternalServerError);
+        return result.Match<CodeListResult.Success, CodeListResult.Failure, IActionResult>(
+            ok => Ok(ApiResponse<IReadOnlyList<CodeDto>>.Ok(ok.Data.Codes)),
+            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Updates one of the caller's codes — replaces editable fields and the whole rule set, keeping the immutable slug (401 if anonymous, 404 if not theirs).</summary>
+    /// <summary>Updates a code by id — replaces editable fields and the whole rule set, keeping the immutable slug.</summary>
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCodeRequest request, CancellationToken ct)
+    [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateById(Guid id, [FromBody] UpdateCodeRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
@@ -114,58 +118,55 @@ public class CodesController(
                 .ToList(),
         };
 
-        var result = await mediator.SendAsync(command, ct);
+        var result = await sender.SendAsync(command, ct);
 
-        if (result is ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>.Success success)
-            return Ok(ApiResponse<CodeDto>.Ok(success.Data.Code));
-
-        var failure = (result as ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>.Failure)?.Error;
-        return failure?.NotFound == true
-            ? NotFound()
-            : Problem(detail: failure?.ErrorMessage, statusCode: StatusCodes.Status500InternalServerError);
+        return result.Match<CodeUpdateResult.Success, CodeUpdateResult.Failure, IActionResult>(
+            ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
+            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Enables or disables one of the caller's codes (401 if anonymous, 404 if not theirs).</summary>
+    /// <summary>Sets a code's active state by id — enables or disables it.</summary>
     [HttpPatch("{id:guid}/active")]
-    public async Task<IActionResult> SetActive(Guid id, [FromBody] SetActiveRequest request, CancellationToken ct)
+    [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SetActiveById(Guid id, [FromBody] SetActiveRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
         var command = new CodeSetActiveCommand { Id = id, UserId = userId, IsActive = request.IsActive };
 
-        var result = await mediator.SendAsync(command, ct);
+        var result = await sender.SendAsync(command, ct);
 
-        if (result is ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>.Success success)
-            return Ok(ApiResponse<CodeDto>.Ok(success.Data.Code));
-
-        var failure = (result as ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>.Failure)?.Error;
-        return failure?.NotFound == true
-            ? NotFound()
-            : Problem(detail: failure?.ErrorMessage, statusCode: StatusCodes.Status500InternalServerError);
+        return result.Match<CodeSetActiveResult.Success, CodeSetActiveResult.Failure, IActionResult>(
+            ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
+            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Hard-deletes one of the caller's codes, its rules cascading (401 if anonymous, 404 if not theirs).</summary>
+    /// <summary>Deletes a code by id, its rules cascading.</summary>
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteById(Guid id, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await mediator.SendAsync(new CodeDeleteCommand { Id = id, UserId = userId }, ct);
+        var result = await sender.SendAsync(new CodeDeleteCommand { Id = id, UserId = userId }, ct);
 
-        if (result is ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>.Success)
-            return NoContent();
-
-        var failure = (result as ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>.Failure)?.Error;
-        return failure?.NotFound == true
-            ? NotFound()
-            : Problem(detail: failure?.ErrorMessage, statusCode: StatusCodes.Status500InternalServerError);
+        return result.Match<CodeDeleteResult.Success, CodeDeleteResult.Failure, IActionResult>(
+            NoContent,
+            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Renders the caller's code image (401 if anonymous, 404 if not theirs). <c>?format=svg|png</c>.</summary>
+    /// <summary>Gets a code's rendered image by id. <c>?format=svg|png</c>.</summary>
     [HttpGet("{id:guid}/image")]
-    public async Task<IActionResult> GetImage(Guid id, CancellationToken ct, [FromQuery] string format = "svg")
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetImageById(Guid id, CancellationToken ct, [FromQuery] string format = "svg")
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();

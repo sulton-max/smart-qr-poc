@@ -6,18 +6,13 @@ using SmartQr.Common.Settings;
 
 namespace SmartQr.Common.Persistence.Extensions;
 
-/// <summary>Runtime database bootstrap — ensure the database exists, then apply pending SQL migrations.</summary>
+/// <summary>Provides the runtime database bootstrap — ensure the database exists, then apply pending SQL migrations.</summary>
 public static class DatabaseBootstrapExtensions
 {
-    /// <summary>
-    /// POC startup bootstrap: create the database if missing, then apply all pending migrations (auto-apply).
-    /// The SQL migrator owns the schema — EF no longer calls <c>EnsureCreated</c>. Idempotent.
-    /// </summary>
-    /// <remarks>
-    /// Auto-apply-on-startup is a dev/POC convenience. For real deploys, run migrations as a separate step
-    /// (the <c>smart-qr-migrate</c> CLI or an init container) and leave this off. The advisory lock in the
-    /// runner makes concurrent startups safe regardless.
-    /// </remarks>
+    /// <summary>Creates the database if missing, then applies all pending migrations on startup (idempotent).</summary>
+    /// <remarks>For real deploys, run migrations as a separate step and leave this off; the runner's advisory lock keeps concurrent startups safe.</remarks>
+    /// <param name="services">The application service provider.</param>
+    /// <param name="ct">Token to cancel the operation.</param>
     public static async Task MigrateSmartQrDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {
         using var scope = services.CreateScope();
@@ -29,13 +24,15 @@ public static class DatabaseBootstrapExtensions
         var settings = scope.ServiceProvider.GetRequiredService<SmartQrDbSettings>();
         var databaseName = new NpgsqlConnectionStringBuilder(settings.ConnectionString).Database;
 
-        var created = await DatabaseBootstrap.EnsureDatabaseExistsAsync(settings.ConnectionString, ct);
+        // Create the target database via the maintenance DB before any migration runs.
+        var dialect = scope.ServiceProvider.GetRequiredService<IMigrationDialect>();
+        var created = await dialect.EnsureDatabaseExistsAsync(settings.ConnectionString, ct);
         if (created)
             logger.LogInformation("Created database {Database}.", databaseName);
         else
             logger.LogInformation("Database {Database} already exists.", databaseName);
 
-        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunnerService>();
         await runner.ApplyPendingAsync("startup", ct);
     }
 }

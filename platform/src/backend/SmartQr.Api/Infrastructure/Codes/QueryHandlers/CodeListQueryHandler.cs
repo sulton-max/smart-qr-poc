@@ -4,7 +4,9 @@ using SmartQr.Api.Application.Codes.Core.Queries;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Common.Mediator;
+using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Infrastructure.Codes.QueryHandlers;
 
@@ -13,9 +15,10 @@ public sealed class CodeListQueryHandler(
     ICodeRepository repository,
     ApiSettings settings,
     ILogger<CodeListQueryHandler> logger)
-    : IQueryHandler<CodeListQuery, ApplicationResult<CodeListResult.Success, CodeListResult.Failure>>
+    : IQueryHandler<CodeListQuery, AppResult<CodeListResult.Success, CodeListResult.Failure>>
 {
-    public async Task<ApplicationResult<CodeListResult.Success, CodeListResult.Failure>> Handle(
+    /// <inheritdoc />
+    public async ValueTask<AppResult<CodeListResult.Success, CodeListResult.Failure>> HandleAsync(
         CodeListQuery request, CancellationToken ct)
     {
         try
@@ -23,14 +26,14 @@ public sealed class CodeListQueryHandler(
             var codes = await repository.ListByUserAsync(request.UserId, request.Q, ct);
             var dtos = codes.Select(c => c.ToDto(settings.RedirectBaseUrl)).ToList();
 
-            return new ApplicationResult<CodeListResult.Success, CodeListResult.Failure>
+            return new AppResult<CodeListResult.Success, CodeListResult.Failure>
                 .Success(new CodeListResult.Success(dtos));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeList failed for user {UserId}", request.UserId);
-            return new ApplicationResult<CodeListResult.Success, CodeListResult.Failure>
-                .Failure(new CodeListResult.Failure(ex.Message));
+            return new AppResult<CodeListResult.Success, CodeListResult.Failure>
+                .Failure(new CodeListResult.Failure(ex.Message, FailureCategory.Unexpected));
         }
     }
 }

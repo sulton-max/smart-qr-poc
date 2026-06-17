@@ -1,9 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- ISuccessResult / IFailureResult — the result-pattern markers the per-operation result containers
+             and ISmartQrFailure implement. Flows transitively to Api + Application. -->
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.23-beta" />
+    </ItemGroup>
 
 </Project>

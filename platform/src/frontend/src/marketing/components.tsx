@@ -96,7 +96,11 @@ export function StepCard({ step, index }: { step: Step; index: number }) {
   );
 }
 
-/** The four pricing tiers as a card grid. Every CTA drops the visitor into the guest builder. */
+/**
+ * The four pricing tiers as a card grid. Free drops the visitor into the guest builder (`/app/new`);
+ * every paid tier routes to the in-app billing screen (`/app/billing`), where the app gate resolves
+ * identity and the screen starts Stripe Checkout. Marketing stays backend-independent — no API calls.
+ */
 export function PricingCards({ tiers = PRICING }: { tiers?: PricingTier[] }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -107,7 +111,13 @@ export function PricingCards({ tiers = PRICING }: { tiers?: PricingTier[] }) {
   );
 }
 
+/** Free → the guest builder; any paid plan → the in-app billing screen which kicks off Checkout. */
+function tierCtaHref(tier: PricingTier): string {
+  return tier.id === "free" ? "/app/new" : "/app/billing";
+}
+
 function PricingCard({ tier }: { tier: PricingTier }) {
+  const href = tierCtaHref(tier);
   return (
     <div
       className={`relative flex flex-col rounded-2xl border bg-card p-6 ${
@@ -135,11 +145,11 @@ function PricingCard({ tier }: { tier: PricingTier }) {
       </ul>
       {tier.featured ? (
         <Button asChild className="mt-6" tone="primary" isFullWidth>
-          <Link to="/app/new">{tier.cta}</Link>
+          <Link to={href}>{tier.cta}</Link>
         </Button>
       ) : (
         <Button asChild className="mt-6" tone="neutral" variant="outline" isFullWidth>
-          <Link to="/app/new">{tier.cta}</Link>
+          <Link to={href}>{tier.cta}</Link>
         </Button>
       )}
     </div>

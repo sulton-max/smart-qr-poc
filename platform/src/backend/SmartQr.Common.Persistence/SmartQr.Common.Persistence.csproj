@@ -1,17 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.*" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.*" />
-        <PackageReference Include="EFCore.NamingConventions" Version="9.*" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
+        <PackageReference Include="EFCore.NamingConventions" Version="10.*" />
         <PackageReference Include="Dapper" Version="2.*" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.*" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.*" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,13 +22,14 @@
     </ItemGroup>
 
     <!--
-      SQL migrations ship two ways from one set of files:
+      SQL migrations live under Migrations/ and ship two ways from one set of files:
         • EmbeddedResource → runtime hosts read them from the binary (logical name "Migrations/NNN-name/Apply.sql").
         • on disk          → the CLI + dev edit/apply them live via FileSystemMigrationSource.
     -->
     <ItemGroup>
-        <EmbeddedResource Include="SqlFiles\**\*.sql">
-            <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+        <!-- Exclude Dev/ drafts: unpromoted dev SQL must never ship in the binary (runtime ignores them, but don't embed them). -->
+        <EmbeddedResource Include="Migrations\**\*.sql" Exclude="Migrations\Dev\**\*.sql">
+            <LogicalName>Migrations/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 

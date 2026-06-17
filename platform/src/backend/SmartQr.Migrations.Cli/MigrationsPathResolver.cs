@@ -1,6 +1,6 @@
 namespace SmartQr.Migrations.Cli;
 
-/// <summary>Locates the on-disk <c>SqlFiles/Migrations</c> directory for the filesystem source.</summary>
+/// <summary>Locates the on-disk <c>Migrations</c> directory for the filesystem source.</summary>
 internal static class MigrationsPathResolver
 {
     /// <summary>Walks up from the cwd (and the binary dir) looking for the migrations folder.</summary>
@@ -9,8 +9,8 @@ internal static class MigrationsPathResolver
     {
         var relativeCandidates = new[]
         {
-            Path.Combine("SmartQr.Common.Persistence", "SqlFiles", "Migrations"),
-            Path.Combine("SqlFiles", "Migrations"),
+            Path.Combine("SmartQr.Common.Persistence", "Migrations"),
+            "Migrations",
         };
 
         foreach (var start in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
@@ -27,6 +27,6 @@ internal static class MigrationsPathResolver
         }
 
         throw new DirectoryNotFoundException(
-            "Could not locate SqlFiles/Migrations. Pass --sql-dir <path> or set SMARTQR_SQL_DIR.");
+            "Could not locate the Migrations directory. Pass --sql-dir <path> or set SMARTQR_SQL_DIR.");
     }
 }

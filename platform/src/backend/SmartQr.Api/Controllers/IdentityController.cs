@@ -5,10 +5,10 @@ using SmartQr.Common.Models;
 
 namespace SmartQr.Api.Controllers;
 
-/// <summary>Identity endpoints — inspect and establish the calling principal.</summary>
+/// <summary>Manages identity.</summary>
 [ApiController]
 [Route("api/identity")]
-public class IdentityController(ICurrentUser currentUser, IGuestSession guestSession) : ControllerBase
+public sealed class IdentityController(ICurrentUser currentUser, IGuestSession guestSession) : ControllerBase
 {
     /// <summary>
     /// Returns the caller's current identity. Read-only — never sets a cookie. Always 200.

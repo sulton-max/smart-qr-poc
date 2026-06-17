@@ -8,14 +8,12 @@ using SmartQr.Common.Settings;
 
 namespace SmartQr.Common.Persistence.Extensions;
 
-/// <summary>Registers data access — the shared Npgsql data source, EF Core context, and Dapper config.</summary>
+/// <summary>Provides registration of data access — the shared Npgsql data source, EF Core context, and Dapper config.</summary>
 public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// Registers SmartQr persistence. Requires <see cref="SmartQrDbSettings"/> to be registered by the host service.
-    /// Enums are stored as text (see <c>SmartQrDbContext.ConfigureConventions</c>) — no native PG enum types,
-    /// which keeps runtime schema creation simple.
-    /// </summary>
+    /// <summary>Registers SmartQr persistence and the SQL migrator over the product assembly.</summary>
+    /// <remarks>Requires <see cref="SmartQrDbSettings"/> registered by the host; enums are stored as text (see <c>SmartQrDbContext.ConfigureConventions</c>).</remarks>
+    /// <param name="services">The service collection to register into.</param>
     public static IServiceCollection AddSmartQrPersistence(this IServiceCollection services)
     {
         // Dapper: map snake_case DB columns → PascalCase C# properties.
@@ -39,7 +37,7 @@ public static class ServiceCollectionExtensions
 
         // SQL migrator (embedded source) — owns the Postgres schema; EF is a pure mapper over it.
         // The SQL ships embedded in THIS (product) assembly, so hand the migrator the DbContext's assembly.
-        services.AddSqlMigrations(typeof(SmartQrDbContext).Assembly);
+        services.AddDatabaseBespokeMigrations(typeof(SmartQrDbContext).Assembly);
 
         return services;
     }

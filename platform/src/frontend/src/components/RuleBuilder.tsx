@@ -63,8 +63,8 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
 
           <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
             <Select<RuleConditionType>
-              selected={rule.conditionType}
-              onChange={(opt) => opt && update(rule.id, { conditionType: opt.itemKey })}
+              value={rule.conditionType}
+              onValueChange={(opt) => opt && update(rule.id, { conditionType: opt.itemKey })}
             >
               <Select.Trigger>
                 <Select.Value />

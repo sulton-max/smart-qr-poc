@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SmartQr.Common.Domain.Billing.Entities;
+using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
 
@@ -18,6 +20,9 @@ public class SmartQrDbContext(DbContextOptions<SmartQrDbContext> options) : DbCo
     /// <summary>Append-only scan/click events.</summary>
     public DbSet<ScanEventEntity> ScanEvents => Set<ScanEventEntity>();
 
+    /// <summary>Stripe subscriptions — one live row per user; absence ⇒ Free.</summary>
+    public DbSet<SubscriptionEntity> Subscriptions => Set<SubscriptionEntity>();
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         // Store enums as text (their C# name) on every provider — readable, evolution-friendly, and
@@ -26,6 +31,8 @@ public class SmartQrDbContext(DbContextOptions<SmartQrDbContext> options) : DbCo
         configurationBuilder.Properties<BarcodeFormat>().HaveConversion<string>();
         configurationBuilder.Properties<RuleConditionType>().HaveConversion<string>();
         configurationBuilder.Properties<DeviceType>().HaveConversion<string>();
+        configurationBuilder.Properties<Plan>().HaveConversion<string>();
+        configurationBuilder.Properties<SubscriptionStatus>().HaveConversion<string>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

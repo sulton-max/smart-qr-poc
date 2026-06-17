@@ -1,4 +1,13 @@
-import type { ApiSuccess, CodeDto, CreateCodeRequest, Me, UpdateCodeRequest } from "./types";
+import type {
+  ApiSuccess,
+  BillingStatus,
+  CodeDto,
+  CreateCodeRequest,
+  Me,
+  Plan,
+  SessionUrlDto,
+  UpdateCodeRequest,
+} from "./types";
 
 /**
  * Management API base. Empty = same-origin (relative) — the Api serves this SPA in prod, and the
@@ -137,4 +146,61 @@ export async function createGuest(): Promise<Me> {
 
   const json = (await res.json()) as ApiSuccess<Me>;
   return json.data;
+}
+
+// ── Billing ──────────────────────────────────────────────────────────────────
+
+/**
+ * Current plan, raw subscription status, code cap, and live usage for the caller.
+ * Owner-scoped via the guest cookie; a guest with no subscription row resolves to Free/active.
+ */
+export async function getBilling(): Promise<BillingStatus> {
+  const res = await fetch(`${API_BASE}/api/billing/me`, {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Billing status failed (HTTP ${res.status})`);
+  }
+
+  const json = (await res.json()) as ApiSuccess<BillingStatus>;
+  return json.data;
+}
+
+/**
+ * Opens a Stripe Hosted Checkout session for `plan` (a paid plan — the backend rejects `Free`) and
+ * returns the hosted URL. The caller redirects the browser to it (`window.location.href = url`).
+ */
+export async function createCheckout(plan: Plan): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/billing/checkout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan }),
+    credentials: "include", // owner-scoped — Checkout's client_reference_id is keyed off this cookie
+  });
+
+  if (!res.ok) {
+    throw new Error(`Checkout failed (HTTP ${res.status})`);
+  }
+
+  const json = (await res.json()) as ApiSuccess<SessionUrlDto>;
+  return json.data.url;
+}
+
+/**
+ * Opens a Stripe Customer Portal session for the caller's stored Stripe customer and returns the
+ * hosted URL to redirect to. Body-less; fails (404/409) when the caller has no Stripe customer yet.
+ */
+export async function createPortal(): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/billing/portal`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Portal failed (HTTP ${res.status})`);
+  }
+
+  const json = (await res.json()) as ApiSuccess<SessionUrlDto>;
+  return json.data.url;
 }

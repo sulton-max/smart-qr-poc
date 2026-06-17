@@ -5,7 +5,9 @@ using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
 using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Mediator;
+using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Infrastructure.Codes.CommandHandlers;
 
@@ -14,9 +16,10 @@ public sealed class CodeUpdateCommandHandler(
     ICodeRepository repository,
     ApiSettings settings,
     ILogger<CodeUpdateCommandHandler> logger)
-    : ICommandHandler<CodeUpdateCommand, ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>>
+    : ICommandHandler<CodeUpdateCommand, AppResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>>
 {
-    public async Task<ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>> Handle(
+    /// <inheritdoc />
+    public async ValueTask<AppResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>> HandleAsync(
         CodeUpdateCommand request, CancellationToken ct)
     {
         try
@@ -24,8 +27,8 @@ public sealed class CodeUpdateCommandHandler(
             var code = await repository.GetByIdForUserAsync(request.Id, request.UserId, ct);
 
             if (code is null)
-                return new ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>
-                    .Failure(new CodeUpdateResult.Failure("Code not found", NotFound: true));
+                return new AppResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>
+                    .Failure(new CodeUpdateResult.Failure("Code not found", FailureCategory.NotFound));
 
             // Apply editable fields — slug, scan count, and creation timestamp are deliberately untouched.
             code.Name = request.Name;
@@ -48,14 +51,14 @@ public sealed class CodeUpdateCommandHandler(
 
             var updated = await repository.UpdateAsync(code, ct);
 
-            return new ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>
+            return new AppResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>
                 .Success(new CodeUpdateResult.Success(updated.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeUpdate failed for {CodeId} user {UserId}", request.Id, request.UserId);
-            return new ApplicationResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>
-                .Failure(new CodeUpdateResult.Failure(ex.Message));
+            return new AppResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>
+                .Failure(new CodeUpdateResult.Failure(ex.Message, FailureCategory.Unexpected));
         }
     }
 }

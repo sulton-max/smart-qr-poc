@@ -1,11 +1,12 @@
 using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Common.Mediator;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Application.Codes.Core.Commands;
 
 /// <summary>Enables or disables a code (toggles <c>is_active</c> only). Owner-scoped.</summary>
 public sealed record CodeSetActiveCommand
-    : ICommand<ApplicationResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>>
+    : ICommand<AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>>
 {
     /// <summary>Id of the code to toggle.</summary>
     public required Guid Id { get; init; }

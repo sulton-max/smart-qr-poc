@@ -1,12 +1,13 @@
 namespace SmartQr.Common.Persistence.Migrations;
 
-/// <summary>Reads migrations from <c>{root}/NNN-name/{Apply,Rollback}.sql</c> on disk. Used by the CLI + dev.</summary>
+/// <summary>Provides migrations read from <c>{root}/NNN-name/{Apply,Rollback}.sql</c> on disk for the CLI and dev.</summary>
 public sealed class FileSystemMigrationSource(string migrationsRoot) : IMigrationSource
 {
-    /// <summary>The migrations root — the folder containing the <c>NNN-name</c> directories.</summary>
+    /// <summary>Gets the migrations root — the folder containing the <c>NNN-name</c> directories.</summary>
     public string Root { get; } = migrationsRoot;
 
     /// <inheritdoc />
+    /// <exception cref="InvalidOperationException">A migration folder is missing its Rollback script.</exception>
     public IReadOnlyList<RawMigration> Read()
     {
         if (!Directory.Exists(Root))
@@ -15,15 +16,21 @@ public sealed class FileSystemMigrationSource(string migrationsRoot) : IMigratio
         var migrations = new List<RawMigration>();
         foreach (var dir in Directory.GetDirectories(Root))
         {
-            var applyPath = Path.Combine(dir, "Apply.sql");
+            var applyPath = Path.Combine(dir, MigrationConventions.ApplyFileName);
             if (!File.Exists(applyPath))
-                continue; // skip the Dev/ folder + anything without an Apply.sql
+                continue; // Skip the Dev folder and anything without an Apply script.
 
-            var rollbackPath = Path.Combine(dir, "Rollback.sql");
-            migrations.Add(new RawMigration(
-                Path.GetFileName(dir),
-                File.ReadAllText(applyPath),
-                File.Exists(rollbackPath) ? File.ReadAllText(rollbackPath) : null));
+            var rollbackPath = Path.Combine(dir, MigrationConventions.RollbackFileName);
+            if (!File.Exists(rollbackPath))
+                throw new InvalidOperationException(
+                    $"Migration '{Path.GetFileName(dir)}' is missing {MigrationConventions.RollbackFileName} — every migration must ship a rollback.");
+
+            migrations.Add(new RawMigration
+            {
+                Name = Path.GetFileName(dir),
+                ApplySql = File.ReadAllText(applyPath),
+                RollbackSql = File.ReadAllText(rollbackPath),
+            });
         }
 
         return migrations;

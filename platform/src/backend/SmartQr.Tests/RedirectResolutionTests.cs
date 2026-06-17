@@ -95,4 +95,43 @@ public class RedirectResolutionTests
 
         Assert.Null(config); // endpoint maps this to 404
     }
+
+    /// <summary>
+    /// Never-deactivate-on-downgrade guard: a code whose owner is far over their plan cap (here a Free owner with
+    /// many codes) still resolves. The redirect path is plan-agnostic — it never reads subscriptions, so being
+    /// over-cap is invisible here. (Confirms SmartQr.Redirect carries no billing/subscription reference.)
+    /// </summary>
+    [Fact]
+    public async Task Over_cap_owners_code_still_resolves()
+    {
+        using var db = new SqliteTestDb();
+        var owner = Guid.NewGuid();
+
+        // Seed many codes for one owner (Free cap is 3) — all owned by the same over-cap user.
+        await using (var ctx = db.NewContext())
+        {
+            for (var i = 0; i < 10; i++)
+                ctx.Codes.Add(new CodeEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = i == 0 ? "overcap1" : $"oc{i:D5}",
+                    UserId = owner,
+                    Name = $"code-{i}",
+                    CodeType = CodeType.Qr,
+                    BarcodeFormat = BarcodeFormat.QrCode,
+                    FallbackUrl = "https://still-works.example",
+                });
+            await ctx.SaveChangesAsync();
+        }
+
+        await using var sp = BuildProvider(db);
+
+        // The 1st code (way past the cap, no subscription row ⇒ Free) resolves like any other.
+        var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("overcap1", default);
+        Assert.NotNull(config);
+
+        var decision = sp.GetRequiredService<IRoutingEvaluator>().Evaluate(config!, Scan("overcap1", DeviceType.Desktop));
+        Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
+        Assert.Equal("https://still-works.example", decision.DestinationUrl);
+    }
 }

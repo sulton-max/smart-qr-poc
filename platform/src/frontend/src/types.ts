@@ -90,3 +90,51 @@ export interface Me {
   kind: UserKind;
   user: UserSummary | null;
 }
+
+// ── Billing (mirrors SmartQr.Api Billing DTOs + SmartQr.Common.Domain.Billing.Enums) ──
+
+/** Subscription plan — enum-as-text, matches `Plan.cs` (`HaveConversion<string>`). */
+export const Plan = {
+  Free: "Free",
+  Solo: "Solo",
+  Pro: "Pro",
+  Agency: "Agency",
+} as const;
+export type Plan = (typeof Plan)[keyof typeof Plan];
+
+/** The paid plans, in upgrade order — the only ones `POST /api/billing/checkout` accepts (`Free` is rejected). */
+export const PAID_PLANS: Plan[] = [Plan.Solo, Plan.Pro, Plan.Agency];
+
+/**
+ * Body for `POST /api/billing/checkout`. `plan` is enum-as-text (the configured
+ * `JsonStringEnumConverter`); the backend rejects `Free`.
+ */
+export interface CheckoutRequest {
+  plan: Plan;
+}
+
+/** `CheckoutSessionDto` / `PortalSessionDto` — both carry a single hosted Stripe URL to redirect to. */
+export interface SessionUrlDto {
+  url: string;
+}
+
+/** `LimitsDto` — code cap for the plan. `maxCodes === -1` is the Agency unlimited sentinel (render as ∞). */
+export interface LimitsDto {
+  maxCodes: number;
+}
+
+/** `UsageDto` — live count of the caller's codes. */
+export interface UsageDto {
+  codeCount: number;
+}
+
+/**
+ * `BillingStatusDto` from `GET /api/billing/me` — plan + raw subscription status
+ * + limits + usage. A guest with no subscription row resolves to `{ plan: Free, status: "active" }`.
+ */
+export interface BillingStatus {
+  plan: Plan;
+  status: string;
+  limits: LimitsDto;
+  usage: UsageDto;
+}

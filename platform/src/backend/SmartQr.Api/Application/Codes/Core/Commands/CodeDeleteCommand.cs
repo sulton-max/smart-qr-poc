@@ -1,11 +1,12 @@
 using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Common.Mediator;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Api.Application.Codes.Core.Commands;
 
 /// <summary>Hard-deletes a code (its rules cascade). Owner-scoped.</summary>
 public sealed record CodeDeleteCommand
-    : ICommand<ApplicationResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>>
+    : ICommand<AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>>
 {
     /// <summary>Id of the code to delete.</summary>
     public required Guid Id { get; init; }

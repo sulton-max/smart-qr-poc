@@ -106,4 +106,8 @@ public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
     /// <inheritdoc />
     public Task<bool> SlugExistsAsync(string slug, CancellationToken ct) =>
         db.Codes.AnyAsync(c => c.Slug == slug, ct);
+
+    /// <inheritdoc />
+    public Task<int> CountByUserAsync(Guid userId, CancellationToken ct) =>
+        db.Codes.CountAsync(c => c.UserId == userId, ct);
 }
