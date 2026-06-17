@@ -10,10 +10,7 @@ namespace SmartQr.Api.Controllers;
 [Route("api/identity")]
 public sealed class IdentityController(ICurrentUser currentUser, IGuestSession guestSession) : ControllerBase
 {
-    /// <summary>
-    /// Returns the caller's current identity. Read-only — never sets a cookie. Always 200.
-    /// The guest id is intentionally omitted from the JSON body (it is the cookie capability itself).
-    /// </summary>
+    /// <summary>Gets the current identity.</summary>
     [HttpGet("me")]
     public IActionResult Me()
     {
@@ -27,10 +24,7 @@ public sealed class IdentityController(ICurrentUser currentUser, IGuestSession g
         return Ok(ApiResponse<MeResponse>.Ok(response));
     }
 
-    /// <summary>
-    /// Provisions a guest session (idempotent). If the <c>user-id</c> cookie is absent a new one is set;
-    /// if it is already present the existing id is reused. Always returns 200 with <c>Kind=Guest</c>.
-    /// </summary>
+    /// <summary>Provisions a guest session.</summary>
     [HttpPost("guest")]
     public IActionResult Guest()
     {

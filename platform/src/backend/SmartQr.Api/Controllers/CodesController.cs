@@ -38,20 +38,12 @@ public sealed class CodesController(
             CodeType = request.CodeType,
             BarcodeFormat = request.BarcodeFormat,
             FallbackUrl = request.FallbackUrl,
-            Rules = request.Rules
-                .Select(r => new RuleDto
-                {
-                    Order = r.Order,
-                    ConditionType = r.ConditionType,
-                    ConditionValue = r.ConditionValue,
-                    Destination = r.Destination,
-                })
-                .ToList(),
+            Rules = request.Rules,
         };
 
         var result = await sender.SendAsync(command, ct);
 
-        return result.Match<CodeCreateResult.Success, CodeCreateResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
@@ -68,12 +60,12 @@ public sealed class CodesController(
 
         var result = await sender.SendAsync(new CodeGetByIdQuery { Id = id, UserId = userId }, ct);
 
-        return result.Match<CodeGetByIdResult.Success, CodeGetByIdResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Gets all of the caller's codes. Optional <c>?q=</c> filters case-insensitively on name or fallback URL.</summary>
+    /// <summary>Gets all of the caller's codes.</summary>
     [HttpGet]
     [ProducesResponseType<ApiResponse<IReadOnlyList<CodeDto>>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -84,12 +76,12 @@ public sealed class CodesController(
 
         var result = await sender.SendAsync(new CodeListQuery { UserId = userId, Q = q }, ct);
 
-        return result.Match<CodeListResult.Success, CodeListResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<IReadOnlyList<CodeDto>>.Ok(ok.Data.Codes)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Updates a code by id — replaces editable fields and the whole rule set, keeping the immutable slug.</summary>
+    /// <summary>Updates a code by id.</summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -107,25 +99,17 @@ public sealed class CodesController(
             CodeType = request.CodeType,
             BarcodeFormat = request.BarcodeFormat,
             FallbackUrl = request.FallbackUrl,
-            Rules = request.Rules
-                .Select(r => new RuleDto
-                {
-                    Order = r.Order,
-                    ConditionType = r.ConditionType,
-                    ConditionValue = r.ConditionValue,
-                    Destination = r.Destination,
-                })
-                .ToList(),
+            Rules = request.Rules,
         };
 
         var result = await sender.SendAsync(command, ct);
 
-        return result.Match<CodeUpdateResult.Success, CodeUpdateResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Sets a code's active state by id — enables or disables it.</summary>
+    /// <summary>Sets a code's active state by id.</summary>
     [HttpPatch("{id:guid}/active")]
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -139,12 +123,12 @@ public sealed class CodesController(
 
         var result = await sender.SendAsync(command, ct);
 
-        return result.Match<CodeSetActiveResult.Success, CodeSetActiveResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Deletes a code by id, its rules cascading.</summary>
+    /// <summary>Deletes a code by id.</summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -156,12 +140,12 @@ public sealed class CodesController(
 
         var result = await sender.SendAsync(new CodeDeleteCommand { Id = id, UserId = userId }, ct);
 
-        return result.Match<CodeDeleteResult.Success, CodeDeleteResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             NoContent,
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Gets a code's rendered image by id. <c>?format=svg|png</c>.</summary>
+    /// <summary>Gets a code's rendered image by id.</summary>
     [HttpGet("{id:guid}/image")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

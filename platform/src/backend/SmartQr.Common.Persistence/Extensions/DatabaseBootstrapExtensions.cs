@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using SmartQr.Common.Persistence.Migrations;
 using SmartQr.Common.Settings;
+using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Common.Persistence.Extensions;
 

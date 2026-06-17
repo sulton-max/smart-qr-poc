@@ -17,7 +17,7 @@ using Microsoft.Extensions.Hosting;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Common.Persistence.DataContexts;
-using SmartQr.Common.Persistence.Migrations;
+using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 // Disambiguate the two top-level `Program` types (both live in their assembly's global namespace).
 using ApiProgram = apihost::Program;

@@ -15,7 +15,7 @@ namespace SmartQr.Api.Controllers;
 [Route("api/billing")]
 public sealed class BillingController(ISender sender, ICurrentUser currentUser) : ControllerBase
 {
-    /// <summary>Starts a hosted Checkout session for a paid plan and returns the URL to redirect the browser to.</summary>
+    /// <summary>Starts a checkout session.</summary>
     [HttpPost("checkout")]
     [ProducesResponseType<ApiResponse<CheckoutSessionDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,12 +27,12 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         var result = await sender.SendAsync(new BillingCheckoutCommand { UserId = userId, Plan = request.Plan }, ct);
 
-        return result.Match<BillingCheckoutResult.Success, BillingCheckoutResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CheckoutSessionDto>.Ok(ok.Data.Session)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Opens a Customer Portal session for the caller's stored Stripe customer.</summary>
+    /// <summary>Opens a billing portal session.</summary>
     [HttpPost("portal")]
     [ProducesResponseType<ApiResponse<PortalSessionDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -44,16 +44,17 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         var result = await sender.SendAsync(new BillingPortalCommand { UserId = userId }, ct);
 
-        return result.Match<BillingPortalResult.Success, BillingPortalResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<PortalSessionDto>.Ok(ok.Data.Session)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>
-    /// Handles a Stripe webhook event — NOT owner-scoped and NOT enveloped. Reads the raw body + <c>Stripe-Signature</c>
-    /// header, verifies it, and upserts the affected subscription. Returns 200 when handled/ignored, 400 on a bad
-    /// signature (so Stripe's retry logic is correct).
-    /// </summary>
+    /// <summary>Handles a Stripe webhook event.</summary>
+    /// <remarks>
+    /// Not owner-scoped and not enveloped: reads the raw body + <c>Stripe-Signature</c> header, verifies it, and
+    /// upserts the affected subscription. Returns 200 when handled/ignored, 400 on a bad signature (so Stripe's
+    /// retry logic is correct).
+    /// </remarks>
     [HttpPost("webhook")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,12 +68,12 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
         var result = await sender.SendAsync(
             new BillingWebhookCommand { RawBody = rawBody, StripeSignature = signature }, ct);
 
-        return result.Match<BillingWebhookResult.Success, BillingWebhookResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             _ => Ok(),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Gets the caller's plan, status, limits, and live usage. No subscription row ⇒ a Free/active default.</summary>
+    /// <summary>Gets the caller's billing status.</summary>
     [HttpGet("me")]
     [ProducesResponseType<ApiResponse<BillingStatusDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -83,7 +84,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         var result = await sender.SendAsync(new BillingMeQuery { UserId = userId }, ct);
 
-        return result.Match<BillingMeResult.Success, BillingMeResult.Failure, IActionResult>(
+        return result.Match<IActionResult>(
             ok => Ok(ApiResponse<BillingStatusDto>.Ok(ok.Data.Status)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }

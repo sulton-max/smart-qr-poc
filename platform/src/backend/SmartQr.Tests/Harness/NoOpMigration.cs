@@ -1,5 +1,5 @@
-using Npgsql;
-using SmartQr.Common.Persistence.Migrations;
+using System.Data.Common;
+using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Tests.Harness;
 
@@ -16,15 +16,15 @@ internal sealed class NoOpMigrationDialect : IMigrationDialect
         Task.FromResult(false); // SQLite DB already exists (held open) — never create a Postgres DB.
 
     /// <inheritdoc />
-    public Task AcquireLockAsync(NpgsqlConnection connection, long lockId, CancellationToken ct = default) =>
+    public Task AcquireLockAsync(DbConnection connection, long lockId, CancellationToken ct = default) =>
         Task.CompletedTask;
 
     /// <inheritdoc />
-    public Task ReleaseLockAsync(NpgsqlConnection connection, long lockId, CancellationToken ct = default) =>
+    public Task ReleaseLockAsync(DbConnection connection, long lockId, CancellationToken ct = default) =>
         Task.CompletedTask;
 
     /// <inheritdoc />
-    public Task EnsureHistoryTableAsync(NpgsqlConnection connection, string schemaName, string tableName, CancellationToken ct = default) =>
+    public Task EnsureHistoryTableAsync(DbConnection connection, string schemaName, string tableName, CancellationToken ct = default) =>
         Task.CompletedTask;
 }
 

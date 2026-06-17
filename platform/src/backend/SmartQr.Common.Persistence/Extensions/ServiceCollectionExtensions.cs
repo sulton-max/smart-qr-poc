@@ -1,10 +1,12 @@
+using System.Data.Common;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using SmartQr.Common.Persistence.DataContexts;
-using SmartQr.Common.Persistence.Migrations;
 using SmartQr.Common.Settings;
+using WoW.Two.Sdk.Backend.Beta.Data.Dapper;
+using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Common.Persistence.Extensions;
 
@@ -24,8 +26,11 @@ public static class ServiceCollectionExtensions
             var settings = sp.GetRequiredService<SmartQrDbSettings>();
             return new NpgsqlDataSourceBuilder(settings.ConnectionString).Build();
         });
+        // Expose the same source as the base DbDataSource the SDK connection factory binds to (EF still resolves the concrete NpgsqlDataSource).
+        services.AddSingleton<DbDataSource>(sp => sp.GetRequiredService<NpgsqlDataSource>());
 
-        services.AddSingleton<DbConnectionFactory>();
+        // SDK connection seam: registers DataSourceConnectionFactory as IDbConnectionFactory, backed by the DbDataSource above (the migrator's connection source).
+        services.AddDataSourceConnectionFactory();
 
         services.AddDbContext<SmartQrDbContext>((sp, optionsBuilder) =>
         {

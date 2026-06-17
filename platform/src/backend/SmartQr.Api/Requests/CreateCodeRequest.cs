@@ -1,3 +1,4 @@
+using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Common.Domain.Codes.Enums;
 
 namespace SmartQr.Api.Requests;
@@ -18,5 +19,5 @@ public sealed record CreateCodeRequest
     public required string FallbackUrl { get; init; }
 
     /// <summary>Optional ordered routing rules.</summary>
-    public List<CreateRuleRequest> Rules { get; init; } = [];
+    public IReadOnlyList<RuleDto> Rules { get; init; } = [];
 }
