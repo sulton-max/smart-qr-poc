@@ -20,12 +20,14 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
     [ProducesResponseType<ApiResponse<CheckoutSessionDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken ct)
+    public async Task<IActionResult> Checkout([FromBody] CheckoutBillingApiRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await sender.SendAsync(new BillingCheckoutCommand { UserId = userId, Plan = request.Plan }, ct);
+        var command = request.ToCommand(userId);
+
+        var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CheckoutSessionDto>.Ok(ok.Data.Session)),
@@ -42,7 +44,9 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await sender.SendAsync(new BillingPortalCommand { UserId = userId }, ct);
+        var command = new BillingPortalCommand { UserId = userId };
+
+        var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<PortalSessionDto>.Ok(ok.Data.Session)),
@@ -73,7 +77,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Gets the caller's billing status.</summary>
+    /// <summary>Gets the current billing status.</summary>
     [HttpGet("me")]
     [ProducesResponseType<ApiResponse<BillingStatusDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -82,7 +86,9 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await sender.SendAsync(new BillingMeQuery { UserId = userId }, ct);
+        var query = new BillingMeQuery { UserId = userId };
+
+        var result = await sender.SendAsync(query, ct);
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<BillingStatusDto>.Ok(ok.Data.Status)),

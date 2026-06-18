@@ -26,20 +26,12 @@ public sealed class CodesController(
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
-    public async Task<IActionResult> Create([FromBody] CreateCodeRequest request, CancellationToken ct)
+    public async Task<IActionResult> Create([FromBody] CreateCodeApiRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var command = new CodeCreateCommand
-        {
-            UserId = userId,
-            Name = request.Name,
-            CodeType = request.CodeType,
-            BarcodeFormat = request.BarcodeFormat,
-            FallbackUrl = request.FallbackUrl,
-            Rules = request.Rules,
-        };
+        var command = request.ToCommand(userId);
 
         var result = await sender.SendAsync(command, ct);
 
@@ -58,14 +50,16 @@ public sealed class CodesController(
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await sender.SendAsync(new CodeGetByIdQuery { Id = id, UserId = userId }, ct);
+        var query = new CodeGetByIdQuery { Id = id, UserId = userId };
+
+        var result = await sender.SendAsync(query, ct);
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
             fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
     }
 
-    /// <summary>Gets all of the caller's codes.</summary>
+    /// <summary>Gets all codes.</summary>
     [HttpGet]
     [ProducesResponseType<ApiResponse<IReadOnlyList<CodeDto>>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -74,7 +68,9 @@ public sealed class CodesController(
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await sender.SendAsync(new CodeListQuery { UserId = userId, Q = q }, ct);
+        var query = new CodeListQuery { UserId = userId, Q = q };
+
+        var result = await sender.SendAsync(query, ct);
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<IReadOnlyList<CodeDto>>.Ok(ok.Data.Codes)),
@@ -86,21 +82,12 @@ public sealed class CodesController(
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateById(Guid id, [FromBody] UpdateCodeRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateById(Guid id, [FromBody] UpdateCodeApiRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var command = new CodeUpdateCommand
-        {
-            Id = id,
-            UserId = userId,
-            Name = request.Name,
-            CodeType = request.CodeType,
-            BarcodeFormat = request.BarcodeFormat,
-            FallbackUrl = request.FallbackUrl,
-            Rules = request.Rules,
-        };
+        var command = request.ToCommand(id, userId);
 
         var result = await sender.SendAsync(command, ct);
 
@@ -114,12 +101,12 @@ public sealed class CodesController(
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> SetActiveById(Guid id, [FromBody] SetActiveRequest request, CancellationToken ct)
+    public async Task<IActionResult> SetActiveById(Guid id, [FromBody] SetActiveCodeApiRequest request, CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var command = new CodeSetActiveCommand { Id = id, UserId = userId, IsActive = request.IsActive };
+        var command = request.ToCommand(id, userId);
 
         var result = await sender.SendAsync(command, ct);
 
@@ -138,7 +125,9 @@ public sealed class CodesController(
         if (currentUser.Id is not { } userId)
             return Unauthorized();
 
-        var result = await sender.SendAsync(new CodeDeleteCommand { Id = id, UserId = userId }, ct);
+        var command = new CodeDeleteCommand { Id = id, UserId = userId };
+
+        var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
             NoContent,

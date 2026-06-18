@@ -12,23 +12,28 @@ public sealed class IdentityController(ICurrentUser currentUser, IGuestSession g
 {
     /// <summary>Gets the current identity.</summary>
     [HttpGet("me")]
+    [ProducesResponseType<ApiResponse<CurrentUserDto>>(StatusCodes.Status200OK)]
     public IActionResult Me()
     {
-        var response = currentUser.Kind switch
+        var current = currentUser.Kind switch
         {
-            UserKind.Guest     => new MeResponse(UserKind.Guest, User: null),
-            UserKind.User      => new MeResponse(UserKind.User, User: null),   // future: resolve from claims
-            _                  => new MeResponse(UserKind.Anonymous, User: null),
+            UserKind.Guest => new CurrentUserDto(UserKind.Guest, User: null),
+            UserKind.User  => new CurrentUserDto(UserKind.User, User: null),   // future: resolve from claims
+            _              => new CurrentUserDto(UserKind.Anonymous, User: null),
         };
 
-        return Ok(ApiResponse<MeResponse>.Ok(response));
+        return Ok(ApiResponse<CurrentUserDto>.Ok(current));
     }
 
     /// <summary>Provisions a guest session.</summary>
     [HttpPost("guest")]
+    [ProducesResponseType<ApiResponse<CurrentUserDto>>(StatusCodes.Status200OK)]
     public IActionResult Guest()
     {
         guestSession.EnsureGuest();
-        return Ok(ApiResponse<MeResponse>.Ok(new MeResponse(UserKind.Guest, User: null)));
+
+        var current = new CurrentUserDto(UserKind.Guest, User: null);
+
+        return Ok(ApiResponse<CurrentUserDto>.Ok(current));
     }
 }
