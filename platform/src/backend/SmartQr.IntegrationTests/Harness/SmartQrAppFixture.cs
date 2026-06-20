@@ -3,11 +3,16 @@ extern alias redirecthost;
 
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartQr.IntegrationTests.Harness.Containers;
 
 // Disambiguate the two top-level `Program` types (both live in the global namespace of their assembly).
 using ApiProgram = apihost::Program;
 using RedirectProgram = redirecthost::Program;
+
+// The Api's Google-verifier seam — swapped for a deterministic fake in the test host.
+using IGoogleTokenVerifier = apihost::SmartQr.Api.Application.Identity.Core.Services.IGoogleTokenVerifier;
 
 namespace SmartQr.IntegrationTests.Harness;
 
@@ -22,6 +27,9 @@ public sealed class SmartQrAppFixture : IAsyncLifetime
 {
     /// <summary>Name of the identity cookie the Api host sets on guest provisioning.</summary>
     public const string UserIdCookieName = "user-id";
+
+    /// <summary>Name of the session cookie the Api host sets on Google sign-in.</summary>
+    public const string AuthCookieName = "sqr-auth";
 
     /// <summary>
     /// Stable redirect base used to build each code's <c>shortUrl</c>. Set via <c>SMARTQR_REDIRECT_BASE_URL</c>
@@ -65,7 +73,16 @@ public sealed class SmartQrAppFixture : IAsyncLifetime
         Environment.SetEnvironmentVariable("SMARTQR_REDIRECT_BASE_URL", RedirectBaseUrl);
         Environment.SetEnvironmentVariable("SMARTQR_REDIS_CONNECTION", null); // ensure DbRedirectConfigStore path
 
-        _apiHost = new WebApiTestHost<ApiProgram> { ConnectionString = _postgres.ConnectionString };
+        _apiHost = new WebApiTestHost<ApiProgram>
+        {
+            ConnectionString = _postgres.ConnectionString,
+            // Swap the real Google verifier for a deterministic fake so E2E never calls Google.
+            ConfigureServicesHook = services =>
+            {
+                services.RemoveAll<IGoogleTokenVerifier>();
+                services.AddScoped<IGoogleTokenVerifier>(_ => new FakeGoogleTokenVerifier());
+            },
+        };
         _redirectHost = new WebApiTestHost<RedirectProgram> { ConnectionString = _postgres.ConnectionString };
 
         // Force each host to build (and run its startup migration) before snapshotting the DB with Respawn.
@@ -111,15 +128,18 @@ public sealed class SmartQrAppFixture : IAsyncLifetime
         return new GuestClient(authed, userId);
     }
 
-    private static string? ExtractUserId(HttpResponseMessage response)
+    private static string? ExtractUserId(HttpResponseMessage response) => ExtractCookie(response, UserIdCookieName);
+
+    /// <summary>Lifts a cookie value out of the response's <c>Set-Cookie</c> headers by name, or null when absent.</summary>
+    public static string? ExtractCookie(HttpResponseMessage response, string name)
     {
         if (!response.Headers.TryGetValues("Set-Cookie", out var cookies))
             return null;
 
+        var prefix = $"{name}=";
         foreach (var cookie in cookies)
         {
-            // "user-id=<guid>; path=/; secure; httponly; ..."
-            var prefix = $"{UserIdCookieName}=";
+            // e.g. "sqr-auth=<value>; path=/; secure; httponly; ..."
             var head = cookie.Split(';', 2)[0].Trim();
             if (head.StartsWith(prefix, StringComparison.Ordinal))
                 return head[prefix.Length..];

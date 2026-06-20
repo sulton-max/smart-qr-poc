@@ -45,4 +45,15 @@ public sealed class CookieGuestSession(IHttpContextAccessor accessor) : IGuestSe
         _provisioned = issued;
         return _provisioned.Value;
     }
+
+    /// <inheritdoc />
+    public void Clear()
+    {
+        var http = accessor.HttpContext
+            ?? throw new InvalidOperationException("No HttpContext — IGuestSession is only valid within a request scope.");
+
+        // Delete with the same Path the cookie was written with, so the browser actually drops it.
+        http.Response.Cookies.Delete(CookieName, new CookieOptions { Path = "/" });
+        _provisioned = null;
+    }
 }

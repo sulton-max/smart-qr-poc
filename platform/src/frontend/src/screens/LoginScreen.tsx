@@ -1,16 +1,15 @@
 import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "@wow-two-beta/ui/actions";
-import { FormField, TextInput } from "@wow-two-beta/ui/forms";
 import { Card, Heading } from "@wow-two-beta/ui/display";
-import { createGuest } from "../api";
+import { GOOGLE_CLIENT_ID, signInWithGoogle, createGuest } from "../api";
+import type { Me } from "../types";
 
 interface LoginScreenProps {
-  onGuest: () => void;
+  onAuthenticated: (me: Me) => void;
 }
 
-export function LoginScreen({ onGuest }: LoginScreenProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,8 +17,8 @@ export function LoginScreen({ onGuest }: LoginScreenProps) {
     setLoading(true);
     setError(null);
     try {
-      await createGuest();
-      onGuest();
+      const me = await createGuest();
+      onAuthenticated(me);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -39,29 +38,31 @@ export function LoginScreen({ onGuest }: LoginScreenProps) {
           </p>
         </div>
 
-        <FormField label="Email">
-          <TextInput
-            value={email}
-            placeholder="you@example.com"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </FormField>
-
-        <FormField label="Password">
-          <TextInput
-            value={password}
-            placeholder="••••••••"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FormField>
-
-        <Button tone="neutral" variant="outline" isFullWidth isDisabled>
-          Log in
-        </Button>
-
-        <p className="text-center text-xs text-muted-foreground">
-          Accounts are coming soon. No sign-up required right now.
-        </p>
+        {GOOGLE_CLIENT_ID ? (
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (cr) => {
+                const idToken = cr.credential;
+                if (!idToken) return;
+                setLoading(true);
+                setError(null);
+                try {
+                  const me = await signInWithGoogle(idToken);
+                  onAuthenticated(me);
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "Sign-in failed");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              onError={() => setError("Google sign-in failed")}
+            />
+          </div>
+        ) : (
+          <p className="text-center text-xs text-muted-foreground">
+            Google sign-in isn't configured yet.
+          </p>
+        )}
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

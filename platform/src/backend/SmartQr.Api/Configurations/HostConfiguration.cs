@@ -16,6 +16,7 @@ public static partial class HostConfiguration
             .AddCodeServices()
             .AddApplicationServices()
             .AddIdentity()
+            .AddAuth()
             .AddBilling()
             .AddCustomCors()
             .AddControllers();
@@ -35,6 +36,9 @@ public static partial class HostConfiguration
 
         app.UseCors();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "smart-qr-api" }));
         app.MapControllers();
 
@@ -43,6 +47,7 @@ public static partial class HostConfiguration
 
         Console.WriteLine("🚀 SmartQr.Api starting...");
         Console.WriteLine("   Identity:  GET /api/identity/me, POST /api/identity/guest");
+        Console.WriteLine("   Auth:      POST /api/auth/google, POST /api/auth/logout");
         Console.WriteLine("   Codes:     POST /api/codes, GET /api/codes, GET /api/codes/{id}, GET /api/codes/{id}/image");
         Console.WriteLine("   Health:    /health");
 

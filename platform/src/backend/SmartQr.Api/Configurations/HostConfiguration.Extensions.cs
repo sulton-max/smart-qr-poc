@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
@@ -13,6 +15,7 @@ using SmartQr.Common.Extensions;
 using SmartQr.Common.Persistence.Extensions;
 using SmartQr.Common.Settings;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
+using AuthSettings = SmartQr.Api.Settings.Auth;
 using BillingSettings = SmartQr.Api.Settings.Billing;
 
 namespace SmartQr.Api.Configurations;
@@ -25,6 +28,7 @@ public static partial class HostConfiguration
         builder.Services.AddSingleton(ConfigurationLoader.Load<SmartQrDbSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration));
+        builder.Services.AddSingleton(ConfigurationLoader.Load<AuthSettings>(builder.Configuration));
         return builder;
     }
 
@@ -58,6 +62,40 @@ public static partial class HostConfiguration
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ICurrentUser, CookieCurrentUser>();
         builder.Services.AddScoped<IGuestSession, CookieGuestSession>();
+        return builder;
+    }
+
+    /// <summary>Registers the auth seam — user repository, Google token verifier, and the cookie session scheme.</summary>
+    private static WebApplicationBuilder AddAuth(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
+
+        builder.Services
+            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "sqr-auth";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                options.SlidingExpiration = true;
+
+                // This is an API, not a server-rendered app: never 302 to a login page — surface 401/403 so the SPA reacts.
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                };
+            });
+
+        builder.Services.AddAuthorization();
         return builder;
     }
 

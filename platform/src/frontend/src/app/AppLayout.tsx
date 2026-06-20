@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { Spinner } from "@wow-two-beta/ui/feedback";
+import { Button } from "@wow-two-beta/ui/actions";
 import { Logo } from "../marketing/components";
 import { LoginScreen } from "../screens/LoginScreen";
-import { getMe } from "../api";
+import { getMe, logout } from "../api";
+import type { Me } from "../types";
 
 type Status = "checking" | "gate" | "ready";
 
@@ -14,16 +16,23 @@ type Status = "checking" | "gate" | "ready";
  */
 export function AppLayout() {
   const [status, setStatus] = useState<Status>("checking");
+  const [me, setMe] = useState<Me | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     getMe()
-      .then((me) => {
-        if (!cancelled) setStatus(me.kind === "Anonymous" ? "gate" : "ready");
+      .then((result) => {
+        if (!cancelled) {
+          setMe(result);
+          setStatus(result.kind === "Anonymous" ? "gate" : "ready");
+        }
       })
       .catch(() => {
         // A failed identity check is treated as anonymous — show the gate.
-        if (!cancelled) setStatus("gate");
+        if (!cancelled) {
+          setMe(null);
+          setStatus("gate");
+        }
       });
     return () => {
       cancelled = true;
@@ -46,6 +55,22 @@ export function AppLayout() {
                 Billing
               </Link>
             )}
+            {me?.kind === "User" && me.user && (
+              <>
+                <span className="text-sm text-muted-foreground">{me.user.name}</span>
+                <Button
+                  tone="neutral"
+                  variant="outline"
+                  onClick={async () => {
+                    await logout();
+                    setMe(null);
+                    setStatus("gate");
+                  }}
+                >
+                  Log out
+                </Button>
+              </>
+            )}
             <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
               ← Back to site
             </Link>
@@ -59,7 +84,14 @@ export function AppLayout() {
             <Spinner size="lg" label="Loading" />
           </div>
         )}
-        {status === "gate" && <LoginScreen onGuest={() => setStatus("ready")} />}
+        {status === "gate" && (
+          <LoginScreen
+            onAuthenticated={(m) => {
+              setMe(m);
+              setStatus("ready");
+            }}
+          />
+        )}
         {status === "ready" && <Outlet />}
       </main>
     </div>

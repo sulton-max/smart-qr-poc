@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using SmartQr.Api.Application.Identity.Core.Models;
 using SmartQr.Api.Application.Identity.Core.Services;
@@ -25,10 +26,12 @@ public sealed class CookieCurrentUser(IHttpContextAccessor accessor) : ICurrentU
         var http = accessor.HttpContext
             ?? throw new InvalidOperationException("No HttpContext — ICurrentUser is only valid within a request scope.");
 
-        // Future branch: registered account via ASP.NET Core auth.
+        // Registered account: the cookie-auth principal carries the account id in its NameIdentifier claim.
         if (http.User.Identity?.IsAuthenticated == true)
         {
-            _resolved = (null, UserKind.User); // id resolved from claims — left for the auth PR
+            var subject = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = Guid.TryParse(subject, out var parsed) ? parsed : (Guid?)null;
+            _resolved = (userId, UserKind.User);
             return _resolved.Value;
         }
 

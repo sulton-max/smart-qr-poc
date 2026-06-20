@@ -110,4 +110,10 @@ public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
     /// <inheritdoc />
     public Task<int> CountByUserAsync(Guid userId, CancellationToken ct) =>
         db.Codes.CountAsync(c => c.UserId == userId, ct);
+
+    /// <inheritdoc />
+    public Task<int> ReassignOwnerAsync(Guid fromUserId, Guid toUserId, CancellationToken ct) =>
+        db.Codes
+            .Where(c => c.UserId == fromUserId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.UserId, toUserId), ct);
 }

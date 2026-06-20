@@ -18,6 +18,12 @@ export const API_BASE: string = import.meta.env.VITE_API_BASE ?? "";
 /** Redirect service base — used to build preview short URLs. Override via VITE_REDIRECT_BASE. */
 export const REDIRECT_BASE: string = import.meta.env.VITE_REDIRECT_BASE ?? "http://localhost:7022";
 
+/**
+ * Google OAuth Web client id — public, also serves as the backend's token audience. Set via
+ * VITE_GOOGLE_CLIENT_ID; empty when unconfigured (sign-in button stays inert).
+ */
+export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+
 export async function createCode(request: CreateCodeRequest): Promise<CodeDto> {
   const res = await fetch(`${API_BASE}/api/codes`, {
     method: "POST",
@@ -146,6 +152,38 @@ export async function createGuest(): Promise<Me> {
 
   const json = (await res.json()) as ApiSuccess<Me>;
   return json.data;
+}
+
+/**
+ * Exchanges a Google ID token (credential from the Sign-in button) for an authenticated session.
+ * The backend verifies the token against GOOGLE_CLIENT_ID, upserts the user, and sets the auth
+ * cookie. Resolves to the signed-in `Me`.
+ */
+export async function signInWithGoogle(idToken: string): Promise<Me> {
+  const res = await fetch(`${API_BASE}/api/auth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+    credentials: "include", // server sets the auth cookie on this response
+  });
+
+  if (!res.ok) {
+    throw new Error(`Sign-in failed (HTTP ${res.status})`);
+  }
+
+  return ((await res.json()) as ApiSuccess<Me>).data;
+}
+
+/** Clears the authenticated session server-side (drops the auth cookie). Resolves on success. */
+export async function logout(): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Logout failed (HTTP ${res.status})`);
+  }
 }
 
 // ── Billing ──────────────────────────────────────────────────────────────────

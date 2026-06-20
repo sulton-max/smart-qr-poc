@@ -31,4 +31,7 @@ public interface ICodeRepository
 
     /// <summary>Counts how many codes a user currently owns — drives the per-plan create-time cap.</summary>
     Task<int> CountByUserAsync(Guid userId, CancellationToken ct);
+
+    /// <summary>Reassigns every code owned by <paramref name="fromUserId"/> to <paramref name="toUserId"/> in one statement; returns how many moved. Claims a guest's codes into an account on sign-in.</summary>
+    Task<int> ReassignOwnerAsync(Guid fromUserId, Guid toUserId, CancellationToken ct);
 }

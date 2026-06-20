@@ -5,6 +5,7 @@ using SmartQr.Common.Domain.Billing.Entities;
 using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Common.Domain.Identity.Entities;
 
 namespace SmartQr.Common.Persistence.DataContexts;
 
@@ -22,6 +23,9 @@ public class SmartQrDbContext(DbContextOptions<SmartQrDbContext> options) : DbCo
 
     /// <summary>Stripe subscriptions — one live row per user; absence ⇒ Free.</summary>
     public DbSet<SubscriptionEntity> Subscriptions => Set<SubscriptionEntity>();
+
+    /// <summary>Registered accounts (Google sign-in), layered over the guest-first identity.</summary>
+    public DbSet<UserEntity> Users => Set<UserEntity>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

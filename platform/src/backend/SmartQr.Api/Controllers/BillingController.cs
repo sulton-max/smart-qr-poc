@@ -26,7 +26,6 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
             return Unauthorized();
 
         var command = request.ToCommand(userId);
-
         var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
@@ -45,7 +44,6 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
             return Unauthorized();
 
         var command = new BillingPortalCommand { UserId = userId };
-
         var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
@@ -87,7 +85,6 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
             return Unauthorized();
 
         var query = new BillingMeQuery { UserId = userId };
-
         var result = await sender.SendAsync(query, ct);
 
         return result.Match<IActionResult>(

@@ -32,7 +32,6 @@ public sealed class CodesController(
             return Unauthorized();
 
         var command = request.ToCommand(userId);
-
         var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
@@ -51,7 +50,6 @@ public sealed class CodesController(
             return Unauthorized();
 
         var query = new CodeGetByIdQuery { Id = id, UserId = userId };
-
         var result = await sender.SendAsync(query, ct);
 
         return result.Match<IActionResult>(
@@ -69,7 +67,6 @@ public sealed class CodesController(
             return Unauthorized();
 
         var query = new CodeListQuery { UserId = userId, Q = q };
-
         var result = await sender.SendAsync(query, ct);
 
         return result.Match<IActionResult>(
@@ -88,7 +85,6 @@ public sealed class CodesController(
             return Unauthorized();
 
         var command = request.ToCommand(id, userId);
-
         var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
@@ -107,7 +103,6 @@ public sealed class CodesController(
             return Unauthorized();
 
         var command = request.ToCommand(id, userId);
-
         var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(
@@ -126,7 +121,6 @@ public sealed class CodesController(
             return Unauthorized();
 
         var command = new CodeDeleteCommand { Id = id, UserId = userId };
-
         var result = await sender.SendAsync(command, ct);
 
         return result.Match<IActionResult>(

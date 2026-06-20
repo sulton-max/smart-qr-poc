@@ -33,6 +33,24 @@ public sealed record MeResponseDto
     public string Kind { get; init; } = "";
 }
 
+/// <summary>Wire shape of <c>CurrentUserDto</c> including the registered-user profile.</summary>
+public sealed record MeWithUserDto
+{
+    /// <summary>The caller's identity kind (Anonymous / Guest / User).</summary>
+    public string Kind { get; init; } = "";
+
+    /// <summary>The signed-in account profile; null for guest / anonymous.</summary>
+    public UserSummaryDtoModel? User { get; init; }
+}
+
+/// <summary>Wire shape of <c>UserSummaryDto</c>.</summary>
+public sealed record UserSummaryDtoModel
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = "";
+    public string Email { get; init; } = "";
+}
+
 /// <summary>Wire shape of <c>CodeDto</c>.</summary>
 public sealed record CodeDtoModel
 {

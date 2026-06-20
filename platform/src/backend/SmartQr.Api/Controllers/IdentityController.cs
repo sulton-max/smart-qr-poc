@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using SmartQr.Api.Application.Identity.Core.Models;
 using SmartQr.Api.Application.Identity.Core.Services;
@@ -18,11 +19,22 @@ public sealed class IdentityController(ICurrentUser currentUser, IGuestSession g
         var current = currentUser.Kind switch
         {
             UserKind.Guest => new CurrentUserDto(UserKind.Guest, User: null),
-            UserKind.User  => new CurrentUserDto(UserKind.User, User: null),   // future: resolve from claims
+            UserKind.User  => new CurrentUserDto(UserKind.User, ReadUserFromClaims()),
             _              => new CurrentUserDto(UserKind.Anonymous, User: null),
         };
 
         return Ok(ApiResponse<CurrentUserDto>.Ok(current));
+    }
+
+    /// <summary>Builds the signed-in user's summary from the cookie-auth claims — the claims are the source, so no DB read.</summary>
+    private UserSummaryDto? ReadUserFromClaims()
+    {
+        if (!Guid.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            return null;
+
+        var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "";
+        var name = User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        return new UserSummaryDto(userId, name, email);
     }
 
     /// <summary>Provisions a guest session.</summary>

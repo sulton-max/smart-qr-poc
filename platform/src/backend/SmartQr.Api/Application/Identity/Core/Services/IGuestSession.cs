@@ -11,4 +11,7 @@ public interface IGuestSession
     /// times per request — the cookie is appended at most once.
     /// </summary>
     Guid EnsureGuest();
+
+    /// <summary>Clears the <c>user-id</c> cookie from the response — called after sign-in, once the auth cookie is the identity.</summary>
+    void Clear();
 }

@@ -1,6 +1,6 @@
 # Smart QR — Platform Planning
 
-*Last updated: 2026-06-17*
+*Last updated: 2026-06-19*
 
 Durable roadmap + backlog for the technical platform — the standing plan that version docs pull from
 and return to. Business roadmap → `business/business-context.md`. Strategy →
@@ -8,14 +8,16 @@ and return to. Business roadmap → `business/business-context.md`. Strategy →
 
 ## Versions
 
-Release roadmap. Per-version detail in `versions/v{X.Y}/v{X.Y}.md`. Bump: pre-MVP `+0.1` per
-capability; post-MVP minor = feature batch, major = milestone. **Timebox: ≤1 week per version.**
+Release roadmap. Per-version detail in `versions/v{X.Y}/v{X.Y}.md`. Products start at `v0.1`, minor-increment per
+version, major only at `.100` or a breaking change (scheme → `wow-two-ws/conventions/planning/version-planning/version-docs.md`).
+**Two-cycle shipping:** a deliverable version then its SDK-extraction version (1 cycle = 2 versions). **Timebox: ≤1 week per version.**
 Shipped + the active/next version only — future work lives in the ordered backlog.
 
 | Version | Theme | Deliverables | Status |
 |---|---|---|---|
-| v0.1 | POC — backend + frontend + runtime DB | Clean-arch backend, code generation, routing engine, redirect hot path, Create-Code builder, runtime DB; verified e2e vs Postgres; 16 tests | ✅ |
-| v1.0 | Manage codes (guest-first) | — | ⏳ |
+| v0.1 | Product foundation (guest-first) | Generate + serve codes (QR · routing · fallback) · guest identity + ownership · manage codes (edit / enable-disable / delete / search · edit→next-scan); verified e2e | ✅ |
+| v0.2 | Migration layer (bespoke migrator → SDK) | Built the migrator inline → extracted to `WoW2.Sdk.Backend.Beta` + `wow-migrate` CLI; SQLite dialect + web-freedom arch test; **adopted across all 3 apps** (smart-qr · secrets-vault · drydock) on Postgres; SDK migrator STABLE | ✅ |
+| v0.3 | Accounts & ownership | sign in with Google · claim guest codes · cross-device management | 🚧 building |
 
 > Work hierarchy (Version → Iteration → Task), lifecycle, and numbering → `wow-two-ws/conventions/planning/`.
 
@@ -40,6 +42,7 @@ Shipped + the active/next version only — future work lives in the ordered back
 | Tests = **E2E** (real Postgres via Testcontainers, both hosts over HTTP) over unit / mock-heavy integration | smart-qr has ~no external APIs to mock → E2E mocks nothing and covers the real flow incl. the two-host wedge. Catches PG/serialization/auth/ownership bugs units miss. Harness mirrors the backend-beta SDK testing scaffold (extract later). |
 | SDK-bound infra split into `SmartQr.Platform.*` libs (`Core` · `Migrations` · `Testing`) + solution folders | **Sanitary separation**: the generic infra (mediator/result/config/conn-factory, migrator engine, generic E2E harness) lives in clearly-named libs referenced by product projects — so the eventual lift to backend-beta is obvious + cheap (move + rename namespaces at lift). Refs go product → platform only. |
 | Billing: **Stripe hosted** (Checkout + Customer Portal), TEST mode, no on-site card capture; **subscription keyed by guest `UserId`** (no auth this pass); **bespoke `002-billing` migration** (not EF) | Hosted flow = PCI off-loaded, zero card UI. `UserId`-keyed sub fits guest-first (auth lands later as additive claim flow, no rewrite). `002-billing` keeps the schema-first SQL migrator authority. Enforcement is **create-time only** — redirect stays plan-agnostic (never-deactivate-on-downgrade). |
+| Auth (v0.3) = **Google OAuth** (sign in with Google); session = a server-issued **HttpOnly auth cookie** (ASP.NET cookie auth, not the SDK JWT bearer); Google ID token verified behind an **`IGoogleTokenVerifier`** seam; **bespoke `003-accounts` migration** | One-click, no passwords or email infra to run — strongly GWDNBM. Same-origin SPA+Api → cookie auth is the secure, simplest fit and sidesteps the kit JWT-bearer `init`-only bug (issuance side is fine; bearer is the broken part). The verifier seam keeps E2E mock-free (real verifier hits Google; tests use a fake). **Claim** upgrades the guest user-key **in place** — the guest cookie Guid becomes the account id, so same-device signup needs zero code reassignment; cross-device signup merges the guest's codes into the existing account. |
 
 ## Component Tracker
 
@@ -51,16 +54,20 @@ Shipped + the active/next version only — future work lives in the ordered back
 | `SmartQr.Codes` (QR/barcode/logo generation) | ✅ built + tested |
 | `SmartQr.Api` (management API) | ✅ create + manage (edit / toggle / delete / search) |
 | `SmartQr.Redirect` (hot path + async analytics) | ✅ built — direct-DB config read (cache deferred; `CachedRedirectConfigStore` unwired) |
-| `SmartQr.Tests` | ✅ 44 green — pure-logic units (generation, routing) + SQLite repo/redirect + billing (plan limits · 402 gate · subscription repo · handlers · `/me`) |
-| `SmartQr.IntegrationTests` | ✅ 18 green — **E2E over real Postgres** (Testcontainers): identity · codes CRUD/search · ownership edges · render · two-host wedge. Needs Docker. (no billing E2E this pass) |
+| `SmartQr.Tests` | ✅ 52 green — pure-logic units (generation, routing) + SQLite repo/redirect + billing (plan limits · 402 gate · subscription repo · handlers · `/me`) |
+| `SmartQr.IntegrationTests` | ✅ **24 green** — **E2E over real Postgres** (Testcontainers): identity · codes CRUD/search · ownership edges · render · two-host wedge · **auth (Google sign-in / claim / cross-device / logout)**. Needs Docker. (no billing E2E this pass) |
 | `SmartQr.Migrations.Tests` | ✅ **10 green** — engine tests vs the SDK package (apply · drift+repair · orphan · `@no-transaction` · concurrency · failure-mid-batch · rollback); Testcontainers PG, `Api`-independent |
 | Migrator CLI | ✅ **SDK `wow-migrate` dotnet tool** (`WoW2.Sdk.Backend.Beta.Data.Migrations.Cli`) — local `SmartQr.Migrations.Cli` dropped |
 | DB schema / migrations | ✅ **migrator consumed from the SDK** (`AddDatabaseBespokeMigrations`); `001-baseline` + `002-billing` embedded; local engine extracted → SDK `Data/Migrations/Bespoke/` |
-| User identity (guest cookie + `/identity/me` + `/identity/guest`) | ✅ `ICurrentUser`, `user-id` cookie |
+| User identity (guest cookie + `/identity/me` + `/identity/guest`) | ✅ `ICurrentUser`, `user-id` cookie; `/identity/me` now resolves a signed-in `UserSummaryDto` from claims |
+| Accounts — Google sign-in (`users`, `003-accounts`) | ✅ built — `UserEntity` + `POST /api/auth/google` and `/api/auth/logout`, cookie session (`sqr-auth`), `IGoogleTokenVerifier` seam (real `Google.Apis.Auth`), frontend Google button + header. **Live Google sign-in pending the OAuth client id** |
+| Claim guest codes on sign-in | ✅ built (backend) — same-device upgrade-in-place (guest Guid becomes the account id, zero reassignment); cross-device merge via `ICodeRepository.ReassignOwnerAsync` |
+| Auth E2E | ✅ **6 green** — sign-in/find-or-create · invalid-token 401 · `/me` profile · same-device claim · cross-device ownership · logout (fake verifier seam, Testcontainers PG) |
 | Edit → hot-path propagation | ✅ edits land in Postgres; redirect reads DB directly per scan |
 | Geo resolver (MaxMind) | ⛔ stub (`NoopGeoResolver`) |
 | Frontend — codes builder + management | ✅ create + codes list + edit (toggle / delete / search) |
 | Frontend — marketing surface (landing · pricing · blog) | ✅ built — public pages at `/`, `/pricing`, `/blog/*` on `react-router`; app moved under `/app/*`; per-page meta/OG; 4 SEO seed posts |
+| Frontend — auth (Google sign-in · signed-in header · logout) | ✅ built — `@react-oauth/google` `GoogleLogin` on the gate (gated on `VITE_GOOGLE_CLIENT_ID`; guest-only when unset), `AppLayout` shows account name + Log out, wired to `/api/auth/{google,logout}`. `tsc` + `vite build` green. **pnpm** (not npm — `workspace:` protocol) |
 | Billing — backend (Stripe hosted, `UserId`-keyed sub) | ✅ built — `api/billing` (`checkout`·`portal`·`webhook`·`me`), `IBillingGateway`+`StripeBillingGateway`, `subscriptions` table (`002-billing`), config-driven prices, 402 create-time gate (`PlanLimits`). Live Stripe test-mode pass pending. See `architecture/billing.md` |
 | Billing — frontend (`/app/billing`) | ✅ built — `BillingScreen` (current plan + usage `MeterBar` w/ ∞ sentinel + upgrade cards → Checkout, Manage → Portal, return `Banner`); header nav link; pricing CTAs route paid tiers → `/app/billing` |
 | Plan enforcement (per-plan code cap, 402) | ✅ create-time only in `CodeCreateCommandHandler` (count vs `PlanLimits` cap → `LimitReached` → 402); redirect stays plan-agnostic (never-deactivate) |
@@ -78,12 +85,23 @@ strike-through + ✅ when done (kept for traceability).
 | Sign up / log in | feature | accounts so codes have a durable owner |
 | Claim guest codes into an account | feature | attach the anonymous owner key's codes to the new user — additive over v1.0 |
 | Cross-device management | feature | manage your codes from any device once signed in |
+| Guest cookie recovery (admin-issued link) | feature | lost-cookie recovery: owner reaches admin → admin mints a one-time link → opening it re-sets the owner-key cookie. Gate: no login in ~10 days + requester proves code details (e.g. routing) before issue |
+| Claim guest subscription on sign-in | issue | a guest who subscribed then signs in on another device: the guest's subscription row doesn't follow (unique on `user_id` blocks a naive merge). Same-device signup is fine (upgrade-in-place keeps the id). Decide merge semantics |
+| Refresh account profile on login | idea | update the stored name / avatar from Google on each sign-in (v0.3 captures them once at first sign-in) |
+
+### Builder + correctness (v0.3 candidates)
+
+| Item | Type | Notes |
+|---|---|---|
+| Backend QR in live preview | issue | the builder preview is client-side and now differs from the server-rendered downloadable asset — render the preview from the backend so they match |
+| Request validation + slug uniqueness | feature | FluentValidation (via the SDK) for create / update; enforce slug uniqueness |
 
 ### Scan insights
 
 | Item | Type | Notes |
 |---|---|---|
 | Scan analytics | feature | scans over time; unique vs total; by device / country / OS; top hours |
+| Scan-count semantics: raw vs footprint | check | raw per-scan (simple, no tracking, inflated by refresh/bots) vs unique-by-footprint (device/IP/UA dedup). Footprint conflicts with the no-fingerprint / GWDNBM identity stance — decide before building analytics |
 
 ### Production readiness
 
@@ -179,6 +197,7 @@ abuse-moderation depth · edge redirect timing · self-host edition.
 
 ## Log
 
+- **2026-06-19:** v0.3 **Accounts & ownership — backend + E2E** (the deliverable half of cycle 2). **Google OAuth** sign-in built inline: new `users` table (bespoke **`003-accounts`**, `google_subject` unique) + `UserEntity`; `POST /api/auth/google` (verify → find-or-create → claim guest codes → issue session) and `POST /api/auth/logout`. Session = ASP.NET **cookie auth** (`sqr-auth`, HttpOnly+Secure, 30-day sliding; `OnRedirectToLogin/AccessDenied` → 401/403 not 302) — **sidesteps the kit JWT-bearer `init`-only bug** (issuance is fine, bearer is the broken part; cookie auth is the right fit for the same-origin SPA anyway). Google ID token verified behind an **`IGoogleTokenVerifier`** seam (real = `Google.Apis.Auth` 1.75.0 checking audience = client id; E2E swaps a fake) — keeps E2E mock-free. `CookieCurrentUser` now resolves `UserKind.User` + id from the `NameIdentifier` claim (filled the `// auth PR` TODO); `IdentityController.Me` returns the real `UserSummaryDto` from claims (no DB hit). **Claim** upgrades the guest user-key **in place** (guest cookie Guid becomes the account id → zero code reassignment same-device) and merges cross-device via `ICodeRepository.ReassignOwnerAsync` (single `ExecuteUpdate`). Verified: backend build 0/0 · **52 unit + 24 E2E** green (+6 auth E2E: sign-in / invalid-token 401 / `/me` profile / same-device claim / cross-device ownership / logout — Testcontainers PG + fake verifier). **Frontend** (built across 3 parallel agents on disjoint files): `@react-oauth/google` sign-in button on the gate (gated on `VITE_GOOGLE_CLIENT_ID`; guest-only when unset) + signed-in header (account name + Log out) wired to `/api/auth/{google,logout}` — `tsc` + `vite build` green (frontend is **pnpm**, not npm). **Pending:** live Google sign-in (needs the Google Cloud OAuth Web client id — placeholder `Auth:Google:ClientId` + `VITE_GOOGLE_CLIENT_ID`, like billing's live-Stripe pass). Subscriptions-claim + profile-refresh deferred to backlog. SDK auth-infra extraction → v0.4.
 - **2026-06-17:** Migrator **extracted to the SDK + adopted here**. The local engine `SmartQr.Platform.Migrations` (22 files) + the local `SmartQr.Migrations.Cli` are **dropped**; `Common.Persistence` now consumes `WoW2.Sdk.Backend.Beta` `10.0.24-beta` (engine at `WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke`, registered via the same `AddDatabaseBespokeMigrations`). Connection seam re-pointed `DbConnectionFactory`→ SDK `AddDataSourceConnectionFactory()` (`IDbConnectionFactory`). Proof: `Common.Persistence` + `Redirect` build green vs the published package (Redirect applies at startup). Also published: `…Data.Abstractions` (BCL `IDbConnectionFactory`) + the **`wow-migrate`** CLI tool. New `SmartQr.Migrations.Tests` — **10 green** engine tests (apply/drift/orphan/`@no-transaction`/concurrency/failure-mid-batch/rollback, Testcontainers PG, `Api`-independent). ⚠️ `SmartQr.Api` build blocked by an unrelated `AppResult.Match` 3→1-arg controller drift (10.0.24 Mediator) — **controllers chat's lane**; full E2E runs once it compiles. Migrator design doc → SDK `Data/Migrations/Bespoke/bespoke.md`.
 - **2026-06-15:** Billing (Stripe) — **paywall + plan limits + subscriptions**, backend + frontend. Backend: new `Billing/` domain (`SubscriptionEntity` + `Plan`/`SubscriptionStatus` enums-as-text), bespoke **`002-billing`** migration (`subscriptions`, unique on `user_id`), `api/billing` controller (`checkout`·`portal`·`webhook`·`me`, owner-scoped except the Stripe webhook) over per-op `ApplicationResult`s, `IBillingGateway`→`StripeBillingGateway` (Stripe.net 52.0.0, hosted Checkout `mode=subscription` + Customer Portal, no on-site card capture; `ParseWebhookEvent`→flattened `BillingWebhookEvent` so no SDK type leaks), `ISubscriptionRepository` (single upsert row per `UserId`), `PlanLimits` (3/25/200/∞, `-1` API sentinel) + config-driven `PlanPriceMap`. **Enforcement: create-time only** — `CodeCreateCommandHandler` count-vs-cap → `LimitReached` → **402** in `CodesController`; redirect stays plan-agnostic (never-deactivate-on-downgrade). Config = `Billing` settings (empty placeholders in appsettings; secrets via env/user-secrets). Frontend: `/app/billing` `BillingScreen` (current-plan card + usage `MeterBar` w/ ∞ sentinel + at-limit note + upgrade cards → Checkout, Manage billing → Portal, success/cancel `Banner`), header nav link (past the guest gate), pricing CTAs route every paid tier → `/app/billing` (marketing stays API-free). Keyed by the guest `UserId` — **no auth this pass** (additive later). Verified: backend build 0/0 · **44 unit tests** (20 → +23 billing + the over-cap redirect guard) green · frontend typecheck/build clean. **Pending live Stripe test-mode** (real keys + `stripe listen` webhook). Architecture: `architecture/billing.md`.
 - **2026-06-13:** Pre-extract polish **audit** (multi-agent re-scan → adversarial verify → synth: 50 agents, 24 confirmed findings). Verdict: engine **extraction-ready**. Fixed before the lift: **(1, blocker)** CLI safety — `rollback`/`verify --repair` no longer hard-wire `AllowRollback=true`; both now require `--i-understand-this-is <db>` matching the target + `[y/N]` (or `--force`) — smoke-tested vs the live local DB (refuse / wrong-name / decline all exit 2). **(3)** apply **fails closed on orphaned history** (`MigrationOrphanException`, opt-out `MigrationOptions.AllowOrphanedHistory`). **(4)** CLI exit codes 0/1/2 per design §4.4 (drift→1, exec/guard→2). **(10)** `RepairAsync` now `AllowRollback`-gated + advisory-locked. Plus low polish: `@no-transaction` re-run/idempotency contract documented on 4 surfaces, `RawMigration` positional→body record, `MigrationOptions`/`MigrationDriftException` doc+message de-CLI'd, `Dev/*.sql` excluded from the embedded glob, explicit `using` for the `DbConnectionFactory` ancestry seam. SDK migrator README §0.0 corrected (15→21 files, real type names, dialect seam) + 5 deltas rows. **Deferred to the extraction step:** 2 naming decisions (impl names vs design-doc names; the `SmartQr.Common.Persistence.Migrations`→SDK-root namespace rename). Verified: build 0/0 · **38 tests** (20 unit + 18 E2E) green.

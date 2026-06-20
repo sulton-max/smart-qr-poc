@@ -33,7 +33,9 @@
 
 | File | Content |
 |---|---|
-| `v1.0/v1.0.md` | v1.0 (Manage codes — guest-first) — 2 iterations: manage codes (owner key + edit propagation), management UI |
+| `v0.1/v0.1.md` | v0.1 (Product foundation — guest-first) — POC + manage codes + marketing + billing (renamed from v1.0) |
+| `v0.2/v0.2.md` | v0.2 (Migration layer) — bespoke migrator extracted to SDK + adopted across all 3 apps |
+| `v0.3/v0.3.md` | v0.3 (Accounts & ownership) — Google sign-in, guest-code claim, cross-device ownership |
 
 ## Platform — Source (`platform/src/backend/`)
 
