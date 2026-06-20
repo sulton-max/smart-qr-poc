@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "@wow-two-beta/ui/actions";
 import { Card, Heading } from "@wow-two-beta/ui/display";
-import { GOOGLE_CLIENT_ID, signInWithGoogle, createGuest } from "../api";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
+import { GOOGLE_CLIENT_ID, createGuest } from "../api";
 import type { Me } from "../types";
 
 interface LoginScreenProps {
@@ -40,23 +40,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
 
         {GOOGLE_CLIENT_ID ? (
           <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={async (cr) => {
-                const idToken = cr.credential;
-                if (!idToken) return;
-                setLoading(true);
-                setError(null);
-                try {
-                  const me = await signInWithGoogle(idToken);
-                  onAuthenticated(me);
-                } catch (e) {
-                  setError(e instanceof Error ? e.message : "Sign-in failed");
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              onError={() => setError("Google sign-in failed")}
-            />
+            <GoogleSignInButton onSignedIn={onAuthenticated} onError={setError} />
           </div>
         ) : (
           <p className="text-center text-xs text-muted-foreground">

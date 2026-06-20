@@ -4,6 +4,7 @@ import { Spinner } from "@wow-two-beta/ui/feedback";
 import { Button } from "@wow-two-beta/ui/actions";
 import { Logo } from "../marketing/components";
 import { LoginScreen } from "../screens/LoginScreen";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
 import { getMe, logout } from "../api";
 import type { Me } from "../types";
 
@@ -39,6 +40,12 @@ export function AppLayout() {
     };
   }, []);
 
+  async function handleSignOut() {
+    await logout();
+    setMe(null);
+    setStatus("gate");
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="border-b border-border">
@@ -55,18 +62,19 @@ export function AppLayout() {
                 Billing
               </Link>
             )}
+            {me?.kind === "Guest" && (
+              <>
+                <span className="text-sm text-muted-foreground">Guest</span>
+                <GoogleSignInButton onSignedIn={(m) => setMe(m)} />
+                <Button tone="neutral" variant="outline" onClick={handleSignOut}>
+                  Sign out
+                </Button>
+              </>
+            )}
             {me?.kind === "User" && me.user && (
               <>
                 <span className="text-sm text-muted-foreground">{me.user.name}</span>
-                <Button
-                  tone="neutral"
-                  variant="outline"
-                  onClick={async () => {
-                    await logout();
-                    setMe(null);
-                    setStatus("gate");
-                  }}
-                >
+                <Button tone="neutral" variant="outline" onClick={handleSignOut}>
                   Log out
                 </Button>
               </>

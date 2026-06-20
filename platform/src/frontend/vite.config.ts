@@ -11,11 +11,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), mkcert()],
   server: {
     port: 7025,
-    // Proxy /api to the backend's single HTTP port (TLS is terminated upstream in prod — see
-    // backend/launch-profiles.md). changeOrigin:false preserves the dev origin end-to-end.
+    // Proxy /api to the backend's HTTPS (even) port with secure:false (self-signed .NET dev cert) — per
+    // frontend/state-and-data.md. changeOrigin:false preserves the dev origin end-to-end.
     proxy: {
-      "/api": { target: "http://localhost:7020", changeOrigin: false, secure: false },
-      "/health": { target: "http://localhost:7020", changeOrigin: false, secure: false },
+      "/api": { target: "https://localhost:7020", changeOrigin: false, secure: false },
+      "/health": { target: "https://localhost:7020", changeOrigin: false, secure: false },
     },
   },
   // Prod-ish: build straight into the Api's wwwroot so the backend serves the SPA.

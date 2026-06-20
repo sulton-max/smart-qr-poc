@@ -39,12 +39,13 @@ public sealed class AuthController(ISender sender, ICurrentUser currentUser, IGu
                 Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category))));
     }
 
-    /// <summary>Signs out — clears the session cookie.</summary>
+    /// <summary>Signs out — clears both the session cookie and the guest cookie, returning the caller to anonymous.</summary>
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        guestSession.Clear();   // also drop the guest cookie so a guest can sign out back to anonymous.
         return NoContent();
     }
 
