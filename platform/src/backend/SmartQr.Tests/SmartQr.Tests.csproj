@@ -32,7 +32,7 @@
     <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
     <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
     <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" Aliases="global,apihost" />
-    <ProjectReference Include="..\SmartQr.Redirect\SmartQr.Redirect.csproj" Aliases="global,redirecthost" />
+    <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" Aliases="global,redirecthost" />
   </ItemGroup>
 
 </Project>

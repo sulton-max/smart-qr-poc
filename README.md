@@ -24,7 +24,7 @@ platform/src/backend/SmartQr.sln
 ├── SmartQr.Common.Persistence # EF Core DbContext, entity configs, Npgsql enum-mapped data source (snake_case)
 ├── SmartQr.Codes             # generation library: QR (QRCoder), barcodes (ZXing.Net), logo overlay (ImageSharp)
 ├── SmartQr.Api               # management API (controllers + CQRS): create / read / list codes, render image
-├── SmartQr.Redirect          # hot-path service (minimal API): GET /{slug} → rule eval → 302, async scan log
+├── SmartQr.Redirect.Api          # hot-path service (minimal API): GET /{slug} → rule eval → 302, async scan log
 └── SmartQr.Tests             # xUnit: generation + routing-engine unit tests
 ```
 
@@ -60,7 +60,7 @@ dotnet test SmartQr.Tests        # no DB needed — generation + routing + SQLit
 pnpm -C ../frontend install && pnpm -C ../frontend build
 
 dotnet run --project SmartQr.Api       # → http://localhost:7021  — serves the UI + /api
-dotnet run --project SmartQr.Redirect  # → http://localhost:7023  — redirect hot path
+dotnet run --project SmartQr.Redirect.Api  # → http://localhost:7023  — redirect hot path
 ```
 
 **Open the app at http://localhost:7021.** Default `dotnet run` uses the **http** profile (`:7021`); for `https://localhost:7020` add `--launch-profile https` (and `dotnet dev-certs https --trust`). Re-run `pnpm -C ../frontend build` after UI changes.
@@ -69,7 +69,7 @@ Health checks need no DB: `GET http://localhost:7021/health`, `GET http://localh
 
 For live frontend dev with hot reload: `pnpm -C ../frontend dev` (http://localhost:7025, proxies `/api` → the Api).
 
-Try the API flows in `SmartQr.Api/SmartQr.Api.http` and `SmartQr.Redirect/SmartQr.Redirect.http`.
+Try the API flows in `SmartQr.Api/SmartQr.Api.http` and `SmartQr.Redirect.Api/SmartQr.Redirect.Api.http`.
 
 ### Configuration
 

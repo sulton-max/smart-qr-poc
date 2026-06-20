@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartQr.Common.Persistence"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartQr.Codes", "SmartQr.Codes\SmartQr.Codes.csproj", "{0C975CCF-6D0C-46B7-BF34-80ED2030BFD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartQr.Redirect", "SmartQr.Redirect\SmartQr.Redirect.csproj", "{F45E402F-C6F1-4106-BC0E-C88325A49209}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartQr.Redirect.Api", "SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj", "{F45E402F-C6F1-4106-BC0E-C88325A49209}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject

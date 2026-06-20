@@ -10,7 +10,7 @@ export default defineConfig({
   // working; convention: frontend/project-structure.md §Dev server.
   plugins: [react(), tailwindcss(), mkcert()],
   server: {
-    port: 7025,
+    port: 7024,
     // Proxy /api to the backend's HTTPS (even) port with secure:false (self-signed .NET dev cert) — per
     // frontend/state-and-data.md. changeOrigin:false preserves the dev origin end-to-end.
     proxy: {

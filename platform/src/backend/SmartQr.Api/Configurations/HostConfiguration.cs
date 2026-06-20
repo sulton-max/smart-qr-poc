@@ -1,4 +1,5 @@
 using SmartQr.Common.Persistence.Extensions;
+using WoW.Two.Sdk.Backend.Beta.Meta;
 
 namespace SmartQr.Api.Configurations;
 
@@ -9,6 +10,17 @@ public static partial class HostConfiguration
     public static WebApplicationBuilder Configure(this WebApplicationBuilder builder)
     {
         builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
+
+        // SDK boot floor (logging, tracing, metrics, health, proxy-aware hosting, OpenAPI, problem details,
+        // secure headers, compression). CORS stays product-side — see AddCustomCors: the API is cookie-authed, so
+        // the policy must allow credentials, which the SDK's credential-less default preset can't express.
+        // Output cache + rate limiting are OFF: this host serves cookie-scoped, per-user API responses.
+        builder.AddApiDefaults(o =>
+        {
+            o.ServiceName = "smart-qr-api";
+            o.EnableOutputCache = false;
+            o.EnableRateLimiting = false;
+        });
 
         builder
             .AddSettings()
@@ -34,22 +46,18 @@ public static partial class HostConfiguration
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
+        // SDK middleware pipeline (forwarded headers, secure headers, compression) + maps OpenAPI + /health.
+        app.UseApiDefaults();
+
         app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "smart-qr-api" }));
         app.MapControllers();
 
         // SPA fallback — any non-API, non-file GET returns index.html (client-side routing).
         app.MapFallbackToFile("index.html");
-
-        Console.WriteLine("🚀 SmartQr.Api starting...");
-        Console.WriteLine("   Identity:  GET /api/identity/me, POST /api/identity/guest");
-        Console.WriteLine("   Auth:      POST /api/auth/google, POST /api/auth/logout");
-        Console.WriteLine("   Codes:     POST /api/codes, GET /api/codes, GET /api/codes/{id}, GET /api/codes/{id}/image");
-        Console.WriteLine("   Health:    /health");
 
         return app;
     }

@@ -10,7 +10,7 @@
 
 - Subscription is keyed by `UserId` (the guest-cookie Guid). Checkout `client_reference_id = UserId`; Portal opened from the stored `StripeCustomerId` looked up by `UserId`.
 - Guest with **no** `subscriptions` row ⇒ **Free**. No row is ever required to use the app.
-- **Never-deactivate-on-downgrade.** `SmartQr.Redirect` stays **plan-agnostic** — never add a plan/limit check on the redirect hot path. A code over the cap still resolves forever (the never-expire promise). Enforcement is **create-time only**.
+- **Never-deactivate-on-downgrade.** `SmartQr.Redirect.Api` stays **plan-agnostic** — never add a plan/limit check on the redirect hot path. A code over the cap still resolves forever (the never-expire promise). Enforcement is **create-time only**.
 - Price IDs are **never hardcoded** — always from config (`Billing:Prices:{Solo,Pro,Agency}`). `appsettings` holds **empty placeholders only**; real keys live in env / user-secrets.
 
 ---
@@ -232,7 +232,7 @@ Once `SubscriptionEntity` is on `SmartQrDbContext`, `SqliteTestDb` builds the `s
 | `CodeCreateLimitTests.cs` | **the 402 gate** — construct `CodeCreateCommandHandler` with `CodeRepository` (SQLite) + a Free/Solo subscription; seed N codes; assert create succeeds at `count < cap` and returns `Failure { LimitReached = true }` at `count == cap`; Agency never trips. |
 | `BillingHandlersTests.cs` | checkout handler rejects `Free`, resolves price from config, calls `FakeBillingGateway` and returns its URL; portal handler fails when no `StripeCustomerId`; webhook handler upserts a row from a Fake-parsed `checkout.session.completed` and flips status on `…deleted`. |
 | `BillingMeQueryTests.cs` | no row ⇒ `Free/active`, correct `maxCodes` + live `codeCount`; with a Pro row ⇒ Pro limits. |
-| (assert) `RedirectResolutionTests.cs` | **negative guard** — a code whose owner is over-cap still resolves (redirect stays plan-agnostic). Confirm `SmartQr.Redirect` gains **no** billing reference. |
+| (assert) `RedirectResolutionTests.cs` | **negative guard** — a code whose owner is over-cap still resolves (redirect stays plan-agnostic). Confirm `SmartQr.Redirect.Api` gains **no** billing reference. |
 
 `FakeBillingGateway` lives in `SmartQr.Tests` (implements `IBillingGateway`): canned checkout/portal URLs; `ParseWebhookEvent` returns a test-supplied `BillingWebhookEvent` so webhook-handler logic is exercised without signature/network.
 

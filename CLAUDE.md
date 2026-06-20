@@ -22,10 +22,10 @@ Backend (`platform/src/backend/`) — refs go product → platform, never revers
 | `SmartQr.Platform.*` | SDK-bound infra (mediator/result/config · migrator · E2E harness) → extracts to backend-beta |
 | `SmartQr.Codes` | code generation (QRCoder / ZXing / ImageSharp) |
 | `SmartQr.Api` | management API · https **7020** |
-| `SmartQr.Redirect` | redirect hot path · https **7022** |
+| `SmartQr.Redirect.Api` | redirect hot path · https **7022** |
 | `SmartQr.Tests` · `.IntegrationTests` · `.Migrations.Tests` | xUnit · E2E (Testcontainers PG) · migrator engine |
 
-Frontend (`platform/src/frontend/`) — React 19 + Vite + Tailwind v4 + `@wow-two-beta/ui`; **pnpm** (not npm — `workspace:` protocol); https dev server via mkcert (7025).
+Frontend (`platform/src/frontend/`) — React 19 + Vite + Tailwind v4 + `@wow-two-beta/ui`; **pnpm** (not npm — `workspace:` protocol); https dev server via mkcert (even port 7024).
 
 ## Conventions
 

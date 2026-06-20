@@ -1,6 +1,6 @@
 using SmartQr.Common.Domain.Codes.Enums;
-using SmartQr.Redirect.Application.Routing.Models;
-using SmartQr.Redirect.Infrastructure.Routing;
+using SmartQr.Redirect.Api.Application.Routing.Models;
+using SmartQr.Redirect.Api.Infrastructure.Routing;
 
 namespace SmartQr.Tests;
 

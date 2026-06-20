@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
 using SmartQr.Common.Persistence.DataContexts;
-using SmartQr.Redirect.Application.Routing.Models;
-using SmartQr.Redirect.Application.Routing.Services;
-using SmartQr.Redirect.Infrastructure.Routing;
-using SmartQr.Redirect.Settings;
+using SmartQr.Redirect.Api.Application.Routing.Models;
+using SmartQr.Redirect.Api.Application.Routing.Services;
+using SmartQr.Redirect.Api.Infrastructure.Routing;
+using SmartQr.Redirect.Api.Settings;
 
 namespace SmartQr.Tests;
 

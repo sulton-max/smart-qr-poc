@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Serve every scan fast and survive viral spikes (a code on a billboard can do millions of scans in minutes), while logging analytics without ever slowing the redirect. This is the only part of the system that scales under load, so it's a separate, slim, stateless service (`SmartQr.Redirect`).
+Serve every scan fast and survive viral spikes (a code on a billboard can do millions of scans in minutes), while logging analytics without ever slowing the redirect. This is the only part of the system that scales under load, so it's a separate, slim, stateless service (`SmartQr.Redirect.Api`).
 
 ## Caching philosophy
 
@@ -30,13 +30,13 @@ Analytics is decoupled: `ChannelScanRecorder` is a bounded in-memory queue (drop
 
 | Type | File |
 |---|---|
-| Endpoint `GET /{slug}` | `platform/src/backend/SmartQr.Redirect/Endpoints/RedirectEndpoints.cs` |
-| `IRedirectConfigStore` | `SmartQr.Redirect/Application/Routing/Services/IRedirectConfigStore.cs` |
-| `CachedRedirectConfigStore` (default: IMemoryCache over DB) | `SmartQr.Redirect/Infrastructure/Routing/CachedRedirectConfigStore.cs` |
-| `RedisRedirectConfigStore` (production) | `SmartQr.Redirect/Infrastructure/Routing/RedisRedirectConfigStore.cs` |
-| `ChannelScanRecorder` (queue) | `SmartQr.Redirect/Infrastructure/Analytics/ChannelScanRecorder.cs` |
-| `ScanFlushBackgroundService` (batch flush) | `SmartQr.Redirect/Infrastructure/Analytics/ScanFlushBackgroundService.cs` |
-| Store/recorder selection (DI) | `SmartQr.Redirect/Configurations/HostConfiguration.Extensions.cs` |
+| Endpoint `GET /{slug}` | `platform/src/backend/SmartQr.Redirect.Api/Endpoints/RedirectEndpoints.cs` |
+| `IRedirectConfigStore` | `SmartQr.Redirect.Api/Application/Routing/Services/IRedirectConfigStore.cs` |
+| `CachedRedirectConfigStore` (default: IMemoryCache over DB) | `SmartQr.Redirect.Api/Infrastructure/Routing/CachedRedirectConfigStore.cs` |
+| `RedisRedirectConfigStore` (production) | `SmartQr.Redirect.Api/Infrastructure/Routing/RedisRedirectConfigStore.cs` |
+| `ChannelScanRecorder` (queue) | `SmartQr.Redirect.Api/Infrastructure/Analytics/ChannelScanRecorder.cs` |
+| `ScanFlushBackgroundService` (batch flush) | `SmartQr.Redirect.Api/Infrastructure/Analytics/ScanFlushBackgroundService.cs` |
+| Store/recorder selection (DI) | `SmartQr.Redirect.Api/Configurations/HostConfiguration.Extensions.cs` |
 
 ## Scaling levers
 

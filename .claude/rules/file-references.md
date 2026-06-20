@@ -46,7 +46,7 @@
 | `SmartQr.Common*` | shared libs (mediator, domain entities, EF Core persistence) |
 | `SmartQr.Codes` | generation library (QRCoder / ZXing.Net / ImageSharp) |
 | `SmartQr.Api` | management API (controllers + CQRS) |
-| `SmartQr.Redirect` | redirect hot path (minimal API) |
+| `SmartQr.Redirect.Api` | redirect hot path (minimal API) |
 | `SmartQr.Tests` | xUnit |
 
 ## Platform — Frontend (`platform/src/frontend/`)

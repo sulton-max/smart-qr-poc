@@ -30,11 +30,11 @@ Condition matching (`RuleConditionType`):
 
 | Type | File |
 |---|---|
-| `RoutingEvaluator` (the logic) | `platform/src/backend/SmartQr.Redirect/Infrastructure/Routing/RoutingEvaluator.cs` |
-| `IRoutingEvaluator` | `SmartQr.Redirect/Application/Routing/Services/IRoutingEvaluator.cs` |
-| `CodeRouteConfig` / `RouteRule` / `ScanContext` / `RouteDecision` / `RouteOutcome` | `SmartQr.Redirect/Application/Routing/Models/` |
-| `UserAgentDeviceDetector` | `SmartQr.Redirect/Infrastructure/Routing/UserAgentDeviceDetector.cs` |
-| `IGeoResolver` / `NoopGeoResolver` | `SmartQr.Redirect/.../Routing/` (geo is a stub — see below) |
+| `RoutingEvaluator` (the logic) | `platform/src/backend/SmartQr.Redirect.Api/Infrastructure/Routing/RoutingEvaluator.cs` |
+| `IRoutingEvaluator` | `SmartQr.Redirect.Api/Application/Routing/Services/IRoutingEvaluator.cs` |
+| `CodeRouteConfig` / `RouteRule` / `ScanContext` / `RouteDecision` / `RouteOutcome` | `SmartQr.Redirect.Api/Application/Routing/Models/` |
+| `UserAgentDeviceDetector` | `SmartQr.Redirect.Api/Infrastructure/Routing/UserAgentDeviceDetector.cs` |
+| `IGeoResolver` / `NoopGeoResolver` | `SmartQr.Redirect.Api/.../Routing/` (geo is a stub — see below) |
 | `RuleConditionType` / `DeviceType` (enums) | `SmartQr.Common.Domain/Codes/Enums/` |
 | Persisted: `RoutingRuleEntity` / `CodeEntity` | `SmartQr.Common.Domain/Codes/Entities/` |
 

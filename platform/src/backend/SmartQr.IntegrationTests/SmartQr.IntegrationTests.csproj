@@ -35,7 +35,7 @@
         <!-- Generic web-API integration-test harness (base types, fixtures, Postgres container, web host). -->
         <ProjectReference Include="..\SmartQr.Platform.Testing\SmartQr.Platform.Testing.csproj"/>
         <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" Aliases="apihost"/>
-        <ProjectReference Include="..\SmartQr.Redirect\SmartQr.Redirect.csproj" Aliases="redirecthost"/>
+        <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" Aliases="redirecthost"/>
     </ItemGroup>
 
 </Project>
