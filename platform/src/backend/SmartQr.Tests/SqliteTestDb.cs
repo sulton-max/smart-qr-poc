@@ -1,18 +1,17 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using SmartQr.Common.Persistence.DataContexts;
+using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Audit;
 
 namespace SmartQr.Tests;
 
-/// <summary>
-/// A fresh SQLite in-memory database for one test. The connection is held open so the database
-/// survives across multiple <see cref="SmartQrDbContext"/> instances (an in-memory SQLite DB is
-/// dropped when its last connection closes). Real relational provider — supports ExecuteUpdate,
-/// unique constraints, and transactions, unlike EF's InMemory provider.
-/// </summary>
+/// <summary>A fresh in-memory SQLite database for one test, connection held open so it survives across context instances. Real relational provider — supports ExecuteUpdate, unique constraints, transactions.</summary>
+/// <remarks>Attaches the SDK <see cref="AuditInterceptor"/> by hand (no DI) so audit timestamps stamp; without it the timestamp-assertion tests would fail.</remarks>
 public sealed class SqliteTestDb : IDisposable
 {
     private readonly SqliteConnection _connection;
+
+    private readonly AuditInterceptor _auditInterceptor = new(TimeProvider.System);
 
     public SqliteTestDb()
     {
@@ -25,9 +24,12 @@ public sealed class SqliteTestDb : IDisposable
     /// <summary>The shared open connection — pass to <c>UseSqlite</c> in a DI container to share the same DB.</summary>
     public SqliteConnection Connection => _connection;
 
-    /// <summary>A new context bound to the shared in-memory database.</summary>
+    /// <summary>A new context bound to the shared in-memory database, with the audit interceptor attached (so timestamps stamp).</summary>
     public SmartQrDbContext NewContext() =>
-        new(new DbContextOptionsBuilder<SmartQrDbContext>().UseSqlite(_connection).Options);
+        new(new DbContextOptionsBuilder<SmartQrDbContext>()
+            .UseSqlite(_connection)
+            .AddInterceptors(_auditInterceptor)
+            .Options);
 
     public void Dispose() => _connection.Dispose();
 }

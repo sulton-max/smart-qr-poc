@@ -14,7 +14,7 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
 
         builder.HasKey(e => e.Id);
 
-        // Slug is the immutable public identifier encoded into the printed code — must be unique + fast to look up.
+        // Slug is the immutable public identifier encoded into the printed code — must be unique and fast to look up.
         builder
             .HasIndex(e => e.Slug)
             .IsUnique();

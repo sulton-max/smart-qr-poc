@@ -26,7 +26,7 @@
       from the binary (logical name "Migrations/NNN-name/Apply.sql"), and the SDK migrator's
       AddDatabaseBespokeMigrations(assembly) resolves them via EmbeddedResourceMigrationSource (folderPrefix "Migrations/").
       The dev/CLI filesystem path now lives in the SDK's `wow-migrate` tool, not here.
-      Migrations: 001-baseline · 002-billing · 003-accounts.
+      Migrations: 001-baseline · 002-billing · 003-accounts · 004-enum-snake-case.
     -->
     <ItemGroup>
         <!-- Exclude Dev/ drafts: unpromoted dev SQL must never ship in the binary (runtime ignores them, but don't embed them). -->

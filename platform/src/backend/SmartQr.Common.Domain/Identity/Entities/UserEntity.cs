@@ -1,32 +1,33 @@
-using SmartQr.Common.Domain.Common.Entities;
+using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 
 namespace SmartQr.Common.Domain.Identity.Entities;
 
-/// <summary>A registered account layered over the guest-first identity. Its <see cref="Id"/> is the durable user key a code's owner id points at — on same-device sign-up the guest cookie Guid becomes this id, so existing guest codes need no reassignment.</summary>
-/// <example>users</example>
-public sealed record UserEntity : IEntity
+/// <summary>Represents a registered account layered over the guest-first identity. Its <see cref="Id"/> is the durable user key a code's owner id points at.</summary>
+/// <example>The users row created on first Google sign-in; on same-device sign-up the guest cookie Guid becomes this id</example>
+/// <remarks>On same-device sign-up the guest cookie Guid becomes this id, so guest codes need no reassignment. Profile refreshes per sign-in make it mutable — full <see cref="IAuditable"/> trait.</remarks>
+public sealed record UserEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
 {
-    /// <inheritdoc />
+    /// <summary>Gets the storage table name for the user entity — the single source of truth for hand-written SQL.</summary>
     public static string TableName => "users";
 
     /// <summary>Gets or sets the UUID primary key of the user — the ownership key a code's owner id references.</summary>
     public required Guid Id { get; set; }
 
-    /// <summary>Gets or sets Google's stable subject (the <c>sub</c> claim) — the find-or-create key on sign-in. Unique.</summary>
+    /// <summary>Gets or sets Google's stable subject of the user (the <c>sub</c> claim) — the find-or-create key on sign-in. Unique.</summary>
     public required string GoogleSubject { get; set; }
 
-    /// <summary>Gets or sets the primary email address from the verified Google identity.</summary>
+    /// <summary>Gets or sets the primary email address of the user from the verified Google identity.</summary>
     public required string Email { get; set; }
 
-    /// <summary>Gets or sets the display name from the verified Google identity.</summary>
+    /// <summary>Gets or sets the display name of the user from the verified Google identity.</summary>
     public required string Name { get; set; }
 
-    /// <summary>Gets or sets the avatar URL from the Google identity, when present.</summary>
+    /// <summary>Gets or sets the avatar URL of the user from the Google identity, when present.</summary>
     public string? AvatarUrl { get; set; }
 
-    /// <summary>Gets or sets the creation timestamp (auto-set on insert).</summary>
+    /// <summary>Gets or sets the creation timestamp of the user.</summary>
     public DateTimeOffset CreatedAt { get; set; }
 
-    /// <summary>Gets or sets the last-update timestamp (auto-set on modify).</summary>
+    /// <summary>Gets or sets the last-update timestamp of the user.</summary>
     public DateTimeOffset UpdatedAt { get; set; }
 }

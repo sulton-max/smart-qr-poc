@@ -19,8 +19,7 @@ public sealed class SubscriptionRepository(SmartQrDbContext db) : ISubscriptionR
     /// <inheritdoc />
     public async Task<SubscriptionEntity> UpsertByUserAsync(SubscriptionEntity entity, CancellationToken ct)
     {
-        // Single live row per user (unique index on user_id) — overwrite the existing row's billing fields,
-        // or insert when there's none. CreatedAt/UpdatedAt are stamped by the DbContext.
+        // Single live row per user (unique index on user_id) — overwrite the existing row's billing fields, or insert when there's none.
         var existing = await db.Subscriptions.FirstOrDefaultAsync(s => s.UserId == entity.UserId, ct);
 
         if (existing is null)

@@ -33,9 +33,7 @@ public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
 
         if (!string.IsNullOrWhiteSpace(q))
         {
-            // Case-insensitive contains on name OR fallback URL. Lower-casing both sides translates to
-            // SQL lower() on every provider (PG + SQLite) — reliably case-insensitive, unlike raw LIKE
-            // which is case-sensitive on PostgreSQL.
+            // Lower-case both sides → SQL lower() — reliably case-insensitive on PG + SQLite (raw LIKE is case-sensitive on PG).
             var term = q.Trim().ToLowerInvariant();
             query = query.Where(c =>
                 c.Name.ToLower().Contains(term) ||
@@ -50,11 +48,7 @@ public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
     /// <inheritdoc />
     public async Task<CodeEntity> UpdateAsync(CodeEntity code, CancellationToken ct)
     {
-        // Replace the whole rule set through the tracked graph so EF removes orphaned rules (cascade) and
-        // inserts the new ones in a single SaveChanges. The code is loaded+tracked by the caller; its
-        // existing rules are tracked too, so detaching them here lets EF delete the old rows cleanly
-        // without a stale-tracking conflict. The new rules carry fresh ids — pure inserts.
-        // UpdatedAt is stamped by the DbContext on Modified; slug / scan count / created-at are untouched.
+        // Replace the whole rule set: delete existing rows, insert the new (fresh-id) ones in one SaveChanges.
         var newRules = code.Rules.ToList();
 
         var existingRules = await db.RoutingRules
@@ -87,8 +81,7 @@ public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(Guid id, Guid userId, CancellationToken ct)
     {
-        // Owner-scoped hard delete. Rules are removed explicitly first so the cascade is provider-
-        // independent (it doesn't rely on SQLite's FK pragma being on in tests). No-op if not theirs.
+        // Owner-scoped hard delete. Rules removed explicitly so the cascade is provider-independent (not reliant on SQLite's FK pragma). No-op if not theirs.
         var removed = await db.Codes
             .Where(c => c.Id == id && c.UserId == userId)
             .ExecuteDeleteAsync(ct);
