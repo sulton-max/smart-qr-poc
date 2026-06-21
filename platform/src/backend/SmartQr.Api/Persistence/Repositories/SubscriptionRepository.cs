@@ -6,7 +6,7 @@ using SmartQr.Common.Persistence.DataContexts;
 namespace SmartQr.Api.Persistence.Repositories;
 
 /// <summary>EF Core implementation of <see cref="ISubscriptionRepository"/>.</summary>
-public sealed class SubscriptionRepository(SmartQrDbContext db) : ISubscriptionRepository
+public sealed class SubscriptionRepository(AppDbContext db) : ISubscriptionRepository
 {
     /// <inheritdoc />
     public Task<SubscriptionEntity?> GetByUserAsync(Guid userId, CancellationToken ct) =>

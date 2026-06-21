@@ -11,7 +11,7 @@ namespace SmartQr.Common.Configuration;
 /// </summary>
 public static class ConfigurationLoader
 {
-    /// <summary>Builds a config object of type <typeparamref name="T"/> from appsettings + env-var overlay.</summary>
+    /// <summary>Builds a config object of type <typeparamref name="T"/> from appsettings and env-var overlay.</summary>
     public static T Load<T>(IConfiguration configuration) where T : class, new()
     {
         // Step 1: Bind from appsettings section (already layered by environment)

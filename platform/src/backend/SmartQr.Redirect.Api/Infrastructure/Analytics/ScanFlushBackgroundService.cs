@@ -52,7 +52,7 @@ public sealed class ScanFlushBackgroundService(
     private async Task FlushAsync(IReadOnlyList<ScanRecord> records, CancellationToken ct)
     {
         using var scope = scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<SmartQrDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         foreach (var r in records)
         {

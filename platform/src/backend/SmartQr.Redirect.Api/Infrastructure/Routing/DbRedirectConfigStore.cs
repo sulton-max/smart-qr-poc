@@ -22,7 +22,7 @@ public sealed class DbRedirectConfigStore(IServiceScopeFactory scopeFactory) : I
     public async Task<CodeRouteConfig?> GetAsync(string slug, CancellationToken ct)
     {
         using var scope = scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<SmartQrDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var code = await db.Codes
             .AsNoTracking()

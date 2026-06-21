@@ -13,7 +13,7 @@ namespace SmartQr.IntegrationTests.Harness;
 ///   <item>Environment forced to <c>"Production"</c> (mirrors the SDK CODE — SmartQr startup is not gated on env).</item>
 ///   <item><see cref="FakeTimeProvider"/> registered as the default <see cref="TimeProvider"/>.</item>
 ///   <item>Hooks for replacing services and tweaking configuration before the host builds.</item>
-///   <item>The container connection string injected into <c>SmartQrDbSettings:ConnectionString</c> when set.</item>
+///   <item>The container connection string injected into <c>DatabaseSettings:ConnectionString</c> when set.</item>
 /// </list>
 /// </summary>
 /// <typeparam name="TEntryPoint">The application entry-point type (typically <c>Program</c>).</typeparam>
@@ -27,7 +27,7 @@ public class WebApiTestHost<TEntryPoint> : WebApplicationFactory<TEntryPoint>
     public FakeTimeProvider Clock { get; } = new();
 
     /// <summary>
-    /// PostgreSQL connection string injected as <c>SmartQrDbSettings:ConnectionString</c>. Both the Api and
+    /// PostgreSQL connection string injected as <c>DatabaseSettings:ConnectionString</c>. Both the Api and
     /// Redirect hosts point at the same container DB through this. The matching env var is set process-wide
     /// by the app fixture (the config loader's env overlay wins).
     /// </summary>
@@ -54,7 +54,7 @@ public class WebApiTestHost<TEntryPoint> : WebApplicationFactory<TEntryPoint>
             {
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["SmartQrDbSettings:ConnectionString"] = ConnectionString,
+                    ["DatabaseSettings:ConnectionString"] = ConnectionString,
                 });
             });
         }

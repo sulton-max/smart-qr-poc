@@ -99,7 +99,7 @@ public sealed class BillingWebhookCommandHandler(
     /// <summary>
     /// Refreshes an existing row located by its Stripe subscription id. <paramref name="status"/> is applied for
     /// the delete event; otherwise the status is taken as <see cref="SubscriptionStatus.Active"/> for an update (the
-    /// fake/real gateway only flags the kind, not the granular status). Plan + period end always refresh from the event.
+    /// fake/real gateway only flags the kind, not the granular status). Plan and period end always refresh from the event.
     /// </summary>
     private async Task RefreshFromSubscriptionAsync(BillingWebhookEvent e, SubscriptionStatus status, CancellationToken ct)
     {

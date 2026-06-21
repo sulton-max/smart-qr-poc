@@ -25,8 +25,8 @@ public sealed class SqliteTestDb : IDisposable
     public SqliteConnection Connection => _connection;
 
     /// <summary>A new context bound to the shared in-memory database, with the audit interceptor attached (so timestamps stamp).</summary>
-    public SmartQrDbContext NewContext() =>
-        new(new DbContextOptionsBuilder<SmartQrDbContext>()
+    public AppDbContext NewContext() =>
+        new(new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(_connection)
             .AddInterceptors(_auditInterceptor)
             .Options);

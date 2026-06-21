@@ -10,7 +10,7 @@ namespace SmartQr.IntegrationTests.Support;
 /// </summary>
 public static class TestJson
 {
-    /// <summary>JSON options matching the API: camelCase + string enums.</summary>
+    /// <summary>JSON options matching the API: camelCase and string enums.</summary>
     public static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web)
     {
         Converters = { new JsonStringEnumConverter() },

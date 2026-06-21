@@ -1,6 +1,11 @@
 using System.Text.Json.Serialization;
+using Dapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Npgsql;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
@@ -10,11 +15,20 @@ using SmartQr.Api.Infrastructure.Identity.Services;
 using SmartQr.Api.Persistence.Repositories;
 using SmartQr.Api.Settings;
 using SmartQr.Codes;
+using SmartQr.Codes.Logo;
+using SmartQr.Codes.Rendering;
 using SmartQr.Common.Configuration;
 using SmartQr.Common.Extensions;
-using SmartQr.Common.Persistence.Extensions;
+using SmartQr.Common.Persistence.DataContexts;
 using SmartQr.Common.Settings;
+using WoW.Two.Sdk.Backend.Beta.Data.Dapper;
+using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore;
+using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Audit;
+using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Postgres;
+using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Validation;
+using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
 using AuthSettings = SmartQr.Api.Settings.Auth;
 using BillingSettings = SmartQr.Api.Settings.Billing;
 
@@ -22,10 +36,10 @@ namespace SmartQr.Api.Configurations;
 
 public static partial class HostConfiguration
 {
-    /// <summary>Loads + registers settings (DB + API).</summary>
+    /// <summary>Loads and registers settings (DB and API).</summary>
     private static WebApplicationBuilder AddSettings(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton(ConfigurationLoader.Load<SmartQrDbSettings>(builder.Configuration));
+        builder.Services.AddSingleton(ConfigurationLoader.Load<DatabaseSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<AuthSettings>(builder.Configuration));
@@ -35,28 +49,59 @@ public static partial class HostConfiguration
     /// <summary>Registers the shared EF Core / Npgsql persistence.</summary>
     private static WebApplicationBuilder AddPersistence(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSmartQrPersistence();
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+        // ConnectionString is init-only, so defer construction until the host has bound settings.
+        builder.Services.AddSingleton<IOptions<DatabaseOptions>>(sp =>
+            Options.Create(new DatabaseOptions
+            {
+                ConnectionString = sp.GetRequiredService<DatabaseSettings>().ConnectionString,
+            }));
+
+        builder.Services.AddNpgsqlDataSource();
+        builder.Services.AddDataSourceConnectionFactory();
+        builder.Services.AddEfCoreAuditInterceptor();
+
+        builder.Services.AddDbContext<AppDbContext>((sp, optionsBuilder) =>
+        {
+            var dataSource = sp.GetRequiredService<NpgsqlDataSource>();
+            optionsBuilder
+                .UseNpgsql(dataSource)
+                .UseSnakeCaseNamingConvention()
+                .UseAuditInterceptor(sp);
+        });
+
+        // The bespoke SQL migrator owns the schema; EF is a pure mapper.
+        builder.Services.AddDatabaseBespokeMigrations(typeof(AppDbContext).Assembly);
+
         return builder;
     }
 
-    /// <summary>Registers the code generation library + image service.</summary>
+    /// <summary>Registers the code generation library (stateless renderers and the logo compositor as singletons) and the image service.</summary>
     private static WebApplicationBuilder AddCodeServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSmartQrCodes();
+        builder.Services.AddSingleton<ILogoCompositor, ImageSharpLogoCompositor>();
+        builder.Services.AddSingleton<IQrCodeRenderer, QrCodeRenderer>();
+        builder.Services.AddSingleton<IBarcodeRenderer, BarcodeRenderer>();
+        builder.Services.AddSingleton<ICodeRenderer, CodeRenderer>();
         builder.Services.AddScoped<ICodeImageService, CodeImageService>();
         return builder;
     }
 
-    /// <summary>Registers the mediator (handler scanning) + application services.</summary>
+    /// <summary>Registers the mediator (handler scanning), the FluentValidation pipeline behavior, and application services.</summary>
     private static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMediator(typeof(HostConfiguration).Assembly);
+
+        // Validators run in the pipeline before each handler; a failure throws ValidationException (400 via ValidationExceptionFilter).
+        builder.Services.AddMediatorValidationBehavior();
+
         builder.Services.AddScoped<ICodeRepository, CodeRepository>();
         builder.Services.AddSingleton<ISlugGenerator, SlugGenerator>();
         return builder;
     }
 
-    /// <summary>Registers the identity seam — read-only current-user view + guest provisioning.</summary>
+    /// <summary>Registers the identity seam — read-only current-user view and guest provisioning.</summary>
     private static WebApplicationBuilder AddIdentity(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
@@ -99,7 +144,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the billing seam — subscription repository + swappable Stripe gateway.</summary>
+    /// <summary>Registers the billing seam — subscription repository and swappable Stripe gateway.</summary>
     private static WebApplicationBuilder AddBilling(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
@@ -111,16 +156,41 @@ public static partial class HostConfiguration
     private static WebApplicationBuilder AddCustomCors(this WebApplicationBuilder builder)
     {
         var cors = builder.Configuration.GetSection(nameof(CorsSettings)).Get<CorsSettings>() ?? new CorsSettings();
-        builder.AddSmartQrCors(cors);
+        builder.AddCorsPolicy(cors);
         return builder;
     }
 
-    /// <summary>Registers controllers with string-enum JSON serialization.</summary>
+    /// <summary>Registers controllers with the validation exception filter and string-enum JSON serialization.</summary>
     private static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
         builder.Services
             .AddControllers()
+            .AddValidationExceptionFilter()
             .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         return builder;
+    }
+
+    /// <summary>Creates the database if missing, then applies all pending migrations on startup (idempotent).</summary>
+    private static async Task MigrateDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
+    {
+        using var scope = services.CreateScope();
+
+        var logger = scope.ServiceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("SmartQr.Api.DatabaseBootstrap");
+
+        var settings = scope.ServiceProvider.GetRequiredService<DatabaseSettings>();
+        var databaseName = new NpgsqlConnectionStringBuilder(settings.ConnectionString).Database;
+
+        // Create the target database via the maintenance DB before any migration runs.
+        var dialect = scope.ServiceProvider.GetRequiredService<IMigrationDialect>();
+        var created = await dialect.EnsureDatabaseExistsAsync(settings.ConnectionString, ct);
+        if (created)
+            logger.LogInformation("Created database {Database}.", databaseName);
+        else
+            logger.LogInformation("Database {Database} already exists.", databaseName);
+
+        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunnerService>();
+        await runner.ApplyPendingAsync("startup", ct);
     }
 }

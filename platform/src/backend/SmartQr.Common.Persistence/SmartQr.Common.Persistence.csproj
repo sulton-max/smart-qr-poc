@@ -13,7 +13,7 @@
         <PackageReference Include="Dapper" Version="2.*" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.*" />
         <!-- SQL migrator engine (Data.Migrations.Bespoke) — consumed from the published SDK; brings Data.Abstractions (IDbConnectionFactory) transitively. -->
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.24-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.28-beta" />
     </ItemGroup>
 
     <ItemGroup>

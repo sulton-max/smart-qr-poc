@@ -10,7 +10,7 @@ using StripePortalSessionOptions = Stripe.BillingPortal.SessionCreateOptions;
 namespace SmartQr.Api.Infrastructure.Billing.Services;
 
 /// <summary>
-/// Real <see cref="IBillingGateway"/> backed by Stripe.net. Hosted Checkout (<c>mode=subscription</c>) + Customer Portal,
+/// Real <see cref="IBillingGateway"/> backed by Stripe.net. Hosted Checkout (<c>mode=subscription</c>) and Customer Portal,
 /// no on-site card capture. The secret key is passed per call via <see cref="RequestOptions"/> (no global mutation).
 /// </summary>
 public sealed class StripeBillingGateway(BillingSettings settings) : IBillingGateway
@@ -58,7 +58,7 @@ public sealed class StripeBillingGateway(BillingSettings settings) : IBillingGat
     }
 
     /// <summary>
-    /// Flattens a completed Checkout session. The session itself carries only ids; the price + period end are fetched
+    /// Flattens a completed Checkout session. The session itself carries only ids; the price and period end are fetched
     /// by expanding the subscription (Checkout webhooks don't inline line items).
     /// </summary>
     private BillingWebhookEvent FromCheckout(Session session)
@@ -86,7 +86,7 @@ public sealed class StripeBillingGateway(BillingSettings settings) : IBillingGat
         };
     }
 
-    /// <summary>Flattens a <c>customer.subscription.*</c> event — the event object already is the subscription (price + period end on its item).</summary>
+    /// <summary>Flattens a <c>customer.subscription.*</c> event — the event object already is the subscription (price and period end on its item).</summary>
     private static BillingWebhookEvent FromSubscription(Subscription subscription, BillingWebhookEventType type)
     {
         var item = subscription.Items?.Data?.FirstOrDefault();

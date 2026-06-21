@@ -8,8 +8,8 @@ namespace SmartQr.IntegrationTests.Tests;
 /// <summary>
 /// E2E image rendering (mirrors requests #8–#9 of <c>SmartQr.Api.http</c>) — SVG vector and PNG raster.
 /// </summary>
-[Collection(SmartQrCollection.Name)]
-public sealed class CodeImageTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixture)
+[Collection(AppCollection.Name)]
+public sealed class CodeImageTests(AppFixture fixture) : E2EBase(fixture)
 {
     [Fact]
     public async Task GetImage_Svg_ReturnsSvgContentType_NonEmpty()

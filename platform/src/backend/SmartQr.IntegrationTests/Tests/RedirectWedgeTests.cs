@@ -10,8 +10,8 @@ namespace SmartQr.IntegrationTests.Tests;
 /// Api host is resolved by the Redirect host on the very next scan (DbRedirectConfigStore reads fresh per scan).
 /// Proves: device-rule match, fallback for unmatched device, async scan-count increment, and live re-route on edit.
 /// </summary>
-[Collection(SmartQrCollection.Name)]
-public sealed class RedirectWedgeTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixture)
+[Collection(AppCollection.Name)]
+public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
 {
     private const string IosUserAgent =
         "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";

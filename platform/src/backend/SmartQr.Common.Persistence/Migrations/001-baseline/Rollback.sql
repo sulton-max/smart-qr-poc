@@ -1,6 +1,6 @@
 -- ============================================================
 -- 001-baseline rollback — drops everything Apply.sql created.
--- Reverse dependency order; IF EXISTS + CASCADE so it is safe on partial state.
+-- Reverse dependency order; IF EXISTS and CASCADE so it is safe on partial state.
 -- Dev/test only — production rolls forward.
 -- ============================================================
 

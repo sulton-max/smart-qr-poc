@@ -13,7 +13,7 @@ namespace SmartQr.Common.Persistence.DataContexts;
 /// <summary>The Smart QR application database context — a pure mapper over the SQL-owned schema, on snake_case columns with enums stored as snake_case text.</summary>
 /// <remarks>Schema is owned by <c>Migrations/NNN-name/Apply.sql</c>; EF never creates or alters it — see <c>persistence/database.md</c>.</remarks>
 /// <param name="options">The context options, configured in the host's <c>AddPersistence</c> (Npgsql data source and snake_case naming).</param>
-public sealed class SmartQrDbContext(DbContextOptions<SmartQrDbContext> options) : AppDbContextBase(options)
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : AppDbContextBase(options)
 {
     /// <summary>Gets the dynamic codes (QR / barcode / link) set.</summary>
     public DbSet<CodeEntity> Codes => Set<CodeEntity>();

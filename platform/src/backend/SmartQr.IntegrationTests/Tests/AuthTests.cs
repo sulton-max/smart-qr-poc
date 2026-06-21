@@ -9,8 +9,8 @@ namespace SmartQr.IntegrationTests.Tests;
 /// E2E auth flow: Google sign-in (find-or-create), guest-code claim, cross-device ownership, and sign-out.
 /// Google verification is stubbed by <see cref="FakeGoogleTokenVerifier"/> — token form <c>fake:{sub}:{email}:{name}</c>.
 /// </summary>
-[Collection(SmartQrCollection.Name)]
-public sealed class AuthTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixture)
+[Collection(AppCollection.Name)]
+public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
 {
     private static string Token(string subject, string email, string name) => $"fake:{subject}:{email}:{name}";
 
@@ -25,7 +25,7 @@ public sealed class AuthTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixtur
         me.Kind.Should().Be("User");
 
         response.Headers.TryGetValues("Set-Cookie", out var cookies).Should().BeTrue();
-        cookies!.Should().Contain(c => c.StartsWith($"{SmartQrAppFixture.AuthCookieName}=", StringComparison.Ordinal));
+        cookies!.Should().Contain(c => c.StartsWith($"{AppFixture.AuthCookieName}=", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public sealed class AuthTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixtur
         logout.StatusCode.Should().Be(HttpStatusCode.NoContent);
         logout.Headers.TryGetValues("Set-Cookie", out var cookies).Should().BeTrue();
         // Sign-out deletes the cookie by re-issuing it empty (expired).
-        cookies!.Should().Contain(c => c.StartsWith($"{SmartQrAppFixture.AuthCookieName}=;", StringComparison.Ordinal));
+        cookies!.Should().Contain(c => c.StartsWith($"{AppFixture.AuthCookieName}=;", StringComparison.Ordinal));
     }
 
     /// <summary>Signs in with the fake Google token from a given client (default: a fresh anonymous one) and returns a client carrying the issued session cookie.</summary>
@@ -104,8 +104,8 @@ public sealed class AuthTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixtur
         var response = await client.PostJsonAsync("/api/auth/google", new { idToken });
 
         var authed = Fixture.CreateApiClient();
-        if (SmartQrAppFixture.ExtractCookie(response, SmartQrAppFixture.AuthCookieName) is { } cookie)
-            authed.DefaultRequestHeaders.Add("Cookie", $"{SmartQrAppFixture.AuthCookieName}={cookie}");
+        if (AppFixture.ExtractCookie(response, AppFixture.AuthCookieName) is { } cookie)
+            authed.DefaultRequestHeaders.Add("Cookie", $"{AppFixture.AuthCookieName}={cookie}");
 
         return (response, authed);
     }

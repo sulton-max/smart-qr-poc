@@ -52,7 +52,7 @@ public sealed class CookieGuestSession(IHttpContextAccessor accessor) : IGuestSe
         var http = accessor.HttpContext
             ?? throw new InvalidOperationException("No HttpContext — IGuestSession is only valid within a request scope.");
 
-        // Expire the cookie with the SAME attributes it was written with — name + path identify it, but mirroring
+        // Expire the cookie with the SAME attributes it was written with — name and path identify it, but mirroring
         // Secure / SameSite / HttpOnly keeps strict browsers from ignoring the deletion of a Secure cookie.
         http.Response.Cookies.Delete(CookieName, new CookieOptions
         {

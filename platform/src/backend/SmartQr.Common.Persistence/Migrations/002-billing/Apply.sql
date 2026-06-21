@@ -18,5 +18,5 @@ CREATE TABLE subscriptions (
     CONSTRAINT pk_subscriptions PRIMARY KEY (id)
 );
 
--- One live subscription per user — the lookup key + Stripe Checkout client_reference_id.
+-- One live subscription per user — the lookup key and Stripe Checkout client_reference_id.
 CREATE UNIQUE INDEX ix_subscriptions_user_id ON subscriptions (user_id);

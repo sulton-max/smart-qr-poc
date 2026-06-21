@@ -5,7 +5,7 @@ namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>
 /// Failure mid-batch: a batch of three where #2's Apply.sql is invalid. Each migration runs in its own
-/// transaction, so #1 stays applied + recorded, #2 rolls back wholesale (no table, no history row), and #3 is
+/// transaction, so #1 stays applied and recorded, #2 rolls back wholesale (no table, no history row), and #3 is
 /// never reached. Fixing #2 and re-running completes the batch from where it stopped.
 /// </summary>
 [Collection(MigratorCollection.Name)]
@@ -45,7 +45,7 @@ public sealed class FailureMidBatchTests(PostgresContainerFixture fixture) : Mig
         status.Pending.Select(p => p.Ordinal).Should().Equal(2, 3);
         status.Drifted.Should().BeEmpty();
 
-        // Fix #2 and re-run: the batch resumes and finishes #2 + #3 (not re-applying #1).
+        // Fix #2 and re-run: the batch resumes and finishes #2 and #3 (not re-applying #1).
         Workspace.OverwriteApply("002-broken", "create table t2(id int primary key);");
         var applied = await migrator.Runner.ApplyPendingAsync("test", CancellationToken.None);
 

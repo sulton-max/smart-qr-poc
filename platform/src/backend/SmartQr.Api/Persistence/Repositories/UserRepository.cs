@@ -6,7 +6,7 @@ using SmartQr.Common.Persistence.DataContexts;
 namespace SmartQr.Api.Persistence.Repositories;
 
 /// <summary>EF Core implementation of <see cref="IUserRepository"/>.</summary>
-public sealed class UserRepository(SmartQrDbContext db) : IUserRepository
+public sealed class UserRepository(AppDbContext db) : IUserRepository
 {
     /// <inheritdoc />
     public Task<UserEntity?> FindByGoogleSubjectAsync(string googleSubject, CancellationToken ct) =>

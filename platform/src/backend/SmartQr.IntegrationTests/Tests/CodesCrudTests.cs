@@ -6,11 +6,11 @@ using SmartQr.IntegrationTests.Support;
 namespace SmartQr.IntegrationTests.Tests;
 
 /// <summary>
-/// E2E CRUD + ownership for the codes management API (mirrors requests #4–#13 of <c>SmartQr.Api.http</c>
+/// E2E CRUD and ownership for the codes management API (mirrors requests #4–#13 of <c>SmartQr.Api.http</c>
 /// plus the auth/ownership wedge). Every test runs against the real Postgres container behind two hosts.
 /// </summary>
-[Collection(SmartQrCollection.Name)]
-public sealed class CodesCrudTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixture)
+[Collection(AppCollection.Name)]
+public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
 {
     [Fact]
     public async Task Create_ReturnsCode_WithSlugAndRedirectBaseShortUrl()
@@ -26,7 +26,7 @@ public sealed class CodesCrudTests(SmartQrAppFixture fixture) : SmartQrE2EBase(f
 
         code.Id.Should().NotBeEmpty();
         code.Slug.Should().NotBeNullOrWhiteSpace();
-        code.ShortUrl.Should().Be($"{SmartQrAppFixture.RedirectBaseUrl}/{code.Slug}");
+        code.ShortUrl.Should().Be($"{AppFixture.RedirectBaseUrl}/{code.Slug}");
         code.FallbackUrl.Should().Be("https://example.com");
         code.Rules.Should().ContainSingle()
             .Which.ConditionValue.Should().Be("Ios");
@@ -176,5 +176,29 @@ public sealed class CodesCrudTests(SmartQrAppFixture fixture) : SmartQrE2EBase(f
         // The owner's code must still be intact.
         var ownerGet = await owner.Client.GetAsync($"/api/codes/{created.Id}");
         ownerGet.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    // ── Input validation (FluentValidation pipeline → 400 ProblemDetails) ──
+
+    [Fact]
+    public async Task Create_WithBlankName_Returns400()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var response = await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.Code("", "https://example.com"));
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Create_WithNonHttpFallbackUrl_Returns400()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var response = await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.Code("Bad URL", "ftp://example.com"));
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest, "the fallback URL must be an absolute http(s) URL");
     }
 }

@@ -4,9 +4,9 @@ using SmartQr.Api.Application.Billing.Core.Models;
 using SmartQr.Api.Application.Billing.Core.Queries;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Api.Requests;
-using SmartQr.Common.Models;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
+using WoW.Two.Sdk.Backend.Beta.Web.Contracts;
 
 namespace SmartQr.Api.Controllers;
 
@@ -53,7 +53,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
     /// <summary>Handles a Stripe webhook event.</summary>
     /// <remarks>
-    /// Not owner-scoped and not enveloped: reads the raw body + <c>Stripe-Signature</c> header, verifies it, and
+    /// Not owner-scoped and not enveloped: reads the raw body and <c>Stripe-Signature</c> header, verifies it, and
     /// upserts the affected subscription. Returns 200 when handled/ignored, 400 on a bad signature (so Stripe's
     /// retry logic is correct).
     /// </remarks>

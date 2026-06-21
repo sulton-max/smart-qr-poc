@@ -5,7 +5,7 @@ namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>
 /// <c>-- @no-transaction</c>: the Apply runs outside a transaction (required for e.g. CREATE INDEX CONCURRENTLY)
-/// and is recorded in a separate statement. It still applies + records, and a re-run is a no-op.
+/// and is recorded in a separate statement. It still applies and records, and a re-run is a no-op.
 /// </summary>
 [Collection(MigratorCollection.Name)]
 public sealed class NoTransactionTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
@@ -34,7 +34,7 @@ public sealed class NoTransactionTests(PostgresContainerFixture fixture) : Migra
         var history = await migrator.ReadHistoryAsync();
         history.Select(r => r.Ordinal).Should().Equal(1, 2);
 
-        // Re-running the whole apply is a clean no-op (idempotent Apply + already-recorded row).
+        // Re-running the whole apply is a clean no-op (idempotent Apply and already-recorded row).
         var second = await migrator.Runner.ApplyPendingAsync("test", CancellationToken.None);
         second.Should().BeEmpty();
         (await migrator.ReadHistoryAsync()).Should().HaveCount(2);

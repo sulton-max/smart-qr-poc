@@ -25,7 +25,7 @@ CREATE TABLE codes (
     CONSTRAINT pk_codes PRIMARY KEY (id)
 );
 
--- Slug is the immutable public id encoded into the printed code — unique + the redirect lookup key.
+-- Slug is the immutable public id encoded into the printed code — unique and the redirect lookup key.
 CREATE UNIQUE INDEX ix_codes_slug ON codes (slug);
 
 CREATE TABLE routing_rules (

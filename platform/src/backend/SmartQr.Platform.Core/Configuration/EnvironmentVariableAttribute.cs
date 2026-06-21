@@ -7,6 +7,6 @@ public sealed class EnvironmentVariableAttribute(string envVarName, bool require
     /// <summary>The environment variable name to read.</summary>
     public string EnvVarName { get; } = envVarName;
 
-    /// <summary>Whether the value must be present after binding + env overlay (throws if missing).</summary>
+    /// <summary>Whether the value must be present after binding and env overlay (throws if missing).</summary>
     public bool Required { get; } = required;
 }

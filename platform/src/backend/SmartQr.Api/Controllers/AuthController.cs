@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using SmartQr.Api.Application.Identity.Core.Models;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Api.Requests;
-using SmartQr.Common.Models;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
+using WoW.Two.Sdk.Backend.Beta.Web.Contracts;
 
 namespace SmartQr.Api.Controllers;
 

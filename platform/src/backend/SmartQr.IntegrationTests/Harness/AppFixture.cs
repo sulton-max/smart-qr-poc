@@ -17,13 +17,13 @@ using IGoogleTokenVerifier = apihost::SmartQr.Api.Application.Identity.Core.Serv
 namespace SmartQr.IntegrationTests.Harness;
 
 /// <summary>
-/// Owns the single shared Postgres container and the two in-process hosts (Api + Redirect) the whole E2E run
+/// Owns the single shared Postgres container and the two in-process hosts (Api and Redirect) the whole E2E run
 /// drives. Both hosts point at the SAME container DB, so a write through the Api host is visible to a scan on
-/// the Redirect host. Migrations auto-apply on each host's startup (<c>MigrateSmartQrDatabaseAsync</c>); the
+/// the Redirect host. Migrations auto-apply on each host's startup (<c>MigrateDatabaseAsync</c>); the
 /// Respawner is built once both schemas exist and resets all data tables (except <c>migration_history</c>)
 /// between tests via <see cref="ResetAsync"/>.
 /// </summary>
-public sealed class SmartQrAppFixture : IAsyncLifetime
+public sealed class AppFixture : IAsyncLifetime
 {
     /// <summary>Name of the identity cookie the Api host sets on guest provisioning.</summary>
     public const string UserIdCookieName = "user-id";
@@ -42,7 +42,7 @@ public sealed class SmartQrAppFixture : IAsyncLifetime
     private WebApiTestHost<ApiProgram>? _apiHost;
     private WebApiTestHost<RedirectProgram>? _redirectHost;
 
-    /// <summary>The shared Postgres fixture (container + Respawn).</summary>
+    /// <summary>The shared Postgres fixture (container and Respawn).</summary>
     public PostgresFixture Postgres => _postgres;
 
     /// <summary>The management Api host.</summary>
@@ -154,9 +154,9 @@ public sealed class SmartQrAppFixture : IAsyncLifetime
 /// <param name="UserId">The provisioned guest id (string form of the cookie value).</param>
 public sealed record GuestClient(HttpClient Client, string UserId);
 
-/// <summary>xUnit collection that shares one <see cref="SmartQrAppFixture"/> across the whole E2E run.</summary>
-[CollectionDefinition(SmartQrCollection.Name)]
-public sealed class SmartQrCollection : ICollectionFixture<SmartQrAppFixture>
+/// <summary>xUnit collection that shares one <see cref="AppFixture"/> across the whole E2E run.</summary>
+[CollectionDefinition(AppCollection.Name)]
+public sealed class AppCollection : ICollectionFixture<AppFixture>
 {
     /// <summary>The collection name — every E2E test class joins this so they share the container and run serially.</summary>
     public const string Name = "smart-qr-e2e";
@@ -164,12 +164,12 @@ public sealed class SmartQrCollection : ICollectionFixture<SmartQrAppFixture>
 
 /// <summary>
 /// Convenience base for E2E tests — wires the shared fixture, resets the DB before each test, and exposes
-/// fresh clients. Concrete test classes carry <c>[Collection(SmartQrCollection.Name)]</c>.
+/// fresh clients. Concrete test classes carry <c>[Collection(AppCollection.Name)]</c>.
 /// </summary>
-public abstract class SmartQrE2EBase(SmartQrAppFixture fixture) : IAsyncLifetime
+public abstract class E2EBase(AppFixture fixture) : IAsyncLifetime
 {
-    /// <summary>The shared app fixture (container + two hosts).</summary>
-    protected SmartQrAppFixture Fixture { get; } = fixture;
+    /// <summary>The shared app fixture (container and two hosts).</summary>
+    protected AppFixture Fixture { get; } = fixture;
 
     /// <summary>An anonymous Api client (no identity cookie).</summary>
     protected HttpClient AnonymousClient => Fixture.CreateApiClient();

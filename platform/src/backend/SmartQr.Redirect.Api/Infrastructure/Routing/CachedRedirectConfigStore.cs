@@ -27,7 +27,7 @@ public sealed class CachedRedirectConfigStore(
             return cached;
 
         using var scope = scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<SmartQrDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var code = await db.Codes
             .AsNoTracking()

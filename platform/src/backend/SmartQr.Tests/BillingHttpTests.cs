@@ -66,7 +66,7 @@ public sealed class BillingHttpTests : IDisposable
         var webhook = await BillingWebApp.PostWebhookAsync(apiClient);
         Assert.Equal(HttpStatusCode.OK, webhook.StatusCode); // 200 — handled
 
-        // After: /me reflects the upgraded Pro plan + limits.
+        // After: /me reflects the upgraded Pro plan and limits.
         var after = await BillingWebApp.GetEnvelopeAsync<BillingStatusWire>(apiClient, "/api/billing/me");
         Assert.Equal("Pro", after.Plan);
         Assert.Equal("active", after.Status);

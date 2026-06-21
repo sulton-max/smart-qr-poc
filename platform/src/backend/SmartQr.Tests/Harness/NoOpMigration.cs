@@ -3,17 +3,12 @@ using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Tests.Harness;
 
-/// <summary>
-/// No-op <see cref="IMigrationDialect"/> for the SQLite-backed billing host tests. The startup hook
-/// <c>MigrateSmartQrDatabaseAsync()</c> calls <see cref="EnsureDatabaseExistsAsync"/> against the (unused) Npgsql
-/// connection string — this stub makes that a no-op so nothing touches Postgres. The SQLite schema instead comes
-/// from <c>EnsureCreated()</c> on the shared connection in <see cref="BillingWebApp"/>.
-/// </summary>
+/// <summary>No-op <see cref="IMigrationDialect"/> for the SQLite-backed billing host tests — keeps the startup <c>MigrateDatabaseAsync()</c> hook off Postgres.</summary>
 internal sealed class NoOpMigrationDialect : IMigrationDialect
 {
     /// <inheritdoc />
     public Task<bool> EnsureDatabaseExistsAsync(string connectionString, CancellationToken ct = default) =>
-        Task.FromResult(false); // SQLite DB already exists (held open) — never create a Postgres DB.
+        Task.FromResult(false);
 
     /// <inheritdoc />
     public Task AcquireLockAsync(DbConnection connection, long lockId, CancellationToken ct = default) =>
@@ -26,13 +21,13 @@ internal sealed class NoOpMigrationDialect : IMigrationDialect
     /// <inheritdoc />
     public Task EnsureHistoryTableAsync(DbConnection connection, string schemaName, string tableName, CancellationToken ct = default) =>
         Task.CompletedTask;
+
+    /// <inheritdoc />
+    public string QualifyHistoryTable(string schemaName, string tableName) =>
+        $"\"{tableName}\"";
 }
 
-/// <summary>
-/// No-op <see cref="IMigrationRunnerService"/> — the schema is created by EF's <c>EnsureCreated()</c> on the shared
-/// SQLite connection, so the bespoke SQL migrator never runs in these host tests. <see cref="ApplyPendingAsync"/>
-/// reports "nothing applied"; the other members are unused at startup but must satisfy the interface.
-/// </summary>
+/// <summary>No-op <see cref="IMigrationRunnerService"/> — schema comes from EF's <c>EnsureCreated()</c>, so the bespoke migrator never runs in these host tests.</summary>
 internal sealed class NoOpMigrationRunner : IMigrationRunnerService
 {
     /// <inheritdoc />

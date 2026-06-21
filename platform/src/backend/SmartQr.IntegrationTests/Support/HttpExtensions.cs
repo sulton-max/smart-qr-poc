@@ -7,7 +7,7 @@ namespace SmartQr.IntegrationTests.Support;
 /// <summary>Compact JSON request/response helpers for the E2E tests.</summary>
 public static class HttpExtensions
 {
-    /// <summary>Serializes <paramref name="body"/> with the API JSON conventions (camelCase + string enums).</summary>
+    /// <summary>Serializes <paramref name="body"/> with the API JSON conventions (camelCase and string enums).</summary>
     public static StringContent AsJson(this object body)
     {
         var json = JsonSerializer.Serialize(body, TestJson.Options);

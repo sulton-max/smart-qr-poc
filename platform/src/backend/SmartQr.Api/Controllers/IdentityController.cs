@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using SmartQr.Api.Application.Identity.Core.Models;
 using SmartQr.Api.Application.Identity.Core.Services;
-using SmartQr.Common.Models;
+using WoW.Two.Sdk.Backend.Beta.Web.Contracts;
 
 namespace SmartQr.Api.Controllers;
 

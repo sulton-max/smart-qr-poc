@@ -2,7 +2,7 @@ using SmartQr.Codes.Models;
 
 namespace SmartQr.Codes.Rendering;
 
-/// <summary>Renders QR codes via QRCoder. SVG + PNG paths are both cross-platform (no System.Drawing).</summary>
+/// <summary>Renders QR codes via QRCoder. SVG and PNG paths are both cross-platform (no System.Drawing).</summary>
 public interface IQrCodeRenderer
 {
     /// <summary>Renders the payload as an SVG string (vector — infinite scale, re-styleable).</summary>

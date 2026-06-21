@@ -36,7 +36,7 @@ namespace SmartQr.Tests.Harness;
 /// (schema comes from EF <c>EnsureCreated()</c>).
 /// </summary>
 /// <remarks>
-/// Both hosts run their startup <c>MigrateSmartQrDatabaseAsync()</c>, which targets Npgsql — the
+/// Both hosts run their startup <c>MigrateDatabaseAsync()</c>, which targets Npgsql — the
 /// <see cref="NoOpMigrationDialect"/> / <see cref="NoOpMigrationRunner"/> make that a no-op so nothing hits Postgres.
 /// A parseable (but never-opened) Postgres connection string is injected only because the startup hook reads its
 /// database name.
@@ -57,7 +57,7 @@ public sealed class BillingWebApp : IDisposable
     /// <summary>The fixed current user the Api host resolves every request to (owner of created codes / subscription).</summary>
     public TestCurrentUser CurrentUser { get; } = new();
 
-    /// <summary>JSON options matching the API wire contract: camelCase + string enums.</summary>
+    /// <summary>JSON options matching the API wire contract: camelCase and string enums.</summary>
     public static JsonSerializerOptions Json { get; } = new(JsonSerializerDefaults.Web)
     {
         Converters = { new JsonStringEnumConverter() },
@@ -69,8 +69,8 @@ public sealed class BillingWebApp : IDisposable
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
-        // Create the schema once on the shared connection (subscriptions + codes + rules). MUST use the same
-        // snake_case convention the hosts apply (AddSmartQrPersistence → UseSnakeCaseNamingConvention), otherwise the
+        // Create the schema once on the shared connection (subscriptions, codes, and rules). MUST use the same
+        // snake_case convention the hosts apply (AddPersistence → UseSnakeCaseNamingConvention), otherwise the
         // created columns are PascalCase while the host queries snake_case (e.g. `created_at`) and every read 500s.
         using (var ctx = NewDbContext())
         {
@@ -91,11 +91,11 @@ public sealed class BillingWebApp : IDisposable
     });
 
     /// <summary>
-    /// A new <see cref="SmartQrDbContext"/> on the shared DB — for schema creation and direct seeding / assertions.
+    /// A new <see cref="AppDbContext"/> on the shared DB — for schema creation and direct seeding / assertions.
     /// Applies the same snake_case convention as the hosts so column names line up across schema, seeds, and queries.
     /// </summary>
-    public SmartQrDbContext NewDbContext() =>
-        new(new DbContextOptionsBuilder<SmartQrDbContext>()
+    public AppDbContext NewDbContext() =>
+        new(new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(_connection)
             .UseSnakeCaseNamingConvention()
             .Options);
@@ -110,7 +110,7 @@ public sealed class BillingWebApp : IDisposable
                 UseSharedSqlite(services);
                 NeuterMigrator(services);
 
-                // No network: swap the real Stripe gateway + the cookie identity for in-test doubles.
+                // No network: swap the real Stripe gateway and the cookie identity for in-test doubles.
                 services.RemoveAll<IBillingGateway>();
                 services.AddSingleton<IBillingGateway>(Gateway);
                 services.RemoveAll<ICurrentUser>();
@@ -149,21 +149,21 @@ public sealed class BillingWebApp : IDisposable
         {
             // Read by the startup migrate hook (for the DB name) and the data-source builder; never actually opened.
             // (Billing settings are replaced as a DI singleton in ConfigureTestServices, not via config — see there.)
-            ["SmartQrDbSettings:ConnectionString"] = DummyPgConnection,
+            ["DatabaseSettings:ConnectionString"] = DummyPgConnection,
         }));
 
     /// <summary>Repoints EF off Npgsql onto the single shared SQLite connection so both hosts see the same data.</summary>
     /// <remarks>
-    /// <c>AddDbContext(UseNpgsql…)</c> registers the provider through an <c>IDbContextOptionsConfiguration&lt;SmartQrDbContext&gt;</c>
+    /// <c>AddDbContext(UseNpgsql…)</c> registers the provider through an <c>IDbContextOptionsConfiguration&lt;AppDbContext&gt;</c>
     /// that ACCUMULATES — so a second <c>AddDbContext(UseSqlite…)</c> would leave BOTH providers applied to the same
     /// context's options (EF throws "Only a single database provider can be registered"). Strip every EF descriptor for
     /// this context (the options, its accumulating configuration, and the context registration) before re-adding SQLite.
     /// </remarks>
     private void UseSharedSqlite(IServiceCollection services)
     {
-        services.RemoveAllForDbContext<SmartQrDbContext>();
+        services.RemoveAllForDbContext<AppDbContext>();
 
-        services.AddDbContext<SmartQrDbContext>(o => o
+        services.AddDbContext<AppDbContext>(o => o
             .UseSqlite(_connection)
             .UseSnakeCaseNamingConvention());
     }
@@ -177,7 +177,7 @@ public sealed class BillingWebApp : IDisposable
         services.AddSingleton<IMigrationRunnerService, NoOpMigrationRunner>();
     }
 
-    /// <summary>POSTs <paramref name="value"/> as JSON (camelCase + string enums) to <paramref name="url"/> on the given client.</summary>
+    /// <summary>POSTs <paramref name="value"/> as JSON (camelCase and string enums) to <paramref name="url"/> on the given client.</summary>
     public static Task<HttpResponseMessage> PostJsonAsync(HttpClient client, string url, object value) =>
         client.PostAsync(url, JsonContent.Create(value, options: Json));
 

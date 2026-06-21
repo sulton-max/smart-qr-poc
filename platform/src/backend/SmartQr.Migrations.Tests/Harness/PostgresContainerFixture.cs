@@ -6,7 +6,7 @@ namespace SmartQr.Migrations.Tests.Harness;
 /// <summary>
 /// Owns the single Postgres container shared by the whole migrator suite. Mirrors the Testcontainers idiom in
 /// <c>SmartQr.IntegrationTests/Harness</c> (pinned image, <c>GetConnectionString</c>), but is self-contained — no
-/// app host, no Respawn. Each test gets a clean schema via <see cref="ResetSchemaAsync"/> (drop + recreate
+/// app host, no Respawn. Each test gets a clean schema via <see cref="ResetSchemaAsync"/> (drop and recreate
 /// <c>public</c>), which also wipes the migrator's own <c>migration_history</c> so every test starts from zero.
 /// </summary>
 public sealed class PostgresContainerFixture : IAsyncLifetime

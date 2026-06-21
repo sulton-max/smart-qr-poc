@@ -4,7 +4,7 @@ using SmartQr.Common.Domain.Codes.Enums;
 
 namespace SmartQr.Codes.Rendering;
 
-/// <summary>Facade that dispatches a render request to the QR or barcode renderer based on symbology + format.</summary>
+/// <summary>Facade that dispatches a render request to the QR or barcode renderer based on symbology and format.</summary>
 public sealed class CodeRenderer(IQrCodeRenderer qr, IBarcodeRenderer barcode) : ICodeRenderer
 {
     /// <inheritdoc />

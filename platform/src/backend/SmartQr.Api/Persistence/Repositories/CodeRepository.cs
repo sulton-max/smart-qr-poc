@@ -6,7 +6,7 @@ using SmartQr.Common.Persistence.DataContexts;
 namespace SmartQr.Api.Persistence.Repositories;
 
 /// <summary>EF Core implementation of <see cref="ICodeRepository"/>.</summary>
-public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
+public sealed class CodeRepository(AppDbContext db) : ICodeRepository
 {
     /// <inheritdoc />
     public async Task<CodeEntity> AddAsync(CodeEntity code, CancellationToken ct)
@@ -33,7 +33,7 @@ public sealed class CodeRepository(SmartQrDbContext db) : ICodeRepository
 
         if (!string.IsNullOrWhiteSpace(q))
         {
-            // Lower-case both sides → SQL lower() — reliably case-insensitive on PG + SQLite (raw LIKE is case-sensitive on PG).
+            // Lower-case both sides → SQL lower() — reliably case-insensitive on PG and SQLite (raw LIKE is case-sensitive on PG).
             var term = q.Trim().ToLowerInvariant();
             query = query.Where(c =>
                 c.Name.ToLower().Contains(term) ||

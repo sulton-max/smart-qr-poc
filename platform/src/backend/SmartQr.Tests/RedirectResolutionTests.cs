@@ -19,7 +19,7 @@ public class RedirectResolutionTests
     private static ServiceProvider BuildProvider(SqliteTestDb db)
     {
         var services = new ServiceCollection();
-        services.AddDbContext<SmartQrDbContext>(o => o.UseSqlite(db.Connection));
+        services.AddDbContext<AppDbContext>(o => o.UseSqlite(db.Connection));
         services.AddMemoryCache();
         services.AddSingleton(new RedirectSettings { ConfigCacheSeconds = 30 });
         services.AddSingleton<IRoutingEvaluator, RoutingEvaluator>();

@@ -8,8 +8,8 @@ namespace SmartQr.IntegrationTests.Tests;
 /// <summary>
 /// E2E identity flow (mirrors requests #1–#3 of <c>SmartQr.Api.http</c>): anonymous → mint guest → guest.
 /// </summary>
-[Collection(SmartQrCollection.Name)]
-public sealed class IdentityTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fixture)
+[Collection(AppCollection.Name)]
+public sealed class IdentityTests(AppFixture fixture) : E2EBase(fixture)
 {
     [Fact]
     public async Task Me_WithoutCookie_IsAnonymous()
@@ -30,7 +30,7 @@ public sealed class IdentityTests(SmartQrAppFixture fixture) : SmartQrE2EBase(fi
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Headers.TryGetValues("Set-Cookie", out var cookies).Should().BeTrue();
-        cookies!.Should().Contain(c => c.StartsWith($"{SmartQrAppFixture.UserIdCookieName}=", StringComparison.Ordinal));
+        cookies!.Should().Contain(c => c.StartsWith($"{AppFixture.UserIdCookieName}=", StringComparison.Ordinal));
     }
 
     [Fact]

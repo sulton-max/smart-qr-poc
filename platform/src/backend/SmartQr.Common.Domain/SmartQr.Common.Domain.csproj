@@ -9,7 +9,7 @@
     <ItemGroup>
         <!-- ISuccessResult / IFailureResult — the result-pattern markers the per-operation result containers
              and ISmartQrFailure implement. Flows transitively to Api + Application. -->
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.26-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.28-beta" />
     </ItemGroup>
 
 </Project>
