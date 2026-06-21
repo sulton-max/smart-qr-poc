@@ -19,7 +19,7 @@ export const BarcodeFormat = {
 } as const;
 export type BarcodeFormat = (typeof BarcodeFormat)[keyof typeof BarcodeFormat];
 
-/** A routing rule row in the builder (client-side `id` for list keys). */
+// Builder row; `id` is client-side for list keys.
 export interface RuleDraft {
   id: string;
   order: number;
@@ -41,13 +41,9 @@ export interface CreateCodeRequest {
   }>;
 }
 
-/**
- * Body for `PUT /api/codes/{id}` — full replace of the editable fields plus the entire rule set.
- * Mirrors `CreateCodeRequest`; the slug, scan count, and creation time are server-preserved.
- */
+// `PUT /api/codes/{id}` — full replace; slug, scan count, creation time are server-preserved.
 export type UpdateCodeRequest = CreateCodeRequest;
 
-/** Body for `PATCH /api/codes/{id}/active` — toggles only `is_active`. */
 export interface SetActiveRequest {
   isActive: boolean;
 }
@@ -72,7 +68,7 @@ export interface CodeDto {
   }>;
 }
 
-/** Backend `ApiResponse<T>.Success` envelope (camelCased). */
+// Backend `ApiResponse<T>.Success` envelope (camelCased).
 export interface ApiSuccess<T> {
   data: T;
 }
@@ -93,7 +89,7 @@ export interface Me {
 
 // ── Billing (mirrors SmartQr.Api Billing DTOs + SmartQr.Common.Domain.Billing.Enums) ──
 
-/** Subscription plan — enum-as-text, matches `Plan.cs` (`HaveConversion<string>`). */
+// Enum-as-text; matches `Plan.cs` (`HaveConversion<string>`).
 export const Plan = {
   Free: "Free",
   Solo: "Solo",
@@ -102,36 +98,28 @@ export const Plan = {
 } as const;
 export type Plan = (typeof Plan)[keyof typeof Plan];
 
-/** The paid plans, in upgrade order — the only ones `POST /api/billing/checkout` accepts (`Free` is rejected). */
+// Paid plans in upgrade order; the only ones `/api/billing/checkout` accepts (`Free` rejected).
 export const PAID_PLANS: Plan[] = [Plan.Solo, Plan.Pro, Plan.Agency];
 
-/**
- * Body for `POST /api/billing/checkout`. `plan` is enum-as-text (the configured
- * `JsonStringEnumConverter`); the backend rejects `Free`.
- */
 export interface CheckoutRequest {
   plan: Plan;
 }
 
-/** `CheckoutSessionDto` / `PortalSessionDto` — both carry a single hosted Stripe URL to redirect to. */
+// `CheckoutSessionDto` / `PortalSessionDto` — a single hosted Stripe URL.
 export interface SessionUrlDto {
   url: string;
 }
 
-/** `LimitsDto` — code cap for the plan. `maxCodes === -1` is the Agency unlimited sentinel (render as ∞). */
+// `maxCodes === -1` is the Agency unlimited sentinel (render as ∞).
 export interface LimitsDto {
   maxCodes: number;
 }
 
-/** `UsageDto` — live count of the caller's codes. */
 export interface UsageDto {
   codeCount: number;
 }
 
-/**
- * `BillingStatusDto` from `GET /api/billing/me` — plan + raw subscription status
- * + limits + usage. A guest with no subscription row resolves to `{ plan: Free, status: "active" }`.
- */
+// `GET /api/billing/me`; a guest with no subscription row resolves to `{ plan: Free, status: "active" }`.
 export interface BillingStatus {
   plan: Plan;
   status: string;

@@ -1,3 +1,4 @@
+import { Grid } from "@wow-two-beta/ui/layout";
 import { usePageMeta } from "../lib/meta";
 import { POST_METAS } from "./blog";
 import { BlogCard, Section, SectionHeading } from "./components";
@@ -15,11 +16,11 @@ export function BlogIndexPage() {
         title="Why and how to use QR codes"
         description="Practical guides to getting QR codes right — from the squares that have to scan to the routing rules behind them."
       />
-      <div className="mx-auto mt-12 grid max-w-4xl gap-6 sm:grid-cols-2">
+      <Grid columns="1" gap="6" className="mx-auto mt-12 max-w-4xl sm:grid-cols-2">
         {POST_METAS.map((post) => (
           <BlogCard key={post.slug} post={post} />
         ))}
-      </div>
+      </Grid>
     </Section>
   );
 }

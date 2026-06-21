@@ -9,14 +9,7 @@ import { NotFoundPage } from "./marketing/NotFoundPage";
 import { AppLayout } from "./app/AppLayout";
 import { BillingRoute, CodesListRoute, CreateCodeRoute, EditCodeRoute } from "./app/routes";
 
-/**
- * Top-level router. Two areas:
- *  - `/app/*` — the (guest-gated) product: codes list + create/edit builder.
- *  - everything else — the public marketing surface (landing, pricing, blog), no auth, no API calls.
- *
- * The backend serves this SPA with a fallback to `index.html`, so deep links to any path resolve to
- * the router on the client.
- */
+// `/app/*` is the guest-gated product; everything else is the public marketing surface.
 export function App() {
   return (
     <>

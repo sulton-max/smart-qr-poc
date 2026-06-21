@@ -1,5 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@wow-two-beta/ui/actions";
+import { Badge, Heading, Text } from "@wow-two-beta/ui/display";
+import { Grid, Surface } from "@wow-two-beta/ui/layout";
 import { ArrowLeft } from "lucide-react";
 import { usePageMeta } from "../lib/meta";
 import { getPost, POST_METAS } from "./blog";
@@ -18,7 +20,7 @@ export function BlogPostPage() {
   const { slug = "" } = useParams();
   const post = getPost(slug);
 
-  // Hooks must run unconditionally — set meta from the post (or a fallback) before any early return.
+  // Hooks run unconditionally — set meta before the early return.
   usePageMeta(
     post ? `${post.meta.title} · Smart QR` : "Post not found · Smart QR",
     post?.meta.description,
@@ -39,14 +41,20 @@ export function BlogPostPage() {
       </Link>
 
       <div className="mt-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <span className="rounded-full bg-primary-soft px-2.5 py-1 font-medium text-primary">{meta.tag}</span>
+        <Badge variant="brand" size="md" className="px-2.5 py-1 text-primary">
+          {meta.tag}
+        </Badge>
         <span>{formatDate(meta.date)}</span>
         <span aria-hidden>·</span>
         <span>{meta.readingMinutes} min read</span>
       </div>
 
-      <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{meta.title}</h1>
-      <p className="mt-4 text-lg text-muted-foreground">{meta.description}</p>
+      <Heading level={1} size="2xl" weight="bold" className="mt-4 leading-tight sm:text-4xl">
+        {meta.title}
+      </Heading>
+      <Text size="lg" color="muted" className="mt-4">
+        {meta.description}
+      </Text>
 
       <hr className="my-8 border-border" />
 
@@ -54,12 +62,16 @@ export function BlogPostPage() {
         <Body />
       </div>
 
-      {/* Inline CTA */}
-      <div className="mt-12 rounded-2xl border border-primary/20 bg-primary-soft/50 p-6 text-center">
-        <p className="font-semibold">Try it on a code that never expires.</p>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <Surface
+        variant="subtle"
+        tone="primary"
+        radius="2xl"
+        className="mt-12 bg-primary-soft/50 p-6 text-center"
+      >
+        <Text weight="semibold">Try it on a code that never expires.</Text>
+        <Text size="sm" color="muted" className="mt-1">
           Create a programmable QR code in under a minute — free, no account needed.
-        </p>
+        </Text>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
           <Button asChild tone="primary" size="sm">
             <Link to="/app/new">Create a code</Link>
@@ -68,16 +80,18 @@ export function BlogPostPage() {
             <Link to="/pricing">See pricing</Link>
           </Button>
         </div>
-      </div>
+      </Surface>
 
       {related.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-lg font-semibold">Keep reading</h2>
-          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+          <Heading level={2} size="md" className="tracking-normal">
+            Keep reading
+          </Heading>
+          <Grid columns="1" gap="6" className="mt-4 sm:grid-cols-2">
             {related.map((p) => (
               <BlogCard key={p.slug} post={p} />
             ))}
-          </div>
+          </Grid>
         </div>
       )}
     </article>

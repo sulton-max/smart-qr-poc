@@ -1,20 +1,15 @@
 import { QRCodeSVG } from "qrcode.react";
 
 export interface QrPreviewProps {
-  /** Encoded payload — the short URL the printed code resolves through. */
   value: string;
   foreground: string;
   background: string;
-  /** Error-correction level. Q/H tolerate a center logo. */
+  // Q/H tolerate a center logo.
   level?: "L" | "M" | "Q" | "H";
   size?: number;
 }
 
-/**
- * Domain component (lives in-project; not in the beta lib). Renders the QR live + client-side
- * for instant restyle feedback. The final downloadable asset is produced server-side
- * (vector-first via QRCoder) — this is the editing preview only.
- */
+// Client-side editing preview only; the downloadable asset is rendered server-side via QRCoder.
 export function QrPreview({
   value,
   foreground,

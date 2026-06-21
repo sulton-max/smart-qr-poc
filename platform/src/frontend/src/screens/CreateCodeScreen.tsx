@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button, CopyButton } from "@wow-two-beta/ui/actions";
 import { ColorField, FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
-import { Card, Heading } from "@wow-two-beta/ui/display";
-import { Spinner } from "@wow-two-beta/ui/feedback";
+import { Card, Heading, Text } from "@wow-two-beta/ui/display";
+import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
+import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/layout";
 import { ArrowLeft } from "lucide-react";
 import { QrPreview } from "../components/QrPreview";
 import { RuleBuilder } from "../components/RuleBuilder";
@@ -19,7 +20,7 @@ const SYMBOLOGY_LABEL: Record<BarcodeFormat, string> = {
   UpcA: "UPC-A",
 };
 
-/** Maps a persisted code's rules onto the builder's draft shape (with client-side keys). */
+/** Persisted rules → builder draft shape (adds client-side keys). */
 function toDrafts(code: CodeDto): RuleDraft[] {
   return code.rules.map((r) => ({
     id: crypto.randomUUID(),
@@ -31,19 +32,15 @@ function toDrafts(code: CodeDto): RuleDraft[] {
 }
 
 export interface CreateCodeScreenProps {
-  /** When set, the builder loads this code and edits it (PUT) instead of creating a new one (POST). */
+  /** Set → edit this code (PUT); unset → create (POST). */
   codeId?: string;
-  /** Return to the previous screen (the codes list). */
+  /** Return to the codes list. */
   onBack?: () => void;
-  /** Notify the parent that a save succeeded — used to refresh the list on the way back. */
+  /** Save succeeded — parent refreshes the list. */
   onSaved?: () => void;
 }
 
-/**
- * Code builder — create mode by default, edit mode when `codeId` is provided. Edit mode prefills
- * every editable field (including the rule set) and submits a full replace via `updateCode`; the
- * slug is shown read-only because it is printed and immutable.
- */
+/** Code builder — create, or edit when `codeId` set. Edit submits a full replace; slug is read-only (printed, immutable). */
 export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenProps) {
   const isEdit = Boolean(codeId);
 
@@ -60,7 +57,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [saved, setSaved] = useState<CodeDto | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Edit mode: load the code once and prefill every field.
+  // Edit mode: load once, prefill fields.
   useEffect(() => {
     if (!codeId) return;
     let cancelled = false;
@@ -122,15 +119,15 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <Center className="min-h-[60vh]">
         <Spinner size="lg" label="Loading code" />
-      </div>
+      </Center>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <Stack gap="6">
+      <Stack gap="2">
         {onBack && (
           <Button
             variant="ghost"
@@ -144,18 +141,18 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           </Button>
         )}
         <div>
-          <Heading level={1} className="text-2xl font-bold">
+          <Heading level={1} size="xl" weight="bold">
             {isEdit ? "Edit code" : "Create a code"}
           </Heading>
-          <p className="text-muted-foreground">
+          <Text color="muted">
             {isEdit
               ? "Update the destination and routing — the printed code keeps working."
               : "One code, many destinations — and it never expires."}
-          </p>
+          </Text>
         </div>
-      </div>
+      </Stack>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <Grid columns={{ base: "1", lg: "2" }} gap="6">
         {/* ── Builder ── */}
         <Card className="flex flex-col gap-5 p-6">
           {isEdit && existing && (
@@ -196,19 +193,19 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </Select>
           </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
+          <Grid columns="2" gap="4">
             <FormField label="Foreground">
               <ColorField value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
             </FormField>
             <FormField label="Background">
               <ColorField value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
             </FormField>
-          </div>
+          </Grid>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium">Routing rules</span>
+          <Stack gap="2">
+            <Text as="span" size="sm" weight="medium">Routing rules</Text>
             <RuleBuilder rules={rules} onChange={setRules} />
-          </div>
+          </Stack>
 
           <Button
             tone="primary"
@@ -220,27 +217,29 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             {isEdit ? "Save changes" : "Create code"}
           </Button>
 
-          {error && (
-            <p className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-              {error}
-            </p>
-          )}
+          {error && <Alert severity="danger" description={error} />}
         </Card>
 
         {/* ── Preview ── */}
         <Card className="flex flex-col items-center gap-4 p-6">
           <QrPreview value={previewValue} foreground={foreground} background={background} />
-          <p className="text-center text-xs text-muted-foreground">
+          <Text size="xs" color="muted" align="center">
             Live preview (client-side). The final downloadable asset is rendered server-side
             (vector-first).
-          </p>
+          </Text>
 
           {saved && (
-            <div className="w-full rounded-lg border border-border bg-muted/30 p-4">
-              <p className="text-sm font-medium">{isEdit ? "Changes saved ✓" : "Code created ✓"}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground" title={saved.shortUrl}>
+            <Surface
+              variant="subtle"
+              tone="neutral"
+              radius="lg"
+              padding="md"
+              className="w-full"
+            >
+              <Text size="sm" weight="medium">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
+              <Text size="sm" color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
                 {saved.shortUrl}
-              </p>
+              </Text>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <CopyButton size="sm" text={saved.shortUrl} aria-label="Copy short URL">
                   Copy link
@@ -267,10 +266,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   </Button>
                 )}
               </div>
-            </div>
+            </Surface>
           )}
         </Card>
-      </div>
-    </div>
+      </Grid>
+    </Stack>
   );
 }

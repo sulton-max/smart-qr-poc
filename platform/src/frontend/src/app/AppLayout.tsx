@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { Spinner } from "@wow-two-beta/ui/feedback";
 import { Button } from "@wow-two-beta/ui/actions";
+import { Container, HStack, Navbar } from "@wow-two-beta/ui/layout";
+import { Text } from "@wow-two-beta/ui/display";
 import { Logo } from "../marketing/components";
 import { LoginScreen } from "../screens/LoginScreen";
 import { GoogleSignInButton } from "../components/GoogleSignInButton";
@@ -10,11 +12,7 @@ import type { Me } from "../types";
 
 type Status = "checking" | "gate" | "ready";
 
-/**
- * Shell for the `/app/*` routes. Resolves the visitor's identity once: anonymous visitors see the
- * guest gate (the existing `LoginScreen`), guests and registered users go straight through to the
- * routed screen. This preserves the verified guest-first flow while the marketing pages stay public.
- */
+// Resolves identity once: anonymous → guest gate; guests and users pass through to the routed screen.
 export function AppLayout() {
   const [status, setStatus] = useState<Status>("checking");
   const [me, setMe] = useState<Me | null>(null);
@@ -29,7 +27,7 @@ export function AppLayout() {
         }
       })
       .catch(() => {
-        // A failed identity check is treated as anonymous — show the gate.
+        // Failed identity check → treat as anonymous.
         if (!cancelled) {
           setMe(null);
           setStatus("gate");
@@ -48,12 +46,19 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
+      {/* Navbar's inner Container is `px-4` vs `<main>`'s `px-6` — not overridable (see GAPS). */}
+      <Navbar
+        height="lg"
+        sticky={false}
+        bordered
+        className="bg-background"
+        start={
           <Link to="/" aria-label="Smart QR home">
             <Logo />
           </Link>
-          <nav className="flex items-center gap-5 text-sm">
+        }
+        end={
+          <HStack as="nav" align="center" gap="5" className="text-sm">
             {status === "ready" && (
               <Link
                 to="/app/billing"
@@ -64,7 +69,9 @@ export function AppLayout() {
             )}
             {me?.kind === "Guest" && (
               <>
-                <span className="text-sm text-muted-foreground">Guest</span>
+                <Text as="span" size="sm" color="muted">
+                  Guest
+                </Text>
                 <GoogleSignInButton onSignedIn={(m) => setMe(m)} />
                 <Button tone="neutral" variant="outline" onClick={handleSignOut}>
                   Sign out
@@ -73,7 +80,9 @@ export function AppLayout() {
             )}
             {me?.kind === "User" && me.user && (
               <>
-                <span className="text-sm text-muted-foreground">{me.user.name}</span>
+                <Text as="span" size="sm" color="muted">
+                  {me.user.name}
+                </Text>
                 <Button tone="neutral" variant="outline" onClick={handleSignOut}>
                   Log out
                 </Button>
@@ -82,11 +91,11 @@ export function AppLayout() {
             <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
               ← Back to site
             </Link>
-          </nav>
-        </div>
-      </header>
+          </HStack>
+        }
+      />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+      <Container as="main" size="lg" className="flex-1 px-6 py-8">
         {status === "checking" && (
           <div className="flex min-h-[60vh] items-center justify-center">
             <Spinner size="lg" label="Loading" />
@@ -101,7 +110,7 @@ export function AppLayout() {
           />
         )}
         {status === "ready" && <Outlet />}
-      </main>
+      </Container>
     </div>
   );
 }

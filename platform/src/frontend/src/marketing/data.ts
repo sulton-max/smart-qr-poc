@@ -11,12 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-/**
- * Single source of truth for the marketing surface — pricing, features, the comparison table, the
- * how-it-works steps, and FAQs. The landing page renders compact slices of this; the dedicated
- * pricing page renders it in full. Keep prices in sync with the spec (`ideas/smart-qr-spec.md` §9)
- * and `business/business-knowledge.md`.
- */
+// Marketing-surface source of truth (pricing, features, comparison, steps, FAQs). Keep prices in sync with `ideas/smart-qr-spec.md` §9 and `business/business-knowledge.md`.
 
 export const BRAND = {
   name: "Smart QR",
@@ -100,7 +95,7 @@ export interface PricingTier {
   price: string;
   cadence: string;
   tagline: string;
-  /** Visually emphasised as the recommended plan. */
+  /** Emphasised as the recommended plan. */
   featured?: boolean;
   cta: string;
   features: string[];

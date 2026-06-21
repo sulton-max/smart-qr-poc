@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@wow-two-beta/ui/actions";
+import { Heading, Text } from "@wow-two-beta/ui/display";
+import { Container, Grid } from "@wow-two-beta/ui/layout";
 import { ArrowRight, Infinity as InfinityIcon } from "lucide-react";
 import { usePageMeta } from "../lib/meta";
 import { FAQS, FEATURES, STEPS } from "./data";
@@ -26,19 +28,22 @@ export function LandingPage() {
     <>
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-2">
+        <Container
+          size="full"
+          className="grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-2"
+        >
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
               <InfinityIcon size={14} className="text-primary" />
               Codes never expire — on every plan
             </span>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl">
+            <Heading level={1} size="3xl" weight="bold" className="mt-5 leading-[1.1] sm:text-5xl">
               A QR code smart enough to route every scan — and that you'll never reprint.
-            </h1>
-            <p className="mt-5 text-lg text-muted-foreground">
+            </Heading>
+            <Text size="lg" color="muted" className="mt-5">
               Programmable routing, every code type, one flat price. Print it once; reprogram it
               forever; it never expires on you.
-            </p>
+            </Text>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild tone="primary">
                 <Link to="/app/new">Get started free</Link>
@@ -47,14 +52,14 @@ export function LandingPage() {
                 <Link to="/pricing">See pricing</Link>
               </Button>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground">
+            <Text size="xs" color="muted" className="mt-4">
               No account required · Unlimited scans · Free forever tier
-            </p>
+            </Text>
           </div>
           <div className="flex justify-center lg:justify-end">
             <HeroVisual />
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* ── Features ── */}
@@ -64,11 +69,11 @@ export function LandingPage() {
           title="Everything a printed code should do"
           description="The genuinely useful parts of a QR platform — unbundled from the up-sell and made the default."
         />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <Grid columns="1" gap="5" className="mt-12 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature) => (
             <FeatureCard key={feature.title} feature={feature} />
           ))}
-        </div>
+        </Grid>
       </Section>
 
       {/* ── How it works ── */}
@@ -78,11 +83,11 @@ export function LandingPage() {
           title="Print once. Reprogram forever."
           description="Three steps from idea to a code you'll never have to reprint."
         />
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <Grid columns="1" gap="5" className="mt-12 md:grid-cols-3">
           {STEPS.map((step, i) => (
             <StepCard key={step.title} step={step} index={i} />
           ))}
-        </div>
+        </Grid>
       </Section>
 
       {/* ── Routing demo ── */}

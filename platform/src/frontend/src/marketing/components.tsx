@@ -1,11 +1,11 @@
 import { type ReactNode } from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@wow-two-beta/ui/actions";
+import { Accordion, Badge, Card, Heading, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/display";
+import { Container, Grid, HStack, Section as UiSection, Surface, VStack } from "@wow-two-beta/ui/layout";
 import {
   ArrowRight,
   Check,
-  ChevronDown,
   Clock,
   Globe,
   Languages,
@@ -17,7 +17,7 @@ import { QrPreview } from "../components/QrPreview";
 import { COMPARISON, type Faq, type Feature, PRICING, type PricingTier, type Step } from "./data";
 import { type PostMeta } from "./blog/types";
 
-/** Brand mark — violet QR tile + wordmark. Shared by the marketing header/footer and the app shell. */
+/** Brand mark — shared by marketing header/footer and the app shell. */
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex shrink-0 items-center gap-2 font-bold ${className}`}>
@@ -29,7 +29,7 @@ export function Logo({ className = "" }: { className?: string }) {
   );
 }
 
-/** Standard content band — centered max-width container with consistent vertical rhythm. */
+/** Content band; inner `Container` owns the `max-w-6xl` width (SDK size scale maps to breakpoints, not 6xl). `muted` overrides SDK neutral tint to match original look. */
 export function Section({
   id,
   children,
@@ -42,13 +42,21 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section id={id} className={muted ? "bg-muted/40" : ""}>
-      <div className={`mx-auto max-w-6xl px-6 py-16 sm:py-20 ${className}`}>{children}</div>
-    </section>
+    <UiSection
+      id={id}
+      bleed
+      py="none"
+      tone={muted ? "neutral" : undefined}
+      className={muted ? "border-transparent bg-muted/40" : undefined}
+    >
+      <Container size="full" className={`max-w-6xl px-6 py-16 sm:py-20 ${className}`}>
+        {children}
+      </Container>
+    </UiSection>
   );
 }
 
-/** Eyebrow + title + description block that opens most sections. */
+/** Eyebrow, title, description block. */
 export function SectionHeading({
   eyebrow,
   title,
@@ -62,9 +70,19 @@ export function SectionHeading({
 }) {
   return (
     <div className={`max-w-2xl ${align === "center" ? "mx-auto text-center" : ""}`}>
-      {eyebrow && <span className="text-sm font-semibold text-primary">{eyebrow}</span>}
-      <h2 className="mt-2 text-3xl font-bold tracking-tight">{title}</h2>
-      {description && <p className="mt-3 text-muted-foreground">{description}</p>}
+      {eyebrow && (
+        <Text as="span" size="sm" weight="semibold" color="brand">
+          {eyebrow}
+        </Text>
+      )}
+      <Heading level={2} size="2xl" weight="bold" className="mt-2">
+        {title}
+      </Heading>
+      {description && (
+        <Text color="muted" className="mt-3">
+          {description}
+        </Text>
+      )}
     </div>
   );
 }
@@ -72,46 +90,50 @@ export function SectionHeading({
 export function FeatureCard({ feature }: { feature: Feature }) {
   const { icon: Icon, title, body } = feature;
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
+    <Card variant="outline" radius="xl" elevation={0} className="bg-card p-6">
       <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
         <Icon size={22} />
       </span>
-      <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
-    </div>
+      <Heading level={3} size="md" className="mt-4 tracking-normal">
+        {title}
+      </Heading>
+      <Text size="sm" color="muted" className="mt-2 leading-relaxed">
+        {body}
+      </Text>
+    </Card>
   );
 }
 
 export function StepCard({ step, index }: { step: Step; index: number }) {
   const { icon: Icon, title, body } = step;
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border bg-card p-6">
+    <Card variant="outline" radius="xl" elevation={0} className="relative overflow-hidden bg-card p-6">
       <span className="absolute right-4 top-3 text-5xl font-bold text-foreground/5">{index + 1}</span>
       <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
         <Icon size={22} />
       </span>
-      <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-    </div>
+      <Heading level={3} size="md" className="mt-4 tracking-normal">
+        {title}
+      </Heading>
+      <Text size="sm" color="muted" className="mt-2">
+        {body}
+      </Text>
+    </Card>
   );
 }
 
-/**
- * The four pricing tiers as a card grid. Free drops the visitor into the guest builder (`/app/new`);
- * every paid tier routes to the in-app billing screen (`/app/billing`), where the app gate resolves
- * identity and the screen starts Stripe Checkout. Marketing stays backend-independent — no API calls.
- */
+/** Pricing tier grid. Marketing stays backend-independent — no API calls; paid CTAs defer Checkout to the in-app billing screen. */
 export function PricingCards({ tiers = PRICING }: { tiers?: PricingTier[] }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <Grid columns="1" gap="5" className="sm:grid-cols-2 lg:grid-cols-4">
       {tiers.map((tier) => (
         <PricingCard key={tier.id} tier={tier} />
       ))}
-    </div>
+    </Grid>
   );
 }
 
-/** Free → the guest builder; any paid plan → the in-app billing screen which kicks off Checkout. */
+/** Free → guest builder; paid → in-app billing screen. */
 function tierCtaHref(tier: PricingTier): string {
   return tier.id === "free" ? "/app/new" : "/app/billing";
 }
@@ -119,22 +141,35 @@ function tierCtaHref(tier: PricingTier): string {
 function PricingCard({ tier }: { tier: PricingTier }) {
   const href = tierCtaHref(tier);
   return (
-    <div
-      className={`relative flex flex-col rounded-2xl border bg-card p-6 ${
+    <Card
+      variant="outline"
+      radius="2xl"
+      elevation={0}
+      className={`relative flex flex-col bg-card p-6 ${
         tier.featured ? "border-primary shadow-lg shadow-primary/10" : "border-border"
       }`}
     >
       {tier.featured && (
-        <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+        <Badge
+          variant="brand"
+          size="md"
+          className="absolute -top-3 left-6 bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+        >
           Most popular
-        </span>
+        </Badge>
       )}
-      <h3 className="text-lg font-semibold">{tier.name}</h3>
+      <Heading level={3} size="md" className="tracking-normal">
+        {tier.name}
+      </Heading>
       <div className="mt-2 flex items-baseline gap-1">
         <span className="text-3xl font-bold tracking-tight">{tier.price}</span>
-        <span className="text-sm text-muted-foreground">{tier.cadence}</span>
+        <Text as="span" size="sm" color="muted">
+          {tier.cadence}
+        </Text>
       </div>
-      <p className="mt-2 text-sm text-muted-foreground">{tier.tagline}</p>
+      <Text size="sm" color="muted" className="mt-2">
+        {tier.tagline}
+      </Text>
       <ul className="mt-5 flex flex-1 flex-col gap-2.5">
         {tier.features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-sm">
@@ -152,85 +187,83 @@ function PricingCard({ tier }: { tier: PricingTier }) {
           <Link to={href}>{tier.cta}</Link>
         </Button>
       )}
-    </div>
+    </Card>
   );
 }
 
-/** Anti-incumbent comparison — the marketing's whole point in one table. */
+/** Anti-incumbent comparison table. `headVariant="plain"` keeps normal-case heads; className overrides per-column accents. */
 export function ComparisonTable() {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-border">
-      <table className="w-full min-w-[34rem] text-left text-sm">
-        <thead>
-          <tr className="border-b border-border bg-muted/50">
-            <th className="px-5 py-4 font-medium text-muted-foreground"> </th>
-            <th className="px-5 py-4 font-semibold text-primary">Smart QR</th>
-            <th className="px-5 py-4 font-medium text-muted-foreground">Typical incumbent</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {COMPARISON.map((row) => (
-            <tr key={row.dimension}>
-              <td className="px-5 py-4 font-medium">{row.dimension}</td>
-              <td className="px-5 py-4">
-                <span className="inline-flex items-start gap-2">
-                  <Check size={16} className="mt-0.5 shrink-0 text-primary" />
-                  <span>{row.smartQr}</span>
-                </span>
-              </td>
-              <td className="px-5 py-4 text-muted-foreground">
-                <span className="inline-flex items-start gap-2">
-                  <X size={16} className="mt-0.5 shrink-0" />
-                  <span>{row.incumbent}</span>
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table radius="2xl" density="roomy" className="min-w-[34rem]">
+      <TableHead headVariant="plain">
+        <TableRow>
+          <TableHeaderCell className="font-medium text-muted-foreground"> </TableHeaderCell>
+          <TableHeaderCell className="text-primary">Smart QR</TableHeaderCell>
+          <TableHeaderCell className="font-medium text-muted-foreground">Typical incumbent</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {COMPARISON.map((row) => (
+          <TableRow key={row.dimension}>
+            <TableCell className="font-medium">{row.dimension}</TableCell>
+            <TableCell>
+              <span className="inline-flex items-start gap-2">
+                <Check size={16} className="mt-0.5 shrink-0 text-primary" />
+                <span>{row.smartQr}</span>
+              </span>
+            </TableCell>
+            <TableCell className="text-muted-foreground">
+              <span className="inline-flex items-start gap-2">
+                <X size={16} className="mt-0.5 shrink-0" />
+                <span>{row.incumbent}</span>
+              </span>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 
-/** Lightweight FAQ accordion — one item open at a time. Hand-rolled to avoid lib-API surface. */
+/** FAQ accordion — single open, first open by default. */
 export function FaqList({ items }: { items: Faq[] }) {
-  const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="mx-auto max-w-2xl divide-y divide-border rounded-2xl border border-border">
-      {items.map((item, i) => {
-        const isOpen = open === i;
-        return (
-          <div key={item.q}>
-            <button
-              type="button"
-              aria-expanded={isOpen}
-              onClick={() => setOpen(isOpen ? null : i)}
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-            >
-              <span className="font-medium">{item.q}</span>
-              <ChevronDown
-                size={18}
-                className={`shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-            {isOpen && <p className="-mt-1 px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{item.a}</p>}
-          </div>
-        );
-      })}
-    </div>
+    <Accordion
+      type="single"
+      isCollapsible
+      defaultValue="0"
+      className="mx-auto max-w-2xl divide-y divide-border overflow-hidden rounded-2xl border border-border [&>*]:border-b-0"
+    >
+      {items.map((item, i) => (
+        <Accordion.Item key={item.q} value={String(i)} className="border-b-0">
+          <Accordion.Trigger className="gap-4 px-5 py-4 text-base font-medium hover:bg-transparent [&>svg]:size-[18px]">
+            {item.q}
+          </Accordion.Trigger>
+          <Accordion.Content className="-mt-1 px-5 pb-5 leading-relaxed text-muted-foreground">
+            {item.a}
+          </Accordion.Content>
+        </Accordion.Item>
+      ))}
+    </Accordion>
   );
 }
 
 /** Closing call-to-action band. */
 export function CtaBand() {
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-20">
-      <div className="rounded-3xl border border-primary/20 bg-primary-soft/60 px-6 py-12 text-center sm:py-16">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Your codes, forever.</h2>
-        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+    <Container size="full" className="max-w-6xl px-6 pb-20">
+      <Surface
+        variant="subtle"
+        tone="primary"
+        className="rounded-3xl px-6 py-12 text-center sm:py-16"
+      >
+        <Heading level={2} size="xl" weight="bold" className="sm:text-3xl">
+          Your codes, forever.
+        </Heading>
+        <Text color="muted" className="mx-auto mt-3 max-w-xl">
           Create a programmable code in under a minute. No account needed, unlimited scans, and it
           never expires on you.
-        </p>
+        </Text>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           <Button asChild tone="primary">
             <Link to="/app/new">Create your first code</Link>
@@ -239,12 +272,12 @@ export function CtaBand() {
             <Link to="/pricing">See pricing</Link>
           </Button>
         </div>
-      </div>
-    </div>
+      </Surface>
+    </Container>
   );
 }
 
-/** "One code, many destinations" — a live (client-side) QR beside the rules it resolves through. */
+/** Client-side QR beside the rules it resolves through. */
 export function RoutingDemo() {
   const rules = [
     { icon: Smartphone, when: "On an iPhone", then: "→ App Store" },
@@ -253,18 +286,26 @@ export function RoutingDemo() {
     { icon: Languages, when: "Browser set to Russian", then: "→ RU landing page" },
   ];
   return (
-    <div className="grid items-center gap-8 rounded-3xl border border-border bg-card p-8 lg:grid-cols-2">
+    <Card
+      variant="outline"
+      elevation={0}
+      className="grid items-center gap-8 rounded-3xl bg-card p-8 lg:grid-cols-2"
+    >
       <div className="flex justify-center">
         <QrPreview value="https://smartqr.app/demo" foreground="#18181b" background="#ffffff" size={200} />
       </div>
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-muted-foreground">One printed code resolves by context:</p>
+      <VStack gap="3">
+        <Text size="sm" weight="medium" color="muted">
+          One printed code resolves by context:
+        </Text>
         {rules.map((rule) => {
           const Icon = rule.icon;
           return (
-            <div
+            <HStack
               key={rule.when}
-              className="flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3"
+              align="center"
+              gap="3"
+              className="rounded-lg border border-border bg-background px-4 py-3"
             >
               <span className="grid size-9 shrink-0 place-items-center rounded-md bg-primary-soft text-primary">
                 <Icon size={18} />
@@ -273,18 +314,18 @@ export function RoutingDemo() {
                 <span className="font-medium">{rule.when}</span>{" "}
                 <span className="text-muted-foreground">{rule.then}</span>
               </span>
-            </div>
+            </HStack>
           );
         })}
-        <p className="text-xs text-muted-foreground">
+        <Text size="xs" color="muted">
           …otherwise → your fallback URL. Change any of this without reprinting the code.
-        </p>
-      </div>
-    </div>
+        </Text>
+      </VStack>
+    </Card>
   );
 }
 
-/** Decorative hero visual — a framed violet QR with a glow. Client-side preview, not the real asset. */
+/** Hero visual — client-side preview, not the real asset. */
 export function HeroVisual() {
   return (
     <div className="relative">
@@ -302,19 +343,29 @@ export function HeroVisual() {
 
 export function BlogCard({ post }: { post: PostMeta }) {
   return (
-    <Link
-      to={`/blog/${post.slug}`}
-      className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+    <Surface
+      asChild
+      variant="outline"
+      radius="2xl"
+      className="group flex flex-col bg-card p-6 transition-colors hover:border-primary/40"
     >
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span className="rounded-full bg-primary-soft px-2.5 py-1 font-medium text-primary">{post.tag}</span>
-        <span>{post.readingMinutes} min read</span>
-      </div>
-      <h3 className="mt-4 text-lg font-semibold leading-snug group-hover:text-primary">{post.title}</h3>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{post.description}</p>
-      <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-        Read <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-      </span>
-    </Link>
+      <Link to={`/blog/${post.slug}`}>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Badge variant="brand" size="md" className="px-2.5 py-1 text-primary">
+            {post.tag}
+          </Badge>
+          <span>{post.readingMinutes} min read</span>
+        </div>
+        <Heading level={3} size="md" className="mt-4 leading-snug tracking-normal group-hover:text-primary">
+          {post.title}
+        </Heading>
+        <Text size="sm" color="muted" className="mt-2 flex-1 leading-relaxed">
+          {post.description}
+        </Text>
+        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+          Read <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </Link>
+    </Surface>
   );
 }

@@ -1,5 +1,7 @@
 import { Button } from "@wow-two-beta/ui/actions";
 import { Select, TextInput } from "@wow-two-beta/ui/forms";
+import { Surface, VStack } from "@wow-two-beta/ui/layout";
+import { Text } from "@wow-two-beta/ui/display";
 import { Plus, Trash2 } from "lucide-react";
 import { RuleConditionType, type RuleDraft } from "../types";
 
@@ -22,11 +24,7 @@ const VALUE_PLACEHOLDER: Record<RuleConditionType, string> = {
   TimeOfDay: "09:00-16:00",
 };
 
-/**
- * Domain component (in-project; not generic enough for the beta lib). Ordered conditional-rule
- * editor — composed from the lib's Select / TextInput / Button. First match wins; anything that
- * doesn't match falls through to the code's fallback URL.
- */
+// Ordered conditional-rule editor; first match wins, the rest falls through to the fallback URL.
 export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
   const update = (id: string, patch: Partial<RuleDraft>) =>
     onChange(rules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
@@ -47,19 +45,25 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
     ]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <VStack gap="3">
       {rules.length === 0 && (
-        <p className="text-sm text-muted-foreground">
+        <Text size="sm" color="muted">
           No rules yet — every scan goes to the fallback URL.
-        </p>
+        </Text>
       )}
 
       {rules.map((rule) => (
-        <div
+        <Surface
           key={rule.id}
-          className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3"
+          variant="subtle"
+          tone="neutral"
+          radius="md"
+          padding="md"
+          className="flex items-start gap-2"
         >
-          <span className="mt-2 w-4 shrink-0 text-xs text-muted-foreground">{rule.order}</span>
+          <Text as="span" size="xs" color="muted" className="mt-2 w-4 shrink-0">
+            {rule.order}
+          </Text>
 
           <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
             <Select<RuleConditionType>
@@ -99,12 +103,12 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
           >
             <Trash2 size={16} />
           </Button>
-        </div>
+        </Surface>
       ))}
 
       <Button variant="soft" tone="neutral" leadingSlot={<Plus size={16} />} onClick={add}>
         Add rule
       </Button>
-    </div>
+    </VStack>
   );
 }

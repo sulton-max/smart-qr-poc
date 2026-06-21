@@ -3,17 +3,11 @@ import { GOOGLE_CLIENT_ID, signInWithGoogle } from "../api";
 import type { Me } from "../types";
 
 interface GoogleSignInButtonProps {
-  /** Called with the resolved account after a successful sign-in (and guest-code claim). */
   onSignedIn: (me: Me) => void;
-  /** Called with a message when sign-in fails. */
   onError?: (message: string) => void;
 }
 
-/**
- * Google sign-in button (GIS ID-token flow). Renders Google's button, exchanges the returned credential for a
- * session via the backend, and reports the resolved account. Renders nothing when no client id is configured
- * (`VITE_GOOGLE_CLIENT_ID` unset) — the app stays guest-only.
- */
+// GIS ID-token flow; renders nothing when no client id is configured (app stays guest-only).
 export function GoogleSignInButton({ onSignedIn, onError }: GoogleSignInButtonProps) {
   if (!GOOGLE_CLIENT_ID) return null;
 

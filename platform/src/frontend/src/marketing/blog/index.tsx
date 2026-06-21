@@ -6,7 +6,7 @@ import { dynamicVsStaticQrCodes } from "./dynamic-vs-static-qr-codes";
 
 export type { Post, PostMeta };
 
-/** All blog posts. Add a new post's module here and it appears in the index automatically. */
+/** Add a post's module here and it appears in the index automatically. */
 export const POSTS: Post[] = [
   whyQrCodesShouldNeverExpire,
   smartRoutingOneCodeManyDestinations,
@@ -14,7 +14,7 @@ export const POSTS: Post[] = [
   dynamicVsStaticQrCodes,
 ];
 
-/** Post metadata, newest first — what the blog index renders. */
+/** Metadata, newest first. */
 export const POST_METAS: PostMeta[] = POSTS.map((p) => p.meta).sort((a, b) =>
   a.date < b.date ? 1 : -1,
 );

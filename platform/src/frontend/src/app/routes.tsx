@@ -3,10 +3,7 @@ import { CodesListScreen } from "../screens/CodesListScreen";
 import { CreateCodeScreen } from "../screens/CreateCodeScreen";
 import { BillingScreen } from "../screens/BillingScreen";
 
-/**
- * Thin route adapters that inject router navigation into the existing screen components — the screens
- * keep their callback-prop contract untouched, so they stay exactly as verified.
- */
+// Route adapters injecting router navigation; screens keep their callback-prop contract.
 
 export function CodesListRoute() {
   const navigate = useNavigate();

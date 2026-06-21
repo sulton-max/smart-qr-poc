@@ -1,13 +1,6 @@
 import { useEffect } from "react";
 
-/**
- * Per-page document metadata for the client-rendered marketing pages. Sets `<title>` plus the
- * `description` / Open-Graph tags so each route is shareable and gives crawlers something real.
- *
- * This is client-side only — good enough for a POC. Swap to a prerender/SSG step (e.g. vite-ssg)
- * when SEO depth matters; the per-page strings defined via this hook are exactly what that step
- * would bake into static HTML.
- */
+// Client-side `<title>` + description/OG tags per route; swap to prerender/SSG when SEO depth matters.
 export function usePageMeta(title: string, description?: string): void {
   useEffect(() => {
     if (title) {
@@ -21,7 +14,7 @@ export function usePageMeta(title: string, description?: string): void {
   }, [title, description]);
 }
 
-/** Upserts a `<meta>` tag keyed by an attribute (`name` or `property`). */
+// Upserts a `<meta>` tag keyed by `name` or `property`.
 function setTag(attr: "name" | "property", key: string, content: string): void {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
   if (!el) {

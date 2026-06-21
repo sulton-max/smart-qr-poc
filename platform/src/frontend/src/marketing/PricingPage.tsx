@@ -1,3 +1,4 @@
+import { Text } from "@wow-two-beta/ui/display";
 import { usePageMeta } from "../lib/meta";
 import { PRICING_FAQS } from "./data";
 import {
@@ -26,10 +27,10 @@ export function PricingPage() {
         <div className="mt-12">
           <PricingCards />
         </div>
-        <p className="mt-6 text-center text-sm text-muted-foreground">
+        <Text size="sm" color="muted" align="center" className="mt-6">
           All plans: unlimited scans · codes never deactivate on downgrade · export &amp; delete
           anytime.
-        </p>
+        </Text>
       </Section>
 
       <Section muted>

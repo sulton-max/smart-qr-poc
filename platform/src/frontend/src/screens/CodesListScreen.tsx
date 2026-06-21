@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button, CopyButton } from "@wow-two-beta/ui/actions";
 import { SearchInput } from "@wow-two-beta/ui/forms";
-import { Badge, Card, EmptyState, Heading } from "@wow-two-beta/ui/display";
-import { Spinner } from "@wow-two-beta/ui/feedback";
+import { Badge, Card, EmptyState, Heading, Text } from "@wow-two-beta/ui/display";
+import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
+import { Center, HStack, Stack } from "@wow-two-beta/ui/layout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -17,16 +18,13 @@ import { deleteCode, listCodes, setCodeActive } from "../api";
 import type { CodeDto } from "../types";
 
 interface CodesListScreenProps {
-  /** Open the empty builder to create a new code. */
+  /** Open the empty builder. */
   onCreate: () => void;
-  /** Open the builder in edit mode for an existing code. */
+  /** Open the builder in edit mode. */
   onEdit: (id: string) => void;
 }
 
-/**
- * Owner's codes dashboard: searchable list with per-row Edit / Enable-Disable / Delete actions.
- * Every fetch + mutation is owner-scoped via the credentials cookie carried by the api client.
- */
+/** Codes dashboard — searchable list, per-row Edit / Enable-Disable / Delete. Fetches and mutations are owner-scoped via the credentials cookie. */
 export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
   const [codes, setCodes] = useState<CodeDto[]>([]);
   const [query, setQuery] = useState("");
@@ -47,7 +45,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
     }
   }
 
-  // Debounce the search box so each keystroke doesn't fire a request.
+  // Debounce search — one request per pause, not per keystroke.
   useEffect(() => {
     const handle = setTimeout(() => load(query), 250);
     return () => clearTimeout(handle);
@@ -83,18 +81,18 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <Stack gap="6">
+      <HStack wrap="wrap" align="end" justify="between" gap="4">
         <div>
-          <Heading level={1} className="text-2xl font-bold">
+          <Heading level={1} size="xl" weight="bold">
             Your codes
           </Heading>
-          <p className="text-muted-foreground">Manage destinations and routing — nothing ever expires.</p>
+          <Text color="muted">Manage destinations and routing — nothing ever expires.</Text>
         </div>
         <Button tone="primary" leadingSlot={<Plus size={16} />} onClick={onCreate}>
           Create new
         </Button>
-      </div>
+      </HStack>
 
       <div className="max-w-md">
         <SearchInput
@@ -105,16 +103,12 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
         />
       </div>
 
-      {error && (
-        <p className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          {error}
-        </p>
-      )}
+      {error && <Alert severity="danger" description={error} />}
 
       {loading ? (
-        <div className="flex min-h-[40vh] items-center justify-center">
+        <Center className="min-h-[40vh]">
           <Spinner size="lg" label="Loading codes" />
-        </div>
+        </Center>
       ) : codes.length === 0 ? (
         <Card className="p-6">
           <EmptyState
@@ -135,7 +129,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
           />
         </Card>
       ) : (
-        <div className="flex flex-col gap-3">
+        <Stack gap="3">
           {codes.map((code) => (
             <Card key={code.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1">
@@ -159,15 +153,15 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                   </a>
                   <CopyButton size="xs" variant="ghost" tone="neutral" text={code.shortUrl} aria-label="Copy short URL" />
                 </div>
-                <p className="mt-1 truncate text-sm text-muted-foreground" title={code.fallbackUrl}>
+                <Text size="sm" color="muted" isTruncated className="mt-1" title={code.fallbackUrl}>
                   → {code.fallbackUrl}
-                </p>
+                </Text>
               </div>
 
               <div className="flex shrink-0 items-center gap-4 sm:gap-6">
                 <div className="text-right">
                   <div className="text-lg font-semibold tabular-nums">{code.scanCount.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">scans</div>
+                  <Text size="xs" color="muted">scans</Text>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -205,7 +199,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
               </div>
             </Card>
           ))}
-        </div>
+        </Stack>
       )}
 
       <AlertDialog
@@ -235,6 +229,6 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
           </DialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </Stack>
   );
 }

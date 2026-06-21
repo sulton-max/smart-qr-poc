@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@wow-two-beta/ui/actions";
-import { Badge, Card, Heading } from "@wow-two-beta/ui/display";
-import { Banner, MeterBar, Spinner } from "@wow-two-beta/ui/feedback";
+import { Badge, Card, Heading, Text } from "@wow-two-beta/ui/display";
+import { Alert, Banner, MeterBar, Spinner } from "@wow-two-beta/ui/feedback";
+import { Center, Grid, HStack, Stack } from "@wow-two-beta/ui/layout";
 import { ArrowUpRight, Check, CreditCard, Infinity as InfinityIcon } from "lucide-react";
 import { createCheckout, createPortal, getBilling } from "../api";
 import { PAID_PLANS, Plan } from "../types";
 import type { BillingStatus } from "../types";
 
-/** Outcome of the Stripe return redirect (`/app/billing?status=success|cancelled`). */
+/** Stripe return outcome (`/app/billing?status=success|cancelled`). */
 type ReturnStatus = "success" | "cancelled";
 
-/** Static, plan-keyed display metadata. Caps mirror the backend `PlanLimits` (Free=3, Solo=25, Pro=200, Agency=∞). */
+/** Plan-keyed display metadata. Caps mirror backend `PlanLimits` (Free=3, Solo=25, Pro=200, Agency=∞). */
 interface PlanMeta {
   name: string;
   price: string;
@@ -50,7 +51,7 @@ const PLAN_META: Record<Plan, PlanMeta> = {
   },
 };
 
-/** Rank in the upgrade ladder — drives which plans show an "Upgrade" CTA. */
+/** Upgrade-ladder rank — gates which plans show an Upgrade CTA. */
 const PLAN_RANK: Record<Plan, number> = {
   [Plan.Free]: 0,
   [Plan.Solo]: 1,
@@ -62,23 +63,18 @@ const PLAN_RANK: Record<Plan, number> = {
 const UNLIMITED = -1;
 
 interface BillingScreenProps {
-  /** The `?status=` flag parsed from the Stripe return redirect, if any. */
+  /** `?status=` flag from the Stripe return redirect. */
   returnStatus?: ReturnStatus;
-  /** Clears the `?status=` flag from the URL once its banner is dismissed. */
+  /** Clears the `?status=` flag from the URL once the banner is dismissed. */
   onClearReturnStatus?: () => void;
 }
 
-/**
- * Billing dashboard: shows the caller's current plan, usage against their code cap, an upgrade
- * action for each higher paid plan (→ Stripe Checkout), and a "Manage billing" action (→ Stripe
- * Customer Portal). Both actions redirect the whole window to the hosted Stripe URL. A success /
- * cancelled banner is shown when returning from Checkout.
- */
+/** Billing dashboard — current plan, usage, upgrade CTAs (→ Stripe Checkout), Manage billing (→ Stripe Portal). */
 export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScreenProps) {
   const [billing, setBilling] = useState<BillingStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  /** Which paid plan's Checkout is being created (disables its button + shows the spinner). */
+  /** Paid plan whose Checkout is being created. */
   const [upgradingTo, setUpgradingTo] = useState<Plan | null>(null);
   const [openingPortal, setOpeningPortal] = useState(false);
 
@@ -102,7 +98,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
     setUpgradingTo(plan);
     setError(null);
     try {
-      // Redirect the whole window to Stripe's hosted Checkout — never an in-app card form.
+      // Full-window redirect to Stripe Checkout — not an in-app form.
       window.location.href = await createCheckout(plan);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not start checkout");
@@ -126,17 +122,16 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
   const maxCodes = billing?.limits.maxCodes ?? 0;
   const codeCount = billing?.usage.codeCount ?? 0;
   const unlimited = maxCodes === UNLIMITED;
-  // Higher paid plans the caller can move up to.
   const upgradePlans = PAID_PLANS.filter((p) => PLAN_RANK[p] > currentRank);
   const busy = upgradingTo !== null || openingPortal;
 
   return (
-    <div className="flex flex-col gap-6">
+    <Stack gap="6">
       <div>
-        <Heading level={1} className="text-2xl font-bold">
+        <Heading level={1} size="xl" weight="bold">
           Billing
         </Heading>
-        <p className="text-muted-foreground">Manage your plan, usage, and payment method.</p>
+        <Text color="muted">Manage your plan, usage, and payment method.</Text>
       </div>
 
       {returnStatus === "success" && (
@@ -156,21 +151,17 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
         />
       )}
 
-      {error && (
-        <p className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          {error}
-        </p>
-      )}
+      {error && <Alert severity="danger" description={error} />}
 
       {loading ? (
-        <div className="flex min-h-[40vh] items-center justify-center">
+        <Center className="min-h-[40vh]">
           <Spinner size="lg" label="Loading billing" />
-        </div>
+        </Center>
       ) : (
         <>
           {/* ── Current plan + usage ── */}
           <Card className="flex flex-col gap-5 p-6">
-            <div className="flex flex-wrap items-start justify-between gap-4">
+            <HStack wrap="wrap" align="start" justify="between" gap="4">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">{PLAN_META[currentPlan].name}</span>
@@ -178,7 +169,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                     {currentPlan === Plan.Free ? "Free plan" : "Active"}
                   </Badge>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">{PLAN_META[currentPlan].tagline}</p>
+                <Text size="sm" color="muted" className="mt-1">{PLAN_META[currentPlan].tagline}</Text>
               </div>
               <Button
                 variant="outline"
@@ -191,7 +182,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
               >
                 Manage billing
               </Button>
-            </div>
+            </HStack>
 
             <div>
               <div className="mb-1.5 flex items-center justify-between text-sm">
@@ -207,7 +198,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                 </span>
               </div>
               {unlimited ? (
-                // No cap to meter against on Agency — show a full, calm bar.
+                // No cap on Agency — full bar.
                 <MeterBar value={1} max={1} thresholds={[1, 1]} aria-label="Unlimited codes" />
               ) : (
                 <MeterBar
@@ -217,34 +208,34 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                 />
               )}
               {!unlimited && codeCount >= maxCodes && (
-                <p className="mt-2 text-sm text-warning">
+                <Text size="sm" color="warning" className="mt-2">
                   You've reached your plan's code limit. Upgrade to create more — your existing codes keep
                   working regardless.
-                </p>
+                </Text>
               )}
             </div>
           </Card>
 
           {/* ── Upgrade options ── */}
           {upgradePlans.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              <Heading level={2} className="text-lg font-semibold">
+            <Stack gap="3">
+              <Heading level={2} size="md" weight="semibold">
                 {currentPlan === Plan.Free ? "Choose a plan" : "Upgrade"}
               </Heading>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <Grid columns={{ base: "1", sm: "2", lg: "3" }} gap="4">
                 {upgradePlans.map((plan) => {
                   const meta = PLAN_META[plan];
                   return (
                     <Card key={plan} className="flex flex-col gap-4 p-5">
                       <div>
-                        <div className="flex items-baseline justify-between gap-2">
+                        <HStack align="baseline" justify="between" gap="2">
                           <span className="text-base font-semibold">{meta.name}</span>
                           <span className="text-sm text-muted-foreground">
                             <span className="text-xl font-bold text-foreground">{meta.price}</span>
                             {meta.cadence}
                           </span>
-                        </div>
-                        <p className="mt-1 text-sm text-muted-foreground">{meta.tagline}</p>
+                        </HStack>
+                        <Text size="sm" color="muted" className="mt-1">{meta.tagline}</Text>
                       </div>
                       <ul className="flex flex-1 flex-col gap-2 text-sm">
                         {meta.highlights.map((h) => (
@@ -268,19 +259,19 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                     </Card>
                   );
                 })}
-              </div>
-            </div>
+              </Grid>
+            </Stack>
           ) : (
             <Card className="p-6">
-              <p className="text-sm text-muted-foreground">
+              <Text size="sm" color="muted">
                 You're on the top plan — nothing more to upgrade to. Use{" "}
                 <span className="font-medium text-foreground">Manage billing</span> to update your payment
                 method or cancel.
-              </p>
+              </Text>
             </Card>
           )}
         </>
       )}
-    </div>
+    </Stack>
   );
 }
