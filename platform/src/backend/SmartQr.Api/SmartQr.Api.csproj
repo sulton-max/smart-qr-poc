@@ -10,7 +10,7 @@
         <!-- Mediator (ISender.SendAsync) + AppResult.Match — controllers dispatch + collapse the union.
              Transitive via SmartQr.Common → Platform.Core too; named here so the Api's own intent is explicit. -->
         <PackageReference Include="Google.Apis.Auth" Version="1.75.0" />
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.28-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.31-beta" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.*" />
         <PackageReference Include="Stripe.net" Version="52.0.0" />
     </ItemGroup>
@@ -21,5 +21,18 @@
         <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
         <ProjectReference Include="..\SmartQr.Codes\SmartQr.Codes.csproj" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <SpaRoot>$(MSBuildProjectDirectory)\..\..\frontend\</SpaRoot>
+    </PropertyGroup>
+    <ItemGroup>
+        <SpaInputs Include="$(SpaRoot)src\**\*;$(SpaRoot)index.html;$(SpaRoot)package.json;$(SpaRoot)vite.config.ts" />
+    </ItemGroup>
+    <!-- Rebuild the SPA into wwwroot on backend build; incremental via Inputs/Outputs (no-op when SPA unchanged). -->
+    <Target Name="BuildSpa" BeforeTargets="Build"
+            Inputs="@(SpaInputs)" Outputs="$(MSBuildProjectDirectory)\wwwroot\index.html">
+        <Exec Command="pnpm install --frozen-lockfile" WorkingDirectory="$(SpaRoot)" Condition="!Exists('$(SpaRoot)node_modules')" />
+        <Exec Command="pnpm build" WorkingDirectory="$(SpaRoot)" />
+    </Target>
 
 </Project>

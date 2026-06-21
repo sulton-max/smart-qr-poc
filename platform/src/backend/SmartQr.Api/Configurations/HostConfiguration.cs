@@ -31,7 +31,6 @@ public static partial class HostConfiguration
             .AddIdentity()
             .AddAuth()
             .AddBilling()
-            .AddCustomCors()
             .AddControllers();
 
         return builder;
@@ -50,9 +49,6 @@ public static partial class HostConfiguration
         app.UseStaticFiles();
 
         app.UseApiDefaults();
-
-        // CORS before auth so pre-flight OPTIONS is answered for credentialed SPA calls.
-        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();

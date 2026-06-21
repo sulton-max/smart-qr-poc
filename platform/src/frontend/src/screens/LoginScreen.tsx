@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@wow-two-beta/ui/actions";
 import { Card, Heading, Text } from "@wow-two-beta/ui/display";
 import { Alert } from "@wow-two-beta/ui/feedback";
-import { Center, Stack } from "@wow-two-beta/ui/layout";
+import { Center, Divider, Stack } from "@wow-two-beta/ui/layout";
 import { GoogleSignInButton } from "../components/GoogleSignInButton";
 import { GOOGLE_CLIENT_ID, createGuest } from "../api";
 import type { Me } from "../types";
@@ -51,14 +51,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
             </Text>
           )}
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs text-muted-foreground">
-              <span className="bg-card px-2">or</span>
-            </div>
-          </div>
+          <Divider label="or" />
 
           <Button
             tone="primary"

@@ -16,7 +16,7 @@
       the idiom in SmartQr.IntegrationTests/Harness but is wholly owned here.
     -->
     <ItemGroup>
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.28-beta"/>
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.31-beta"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.*"/>
         <PackageReference Include="Npgsql" Version="10.*"/>

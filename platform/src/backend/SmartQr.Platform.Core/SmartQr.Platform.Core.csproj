@@ -9,7 +9,7 @@
     <ItemGroup>
         <!-- Mediator (IQuery/ICommand + handlers + AddMediator) + AppResult/markers/context — replaces the
              hand-rolled SmartQr.Common.Mediator + the raw MediatR ref. Flows transitively to every consumer. -->
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.28-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.31-beta" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.*" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.*" />
         <PackageReference Include="Npgsql" Version="10.*" />

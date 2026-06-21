@@ -1,7 +1,5 @@
 using System.Text.Json.Serialization;
 using Dapper;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,7 +16,6 @@ using SmartQr.Codes;
 using SmartQr.Codes.Logo;
 using SmartQr.Codes.Rendering;
 using SmartQr.Common.Configuration;
-using SmartQr.Common.Extensions;
 using SmartQr.Common.Persistence.DataContexts;
 using SmartQr.Common.Settings;
 using WoW.Two.Sdk.Backend.Beta.Data.Dapper;
@@ -26,6 +23,7 @@ using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Audit;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Postgres;
 using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
+using WoW.Two.Sdk.Backend.Beta.Identity.Cookies;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Validation;
 using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
@@ -116,29 +114,14 @@ public static partial class HostConfiguration
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
 
-        builder.Services
-            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.Cookie.Name = "sqr-auth";
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.ExpireTimeSpan = TimeSpan.FromDays(30);
-                options.SlidingExpiration = true;
-
-                // This is an API, not a server-rendered app: never 302 to a login page — surface 401/403 so the SPA reacts.
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
-                };
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                };
-            });
+        // API mode returns 401/403 (not a 302) so the SPA reacts; HttpOnly/Secure/SameSite=Lax come from SDK defaults.
+        builder.Services.AddCookieAuthentication(o =>
+        {
+            o.Mode = AuthChallengeMode.Api;
+            o.CookieName = "sqr-auth";
+            o.ExpireTimeSpan = TimeSpan.FromDays(30);
+            o.SlidingExpiration = true;
+        });
 
         builder.Services.AddAuthorization();
         return builder;
@@ -149,14 +132,6 @@ public static partial class HostConfiguration
     {
         builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         builder.Services.AddScoped<IBillingGateway, StripeBillingGateway>();
-        return builder;
-    }
-
-    /// <summary>Registers the CORS policy from settings.</summary>
-    private static WebApplicationBuilder AddCustomCors(this WebApplicationBuilder builder)
-    {
-        var cors = builder.Configuration.GetSection(nameof(CorsSettings)).Get<CorsSettings>() ?? new CorsSettings();
-        builder.AddCorsPolicy(cors);
         return builder;
     }
 
