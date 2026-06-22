@@ -3,8 +3,6 @@ using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 namespace SmartQr.Common.Domain.Identity.Entities;
 
 /// <summary>Represents a registered account layered over the guest-first identity. Its <see cref="Id"/> is the durable user key a code's owner id points at.</summary>
-/// <example>The users row created on first Google sign-in; on same-device sign-up the guest cookie Guid becomes this id</example>
-/// <remarks>On same-device sign-up the guest cookie Guid becomes this id, so guest codes need no reassignment. Profile refreshes per sign-in make it mutable — full <see cref="IAuditable"/> trait.</remarks>
 public sealed record UserEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
 {
     /// <summary>Gets the storage table name for the user entity — the single source of truth for hand-written SQL.</summary>

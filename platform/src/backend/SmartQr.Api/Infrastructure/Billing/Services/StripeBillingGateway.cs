@@ -9,10 +9,7 @@ using StripePortalSessionOptions = Stripe.BillingPortal.SessionCreateOptions;
 
 namespace SmartQr.Api.Infrastructure.Billing.Services;
 
-/// <summary>
-/// Real <see cref="IBillingGateway"/> backed by Stripe.net. Hosted Checkout (<c>mode=subscription</c>) and Customer Portal,
-/// no on-site card capture. The secret key is passed per call via <see cref="RequestOptions"/> (no global mutation).
-/// </summary>
+/// <summary>Real <see cref="IBillingGateway"/> over Stripe.net — hosted Checkout and Customer Portal, with the secret key passed per call via <see cref="RequestOptions"/>.</summary>
 public sealed class StripeBillingGateway(BillingSettings settings) : IBillingGateway
 {
     private RequestOptions Request => new() { ApiKey = settings.SecretKey };
@@ -57,10 +54,7 @@ public sealed class StripeBillingGateway(BillingSettings settings) : IBillingGat
         };
     }
 
-    /// <summary>
-    /// Flattens a completed Checkout session. The session itself carries only ids; the price and period end are fetched
-    /// by expanding the subscription (Checkout webhooks don't inline line items).
-    /// </summary>
+    /// <summary>Flattens a completed Checkout session, expanding the subscription for the price and period end (Checkout webhooks don't inline line items).</summary>
     private BillingWebhookEvent FromCheckout(Session session)
     {
         string? priceId = null;

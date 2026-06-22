@@ -2,12 +2,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Common.Domain.Results;
 
-/// <summary>
-/// Product-side failure shape every operation's <c>Failure</c> result implements. Refines the SDK's empty
-/// <see cref="IFailureResult"/> marker with the two fields the API layer needs: a human-readable message for
-/// the ProblemDetails body and a <see cref="FailureCategory"/> the status map keys on. The failure→HTTP
-/// mapping stays product-side — <c>ApiResults.ToStatusCode</c> branches on this, the SDK marker carries no status.
-/// </summary>
+/// <summary>Product-side failure shape refining the SDK's <see cref="IFailureResult"/> marker with a message and a <see cref="FailureCategory"/>.</summary>
 public interface ISmartQrFailure : IFailureResult
 {
     /// <summary>Gets the human-readable error message surfaced as the ProblemDetails detail.</summary>

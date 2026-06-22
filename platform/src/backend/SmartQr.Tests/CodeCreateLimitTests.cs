@@ -54,6 +54,9 @@ public class CodeCreateLimitTests
                 CodeType = CodeType.Qr,
                 BarcodeFormat = BarcodeFormat.QrCode,
                 FallbackUrl = "https://seed.example",
+                StyleJson = "{}",
+                IsActive = true,
+                NeverExpires = true,
             }, default);
     }
 

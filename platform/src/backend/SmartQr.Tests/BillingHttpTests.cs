@@ -8,14 +8,7 @@ using SmartQr.Tests.Harness;
 
 namespace SmartQr.Tests;
 
-/// <summary>
-/// HTTP-level integration tests for billing — WebApplicationFactory over the SAME in-memory SQLite DB shared by the
-/// Api and Redirect hosts, with the in-test <see cref="FakeBillingGateway"/> (no Stripe) and a fixed
-/// <see cref="TestCurrentUser"/> (no cookie round-trip). Mirrors the existing SQLite unit tests' pattern but drives
-/// the full controller → mediator → handler → repository stack over real HTTP. No Docker, no network.
-/// Covers: /me Free default, a simulated <c>subscription.updated</c> upgrade reflected by /me, the create-time 402
-/// cap (lifted by an upgrade webhook), and the never-deactivate-on-downgrade guarantee through SmartQr.Redirect.
-/// </summary>
+/// <summary>HTTP-level billing tests over the shared in-memory SQLite DB with a fake gateway and fixed user — full controller → handler → repository stack, no Docker.</summary>
 public sealed class BillingHttpTests : IDisposable
 {
     private readonly BillingWebApp _app = new();

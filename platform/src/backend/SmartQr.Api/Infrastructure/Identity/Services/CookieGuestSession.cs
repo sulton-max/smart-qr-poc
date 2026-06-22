@@ -3,10 +3,7 @@ using SmartQr.Api.Application.Identity.Core.Services;
 
 namespace SmartQr.Api.Infrastructure.Identity.Services;
 
-/// <summary>
-/// Idempotent guest-session provisioner. Appends the <c>user-id</c> cookie when absent; returns the existing id
-/// when present. Scoped — at most one cookie write per request.
-/// </summary>
+/// <summary>Idempotent guest-session provisioner — appends the <c>user-id</c> cookie when absent, returns the existing id when present.</summary>
 public sealed class CookieGuestSession(IHttpContextAccessor accessor) : IGuestSession
 {
     /// <summary>Name of the HttpOnly identity cookie.</summary>
@@ -52,8 +49,7 @@ public sealed class CookieGuestSession(IHttpContextAccessor accessor) : IGuestSe
         var http = accessor.HttpContext
             ?? throw new InvalidOperationException("No HttpContext — IGuestSession is only valid within a request scope.");
 
-        // Expire the cookie with the SAME attributes it was written with — name and path identify it, but mirroring
-        // Secure / SameSite / HttpOnly keeps strict browsers from ignoring the deletion of a Secure cookie.
+        // Expire with the same attributes it was written with, or strict browsers ignore the deletion of a Secure cookie.
         http.Response.Cookies.Delete(CookieName, new CookieOptions
         {
             HttpOnly = true,

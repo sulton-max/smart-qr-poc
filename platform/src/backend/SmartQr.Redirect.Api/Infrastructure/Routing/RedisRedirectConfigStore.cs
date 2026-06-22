@@ -5,10 +5,7 @@ using StackExchange.Redis;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>
-/// Production hot store: a single Redis GET per scan (sub-ms). The management API writes/refreshes
-/// the JSON config on code create/edit. This keeps the redirect entirely off the primary DB.
-/// </summary>
+/// <summary>Production hot store — one Redis GET per scan, with the management API refreshing the JSON config on code create/edit, keeping the redirect off the primary DB.</summary>
 public sealed class RedisRedirectConfigStore(IConnectionMultiplexer redis) : IRedirectConfigStore
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);

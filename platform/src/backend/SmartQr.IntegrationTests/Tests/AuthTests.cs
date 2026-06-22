@@ -5,10 +5,7 @@ using SmartQr.IntegrationTests.Support;
 
 namespace SmartQr.IntegrationTests.Tests;
 
-/// <summary>
-/// E2E auth flow: Google sign-in (find-or-create), guest-code claim, cross-device ownership, and sign-out.
-/// Google verification is stubbed by <see cref="FakeGoogleTokenVerifier"/> — token form <c>fake:{sub}:{email}:{name}</c>.
-/// </summary>
+/// <summary>E2E auth flow — Google sign-in (find-or-create), guest-code claim, cross-device ownership, and sign-out, with Google verification stubbed.</summary>
 [Collection(AppCollection.Name)]
 public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
 {

@@ -12,10 +12,7 @@ using BillingSettings = SmartQr.Api.Settings.Billing;
 
 namespace SmartQr.Api.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>
-/// Handles <see cref="BillingWebhookCommand"/> — verifies the Stripe signature (via the gateway) and upserts the
-/// affected subscription row. A bad signature returns a typed failure the controller maps to 400 (so Stripe retries).
-/// </summary>
+/// <summary>Handles <see cref="BillingWebhookCommand"/> — verifies the signature and upserts the affected subscription; a bad signature maps to 400 so Stripe retries.</summary>
 public sealed class BillingWebhookCommandHandler(
     ISubscriptionRepository subscriptions,
     IBillingGateway gateway,
@@ -96,11 +93,7 @@ public sealed class BillingWebhookCommandHandler(
         }, ct);
     }
 
-    /// <summary>
-    /// Refreshes an existing row located by its Stripe subscription id. <paramref name="status"/> is applied for
-    /// the delete event; otherwise the status is taken as <see cref="SubscriptionStatus.Active"/> for an update (the
-    /// fake/real gateway only flags the kind, not the granular status). Plan and period end always refresh from the event.
-    /// </summary>
+    /// <summary>Refreshes an existing row located by its Stripe subscription id, applying <paramref name="status"/> and refreshing plan and period end from the event.</summary>
     private async Task RefreshFromSubscriptionAsync(BillingWebhookEvent e, SubscriptionStatus status, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(e.StripeSubscriptionId))

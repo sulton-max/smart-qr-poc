@@ -50,8 +50,6 @@ public static class RedirectEndpoints
                 return Results.NotFound();
             case RouteOutcome.Gone:
                 return Results.StatusCode(StatusCodes.Status410Gone);
-            case RouteOutcome.PasswordRequired:
-                return Results.Redirect($"/_gate/{slug}"); // interstitial stub (V2)
         }
 
         // Fire-and-forget — the redirect never waits on analytics.

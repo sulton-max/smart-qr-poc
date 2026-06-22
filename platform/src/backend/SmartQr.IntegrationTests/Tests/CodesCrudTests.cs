@@ -5,10 +5,7 @@ using SmartQr.IntegrationTests.Support;
 
 namespace SmartQr.IntegrationTests.Tests;
 
-/// <summary>
-/// E2E CRUD and ownership for the codes management API (mirrors requests #4–#13 of <c>SmartQr.Api.http</c>
-/// plus the auth/ownership wedge). Every test runs against the real Postgres container behind two hosts.
-/// </summary>
+/// <summary>E2E CRUD and ownership for the codes management API against the real Postgres container behind two hosts.</summary>
 [Collection(AppCollection.Name)]
 public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
 {

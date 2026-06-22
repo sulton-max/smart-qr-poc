@@ -5,9 +5,7 @@ using SmartQr.IntegrationTests.Support;
 
 namespace SmartQr.IntegrationTests.Tests;
 
-/// <summary>
-/// E2E identity flow (mirrors requests #1–#3 of <c>SmartQr.Api.http</c>): anonymous → mint guest → guest.
-/// </summary>
+/// <summary>E2E identity flow — anonymous, mint guest, then guest.</summary>
 [Collection(AppCollection.Name)]
 public sealed class IdentityTests(AppFixture fixture) : E2EBase(fixture)
 {

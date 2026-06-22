@@ -21,7 +21,8 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
 
         builder
             .Property(e => e.StyleJson)
-            .HasColumnType(PostgresColumnTypes.Jsonb);
+            .HasColumnType(PostgresColumnTypes.Jsonb)
+            .IsRequired();
 
         // ── Relationships ──
         builder

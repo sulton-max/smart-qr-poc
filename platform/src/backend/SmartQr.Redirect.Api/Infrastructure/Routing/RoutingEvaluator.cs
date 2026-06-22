@@ -13,17 +13,10 @@ public sealed class RoutingEvaluator : IRoutingEvaluator
         if (!config.IsActive)
             return new RouteDecision { Outcome = RouteOutcome.NotFound };
 
-        if (!config.NeverExpires)
-        {
-            if (config.ExpiresAt is { } expiry && context.NowUtc >= expiry)
-                return new RouteDecision { Outcome = RouteOutcome.Gone };
-
-            if (config.MaxScans is { } max && config.ScanCount >= max)
-                return new RouteDecision { Outcome = RouteOutcome.Gone };
-        }
-
-        if (config.HasPassword)
-            return new RouteDecision { Outcome = RouteOutcome.PasswordRequired };
+        if (!config.NeverExpires
+            && config.ExpiresAt is { } expiry
+            && context.NowUtc >= expiry)
+            return new RouteDecision { Outcome = RouteOutcome.Gone };
 
         foreach (var rule in config.Rules.OrderBy(r => r.Order))
         {

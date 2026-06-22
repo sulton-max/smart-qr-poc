@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@wow-two-beta/ui/actions";
-import { Accordion, Badge, Card, Heading, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/display";
+import { Accordion, Badge, Card, FeatureCard as UiFeatureCard, Heading, PricingCard as UiPricingCard, StepCard as UiStepCard, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/display";
 import { Container, Grid, HStack, Section as UiSection, Surface, VStack } from "@wow-two-beta/ui/layout";
 import {
   ArrowRight,
@@ -89,37 +89,12 @@ export function SectionHeading({
 
 export function FeatureCard({ feature }: { feature: Feature }) {
   const { icon: Icon, title, body } = feature;
-  return (
-    <Card variant="outline" radius="xl" elevation={0} className="bg-card p-6">
-      <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
-        <Icon size={22} />
-      </span>
-      <Heading level={3} size="md" className="mt-4 tracking-normal">
-        {title}
-      </Heading>
-      <Text size="sm" color="muted" className="mt-2 leading-relaxed">
-        {body}
-      </Text>
-    </Card>
-  );
+  return <UiFeatureCard icon={<Icon size={22} />} title={title} description={body} />;
 }
 
 export function StepCard({ step, index }: { step: Step; index: number }) {
   const { icon: Icon, title, body } = step;
-  return (
-    <Card variant="outline" radius="xl" elevation={0} className="relative overflow-hidden bg-card p-6">
-      <span className="absolute right-4 top-3 text-5xl font-bold text-foreground/5">{index + 1}</span>
-      <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
-        <Icon size={22} />
-      </span>
-      <Heading level={3} size="md" className="mt-4 tracking-normal">
-        {title}
-      </Heading>
-      <Text size="sm" color="muted" className="mt-2">
-        {body}
-      </Text>
-    </Card>
-  );
+  return <UiStepCard step={index + 1} icon={<Icon size={22} />} title={title} description={body} />;
 }
 
 /** Pricing tier grid. Marketing stays backend-independent — no API calls; paid CTAs defer Checkout to the in-app billing screen. */
@@ -141,53 +116,24 @@ function tierCtaHref(tier: PricingTier): string {
 function PricingCard({ tier }: { tier: PricingTier }) {
   const href = tierCtaHref(tier);
   return (
-    <Card
-      variant="outline"
-      radius="2xl"
-      elevation={0}
-      className={`relative flex flex-col bg-card p-6 ${
-        tier.featured ? "border-primary shadow-lg shadow-primary/10" : "border-border"
-      }`}
+    <UiPricingCard
+      name={tier.name}
+      price={tier.price}
+      cadence={tier.cadence}
+      tagline={tier.tagline}
+      features={tier.features}
+      featured={tier.featured}
     >
-      {tier.featured && (
-        <Badge
-          variant="brand"
-          size="md"
-          className="absolute -top-3 left-6 bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
-        >
-          Most popular
-        </Badge>
-      )}
-      <Heading level={3} size="md" className="tracking-normal">
-        {tier.name}
-      </Heading>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="text-3xl font-bold tracking-tight">{tier.price}</span>
-        <Text as="span" size="sm" color="muted">
-          {tier.cadence}
-        </Text>
-      </div>
-      <Text size="sm" color="muted" className="mt-2">
-        {tier.tagline}
-      </Text>
-      <ul className="mt-5 flex flex-1 flex-col gap-2.5">
-        {tier.features.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-sm">
-            <Check size={16} className="mt-0.5 shrink-0 text-primary" />
-            <span>{f}</span>
-          </li>
-        ))}
-      </ul>
       {tier.featured ? (
-        <Button asChild className="mt-6" tone="primary" isFullWidth>
+        <Button asChild tone="primary" isFullWidth>
           <Link to={href}>{tier.cta}</Link>
         </Button>
       ) : (
-        <Button asChild className="mt-6" tone="neutral" variant="outline" isFullWidth>
+        <Button asChild tone="neutral" variant="outline" isFullWidth>
           <Link to={href}>{tier.cta}</Link>
         </Button>
       )}
-    </Card>
+    </UiPricingCard>
   );
 }
 

@@ -52,11 +52,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
     }
 
     /// <summary>Handles a Stripe webhook event.</summary>
-    /// <remarks>
-    /// Not owner-scoped and not enveloped: reads the raw body and <c>Stripe-Signature</c> header, verifies it, and
-    /// upserts the affected subscription. Returns 200 when handled/ignored, 400 on a bad signature (so Stripe's
-    /// retry logic is correct).
-    /// </remarks>
+    /// <remarks>Not owner-scoped or enveloped; verifies the raw body and signature, returning 400 on a bad signature so Stripe retries.</remarks>
     [HttpPost("webhook")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

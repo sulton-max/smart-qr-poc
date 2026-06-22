@@ -37,8 +37,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : AppDb
         // Base applies this assembly's IEntityTypeConfiguration<T> and SDK conventions first.
         base.OnModelCreating(modelBuilder);
 
-        // Store each domain enum as snake_case text, model-wide. Attaches a converter instance (not a type) because
-        // EnumCaseConverter has no metadata-parameterless ctor, so the conventions-level HaveConversion seam can't activate it.
+        // Store each domain enum as snake_case text via a converter instance — EnumCaseConverter has no parameterless ctor.
         ApplyEnumConverter(modelBuilder, new EnumCaseConverter<CodeType>());
         ApplyEnumConverter(modelBuilder, new EnumCaseConverter<BarcodeFormat>());
         ApplyEnumConverter(modelBuilder, new EnumCaseConverter<RuleConditionType>());
@@ -62,11 +61,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : AppDb
         }
     }
 
-    /// <summary>Attaches an enum-to-snake_case-text converter to every property of <typeparamref name="TEnum"/> across the whole model.</summary>
-    /// <remarks>Matches both the non-nullable and nullable (<c>TEnum?</c>) CLR forms so neither slips through unconverted.</remarks>
-    /// <typeparam name="TEnum">The domain enum to map as snake_case text.</typeparam>
-    /// <param name="modelBuilder">The model builder whose entity types are scanned.</param>
-    /// <param name="converter">The reversible snake_case converter instance to attach.</param>
+    /// <summary>Attaches an enum-to-snake_case-text converter to every <typeparamref name="TEnum"/> property (nullable and non-nullable) across the model.</summary>
     private static void ApplyEnumConverter<TEnum>(ModelBuilder modelBuilder, EnumCaseConverter<TEnum> converter)
         where TEnum : struct, Enum
     {

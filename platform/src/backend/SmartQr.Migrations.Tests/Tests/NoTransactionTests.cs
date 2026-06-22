@@ -3,10 +3,7 @@ using SmartQr.Migrations.Tests.Harness;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
-/// <summary>
-/// <c>-- @no-transaction</c>: the Apply runs outside a transaction (required for e.g. CREATE INDEX CONCURRENTLY)
-/// and is recorded in a separate statement. It still applies and records, and a re-run is a no-op.
-/// </summary>
+/// <summary><c>-- @no-transaction</c> — the Apply runs outside a transaction (needed for CREATE INDEX CONCURRENTLY) and records separately; a re-run is a no-op.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class NoTransactionTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
 {

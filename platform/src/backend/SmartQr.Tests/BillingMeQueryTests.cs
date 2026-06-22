@@ -31,6 +31,9 @@ public class BillingMeQueryTests
                 CodeType = CodeType.Qr,
                 BarcodeFormat = BarcodeFormat.QrCode,
                 FallbackUrl = "https://x.example",
+                StyleJson = "{}",
+                IsActive = true,
+                NeverExpires = true,
             }, default);
     }
 

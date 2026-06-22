@@ -11,7 +11,4 @@ public enum RouteOutcome
 
     /// <summary>Expired or scan-capped (410 Gone).</summary>
     Gone,
-
-    /// <summary>Password gate required (interstitial).</summary>
-    PasswordRequired,
 }

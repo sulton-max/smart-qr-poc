@@ -4,10 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
-/// <summary>
-/// Orphan: an applied history row whose source folder is gone (binary older than DB, or folder deleted). Apply
-/// fails closed (<see cref="MigrationOrphanException"/>) unless <c>AllowOrphanedHistory</c> lets it proceed.
-/// </summary>
+/// <summary>Orphan — an applied history row whose source folder is gone fails closed (<see cref="MigrationOrphanException"/>) unless <c>AllowOrphanedHistory</c> lets it proceed.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class OrphanTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
 {

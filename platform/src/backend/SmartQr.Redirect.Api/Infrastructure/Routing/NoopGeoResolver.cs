@@ -2,10 +2,7 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>
-/// Placeholder geo resolver — returns null (country rules simply won't match yet).
-/// Production: swap for a MaxMind GeoLite2 in-memory lookup (loaded once at startup) — see README §Geo.
-/// </summary>
+/// <summary>Placeholder geo resolver — returns null so country rules don't match yet; production swaps for a MaxMind GeoLite2 lookup.</summary>
 public sealed class NoopGeoResolver : IGeoResolver
 {
     /// <inheritdoc />

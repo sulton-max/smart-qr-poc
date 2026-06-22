@@ -4,8 +4,6 @@ using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 namespace SmartQr.Common.Domain.Codes.Entities;
 
 /// <summary>Represents an append-only record of a single scan / click. Written asynchronously off the redirect hot path.</summary>
-/// <example>One row per resolved redirect, capturing device class, geo, and the destination chosen</example>
-/// <remarks>Deliberately not audited — <see cref="ScannedAt"/> is the caller-supplied resolve-time domain value, more accurate than an interceptor's persist-time <c>CreatedAt</c> would be.</remarks>
 public sealed record ScanEventEntity : IKeyedEntity<Guid>, IHasTableName
 {
     /// <summary>Gets the storage table name for the scan-event entity — the single source of truth for hand-written SQL.</summary>

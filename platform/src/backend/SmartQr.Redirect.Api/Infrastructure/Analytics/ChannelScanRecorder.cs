@@ -4,10 +4,7 @@ using SmartQr.Redirect.Api.Application.Analytics.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Analytics;
 
-/// <summary>
-/// Bounded in-memory queue between the redirect (producer) and the flush worker (consumer).
-/// <see cref="Enqueue"/> never blocks; on overload it drops (analytics is best-effort, the redirect is sacred).
-/// </summary>
+/// <summary>Bounded in-memory queue between the redirect (producer) and the flush worker (consumer) — never blocks, dropping on overload since analytics is best-effort.</summary>
 public sealed class ChannelScanRecorder : IScanRecorder
 {
     private readonly Channel<ScanRecord> _channel = Channel.CreateBounded<ScanRecord>(

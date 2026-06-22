@@ -59,8 +59,12 @@ public sealed class CodeCreateCommandHandler(
                 UserId = request.UserId,
                 Name = request.Name,
                 CodeType = request.CodeType,
-                BarcodeFormat = request.BarcodeFormat,
+                // Defaults that used to live on the entity now originate here, at creation.
+                BarcodeFormat = request.BarcodeFormat, // command defaults this to QrCode
                 FallbackUrl = request.FallbackUrl,
+                IsActive = true,                       // new codes resolve immediately
+                NeverExpires = true,                   // the create request carries no expiry → the never-expire promise holds
+                StyleJson = "{}",                      // empty style placeholder (real default-style content is a future product decision)
                 Rules = request.Rules
                     .Select(r => new RoutingRuleEntity
                     {

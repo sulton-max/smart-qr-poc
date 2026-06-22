@@ -6,10 +6,7 @@ public static class Polling
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan DefaultInterval = TimeSpan.FromMilliseconds(100);
 
-    /// <summary>
-    /// Polls <paramref name="probe"/> until <paramref name="predicate"/> holds or the timeout elapses.
-    /// Returns the last probed value. Never a fixed <c>Task.Delay</c> — fast when the condition is already met.
-    /// </summary>
+    /// <summary>Polls <paramref name="probe"/> until <paramref name="predicate"/> holds or the timeout elapses, returning the last probed value.</summary>
     public static async Task<T> UntilAsync<T>(
         Func<Task<T>> probe,
         Func<T, bool> predicate,

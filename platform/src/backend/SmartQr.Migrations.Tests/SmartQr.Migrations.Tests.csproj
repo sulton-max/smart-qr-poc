@@ -8,15 +8,9 @@
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
-    <!--
-      Engine-under-test suite for the bespoke SQL migrator, consumed from the published SDK package.
-      Deliberately self-contained: it references the SDK package directly and NEVER references
-      SmartQr.Api / SmartQr.Redirect (the Api host is currently broken by unrelated controller drift,
-      and pulling it in would make this suite unbuildable). The Testcontainers Postgres fixture mirrors
-      the idiom in SmartQr.IntegrationTests/Harness but is wholly owned here.
-    -->
+    <!-- Engine-under-test suite for the bespoke SQL migrator — self-contained against the SDK package, with no reference to SmartQr.Api / SmartQr.Redirect. -->
     <ItemGroup>
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.31-beta"/>
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.32-beta"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.*"/>
         <PackageReference Include="Npgsql" Version="10.*"/>

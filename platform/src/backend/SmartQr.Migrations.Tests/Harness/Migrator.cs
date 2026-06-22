@@ -8,12 +8,7 @@ using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Migrations.Tests.Harness;
 
-/// <summary>
-/// One configured migrator instance over a temp <see cref="MigrationsWorkspace"/> and a container DB — the DI
-/// graph the engine-under-test runs inside. Built per test via <see cref="Create"/>, mirroring the production
-/// wiring (<c>AddDataSourceConnectionFactory</c> over a <see cref="DbDataSource"/>, then
-/// <c>AddDatabaseBespokeMigrations(root, configure)</c>) but with nothing else in the container.
-/// </summary>
+/// <summary>One configured migrator instance over a temp <see cref="MigrationsWorkspace"/> and a container DB — the DI graph the engine-under-test runs inside.</summary>
 public sealed class Migrator : IAsyncDisposable
 {
     private readonly ServiceProvider _provider;
@@ -26,10 +21,7 @@ public sealed class Migrator : IAsyncDisposable
     /// <summary>The effective options (after the configure hook), as the engine sees them.</summary>
     public MigrationOptions Options => _provider.GetRequiredService<MigrationOptions>();
 
-    /// <summary>
-    /// Builds a migrator over <paramref name="connectionString"/> reading from <paramref name="root"/>, applying the
-    /// optional <paramref name="configure"/> hook to <see cref="MigrationOptions"/>.
-    /// </summary>
+    /// <summary>Builds a migrator over <paramref name="connectionString"/> reading from <paramref name="root"/>, applying the optional <paramref name="configure"/> hook.</summary>
     public static Migrator Create(
         string connectionString,
         string root,

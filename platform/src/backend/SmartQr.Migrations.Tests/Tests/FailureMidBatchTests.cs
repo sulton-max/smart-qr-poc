@@ -3,11 +3,7 @@ using SmartQr.Migrations.Tests.Harness;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
-/// <summary>
-/// Failure mid-batch: a batch of three where #2's Apply.sql is invalid. Each migration runs in its own
-/// transaction, so #1 stays applied and recorded, #2 rolls back wholesale (no table, no history row), and #3 is
-/// never reached. Fixing #2 and re-running completes the batch from where it stopped.
-/// </summary>
+/// <summary>Failure mid-batch — #2's invalid Apply.sql rolls back wholesale while #1 stays applied and #3 never runs; fixing and re-running resumes the batch.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class FailureMidBatchTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
 {

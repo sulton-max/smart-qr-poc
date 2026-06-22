@@ -2,30 +2,26 @@ using SmartQr.Common.Configuration;
 
 namespace SmartQr.Api.Settings;
 
-/// <summary>
-/// Stripe billing settings. The class name is the appsettings section name (<c>Billing</c>) — bound by
-/// <c>ConfigurationLoader.Load&lt;Billing&gt;</c>. Secrets carry an env-var overlay; appsettings holds empty
-/// placeholders only (never commit real keys — use env vars / user-secrets).
-/// </summary>
+/// <summary>Stripe billing settings (appsettings section <c>Billing</c>) — secrets carry an env-var overlay; appsettings holds empty placeholders.</summary>
 public class Billing
 {
     /// <summary>Stripe secret API key (<c>sk_test_…</c>). Empty in appsettings; set via env / user-secrets.</summary>
-    [EnvironmentVariable("SMARTQR_BILLING_SECRET_KEY")]
+    [EnvironmentVariable("BILLING_SECRET_KEY")]
     public string SecretKey { get; set; } = "";
 
     /// <summary>Stripe webhook signing secret (<c>whsec_…</c>) — printed by <c>stripe listen</c>. Empty in appsettings.</summary>
-    [EnvironmentVariable("SMARTQR_BILLING_WEBHOOK_SECRET")]
+    [EnvironmentVariable("BILLING_WEBHOOK_SECRET")]
     public string WebhookSecret { get; set; } = "";
 
     /// <summary>Stripe price ids per paid plan. Bound from <c>Billing:Prices</c> (appsettings / user-secrets). Never hardcoded.</summary>
     public BillingPrices Prices { get; set; } = new();
 
     /// <summary>Hosted Checkout success-redirect URL.</summary>
-    [EnvironmentVariable("SMARTQR_BILLING_SUCCESS_URL")]
+    [EnvironmentVariable("BILLING_SUCCESS_URL")]
     public string SuccessUrl { get; set; } = "http://localhost:7020/billing/success";
 
     /// <summary>Hosted Checkout cancel-redirect URL (also the Customer Portal return URL).</summary>
-    [EnvironmentVariable("SMARTQR_BILLING_CANCEL_URL")]
+    [EnvironmentVariable("BILLING_CANCEL_URL")]
     public string CancelUrl { get; set; } = "http://localhost:7020/billing/cancel";
 }
 

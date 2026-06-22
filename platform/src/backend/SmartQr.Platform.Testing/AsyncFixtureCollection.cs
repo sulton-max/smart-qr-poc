@@ -1,10 +1,6 @@
 namespace SmartQr.IntegrationTests.Harness;
 
-/// <summary>
-/// Default <see cref="IAsyncFixtureCollection"/> — starts all fixtures sequentially,
-/// resets sequentially, disposes in reverse order.
-/// </summary>
-/// <remarks>Mirrors the wow-two backend-beta SDK testing scaffold (public surface kept identical).</remarks>
+/// <summary>Default <see cref="IAsyncFixtureCollection"/> — starts and resets fixtures sequentially, disposes in reverse order.</summary>
 public sealed class AsyncFixtureCollection : IAsyncFixtureCollection
 {
     private readonly List<IAsyncTestFixture> _fixtures;

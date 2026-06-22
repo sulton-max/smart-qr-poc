@@ -9,11 +9,8 @@ using SmartQr.Redirect.Api.Settings;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>
-/// Default hot store: IMemoryCache over the DB. The redirect hits memory on the happy path; a miss reads the DB once
-/// (no-tracking) and caches for a short TTL. Production swaps this for <see cref="RedisRedirectConfigStore"/>.
-/// </summary>
-// Currently UNWIRED pending the caching backlog item — DbRedirectConfigStore is the active non-Redis default. Kept for the later re-enable.
+/// <summary>IMemoryCache hot store over the DB — a miss reads once (no-tracking) and caches for a short TTL.</summary>
+// UNWIRED pending the caching backlog item — DbRedirectConfigStore is the active non-Redis default.
 public sealed class CachedRedirectConfigStore(
     IServiceScopeFactory scopeFactory,
     IMemoryCache cache,
@@ -51,9 +48,7 @@ public sealed class CachedRedirectConfigStore(
         IsActive = c.IsActive,
         NeverExpires = c.NeverExpires,
         ExpiresAt = c.ExpiresAt,
-        MaxScans = c.MaxScans,
         ScanCount = c.ScanCount,
-        HasPassword = c.PasswordHash is not null,
         Rules = c.Rules
             .OrderBy(r => r.Order)
             .Select(r => new RouteRule

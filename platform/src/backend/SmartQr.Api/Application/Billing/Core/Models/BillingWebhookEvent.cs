@@ -1,9 +1,6 @@
 namespace SmartQr.Api.Application.Billing.Core.Models;
 
-/// <summary>
-/// A signature-verified Stripe webhook event flattened to just the fields the upsert needs.
-/// Produced by <c>IBillingGateway.ParseWebhookEvent</c> so the handler (and tests) never touch Stripe SDK types.
-/// </summary>
+/// <summary>A signature-verified Stripe webhook event flattened to the fields the upsert needs, so the handler never touches Stripe SDK types.</summary>
 public sealed record BillingWebhookEvent
 {
     /// <summary>The kind of event, already normalized to the set we handle.</summary>

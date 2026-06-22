@@ -7,46 +7,27 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace SmartQr.IntegrationTests.Harness;
 
-/// <summary>
-/// Test host wrapping <see cref="WebApplicationFactory{TEntryPoint}"/> with conventional defaults:
-/// <list type="bullet">
-///   <item>Environment forced to <c>"Production"</c> (mirrors the SDK CODE — SmartQr startup is not gated on env).</item>
-///   <item><see cref="FakeTimeProvider"/> registered as the default <see cref="TimeProvider"/>.</item>
-///   <item>Hooks for replacing services and tweaking configuration before the host builds.</item>
-///   <item>The container connection string injected into <c>DatabaseSettings:ConnectionString</c> when set.</item>
-/// </list>
-/// </summary>
+/// <summary>Test host over <see cref="WebApplicationFactory{TEntryPoint}"/> — Production env, <see cref="FakeTimeProvider"/> default, service/config hooks, optional container connection string.</summary>
 /// <typeparam name="TEntryPoint">The application entry-point type (typically <c>Program</c>).</typeparam>
-/// <remarks>Mirrors the wow-two backend-beta SDK <c>WebApiTestHost&lt;TEntryPoint&gt;</c> public surface.</remarks>
 public class WebApiTestHost<TEntryPoint> : WebApplicationFactory<TEntryPoint>
     where TEntryPoint : class
 {
-    /// <summary>
-    /// The fake clock injected as the default <see cref="TimeProvider"/>. Mutate from tests to advance time.
-    /// </summary>
+    /// <summary>The fake clock injected as the default <see cref="TimeProvider"/>; mutate from tests to advance time.</summary>
     public FakeTimeProvider Clock { get; } = new();
 
-    /// <summary>
-    /// PostgreSQL connection string injected as <c>DatabaseSettings:ConnectionString</c>. Both the Api and
-    /// Redirect hosts point at the same container DB through this. The matching env var is set process-wide
-    /// by the app fixture (the config loader's env overlay wins).
-    /// </summary>
+    /// <summary>PostgreSQL connection string injected as <c>DatabaseSettings:ConnectionString</c> for both hosts.</summary>
     public string? ConnectionString { get; init; }
 
-    /// <summary>
-    /// Adds a service-replacement hook. Called once when the host builds.
-    /// </summary>
+    /// <summary>Service-replacement hook, called once when the host builds.</summary>
     public Action<IServiceCollection>? ConfigureServicesHook { get; init; }
 
-    /// <summary>
-    /// Adds an additional `IHostBuilder` configuration step. Useful for `UseEnvironment("Production")` overrides.
-    /// </summary>
+    /// <summary>Additional <c>IHostBuilder</c> configuration step.</summary>
     public Action<IHostBuilder>? ConfigureHostHook { get; init; }
 
     /// <inheritdoc />
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment(Environments.Production); // mirror the SDK CODE — Production, not Testing
+        builder.UseEnvironment(Environments.Production);
 
         if (ConnectionString is not null)
         {
@@ -61,7 +42,7 @@ public class WebApiTestHost<TEntryPoint> : WebApplicationFactory<TEntryPoint>
 
         builder.ConfigureServices(services =>
         {
-            // Default: replace TimeProvider with FakeTimeProvider so tests control time.
+            // Replace TimeProvider with FakeTimeProvider so tests control time.
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(Clock);
 

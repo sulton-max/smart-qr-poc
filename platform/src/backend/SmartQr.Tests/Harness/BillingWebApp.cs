@@ -27,24 +27,9 @@ using BillingPrices = SmartQr.Api.Settings.BillingPrices;
 
 namespace SmartQr.Tests.Harness;
 
-/// <summary>
-/// A SQLite-backed, two-host billing test app — the WebApplicationFactory analogue of the existing direct-handler
-/// billing unit tests, but driven over real HTTP. Owns ONE open in-memory SQLite connection that BOTH hosts share,
-/// so a code created through the Api host is resolvable on the Redirect host's hot path. No Docker, no real Stripe:
-/// the Api host's <see cref="IBillingGateway"/> is the in-test <see cref="FakeBillingGateway"/> and its
-/// <see cref="ICurrentUser"/> is a fixed-id <see cref="TestCurrentUser"/>; the bespoke SQL migrator is neutered
-/// (schema comes from EF <c>EnsureCreated()</c>).
-/// </summary>
-/// <remarks>
-/// Both hosts run their startup <c>MigrateDatabaseAsync()</c>, which targets Npgsql — the
-/// <see cref="NoOpMigrationDialect"/> / <see cref="NoOpMigrationRunner"/> make that a no-op so nothing hits Postgres.
-/// A parseable (but never-opened) Postgres connection string is injected only because the startup hook reads its
-/// database name.
-/// </remarks>
+/// <summary>SQLite-backed two-host billing test app over real HTTP, both hosts sharing one in-memory connection; no Docker, no real Stripe.</summary>
 public sealed class BillingWebApp : IDisposable
 {
-    // A dummy, parseable Npgsql connection string. Never opened — the no-op migrator short-circuits the only path
-    // that would dial Postgres; the data-source singleton is lazy and the redirect read path uses EF over SQLite.
     private const string DummyPgConnection = "Host=localhost;Port=5432;Database=smartqr_test;Username=test;Password=test";
 
     private readonly SqliteConnection _connection;
@@ -69,9 +54,7 @@ public sealed class BillingWebApp : IDisposable
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
-        // Create the schema once on the shared connection (subscriptions, codes, and rules). MUST use the same
-        // snake_case convention the hosts apply (AddPersistence → UseSnakeCaseNamingConvention), otherwise the
-        // created columns are PascalCase while the host queries snake_case (e.g. `created_at`) and every read 500s.
+        // Create the schema with the same snake_case convention the hosts apply, or every read 500s.
         using (var ctx = NewDbContext())
         {
             ctx.Database.EnsureCreated();
@@ -90,10 +73,7 @@ public sealed class BillingWebApp : IDisposable
         AllowAutoRedirect = false,
     });
 
-    /// <summary>
-    /// A new <see cref="AppDbContext"/> on the shared DB — for schema creation and direct seeding / assertions.
-    /// Applies the same snake_case convention as the hosts so column names line up across schema, seeds, and queries.
-    /// </summary>
+    /// <summary>A new <see cref="AppDbContext"/> on the shared DB (snake_case convention) for seeding and assertions.</summary>
     public AppDbContext NewDbContext() =>
         new(new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(_connection)
@@ -110,16 +90,13 @@ public sealed class BillingWebApp : IDisposable
                 UseSharedSqlite(services);
                 NeuterMigrator(services);
 
-                // No network: swap the real Stripe gateway and the cookie identity for in-test doubles.
+                // Swap the real Stripe gateway and cookie identity for in-test doubles.
                 services.RemoveAll<IBillingGateway>();
                 services.AddSingleton<IBillingGateway>(Gateway);
                 services.RemoveAll<ICurrentUser>();
                 services.AddSingleton<ICurrentUser>(CurrentUser);
 
-                // Replace the Billing settings instance directly. The host loads it via ConfigurationLoader.Load<Billing>
-                // at registration time (inside Program), which reads config BEFORE WithWebHostBuilder's in-memory layer
-                // lands — so a config-only price map wouldn't reach it. The price map MUST be populated so the webhook's
-                // price→Plan inverse resolves `price_pro` → Pro.
+                // Replace Billing as a DI singleton — the host loads it before the in-memory config layer lands.
                 services.RemoveAll<BillingSettings>();
                 services.AddSingleton(new BillingSettings
                 {
@@ -147,18 +124,11 @@ public sealed class BillingWebApp : IDisposable
     private static void InjectDummyConfig(IWebHostBuilder builder) =>
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            // Read by the startup migrate hook (for the DB name) and the data-source builder; never actually opened.
-            // (Billing settings are replaced as a DI singleton in ConfigureTestServices, not via config — see there.)
+            // Read by the startup migrate hook (DB name) and the data-source builder; never opened.
             ["DatabaseSettings:ConnectionString"] = DummyPgConnection,
         }));
 
     /// <summary>Repoints EF off Npgsql onto the single shared SQLite connection so both hosts see the same data.</summary>
-    /// <remarks>
-    /// <c>AddDbContext(UseNpgsql…)</c> registers the provider through an <c>IDbContextOptionsConfiguration&lt;AppDbContext&gt;</c>
-    /// that ACCUMULATES — so a second <c>AddDbContext(UseSqlite…)</c> would leave BOTH providers applied to the same
-    /// context's options (EF throws "Only a single database provider can be registered"). Strip every EF descriptor for
-    /// this context (the options, its accumulating configuration, and the context registration) before re-adding SQLite.
-    /// </remarks>
     private void UseSharedSqlite(IServiceCollection services)
     {
         services.RemoveAllForDbContext<AppDbContext>();
@@ -182,7 +152,6 @@ public sealed class BillingWebApp : IDisposable
         client.PostAsync(url, JsonContent.Create(value, options: Json));
 
     /// <summary>POSTs a raw body with a <c>Stripe-Signature</c> header — the webhook contract (no envelope, no auth).</summary>
-    /// <remarks>The request is NOT disposed here — disposing it would tear down its content while <c>SendAsync</c> is still reading it.</remarks>
     public static Task<HttpResponseMessage> PostWebhookAsync(HttpClient client, string signature = "test-sig")
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/billing/webhook")
@@ -229,16 +198,11 @@ public sealed class BillingWebApp : IDisposable
 /// <summary>Service-collection helpers for the billing host tests — strip a host's EF registration so SQLite can replace it.</summary>
 internal static class BillingWebAppServiceCollectionExtensions
 {
-    /// <summary>
-    /// Removes every descriptor that binds <typeparamref name="TContext"/> to its (Npgsql) provider: the context itself,
-    /// its <c>DbContextOptions</c>/<c>DbContextOptions&lt;T&gt;</c>, and the accumulating
-    /// <c>IDbContextOptionsConfiguration&lt;T&gt;</c> that carries <c>UseNpgsql(…)</c>. Leaves EF's provider-agnostic
-    /// infrastructure intact so a fresh <c>AddDbContext&lt;T&gt;(UseSqlite…)</c> wires cleanly.
-    /// </summary>
+    /// <summary>Removes every descriptor binding <typeparamref name="TContext"/> to its Npgsql provider so a fresh SQLite registration wires cleanly.</summary>
     public static IServiceCollection RemoveAllForDbContext<TContext>(this IServiceCollection services)
         where TContext : DbContext
     {
-        // IDbContextOptionsConfiguration<T> is internal (EF 9) — match it by open-generic name rather than a type ref.
+        // IDbContextOptionsConfiguration<T> is internal — match it by open-generic name, not a type ref.
         for (var i = services.Count - 1; i >= 0; i--)
         {
             var serviceType = services[i].ServiceType;

@@ -5,10 +5,7 @@ using SmartQr.Api.Application.Identity.Core.Services;
 
 namespace SmartQr.Api.Infrastructure.Identity.Services;
 
-/// <summary>
-/// Read-only <see cref="ICurrentUser"/> that parses the <c>user-id</c> cookie. Never writes a cookie —
-/// use <see cref="CookieGuestSession"/> for provisioning. Scoped — parsed once per request.
-/// </summary>
+/// <summary>Read-only <see cref="ICurrentUser"/> that parses the <c>user-id</c> cookie; never writes a cookie (use <see cref="CookieGuestSession"/> for provisioning).</summary>
 public sealed class CookieCurrentUser(IHttpContextAccessor accessor) : ICurrentUser
 {
     private (Guid? Id, UserKind Kind)? _resolved;

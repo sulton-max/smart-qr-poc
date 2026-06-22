@@ -3,11 +3,7 @@ using SmartQr.Migrations.Tests.Harness;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
-/// <summary>
-/// Concurrency: two independent migrators (separate connections) apply the SAME source against the SAME DB at the
-/// same time. The session advisory lock serializes them, so the net effect is applied exactly once — no
-/// duplicate-key blowups, no duplicate <c>migration_history</c> rows.
-/// </summary>
+/// <summary>Concurrency — two independent migrators apply the same source against the same DB; the advisory lock serializes them so it lands exactly once.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class ConcurrencyTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
 {

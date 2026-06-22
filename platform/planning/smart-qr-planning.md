@@ -1,6 +1,6 @@
 # Smart QR — Platform Planning
 
-*Last updated: 2026-06-19*
+*Last updated: 2026-06-22*
 
 Durable roadmap + backlog for the technical platform — the standing plan that version docs pull from
 and return to. Business roadmap → `business/business-context.md`. Strategy →
@@ -121,6 +121,8 @@ strike-through + ✅ when done (kept for traceability).
 |---|---|---|
 | Expiring / scan-capped / one-time links | feature | self-destruct + cap primitives |
 | Password-locked links | feature | interstitial gate |
+| Scan limit (`MaxScans`) — conditional expiry by scan count | feature | removed from baseline 2026-06-22 (dead feature: column + redirect gating with no create/edit path). Re-add with the expiry/cap primitives above when built |
+| Code password protection (`PasswordHash`) — separate auth mechanism, design later | feature | removed from baseline 2026-06-22 (dead feature: column + `PasswordRequired` outcome with no create/edit path or interstitial). Its own auth design, not a column bolt-on |
 
 ### Trust & safety
 

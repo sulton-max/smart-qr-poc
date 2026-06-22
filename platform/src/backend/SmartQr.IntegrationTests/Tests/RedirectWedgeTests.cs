@@ -5,11 +5,7 @@ using SmartQr.IntegrationTests.Support;
 
 namespace SmartQr.IntegrationTests.Tests;
 
-/// <summary>
-/// The wedge — programmable routing across the two-host boundary. A code created/edited through the management
-/// Api host is resolved by the Redirect host on the very next scan (DbRedirectConfigStore reads fresh per scan).
-/// Proves: device-rule match, fallback for unmatched device, async scan-count increment, and live re-route on edit.
-/// </summary>
+/// <summary>The wedge — a code created/edited through the Api host resolves on the Redirect host's next scan; covers device-rule match, fallback, async scan-count, and live re-route on edit.</summary>
 [Collection(AppCollection.Name)]
 public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
 {

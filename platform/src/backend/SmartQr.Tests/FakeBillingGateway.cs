@@ -3,11 +3,7 @@ using SmartQr.Api.Application.Billing.Core.Services;
 
 namespace SmartQr.Tests;
 
-/// <summary>
-/// In-memory <see cref="IBillingGateway"/> for tests — no network, no real Stripe. Returns canned Checkout/Portal URLs
-/// and hands back a test-supplied <see cref="BillingWebhookEvent"/> from <see cref="ParseWebhookEvent"/>, so the
-/// webhook handler's upsert logic is exercised without signatures or HTTP. Records the last calls for assertions.
-/// </summary>
+/// <summary>In-memory <see cref="IBillingGateway"/> for tests — canned Checkout/Portal URLs, a test-supplied <see cref="BillingWebhookEvent"/>, and captured last calls; no network.</summary>
 public sealed class FakeBillingGateway : IBillingGateway
 {
     /// <summary>URL returned by <see cref="CreateCheckoutSessionAsync"/>.</summary>

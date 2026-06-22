@@ -3,11 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SmartQr.IntegrationTests.Support;
 
-/// <summary>
-/// Local mirrors of the SmartQr API response shapes used for E2E assertions. Kept independent of the
-/// (extern-aliased) production types so test files don't need alias gymnastics — the wire contract is the
-/// only thing being asserted anyway.
-/// </summary>
+/// <summary>Local mirrors of the API response shapes for E2E assertions — independent of the extern-aliased production types, so only the wire contract is asserted.</summary>
 public static class TestJson
 {
     /// <summary>JSON options matching the API: camelCase and string enums.</summary>

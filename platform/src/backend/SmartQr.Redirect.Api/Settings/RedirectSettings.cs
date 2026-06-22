@@ -9,6 +9,6 @@ public class RedirectSettings
     public int ConfigCacheSeconds { get; set; } = 30;
 
     /// <summary>Optional Redis connection. When set, the Redis config store is used instead of the in-memory cache.</summary>
-    [EnvironmentVariable("SMARTQR_REDIS_CONNECTION")]
+    [EnvironmentVariable("REDIS_CONNECTION")]
     public string? RedisConnectionString { get; set; }
 }

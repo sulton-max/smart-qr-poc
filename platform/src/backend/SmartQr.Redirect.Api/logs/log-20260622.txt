@@ -1,0 +1,11 @@
+2026-06-22 11:58:08.459 +05:00 [INF] Database smartqr already exists.
+2026-06-22 11:59:33.425 +05:00 [INF] Created database smartqr.
+2026-06-22 11:59:33.548 +05:00 [INF] Applied 001-baseline in 20ms.
+2026-06-22 11:59:33.556 +05:00 [INF] Applied 002-billing in 7ms.
+2026-06-22 11:59:33.560 +05:00 [INF] Applied 003-accounts in 2ms.
+2026-06-22 11:59:33.562 +05:00 [INF] Applied 004-enum-snake-case in 2ms.
+2026-06-22 11:59:33.868 +05:00 [INF] Now listening on: https://localhost:7022
+2026-06-22 11:59:33.869 +05:00 [INF] Now listening on: http://localhost:7023
+2026-06-22 11:59:33.869 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-22 11:59:33.869 +05:00 [INF] Hosting environment: Development
+2026-06-22 11:59:33.869 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Redirect.Api

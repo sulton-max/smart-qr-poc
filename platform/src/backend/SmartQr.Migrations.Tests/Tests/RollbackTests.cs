@@ -3,10 +3,7 @@ using SmartQr.Migrations.Tests.Harness;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
-/// <summary>
-/// Rollback: with <c>AllowRollback</c>, <c>RollbackAsync()</c> runs the latest migration's Rollback.sql and removes
-/// its history row. With rollback disabled (the default) it throws.
-/// </summary>
+/// <summary>Rollback — with <c>AllowRollback</c>, <c>RollbackAsync()</c> runs the latest Rollback.sql and removes its history row; disabled (the default) it throws.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class RollbackTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
 {

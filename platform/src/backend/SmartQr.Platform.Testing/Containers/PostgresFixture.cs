@@ -6,18 +6,10 @@ using Testcontainers.PostgreSql;
 
 namespace SmartQr.IntegrationTests.Harness.Containers;
 
-/// <summary>
-/// Async fixture spinning up a PostgreSQL container.
-/// </summary>
-/// <remarks>
-/// Mirrors the wow-two backend-beta SDK <c>PostgresFixture</c> (same constructors, <see cref="Name"/>,
-/// and <see cref="ConnectionString"/>), extended with a Respawn-backed <see cref="ResetAsync"/> and an
-/// open <see cref="Connection"/> so per-test DB reset is owned by the fixture. The extra surface is purely
-/// additive — the SDK swap stays mechanical.
-/// </remarks>
+/// <summary>Async fixture spinning up a PostgreSQL container with a Respawn-backed <see cref="ResetAsync"/> and an open <see cref="Connection"/>.</summary>
 public sealed class PostgresFixture : ContainerFixtureBase<PostgreSqlContainer>
 {
-    // The migrator's own bookkeeping table — must never be truncated, or migrations re-run/desync.
+    // The migrator's bookkeeping table — never truncate, or migrations re-run/desync.
     private const string MigrationHistoryTable = "migration_history";
 
     private DbConnection? _connection;
@@ -44,11 +36,7 @@ public sealed class PostgresFixture : ContainerFixtureBase<PostgreSqlContainer>
     public DbConnection Connection =>
         _connection ?? throw new InvalidOperationException("PostgresFixture not started — Connection is null.");
 
-    /// <summary>
-    /// Builds the Respawner from the open connection. Must be invoked AFTER the host has applied migrations
-    /// (so the schema — and the data tables Respawn snapshots — exist). The SmartQr app fixture calls this
-    /// once both hosts are built.
-    /// </summary>
+    /// <summary>Builds the Respawner from the open connection — must run after the host has applied migrations.</summary>
     public async ValueTask InitializeRespawnerAsync(CancellationToken cancellationToken = default)
     {
         _connection ??= await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);

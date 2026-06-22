@@ -26,11 +26,7 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
-    <!--
-      Both SmartQr.Api and SmartQr.Redirect expose a top-level `Program` in the GLOBAL namespace.
-      Referencing both assemblies makes the bare `Program` type ambiguous, so each is pulled in
-      under an extern alias (`apihost` / `redirecthost`). Tests select the host via the alias.
-    -->
+    <!-- Both hosts expose a top-level `Program` in the global namespace, so each is pulled in under an extern alias (`apihost` / `redirecthost`). -->
     <ItemGroup>
         <!-- Generic web-API integration-test harness (base types, fixtures, Postgres container, web host). -->
         <ProjectReference Include="..\SmartQr.Platform.Testing\SmartQr.Platform.Testing.csproj"/>

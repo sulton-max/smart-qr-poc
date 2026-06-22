@@ -1,11 +1,6 @@
 namespace SmartQr.Migrations.Tests.Harness;
 
-/// <summary>
-/// Convenience base for migrator tests — joins the shared-container collection, resets the schema before each test
-/// (so every test starts with no tables and an empty <c>migration_history</c>), and owns a fresh
-/// <see cref="MigrationsWorkspace"/> disposed afterwards. Concrete classes carry
-/// <c>[Collection(MigratorCollection.Name)]</c>.
-/// </summary>
+/// <summary>Convenience base for migrator tests — joins the shared-container collection, resets the schema per test, and owns a fresh <see cref="MigrationsWorkspace"/>.</summary>
 public abstract class MigratorTestBase(PostgresContainerFixture fixture) : IAsyncLifetime
 {
     /// <summary>The shared Postgres container fixture.</summary>

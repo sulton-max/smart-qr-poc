@@ -2,12 +2,8 @@ using DotNet.Testcontainers.Containers;
 
 namespace SmartQr.IntegrationTests.Harness.Containers;
 
-/// <summary>
-/// Abstract base for Testcontainers-backed fixtures. Per-engine packages
-/// (`Postgres`, `Redis`, `RabbitMq`, ...) inherit and supply the concrete container.
-/// </summary>
+/// <summary>Abstract base for Testcontainers-backed fixtures; per-engine packages inherit and supply the concrete container.</summary>
 /// <typeparam name="TContainer">The concrete Testcontainers container type.</typeparam>
-/// <remarks>Mirrors the wow-two backend-beta SDK testing scaffold (public surface kept identical).</remarks>
 public abstract class ContainerFixtureBase<TContainer> : IAsyncTestFixture
     where TContainer : IContainer
 {

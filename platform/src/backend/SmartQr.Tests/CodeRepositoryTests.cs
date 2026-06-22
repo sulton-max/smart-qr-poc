@@ -17,6 +17,9 @@ public class CodeRepositoryTests
         CodeType = CodeType.Qr,
         BarcodeFormat = BarcodeFormat.QrCode,
         FallbackUrl = "https://fallback.example",
+        StyleJson = "{}",
+        IsActive = true,
+        NeverExpires = true,
         Rules = rules.ToList(),
     };
 
@@ -34,6 +37,9 @@ public class CodeRepositoryTests
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
             FallbackUrl = "https://site.example",
+            StyleJson = "{}",
+            IsActive = true,
+            NeverExpires = true,
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 2, ConditionType = RuleConditionType.Device, ConditionValue = "Android", Destination = "https://play.example" },
@@ -123,6 +129,9 @@ public class CodeRepositoryTests
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
             FallbackUrl = "https://old.example",
+            StyleJson = "{}",
+            IsActive = true,
+            NeverExpires = true,
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://old.example/ios" },
@@ -196,6 +205,9 @@ public class CodeRepositoryTests
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
             FallbackUrl = "https://site.example",
+            StyleJson = "{}",
+            IsActive = true,
+            NeverExpires = true,
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://ios.example" },
@@ -242,6 +254,9 @@ public class CodeRepositoryTests
         CodeType = CodeType.Qr,
         BarcodeFormat = BarcodeFormat.QrCode,
         FallbackUrl = fallback,
+        StyleJson = "{}",
+        IsActive = true,
+        NeverExpires = true,
         Rules = [],
     };
 }

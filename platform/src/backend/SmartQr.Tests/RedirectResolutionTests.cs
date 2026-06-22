@@ -10,10 +10,7 @@ using SmartQr.Redirect.Api.Settings;
 
 namespace SmartQr.Tests;
 
-/// <summary>
-/// End-to-end redirect data path against SQLite: seed a code → the cached config store reads it →
-/// the evaluator resolves the destination. Exercises the real DI wiring used by the redirect service.
-/// </summary>
+/// <summary>End-to-end redirect data path against SQLite — seed a code, the cached config store reads it, the evaluator resolves the destination.</summary>
 public class RedirectResolutionTests
 {
     private static ServiceProvider BuildProvider(SqliteTestDb db)
@@ -40,6 +37,9 @@ public class RedirectResolutionTests
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
             FallbackUrl = "https://fallback.example",
+            StyleJson = "{}",
+            IsActive = true,
+            NeverExpires = true,
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://apple.example" },
@@ -96,11 +96,7 @@ public class RedirectResolutionTests
         Assert.Null(config); // endpoint maps this to 404
     }
 
-    /// <summary>
-    /// Never-deactivate-on-downgrade guard: a code whose owner is far over their plan cap (here a Free owner with
-    /// many codes) still resolves. The redirect path is plan-agnostic — it never reads subscriptions, so being
-    /// over-cap is invisible here. (Confirms SmartQr.Redirect carries no billing/subscription reference.)
-    /// </summary>
+    /// <summary>Never-deactivate-on-downgrade — a code whose owner is far over their plan cap still resolves, since the redirect path is plan-agnostic.</summary>
     [Fact]
     public async Task Over_cap_owners_code_still_resolves()
     {
@@ -120,6 +116,9 @@ public class RedirectResolutionTests
                     CodeType = CodeType.Qr,
                     BarcodeFormat = BarcodeFormat.QrCode,
                     FallbackUrl = "https://still-works.example",
+                    StyleJson = "{}",
+                    IsActive = true,
+                    NeverExpires = true,
                 });
             await ctx.SaveChangesAsync();
         }

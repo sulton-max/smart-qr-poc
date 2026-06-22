@@ -1,10 +1,6 @@
 namespace SmartQr.Api.Settings;
 
-/// <summary>
-/// Authentication settings. The class name is the appsettings section name (<c>Auth</c>) — bound by
-/// <c>ConfigurationLoader.Load&lt;Auth&gt;</c>. The Google client id is public (the SPA ships it too),
-/// so it lives in appsettings / user-secrets, not as a secret.
-/// </summary>
+/// <summary>Authentication settings (appsettings section <c>Auth</c>) — the Google client id is public, so it lives in appsettings, not as a secret.</summary>
 public class Auth
 {
     /// <summary>Google OAuth settings.</summary>

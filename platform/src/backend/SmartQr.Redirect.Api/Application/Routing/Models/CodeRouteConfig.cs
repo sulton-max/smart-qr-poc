@@ -21,14 +21,8 @@ public sealed record CodeRouteConfig
     /// <summary>Optional expiry.</summary>
     public DateTimeOffset? ExpiresAt { get; init; }
 
-    /// <summary>Optional scan cap.</summary>
-    public long? MaxScans { get; init; }
-
     /// <summary>Scan count snapshot (may lag by the cache TTL).</summary>
     public long ScanCount { get; init; }
-
-    /// <summary>Whether a password gate is configured.</summary>
-    public bool HasPassword { get; init; }
 
     /// <summary>Ordered rules.</summary>
     public IReadOnlyList<RouteRule> Rules { get; init; } = [];

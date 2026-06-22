@@ -16,13 +16,7 @@ using IGoogleTokenVerifier = apihost::SmartQr.Api.Application.Identity.Core.Serv
 
 namespace SmartQr.IntegrationTests.Harness;
 
-/// <summary>
-/// Owns the single shared Postgres container and the two in-process hosts (Api and Redirect) the whole E2E run
-/// drives. Both hosts point at the SAME container DB, so a write through the Api host is visible to a scan on
-/// the Redirect host. Migrations auto-apply on each host's startup (<c>MigrateDatabaseAsync</c>); the
-/// Respawner is built once both schemas exist and resets all data tables (except <c>migration_history</c>)
-/// between tests via <see cref="ResetAsync"/>.
-/// </summary>
+/// <summary>Owns the shared Postgres container and the two in-process hosts (Api and Redirect) on the same DB; Respawn resets data tables (except <c>migration_history</c>) between tests.</summary>
 public sealed class AppFixture : IAsyncLifetime
 {
     /// <summary>Name of the identity cookie the Api host sets on guest provisioning.</summary>
@@ -31,10 +25,7 @@ public sealed class AppFixture : IAsyncLifetime
     /// <summary>Name of the session cookie the Api host sets on Google sign-in.</summary>
     public const string AuthCookieName = "sqr-auth";
 
-    /// <summary>
-    /// Stable redirect base used to build each code's <c>shortUrl</c>. Set via <c>SMARTQR_REDIRECT_BASE_URL</c>
-    /// so assertions on <c>shortUrl</c> are deterministic regardless of the (random) Kestrel test port.
-    /// </summary>
+    /// <summary>Stable redirect base for each code's <c>shortUrl</c> (set via <c>REDIRECT_BASE_URL</c>) so assertions are port-independent.</summary>
     public const string RedirectBaseUrl = "https://redirect.smartqr.test";
 
     private readonly PostgresFixture _postgres = new();
@@ -67,11 +58,10 @@ public sealed class AppFixture : IAsyncLifetime
     {
         await _postgres.StartAsync();
 
-        // The config loader's env overlay wins over in-memory config, so the env var is the authoritative
-        // injection point. Process-global, but both hosts share the process and the same DB — that's intended.
-        Environment.SetEnvironmentVariable("SMARTQR_DB_CONNECTION", _postgres.ConnectionString);
-        Environment.SetEnvironmentVariable("SMARTQR_REDIRECT_BASE_URL", RedirectBaseUrl);
-        Environment.SetEnvironmentVariable("SMARTQR_REDIS_CONNECTION", null); // ensure DbRedirectConfigStore path
+        // The config loader's env overlay wins over in-memory config, so the env var is the authoritative seam.
+        Environment.SetEnvironmentVariable("DB_CONNECTION", _postgres.ConnectionString);
+        Environment.SetEnvironmentVariable("REDIRECT_BASE_URL", RedirectBaseUrl);
+        Environment.SetEnvironmentVariable("REDIS_CONNECTION", null); // ensure DbRedirectConfigStore path
 
         _apiHost = new WebApiTestHost<ApiProgram>
         {
@@ -85,7 +75,7 @@ public sealed class AppFixture : IAsyncLifetime
         };
         _redirectHost = new WebApiTestHost<RedirectProgram> { ConnectionString = _postgres.ConnectionString };
 
-        // Force each host to build (and run its startup migration) before snapshotting the DB with Respawn.
+        // Force each host to build (and run its startup migration) before Respawn snapshots the DB.
         _ = _apiHost.Services;
         _ = _redirectHost.Services;
 
@@ -103,15 +93,8 @@ public sealed class AppFixture : IAsyncLifetime
     /// <summary>Truncates all data tables between tests (keeps <c>migration_history</c>).</summary>
     public ValueTask ResetAsync() => _postgres.ResetAsync();
 
-    /// <summary>
-    /// Provisions a guest via <c>POST /api/identity/guest</c>, captures the <c>user-id</c> cookie, and returns an
-    /// Api client that carries it on every request.
-    /// </summary>
-    /// <remarks>
-    /// The cookie is set with <c>Secure=true</c>, which a default <see cref="CookieContainer"/> will not round-trip
-    /// over the test host's <c>http://</c> base address. We therefore lift the id out of the <c>Set-Cookie</c> header
-    /// and attach it as a raw <c>Cookie</c> request header.
-    /// </remarks>
+    /// <summary>Provisions a guest via <c>POST /api/identity/guest</c> and returns an Api client carrying the <c>user-id</c> cookie.</summary>
+    /// <remarks>The cookie is <c>Secure</c> and won't round-trip over the test host's <c>http://</c>, so it's lifted from <c>Set-Cookie</c> and attached as a raw header.</remarks>
     public async Task<GuestClient> CreateGuestClientAsync()
     {
         var client = ApiHost.CreateClient();
@@ -162,10 +145,7 @@ public sealed class AppCollection : ICollectionFixture<AppFixture>
     public const string Name = "smart-qr-e2e";
 }
 
-/// <summary>
-/// Convenience base for E2E tests — wires the shared fixture, resets the DB before each test, and exposes
-/// fresh clients. Concrete test classes carry <c>[Collection(AppCollection.Name)]</c>.
-/// </summary>
+/// <summary>Convenience base for E2E tests — wires the shared fixture, resets the DB per test, and exposes fresh clients.</summary>
 public abstract class E2EBase(AppFixture fixture) : IAsyncLifetime
 {
     /// <summary>The shared app fixture (container and two hosts).</summary>

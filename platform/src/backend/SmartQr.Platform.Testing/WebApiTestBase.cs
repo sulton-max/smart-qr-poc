@@ -2,21 +2,15 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace SmartQr.IntegrationTests.Harness;
 
-/// <summary>
-/// Convenience xUnit base class for an integration test that needs a <see cref="WebApiTestHost{TEntryPoint}"/>.
-/// Implements <see cref="IAsyncLifetime"/> so per-test setup/teardown can be overridden.
-/// </summary>
+/// <summary>Convenience xUnit base for an integration test needing a <see cref="WebApiTestHost{TEntryPoint}"/>.</summary>
 /// <typeparam name="TEntryPoint">The application entry-point type (typically <c>Program</c>).</typeparam>
-/// <remarks>Mirrors the wow-two backend-beta SDK <c>WebApiTestBase&lt;TEntryPoint&gt;</c> public surface.</remarks>
 public abstract class WebApiTestBase<TEntryPoint> : IAsyncLifetime, IDisposable
     where TEntryPoint : class
 {
     private readonly Lazy<WebApiTestHost<TEntryPoint>> _host;
     private bool _disposed;
 
-    /// <summary>
-    /// Creates a new test, lazily building the host on first access.
-    /// </summary>
+    /// <summary>Creates a new test, lazily building the host on first access.</summary>
     protected WebApiTestBase()
     {
         _host = new Lazy<WebApiTestHost<TEntryPoint>>(BuildHost);

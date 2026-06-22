@@ -20,13 +20,7 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <!--
-    Both SmartQr.Api and SmartQr.Redirect expose a top-level `Program` in the GLOBAL namespace, so the
-    bare `Program` type is ambiguous once both are referenced. Each host keeps `global` (so existing unit
-    tests' plain `using SmartQr.Api/Redirect…` still resolve) AND gains a named alias (`apihost` /
-    `redirecthost`); the WebApplicationFactory<…> billing tests qualify the entry point via the alias
-    (`apihost::Program` / `redirecthost::Program`) so they never touch the ambiguous bare `Program`.
-  -->
+  <!-- Both hosts expose a top-level `Program` in the global namespace; each keeps `global` and gains a named alias so the factory tests qualify the entry point. -->
   <ItemGroup>
     <ProjectReference Include="..\SmartQr.Codes\SmartQr.Codes.csproj" />
     <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />

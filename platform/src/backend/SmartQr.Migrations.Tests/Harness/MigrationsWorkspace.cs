@@ -1,15 +1,7 @@
 namespace SmartQr.Migrations.Tests.Harness;
 
-/// <summary>
-/// A throwaway on-disk migrations root for one test — the <c>{root}/NNN-name/{Apply,Rollback}.sql</c> layout the
-/// filesystem migration source reads. Created under the OS temp dir and deleted on <see cref="Dispose"/>.
-/// </summary>
-/// <remarks>
-/// Mirrors how a real product ships migrations on disk, but every folder is written by the test so the SQL is
-/// trivial (e.g. <c>create table t1(id int primary key)</c>). The source REQUIRES a Rollback.sql in every folder
-/// (it throws otherwise), so <see cref="Write"/> always writes both files; pass an empty rollback only when the
-/// test never rolls that migration back.
-/// </remarks>
+/// <summary>Throwaway on-disk migrations root for one test (<c>{root}/NNN-name/{Apply,Rollback}.sql</c>), under the OS temp dir and deleted on <see cref="Dispose"/>.</summary>
+/// <remarks>The source requires a Rollback.sql in every folder, so <see cref="Write"/> always writes both.</remarks>
 public sealed class MigrationsWorkspace : IDisposable
 {
     private const string ApplyFileName = "Apply.sql";
@@ -25,9 +17,7 @@ public sealed class MigrationsWorkspace : IDisposable
         Directory.CreateDirectory(Root);
     }
 
-    /// <summary>
-    /// Writes (or overwrites) a migration folder <c>NNN-name</c> with its Apply and Rollback scripts.
-    /// </summary>
+    /// <summary>Writes (or overwrites) a migration folder <c>NNN-name</c> with its Apply and Rollback scripts.</summary>
     /// <param name="folder">The <c>NNN-name</c> folder name, e.g. <c>001-baseline</c>.</param>
     /// <param name="applySql">The Apply script body.</param>
     /// <param name="rollbackSql">The Rollback script body (every folder must ship one).</param>
