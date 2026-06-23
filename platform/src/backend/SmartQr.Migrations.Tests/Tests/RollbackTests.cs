@@ -1,11 +1,12 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>Rollback — with <c>AllowRollback</c>, <c>RollbackAsync()</c> runs the latest Rollback.sql and removes its history row; disabled (the default) it throws.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class RollbackTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class RollbackTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task Rollback_WithAllowRollback_RemovesLatestHistoryRow_AndRunsRollbackSql()
@@ -24,8 +25,8 @@ public sealed class RollbackTests(PostgresContainerFixture fixture) : MigratorTe
         await migrator.Runner.RollbackAsync(targetOrdinal: null, CancellationToken.None);
 
         // 002's Rollback.sql ran (t2 dropped) and its history row is gone; 001 untouched.
-        (await migrator.TableExistsAsync("t2")).Should().BeFalse();
-        (await migrator.TableExistsAsync("t1")).Should().BeTrue();
+        (await migrator.HasTableAsync("t2")).Should().BeFalse();
+        (await migrator.HasTableAsync("t1")).Should().BeTrue();
         (await migrator.ReadHistoryAsync()).Select(h => h.Ordinal).Should().Equal(1);
 
         // 002 is pending again — rollback returned it to the source-but-not-applied state.
@@ -48,7 +49,7 @@ public sealed class RollbackTests(PostgresContainerFixture fixture) : MigratorTe
             () => migrator.Runner.RollbackAsync(targetOrdinal: null, CancellationToken.None));
 
         // The disabled rollback was a no-op: the migration is still applied.
-        (await migrator.TableExistsAsync("t1")).Should().BeTrue();
+        (await migrator.HasTableAsync("t1")).Should().BeTrue();
         (await migrator.ReadHistoryAsync()).Select(h => h.Ordinal).Should().Equal(1);
     }
 }

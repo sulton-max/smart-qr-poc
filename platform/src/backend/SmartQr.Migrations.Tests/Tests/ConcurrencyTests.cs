@@ -1,11 +1,12 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>Concurrency — two independent migrators apply the same source against the same DB; the advisory lock serializes them so it lands exactly once.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class ConcurrencyTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class ConcurrencyTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task ApplyPending_TwoRunnersConcurrently_AppliesExactlyOnce()
@@ -34,7 +35,7 @@ public sealed class ConcurrencyTests(PostgresContainerFixture fixture) : Migrato
         // History has exactly two rows (one per migration), proving no double-record under the lock.
         var history = await a.ReadHistoryAsync();
         history.Select(h => h.Ordinal).Should().Equal(1, 2);
-        (await a.TableExistsAsync("t1")).Should().BeTrue();
-        (await a.TableExistsAsync("t2")).Should().BeTrue();
+        (await a.HasTableAsync("t1")).Should().BeTrue();
+        (await a.HasTableAsync("t2")).Should().BeTrue();
     }
 }

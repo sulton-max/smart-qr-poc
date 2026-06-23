@@ -15,9 +15,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SmartQr.Api.Application.Billing.Core.Services;
-using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Common.Persistence.DataContexts;
-using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
+using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.EntityFrameworkCore;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 // Disambiguate the two top-level `Program` types (both live in their assembly's global namespace).
 using ApiProgram = apihost::Program;
@@ -125,27 +126,17 @@ public sealed class BillingWebApp : IDisposable
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
             // Read by the startup migrate hook (DB name) and the data-source builder; never opened.
-            ["DatabaseSettings:ConnectionString"] = DummyPgConnection,
+            ["DatabaseOptions:ConnectionString"] = DummyPgConnection,
         }));
 
     /// <summary>Repoints EF off Npgsql onto the single shared SQLite connection so both hosts see the same data.</summary>
-    private void UseSharedSqlite(IServiceCollection services)
-    {
-        services.RemoveAllForDbContext<AppDbContext>();
-
-        services.AddDbContext<AppDbContext>(o => o
+    private void UseSharedSqlite(IServiceCollection services) =>
+        services.RepointDbContext<AppDbContext>(o => o
             .UseSqlite(_connection)
             .UseSnakeCaseNamingConvention());
-    }
 
-    /// <summary>Replaces the Postgres SQL migrator with no-ops so the startup migrate hook touches nothing.</summary>
-    private static void NeuterMigrator(IServiceCollection services)
-    {
-        services.RemoveAll<IMigrationDialect>();
-        services.AddSingleton<IMigrationDialect, NoOpMigrationDialect>();
-        services.RemoveAll<IMigrationRunnerService>();
-        services.AddSingleton<IMigrationRunnerService, NoOpMigrationRunner>();
-    }
+    /// <summary>Disables the bespoke SQL migrator so the startup migrate hook touches nothing.</summary>
+    private static void NeuterMigrator(IServiceCollection services) => services.DisableBespokeMigrator();
 
     /// <summary>POSTs <paramref name="value"/> as JSON (camelCase and string enums) to <paramref name="url"/> on the given client.</summary>
     public static Task<HttpResponseMessage> PostJsonAsync(HttpClient client, string url, object value) =>
@@ -192,31 +183,5 @@ public sealed class BillingWebApp : IDisposable
         /// <summary>The wrapped payload.</summary>
         [JsonPropertyName("data")]
         public T? Data { get; init; }
-    }
-}
-
-/// <summary>Service-collection helpers for the billing host tests — strip a host's EF registration so SQLite can replace it.</summary>
-internal static class BillingWebAppServiceCollectionExtensions
-{
-    /// <summary>Removes every descriptor binding <typeparamref name="TContext"/> to its Npgsql provider so a fresh SQLite registration wires cleanly.</summary>
-    public static IServiceCollection RemoveAllForDbContext<TContext>(this IServiceCollection services)
-        where TContext : DbContext
-    {
-        // IDbContextOptionsConfiguration<T> is internal — match it by open-generic name, not a type ref.
-        for (var i = services.Count - 1; i >= 0; i--)
-        {
-            var serviceType = services[i].ServiceType;
-            var isContext = serviceType == typeof(TContext);
-            var isOptions = serviceType == typeof(DbContextOptions)
-                || serviceType == typeof(DbContextOptions<TContext>);
-            var isOptionsConfig = serviceType.IsGenericType
-                && serviceType.Name.StartsWith("IDbContextOptionsConfiguration", StringComparison.Ordinal)
-                && serviceType.GetGenericArguments() is [var arg] && arg == typeof(TContext);
-
-            if (isContext || isOptions || isOptionsConfig)
-                services.RemoveAt(i);
-        }
-
-        return services;
     }
 }

@@ -1,11 +1,12 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>Fresh-DB apply: pending → applied, history recorded, status reflects it, second apply is a no-op.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class ApplyTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class ApplyTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task ApplyPending_OnFreshDb_AppliesRecordsAndIsIdempotent()
@@ -24,8 +25,8 @@ public sealed class ApplyTests(PostgresContainerFixture fixture) : MigratorTestB
         applied.Should().BeEquivalentTo(["001-baseline", "002-second"]);
 
         // The tables they declare now exist.
-        (await migrator.TableExistsAsync("t1")).Should().BeTrue();
-        (await migrator.TableExistsAsync("t2")).Should().BeTrue();
+        (await migrator.HasTableAsync("t1")).Should().BeTrue();
+        (await migrator.HasTableAsync("t2")).Should().BeTrue();
 
         // migration_history has one row per migration, stamped with appliedBy.
         var history = await migrator.ReadHistoryAsync();

@@ -13,11 +13,10 @@
         <PackageReference Include="Dapper" Version="2.*" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.*" />
         <!-- SQL migrator engine (Data.Migrations.Bespoke) — consumed from the published SDK; brings Data.Abstractions (IDbConnectionFactory) transitively. -->
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.32-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.35-beta" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartQr.Common\SmartQr.Common.csproj" />
         <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
     </ItemGroup>
 

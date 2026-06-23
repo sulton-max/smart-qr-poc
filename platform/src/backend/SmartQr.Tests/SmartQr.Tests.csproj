@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- SDK Testing.Data: EF provider-swap (RepointDbContext) + no-op bespoke migrator (DisableBespokeMigrator) for the SQLite host tests. -->
+    <PackageReference Include="WoW2.Sdk.Backend.Beta.Testing.Data" Version="10.0.35-beta" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />

@@ -1,3 +1,5 @@
+using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
+
 namespace SmartQr.Api.Application.Identity.Core.Models;
 
 /// <summary>Represents the calling principal — its identification kind and, for a registered account, a minimal profile.</summary>

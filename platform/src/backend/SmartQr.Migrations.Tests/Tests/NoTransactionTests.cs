@@ -1,11 +1,12 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary><c>-- @no-transaction</c> — the Apply runs outside a transaction (needed for CREATE INDEX CONCURRENTLY) and records separately; a re-run is a no-op.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class NoTransactionTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class NoTransactionTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task ApplyPending_NoTransactionMigration_AppliesRecordsAndReRunIsNoOp()
@@ -27,7 +28,7 @@ public sealed class NoTransactionTests(PostgresContainerFixture fixture) : Migra
         applied.Should().BeEquivalentTo(["001-baseline", "002-concurrent-index"]);
 
         // The concurrent index exists and the migration is recorded.
-        (await migrator.IndexExistsAsync("ix_t1_name")).Should().BeTrue();
+        (await migrator.HasIndexAsync("ix_t1_name")).Should().BeTrue();
         var history = await migrator.ReadHistoryAsync();
         history.Select(r => r.Ordinal).Should().Equal(1, 2);
 

@@ -8,20 +8,21 @@
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
-    <!-- Engine-under-test suite for the bespoke SQL migrator — self-contained against the SDK package, with no reference to SmartQr.Api / SmartQr.Redirect. -->
+    <!--
+      Engine-under-test suite for the bespoke SQL migrator. Rides the SDK Testing.Data package
+      (WoW2.Sdk.Backend.Beta.Testing.Data): MigratorPostgresFixture (drop-schema reset), MigratorTestBase,
+      MigratorHarness, MigrationsWorkspace — which transitively brings the core SDK + base Testing +
+      Testcontainers(.PostgreSql) + Npgsql + Dapper + AwesomeAssertions, so only the test RUNNER is referenced
+      here. The core SDK is kept directly so the bespoke types (MigrationOptions, MigrationDriftException)
+      resolve in test bodies.
+    -->
     <ItemGroup>
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.32-beta"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.*"/>
-        <PackageReference Include="Npgsql" Version="10.*"/>
-        <PackageReference Include="Dapper" Version="2.1.66"/>
+        <PackageReference Include="WoW2.Sdk.Backend.Beta.Testing.Data" Version="10.0.35-beta"/>
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.35-beta"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
-        <PackageReference Include="Testcontainers" Version="4.0.0"/>
-        <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0"/>
-        <PackageReference Include="AwesomeAssertions" Version="9.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

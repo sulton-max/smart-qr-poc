@@ -3,21 +3,24 @@ extern alias redirecthost;
 
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SmartQr.IntegrationTests.Harness.Containers;
+using Testcontainers.PostgreSql;
+// The Google-verifier seam (SDK type, global namespace) — swapped for a deterministic fake in the test host.
+using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
+using WoW.Two.Sdk.Backend.Beta.Testing;
+using WoW.Two.Sdk.Backend.Beta.Testing.Containers;
+using WoW.Two.Sdk.Backend.Beta.Testing.MultiHost;
 
 // Disambiguate the two top-level `Program` types (both live in the global namespace of their assembly).
 using ApiProgram = apihost::Program;
 using RedirectProgram = redirecthost::Program;
 
-// The Api's Google-verifier seam — swapped for a deterministic fake in the test host.
-using IGoogleTokenVerifier = apihost::SmartQr.Api.Application.Identity.Core.Services.IGoogleTokenVerifier;
-
 namespace SmartQr.IntegrationTests.Harness;
 
-/// <summary>Owns the shared Postgres container and the two in-process hosts (Api and Redirect) on the same DB; Respawn resets data tables (except <c>migration_history</c>) between tests.</summary>
-public sealed class AppFixture : IAsyncLifetime
+/// <summary>Boots the Api and Redirect hosts over one shared Postgres container via the SDK <see cref="MultiHostFixture"/>; Respawn resets data tables (except <c>migration_history</c>) between tests.</summary>
+public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
 {
     /// <summary>Name of the identity cookie the Api host sets on guest provisioning.</summary>
     public const string UserIdCookieName = "user-id";
@@ -28,21 +31,48 @@ public sealed class AppFixture : IAsyncLifetime
     /// <summary>Stable redirect base for each code's <c>shortUrl</c> (set via <c>REDIRECT_BASE_URL</c>) so assertions are port-independent.</summary>
     public const string RedirectBaseUrl = "https://redirect.smartqr.test";
 
-    private readonly PostgresFixture _postgres = new();
-
-    private WebApiTestHost<ApiProgram>? _apiHost;
-    private WebApiTestHost<RedirectProgram>? _redirectHost;
+    private readonly PostgresFixture _postgres;
 
     /// <summary>The shared Postgres fixture (container and Respawn).</summary>
     public PostgresFixture Postgres => _postgres;
 
     /// <summary>The management Api host.</summary>
-    public WebApiTestHost<ApiProgram> ApiHost =>
-        _apiHost ?? throw new InvalidOperationException("Fixture not initialized — ApiHost is null.");
+    public WebApiTestHost<ApiProgram> ApiHost { get; }
 
     /// <summary>The redirect (hot-path) host.</summary>
-    public WebApiTestHost<RedirectProgram> RedirectHost =>
-        _redirectHost ?? throw new InvalidOperationException("Fixture not initialized — RedirectHost is null.");
+    public WebApiTestHost<RedirectProgram> RedirectHost { get; }
+
+    /// <summary>Registers the shared container and both hosts; they build during <see cref="MultiHostFixture.StartAsync"/>.</summary>
+    public AppFixture()
+    {
+        _postgres = AddSharedFixture(new PostgresFixture(new PostgreSqlBuilder().WithImage("postgres:16-alpine").Build()));
+
+        ApiHost = AddHost(new WebApiTestHost<ApiProgram>
+        {
+            // The SDK host has no connection-string knob — inject it the way the app reads it (DatabaseOptions:ConnectionString).
+            // The hook runs at build time (after the container has started), so the connection string is available; it mirrors the DB_CONNECTION env seam.
+            ConfigureHostHook = builder => builder.ConfigureAppConfiguration((_, config) =>
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["DatabaseOptions:ConnectionString"] = _postgres.ConnectionString,
+                })),
+            // Swap the real Google verifier for a deterministic fake so E2E never calls Google.
+            ConfigureServicesHook = services =>
+            {
+                services.RemoveAll<IGoogleIdTokenVerifier>();
+                services.AddScoped<IGoogleIdTokenVerifier>(_ => new FakeGoogleTokenVerifier());
+            },
+        });
+
+        RedirectHost = AddHost(new WebApiTestHost<RedirectProgram>
+        {
+            ConfigureHostHook = builder => builder.ConfigureAppConfiguration((_, config) =>
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["DatabaseOptions:ConnectionString"] = _postgres.ConnectionString,
+                })),
+        });
+    }
 
     /// <summary>A fresh anonymous client against the Api host (no identity cookie).</summary>
     public HttpClient CreateApiClient() => ApiHost.CreateClient();
@@ -53,45 +83,17 @@ public sealed class AppFixture : IAsyncLifetime
         AllowAutoRedirect = false,
     });
 
-    /// <inheritdoc />
-    public async Task InitializeAsync()
+    /// <summary>Points both hosts at the shared container before they build (env is the authoritative cross-host seam).</summary>
+    protected override void ConfigureEnvironment()
     {
-        await _postgres.StartAsync();
-
-        // The config loader's env overlay wins over in-memory config, so the env var is the authoritative seam.
         Environment.SetEnvironmentVariable("DB_CONNECTION", _postgres.ConnectionString);
         Environment.SetEnvironmentVariable("REDIRECT_BASE_URL", RedirectBaseUrl);
         Environment.SetEnvironmentVariable("REDIS_CONNECTION", null); // ensure DbRedirectConfigStore path
-
-        _apiHost = new WebApiTestHost<ApiProgram>
-        {
-            ConnectionString = _postgres.ConnectionString,
-            // Swap the real Google verifier for a deterministic fake so E2E never calls Google.
-            ConfigureServicesHook = services =>
-            {
-                services.RemoveAll<IGoogleTokenVerifier>();
-                services.AddScoped<IGoogleTokenVerifier>(_ => new FakeGoogleTokenVerifier());
-            },
-        };
-        _redirectHost = new WebApiTestHost<RedirectProgram> { ConnectionString = _postgres.ConnectionString };
-
-        // Force each host to build (and run its startup migration) before Respawn snapshots the DB.
-        _ = _apiHost.Services;
-        _ = _redirectHost.Services;
-
-        await _postgres.InitializeRespawnerAsync();
     }
 
-    /// <inheritdoc />
-    public async Task DisposeAsync()
-    {
-        _apiHost?.Dispose();
-        _redirectHost?.Dispose();
-        await _postgres.DisposeAsync();
-    }
-
-    /// <summary>Truncates all data tables between tests (keeps <c>migration_history</c>).</summary>
-    public ValueTask ResetAsync() => _postgres.ResetAsync();
+    /// <summary>Snapshots the post-migration schema for Respawn, after both hosts have applied migrations.</summary>
+    protected override ValueTask InitializeStateAsync(CancellationToken cancellationToken = default) =>
+        _postgres.InitializeRespawnerAsync(cancellationToken);
 
     /// <summary>Provisions a guest via <c>POST /api/identity/guest</c> and returns an Api client carrying the <c>user-id</c> cookie.</summary>
     /// <remarks>The cookie is <c>Secure</c> and won't round-trip over the test host's <c>http://</c>, so it's lifted from <c>Set-Cookie</c> and attached as a raw header.</remarks>
@@ -130,6 +132,12 @@ public sealed class AppFixture : IAsyncLifetime
 
         return null;
     }
+
+    /// <summary>Starts the topology for xUnit — container up, both hosts built and migrated, Respawn snapshotted.</summary>
+    Task IAsyncLifetime.InitializeAsync() => StartAsync().AsTask();
+
+    /// <summary>Disposes the hosts then the container for xUnit's <see cref="IAsyncLifetime"/> contract.</summary>
+    Task IAsyncLifetime.DisposeAsync() => DisposeAsync().AsTask();
 }
 
 /// <summary>An authenticated guest: the <see cref="HttpClient"/> carrying the identity cookie plus its raw id.</summary>

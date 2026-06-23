@@ -8,7 +8,7 @@
 
     <ItemGroup>
         <!-- ISuccessResult / IFailureResult result-pattern markers. -->
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.32-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.35-beta" />
     </ItemGroup>
 
 </Project>

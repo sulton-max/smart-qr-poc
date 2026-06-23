@@ -1,20 +1,17 @@
-extern alias apihost;
-
-using apihost::SmartQr.Api.Application.Identity.Core.Models;
-using apihost::SmartQr.Api.Application.Identity.Core.Services;
+using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 
 namespace SmartQr.IntegrationTests.Harness;
 
-/// <summary>Deterministic <see cref="IGoogleTokenVerifier"/> for E2E — a valid token is <c>fake:{subject}:{email}:{name}</c>; anything else verifies as null.</summary>
-public sealed class FakeGoogleTokenVerifier : IGoogleTokenVerifier
+/// <summary>Deterministic <see cref="IGoogleIdTokenVerifier"/> for E2E — a valid token is <c>fake:{subject}:{email}:{name}</c>; anything else verifies as null.</summary>
+public sealed class FakeGoogleTokenVerifier : IGoogleIdTokenVerifier
 {
     /// <inheritdoc />
-    public Task<GoogleIdentity?> VerifyAsync(string idToken, CancellationToken ct)
+    public Task<GoogleVerifiedIdentity?> VerifyAsync(string idToken, CancellationToken ct)
     {
         var parts = idToken.Split(':', 4);
 
         var identity = parts is ["fake", var subject, var email, var name]
-            ? new GoogleIdentity(subject, email, name, Picture: null)
+            ? new GoogleVerifiedIdentity(subject, email, name, Picture: null)
             : null;
 
         return Task.FromResult(identity);

@@ -1,11 +1,12 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>Failure mid-batch — #2's invalid Apply.sql rolls back wholesale while #1 stays applied and #3 never runs; fixing and re-running resumes the batch.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class FailureMidBatchTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class FailureMidBatchTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task ApplyPending_WithInvalidMiddleMigration_StopsCleanly_AndFixedReRunCompletes()
@@ -27,9 +28,9 @@ public sealed class FailureMidBatchTests(PostgresContainerFixture fixture) : Mig
             () => migrator.Runner.ApplyPendingAsync("test", CancellationToken.None));
 
         // #1 committed; #2 rolled back its per-file tx (no table); #3 never ran.
-        (await migrator.TableExistsAsync("t1")).Should().BeTrue();
-        (await migrator.TableExistsAsync("t2")).Should().BeFalse();
-        (await migrator.TableExistsAsync("t3")).Should().BeFalse();
+        (await migrator.HasTableAsync("t1")).Should().BeTrue();
+        (await migrator.HasTableAsync("t2")).Should().BeFalse();
+        (await migrator.HasTableAsync("t3")).Should().BeFalse();
 
         // History records only #1 — #2's row rolled back with its apply, so the table state and history agree.
         var history = await migrator.ReadHistoryAsync();
@@ -46,8 +47,8 @@ public sealed class FailureMidBatchTests(PostgresContainerFixture fixture) : Mig
         var applied = await migrator.Runner.ApplyPendingAsync("test", CancellationToken.None);
 
         applied.Should().BeEquivalentTo(["002-broken", "003-third"]);
-        (await migrator.TableExistsAsync("t2")).Should().BeTrue();
-        (await migrator.TableExistsAsync("t3")).Should().BeTrue();
+        (await migrator.HasTableAsync("t2")).Should().BeTrue();
+        (await migrator.HasTableAsync("t3")).Should().BeTrue();
         (await migrator.ReadHistoryAsync()).Select(h => h.Ordinal).Should().Equal(1, 2, 3);
     }
 }

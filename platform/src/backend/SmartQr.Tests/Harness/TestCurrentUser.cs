@@ -1,5 +1,4 @@
-using SmartQr.Api.Application.Identity.Core.Models;
-using SmartQr.Api.Application.Identity.Core.Services;
+using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 
 namespace SmartQr.Tests.Harness;
 

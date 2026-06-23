@@ -1,11 +1,22 @@
-# Smart QR — Business Context
+# ForeverPin — Business Context
 
-*Last updated: 2026-06-12*
+*Last updated: 2026-06-23*
+
+> **Rebrand in progress: Smart QR → ForeverPin.** The code/repo still says "Smart QR" until the
+> rebrand lands (tracked → `platform/planning/smart-qr-planning.md` Backlog · Brand). Folder rename later.
 
 ## Current State
 
-- Portfolio **#002**. Status: **building**. Backend POC scaffolded 2026-06-03 (Clean Arch, builds clean, 8 tests green).
-- Pre-revenue, pre-launch. No domain registered yet.
+- Portfolio **#002**. Status: **building** (pre-revenue, pre-launch). Backend + frontend + billing built; marketing surface (landing/pricing/blog) live.
+- **Name locked: ForeverPin.** Domain **`foreverpin.com`** registered at **Cloudflare** (Free plan, $10.46 flat) — 2026-06-23.
+
+## Brand
+
+- **Name:** ForeverPin · **Domain:** `foreverpin.com` (Cloudflare registrar + DNS).
+- **Tagline:** **"Pin it once. It points forever."** — *pin* = drop-a-pin / print-once permanence · *points* = smart routing (one code, many destinations).
+- **Runners-up (logged):** `lodestar.io` (guiding-star metaphor) · `routestone.io` · `permacode`.
+- Chosen via the wow-two naming convention (`conventions/marketing/brand-naming-and-domains.md`): compound-coined + suggestive, clean radio test, standard-priced `.com`, low TM-collision.
+- **Handles to grab same-day:** `@foreverpin` (X · Instagram); `foreverpin` GitHub org (optional — reserve later).
 
 ## Positioning
 
@@ -15,14 +26,18 @@ Programmable routing as the headline + **codes never expire** (the #1 incumbent 
 
 ## Active (business-side)
 
-- **Validate the wedge** — confirm "never-expire + cheap smart routing" resonates vs incumbents (scan r/smallbusiness, r/restaurateur, IndieHackers for hostage-code complaints).
-- **Name + domain** — decide (`Permacode` leans into the never-expire wedge); register ($-budget).
+- ✅ **Name + domain** — ForeverPin / `foreverpin.com` (Cloudflare).
+- **Grab `@foreverpin` handles** (X + Instagram) same-day; GitHub org optional.
+- **Full rebrand Smart QR → ForeverPin** — tracked → `platform/planning/smart-qr-planning.md` Backlog · Brand.
+- **Marketing playbook** — wow-two marketing convention in progress (deep-research → doc, mirrors the naming convention).
+- **Validate the wedge** — scan r/smallbusiness, r/restaurateur, IndieHackers for hostage-code complaints.
 - Build-side tasks → `platform/planning/smart-qr-planning.md`.
 
 ## Decisions Log
 
 | Date | Decision |
 |---|---|
+| 2026-06-23 | **Name = ForeverPin**; domain `foreverpin.com` at **Cloudflare** (at-cost $10.46 flat; DNS already CF-fronted). Chosen via the naming convention; beat `lodestar.io` / `routestone.io` / `permacode`. Supersedes the earlier `Permacode` lean. |
 | 2026-06-03 | POC-first over shared template repo — validate the crowded-market wedge before shared infra. |
 | 2026-05-31 | Repositioned from generic "smart QR" to programmable-routing-first + never-expire. |
 
@@ -35,3 +50,4 @@ Programmable routing as the headline + **codes never expire** (the #1 incumbent 
 - Portfolio brief (market, full spec): `wow-two-ws/ideas/smart-qr-spec.md`
 - Roadmap / feature log: `platform/planning/smart-qr-planning.md`
 - Business model / pricing: `business/business-knowledge.md`
+- Naming convention: `wow-two-ws/conventions/marketing/brand-naming-and-domains.md`

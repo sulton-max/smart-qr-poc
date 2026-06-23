@@ -12,7 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartQr.Common\SmartQr.Common.csproj" />
         <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
         <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
     </ItemGroup>

@@ -5,6 +5,7 @@ using SmartQr.Api.Application.Identity.Core.Models;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Common.Domain.Identity.Entities;
 using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
@@ -12,7 +13,7 @@ namespace SmartQr.Api.Infrastructure.Identity.CommandHandlers;
 
 /// <summary>Handles <see cref="GoogleSignInCommand"/> — verifies the Google token, finds or creates the account, and claims the caller's guest codes.</summary>
 public sealed class GoogleSignInCommandHandler(
-    IGoogleTokenVerifier verifier,
+    IGoogleIdTokenVerifier verifier,
     IUserRepository users,
     ICodeRepository codes,
     ILogger<GoogleSignInCommandHandler> logger)

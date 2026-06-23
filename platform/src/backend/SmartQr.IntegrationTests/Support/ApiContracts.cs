@@ -1,26 +1,10 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SmartQr.IntegrationTests.Support;
 
-/// <summary>Local mirrors of the API response shapes for E2E assertions — independent of the extern-aliased production types, so only the wire contract is asserted.</summary>
-public static class TestJson
-{
-    /// <summary>JSON options matching the API: camelCase and string enums.</summary>
-    public static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new JsonStringEnumConverter() },
-    };
-}
-
-/// <summary>The success envelope every controller wraps payloads in (<c>ApiResponse&lt;T&gt;.Ok</c>).</summary>
-/// <typeparam name="T">Payload type.</typeparam>
-public sealed record ApiEnvelope<T>
-{
-    /// <summary>The wrapped payload.</summary>
-    [JsonPropertyName("data")]
-    public T? Data { get; init; }
-}
+// Local mirrors of the API response shapes for E2E assertions — independent of the extern-aliased
+// production types, so only the wire contract is asserted. The JSON options + success envelope live in
+// the SDK testing package (WoW.Two.Sdk.Backend.Beta.Testing.Web: TestJson, ApiEnvelope<T>).
 
 /// <summary>Wire shape of <c>MeResponse</c>.</summary>
 public sealed record MeResponseDto

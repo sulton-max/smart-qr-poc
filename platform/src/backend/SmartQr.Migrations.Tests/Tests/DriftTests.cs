@@ -1,12 +1,13 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>Drift — editing an applied Apply.sql changes its checksum so the next apply fails closed (<see cref="MigrationDriftException"/>); repair re-records and clears it.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class DriftTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class DriftTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task ApplyPending_AfterAppliedSourceEdited_ThrowsDrift_AndRepairClearsIt()

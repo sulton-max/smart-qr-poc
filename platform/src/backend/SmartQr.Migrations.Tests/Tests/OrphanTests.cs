@@ -1,12 +1,13 @@
 using AwesomeAssertions;
 using SmartQr.Migrations.Tests.Harness;
+using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Migrations.Tests.Tests;
 
 /// <summary>Orphan — an applied history row whose source folder is gone fails closed (<see cref="MigrationOrphanException"/>) unless <c>AllowOrphanedHistory</c> lets it proceed.</summary>
 [Collection(MigratorCollection.Name)]
-public sealed class OrphanTests(PostgresContainerFixture fixture) : MigratorTestBase(fixture)
+public sealed class OrphanTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {
     [Fact]
     public async Task ApplyPending_WithDeletedAppliedSource_ThrowsOrphan()
@@ -59,7 +60,7 @@ public sealed class OrphanTests(PostgresContainerFixture fixture) : MigratorTest
         var applied = await migrator.Runner.ApplyPendingAsync("test", CancellationToken.None);
 
         applied.Should().Contain("003-third");
-        (await migrator.TableExistsAsync("t3")).Should().BeTrue();
+        (await migrator.HasTableAsync("t3")).Should().BeTrue();
         // Orphan still reported in status, but it no longer blocks apply.
         (await migrator.Runner.GetStatusAsync(CancellationToken.None)).Orphaned.Should().Contain(2);
     }

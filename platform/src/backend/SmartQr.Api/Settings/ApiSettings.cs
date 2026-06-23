@@ -1,4 +1,4 @@
-using SmartQr.Common.Configuration;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 
 namespace SmartQr.Api.Settings;
 

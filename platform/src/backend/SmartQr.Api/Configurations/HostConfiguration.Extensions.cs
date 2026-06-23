@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -9,21 +11,22 @@ using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Api.Infrastructure.Billing.Services;
 using SmartQr.Api.Infrastructure.Codes.Services;
-using SmartQr.Api.Infrastructure.Identity.Services;
 using SmartQr.Api.Persistence.Repositories;
 using SmartQr.Api.Settings;
 using SmartQr.Codes;
 using SmartQr.Codes.Logo;
 using SmartQr.Codes.Rendering;
-using SmartQr.Common.Configuration;
 using SmartQr.Common.Persistence.DataContexts;
-using SmartQr.Common.Settings;
 using WoW.Two.Sdk.Backend.Beta.Data.Dapper;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Audit;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Postgres;
 using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 using WoW.Two.Sdk.Backend.Beta.Identity.Cookies;
+using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
+using WoW.Two.Sdk.Backend.Beta.Identity.Guest;
+using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Validation;
 using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
@@ -37,7 +40,8 @@ public static partial class HostConfiguration
     /// <summary>Loads and registers settings (DB and API).</summary>
     private static WebApplicationBuilder AddSettings(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton(ConfigurationLoader.Load<DatabaseSettings>(builder.Configuration));
+        // DB connection: env DB_CONNECTION wins over appsettings (DatabaseOptions:ConnectionString), preserving today's overlay.
+        builder.Services.AddDatabaseConnection(builder.Configuration);
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<AuthSettings>(builder.Configuration));
@@ -48,13 +52,6 @@ public static partial class HostConfiguration
     private static WebApplicationBuilder AddPersistence(this WebApplicationBuilder builder)
     {
         DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-        // ConnectionString is init-only, so defer construction until the host has bound settings.
-        builder.Services.AddSingleton<IOptions<DatabaseOptions>>(sp =>
-            Options.Create(new DatabaseOptions
-            {
-                ConnectionString = sp.GetRequiredService<DatabaseSettings>().ConnectionString,
-            }));
 
         builder.Services.AddNpgsqlDataSource();
         builder.Services.AddDataSourceConnectionFactory();
@@ -99,20 +96,23 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the identity seam — read-only current-user view and guest provisioning.</summary>
+    /// <summary>Registers the identity seam — read-only current-user view and guest provisioning (SDK Identity modules, on the <c>user-id</c> cookie).</summary>
     private static WebApplicationBuilder AddIdentity(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddScoped<ICurrentUser, CookieCurrentUser>();
-        builder.Services.AddScoped<IGuestSession, CookieGuestSession>();
+        builder.Services.AddGuestSession(o => o.CookieName = "user-id");
+        builder.Services.AddCurrentUser(o => o.GuestCookieName = "user-id");
         return builder;
     }
 
-    /// <summary>Registers the auth seam — user repository, Google token verifier, and the cookie session scheme.</summary>
+    /// <summary>Registers the auth seam — user repository, Google ID-token verifier, and the cookie session scheme.</summary>
     private static WebApplicationBuilder AddAuth(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
+
+        // Verify Google ID tokens against the Web client id (same id the SPA uses via VITE_GOOGLE_CLIENT_ID).
+        var auth = ConfigurationLoader.Load<AuthSettings>(builder.Configuration);
+        builder.Services.AddGoogleIdTokenVerifier(o => o.WithClientId(auth.Google.ClientId));
 
         // API mode returns 401/403 (not a 302) so the SPA reacts; HttpOnly/Secure/SameSite=Lax come from SDK defaults.
         builder.Services.AddCookieAuthentication(o =>
@@ -154,12 +154,12 @@ public static partial class HostConfiguration
             .GetRequiredService<ILoggerFactory>()
             .CreateLogger("SmartQr.Api.DatabaseBootstrap");
 
-        var settings = scope.ServiceProvider.GetRequiredService<DatabaseSettings>();
-        var databaseName = new NpgsqlConnectionStringBuilder(settings.ConnectionString).Database;
+        var connectionString = scope.ServiceProvider.GetRequiredService<DatabaseOptions>().ConnectionString;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database;
 
         // Create the target database via the maintenance DB before any migration runs.
         var dialect = scope.ServiceProvider.GetRequiredService<IMigrationDialect>();
-        var created = await dialect.EnsureDatabaseExistsAsync(settings.ConnectionString, ct);
+        var created = await dialect.EnsureDatabaseExistsAsync(connectionString, ct);
         if (created)
             logger.LogInformation("Created database {Database}.", databaseName);
         else
@@ -167,5 +167,22 @@ public static partial class HostConfiguration
 
         var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunnerService>();
         await runner.ApplyPendingAsync("startup", ct);
+    }
+
+    /// <summary>Binds the SDK <see cref="DatabaseOptions"/> from appsettings (<c>DatabaseOptions:ConnectionString</c>) with the <c>DB_CONNECTION</c> env var winning, and registers it as a singleton and <see cref="IOptions{TOptions}"/>.</summary>
+    private static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration configuration)
+    {
+        var fromConfig = configuration["DatabaseOptions:ConnectionString"];
+        var fromEnv = Environment.GetEnvironmentVariable("DB_CONNECTION");
+        var connectionString = string.IsNullOrWhiteSpace(fromEnv) ? fromConfig : fromEnv;
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException(
+                "Database connection string not found. Set env var 'DB_CONNECTION' or appsettings 'DatabaseOptions:ConnectionString'.");
+
+        var options = new DatabaseOptions { ConnectionString = connectionString };
+        services.AddSingleton(options);
+        services.AddSingleton<IOptions<DatabaseOptions>>(Options.Create(options));
+        return services;
     }
 }

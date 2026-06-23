@@ -1,6 +1,6 @@
 # Smart QR — Platform Planning
 
-*Last updated: 2026-06-22*
+*Last updated: 2026-06-23*
 
 Durable roadmap + backlog for the technical platform — the standing plan that version docs pull from
 and return to. Business roadmap → `business/business-context.md`. Strategy →
@@ -18,7 +18,8 @@ Shipped + the active/next version only — future work lives in the ordered back
 | v0.1 | Product foundation (guest-first) | Generate + serve codes (QR · routing · fallback) · guest identity + ownership · manage codes (edit / enable-disable / delete / search · edit→next-scan); verified e2e | ✅ |
 | v0.2 | Migration layer (bespoke migrator → SDK) | Built the migrator inline → extracted to `WoW2.Sdk.Backend.Beta` + `wow-migrate` CLI; SQLite dialect + web-freedom arch test; **adopted across all 3 apps** (smart-qr · secrets-vault · drydock) on Postgres; SDK migrator STABLE | ✅ |
 | v0.3 | Accounts & ownership | sign in with Google · claim guest codes · cross-device management | ✅ |
-| v0.4 | SDK adoption (backend-beta + frontend-beta) | extract all non-business-logic infra to the SDK (incl. the test baseline); adopt `@wow-two-beta/ui` fully | ⏳ next |
+| v0.4 | SDK adoption (backend-beta + frontend-beta) | extract all non-business-logic infra to the SDK (incl. the test baseline + the migrator/EF test harness → `Testing.Data`); adopt `@wow-two-beta/ui` fully | ✅ |
+| v0.5 | TBD — brainstorm | TBD — brainstorm (scaffold seeded from v0.4 deferrals + backlog) | 🚧 planning |
 
 > Work hierarchy (Version → Iteration → Task), lifecycle, and numbering → `wow-two-ws/conventions/planning/`.
 
@@ -78,6 +79,14 @@ Shipped + the active/next version only — future work lives in the ordered back
 Anything not in the active version — **ordered, top = next to pull**. Grouped by theme; order within.
 Type: `feature` · `issue` · `check` · `idea`. Pull items into an iteration when it's their turn;
 strike-through + ✅ when done (kept for traceability).
+
+### Brand & rebrand
+
+| Item | Type | Notes |
+|---|---|---|
+| Full rebrand `Smart QR` → **`ForeverPin`** | feature | name locked 2026-06-23 (`foreverpin.com`, Cloudflare). Sweep user-facing strings first: frontend `data.ts` `BRAND` · `Logo` · `index.html` title/meta/OG · footer · blog mentions · page `<title>`s · `package.json` name. Then docs (`CLAUDE.md` · spec · architecture). Tagline: **"Pin it once. It points forever."** |
+| Rename `SmartQr.*` backend namespaces / projects | idea | larger sweep (`.sln`/`.csproj`/usings) — defer until the user-facing rebrand is stable |
+| Rename repo folder `smart-qr-poc` → `foreverpin` | idea | touches git + `scripts/active.sh` registry — later |
 
 ### Accounts & ownership (next)
 

@@ -8,8 +8,9 @@
 
 | File | Content |
 |---|---|
-| `business-context.md` | Current state, active business-side tasks, decisions log |
+| `business-context.md` | Current state, brand (name/tagline/domain), active business-side tasks, decisions log |
 | `business-knowledge.md` | Model, pricing tiers, positioning, GWDNBM, target users, kill gates |
+| `marketing.md` | App GTM — positioning v2 (free generator + forwarder), $1 pricing experiment, channels |
 
 ## Platform — Planning (`platform/planning/`)
 
@@ -36,6 +37,8 @@
 | `v0.1/v0.1.md` | v0.1 (Product foundation — guest-first) — POC + manage codes + marketing + billing (renamed from v1.0) |
 | `v0.2/v0.2.md` | v0.2 (Migration layer) — bespoke migrator extracted to SDK + adopted across all 3 apps |
 | `v0.3/v0.3.md` | v0.3 (Accounts & ownership) — Google sign-in, guest-code claim, cross-device ownership |
+| `v0.4/v0.4.md` | v0.4 (SDK adoption) — extract non-business infra to backend-beta + adopt `@wow-two-beta/ui` fully |
+| `v0.5/v0.5.md` | v0.5 (TBD — brainstorm) — planning scaffold seeded from v0.4 deferrals + backlog |
 
 ## Platform — Source (`platform/src/backend/`)
 

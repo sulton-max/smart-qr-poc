@@ -2,6 +2,7 @@ using System.Net;
 using AwesomeAssertions;
 using SmartQr.IntegrationTests.Harness;
 using SmartQr.IntegrationTests.Support;
+using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.IntegrationTests.Tests;
 
