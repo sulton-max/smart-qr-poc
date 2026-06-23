@@ -11,13 +11,14 @@ using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
 using SmartQr.Common.Domain.Results;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
+using SmartQr.Tests.Harness;
 
 namespace SmartQr.Tests;
 
 /// <summary>The single 402 enforcement point — CodeCreateCommandHandler rejects at the plan code cap.</summary>
-public class CodeCreateLimitTests
+public class CodeCreateLimitTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
-    private static CodeCreateCommandHandler NewHandler(SqliteTestDb db) => new(
+    private static CodeCreateCommandHandler NewHandler(SmartQrTestDb db) => new(
         new CodeRepository(db.NewContext()),
         new SubscriptionRepository(db.NewContext()),
         new SlugGenerator(),
@@ -31,7 +32,7 @@ public class CodeCreateLimitTests
         FallbackUrl = "https://x.example",
     };
 
-    private static async Task SeedSubscriptionAsync(SqliteTestDb db, Guid user, Plan plan) =>
+    private static async Task SeedSubscriptionAsync(SmartQrTestDb db, Guid user, Plan plan) =>
         await new SubscriptionRepository(db.NewContext()).UpsertByUserAsync(new SubscriptionEntity
         {
             Id = Guid.NewGuid(),
@@ -42,7 +43,7 @@ public class CodeCreateLimitTests
             StripeSubscriptionId = "sub_1",
         }, default);
 
-    private static async Task SeedCodesAsync(SqliteTestDb db, Guid user, int count)
+    private static async Task SeedCodesAsync(SmartQrTestDb db, Guid user, int count)
     {
         for (var i = 0; i < count; i++)
             await new CodeRepository(db.NewContext()).AddAsync(new CodeEntity
@@ -63,11 +64,10 @@ public class CodeCreateLimitTests
     [Fact]
     public async Task Free_user_at_two_codes_can_create_the_third()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
-        await SeedCodesAsync(db, user, 2); // Free cap = 3, count < cap
+        await SeedCodesAsync(Db, user, 2); // Free cap = 3, count < cap
 
-        var result = await NewHandler(db).HandleAsync(Create(user), default);
+        var result = await NewHandler(Db).HandleAsync(Create(user), default);
 
         Assert.IsType<AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>.Success>(result);
     }
@@ -75,11 +75,10 @@ public class CodeCreateLimitTests
     [Fact]
     public async Task Free_user_at_cap_is_rejected_with_LimitReached()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
-        await SeedCodesAsync(db, user, 3); // Free cap = 3, count == cap (no subscription row ⇒ Free)
+        await SeedCodesAsync(Db, user, 3); // Free cap = 3, count == cap (no subscription row ⇒ Free)
 
-        var result = await NewHandler(db).HandleAsync(Create(user), default);
+        var result = await NewHandler(Db).HandleAsync(Create(user), default);
 
         var failure = Assert.IsType<AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>.Failure>(result);
         Assert.Equal(FailureCategory.PaymentRequired, failure.Error.Category);
@@ -88,12 +87,11 @@ public class CodeCreateLimitTests
     [Fact]
     public async Task Solo_user_at_cap_is_rejected_with_LimitReached()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
-        await SeedSubscriptionAsync(db, user, Plan.Solo); // cap = 25
-        await SeedCodesAsync(db, user, 25);
+        await SeedSubscriptionAsync(Db, user, Plan.Solo); // cap = 25
+        await SeedCodesAsync(Db, user, 25);
 
-        var result = await NewHandler(db).HandleAsync(Create(user), default);
+        var result = await NewHandler(Db).HandleAsync(Create(user), default);
 
         var failure = Assert.IsType<AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>.Failure>(result);
         Assert.Equal(FailureCategory.PaymentRequired, failure.Error.Category);
@@ -102,12 +100,11 @@ public class CodeCreateLimitTests
     [Fact]
     public async Task Agency_user_never_trips_the_cap()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
-        await SeedSubscriptionAsync(db, user, Plan.Agency); // cap = int.MaxValue
-        await SeedCodesAsync(db, user, 30); // well past every bounded tier
+        await SeedSubscriptionAsync(Db, user, Plan.Agency); // cap = int.MaxValue
+        await SeedCodesAsync(Db, user, 30); // well past every bounded tier
 
-        var result = await NewHandler(db).HandleAsync(Create(user), default);
+        var result = await NewHandler(Db).HandleAsync(Create(user), default);
 
         Assert.IsType<AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>.Success>(result);
     }

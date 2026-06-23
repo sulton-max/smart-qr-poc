@@ -1,11 +1,4 @@
-using System.Text.Json.Serialization;
-using Dapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Npgsql;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Application.Identity.Core.Services;
@@ -17,11 +10,7 @@ using SmartQr.Codes;
 using SmartQr.Codes.Logo;
 using SmartQr.Codes.Rendering;
 using SmartQr.Common.Persistence.DataContexts;
-using WoW.Two.Sdk.Backend.Beta.Data.Dapper;
-using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore;
-using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Audit;
-using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Postgres;
-using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
+using WoW.Two.Sdk.Backend.Beta.Data;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 using WoW.Two.Sdk.Backend.Beta.Identity.Cookies;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
@@ -30,6 +19,7 @@ using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Validation;
 using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
+using WoW.Two.Sdk.Backend.Beta.Web.Json;
 using AuthSettings = SmartQr.Api.Settings.Auth;
 using BillingSettings = SmartQr.Api.Settings.Billing;
 
@@ -37,38 +27,19 @@ namespace SmartQr.Api.Configurations;
 
 public static partial class HostConfiguration
 {
-    /// <summary>Loads and registers settings (DB and API).</summary>
+    /// <summary>Loads and registers settings (API).</summary>
     private static WebApplicationBuilder AddSettings(this WebApplicationBuilder builder)
     {
-        // DB connection: env DB_CONNECTION wins over appsettings (DatabaseOptions:ConnectionString), preserving today's overlay.
-        builder.Services.AddDatabaseConnection(builder.Configuration);
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration));
         builder.Services.AddSingleton(ConfigurationLoader.Load<AuthSettings>(builder.Configuration));
         return builder;
     }
 
-    /// <summary>Registers the shared EF Core / Npgsql persistence.</summary>
+    /// <summary>Registers the full Postgres host floor for <see cref="AppDbContext"/> — connection resolve (env <c>DB_CONNECTION</c> over <c>DatabaseOptions:ConnectionString</c>), shared data source, Dapper factory, audit interceptor, snake_case audited <c>DbContext</c>, and the bespoke migrator over the context's assembly.</summary>
     private static WebApplicationBuilder AddPersistence(this WebApplicationBuilder builder)
     {
-        DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-        builder.Services.AddNpgsqlDataSource();
-        builder.Services.AddDataSourceConnectionFactory();
-        builder.Services.AddEfCoreAuditInterceptor();
-
-        builder.Services.AddDbContext<AppDbContext>((sp, optionsBuilder) =>
-        {
-            var dataSource = sp.GetRequiredService<NpgsqlDataSource>();
-            optionsBuilder
-                .UseNpgsql(dataSource)
-                .UseSnakeCaseNamingConvention()
-                .UseAuditInterceptor(sp);
-        });
-
-        // The bespoke SQL migrator owns the schema; EF is a pure mapper.
-        builder.Services.AddDatabaseBespokeMigrations(typeof(AppDbContext).Assembly);
-
+        builder.Services.AddPostgresPersistence<AppDbContext>(builder.Configuration);
         return builder;
     }
 
@@ -141,48 +112,7 @@ public static partial class HostConfiguration
         builder.Services
             .AddControllers()
             .AddValidationExceptionFilter()
-            .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            .AddJsonStringEnums();
         return builder;
-    }
-
-    /// <summary>Creates the database if missing, then applies all pending migrations on startup (idempotent).</summary>
-    private static async Task MigrateDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
-    {
-        using var scope = services.CreateScope();
-
-        var logger = scope.ServiceProvider
-            .GetRequiredService<ILoggerFactory>()
-            .CreateLogger("SmartQr.Api.DatabaseBootstrap");
-
-        var connectionString = scope.ServiceProvider.GetRequiredService<DatabaseOptions>().ConnectionString;
-        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database;
-
-        // Create the target database via the maintenance DB before any migration runs.
-        var dialect = scope.ServiceProvider.GetRequiredService<IMigrationDialect>();
-        var created = await dialect.EnsureDatabaseExistsAsync(connectionString, ct);
-        if (created)
-            logger.LogInformation("Created database {Database}.", databaseName);
-        else
-            logger.LogInformation("Database {Database} already exists.", databaseName);
-
-        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunnerService>();
-        await runner.ApplyPendingAsync("startup", ct);
-    }
-
-    /// <summary>Binds the SDK <see cref="DatabaseOptions"/> from appsettings (<c>DatabaseOptions:ConnectionString</c>) with the <c>DB_CONNECTION</c> env var winning, and registers it as a singleton and <see cref="IOptions{TOptions}"/>.</summary>
-    private static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration configuration)
-    {
-        var fromConfig = configuration["DatabaseOptions:ConnectionString"];
-        var fromEnv = Environment.GetEnvironmentVariable("DB_CONNECTION");
-        var connectionString = string.IsNullOrWhiteSpace(fromEnv) ? fromConfig : fromEnv;
-
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException(
-                "Database connection string not found. Set env var 'DB_CONNECTION' or appsettings 'DatabaseOptions:ConnectionString'.");
-
-        var options = new DatabaseOptions { ConnectionString = connectionString };
-        services.AddSingleton(options);
-        services.AddSingleton<IOptions<DatabaseOptions>>(Options.Create(options));
-        return services;
     }
 }

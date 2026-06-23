@@ -7,12 +7,13 @@ using SmartQr.Common.Domain.Billing.Entities;
 using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Results;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
+using SmartQr.Tests.Harness;
 using BillingSettings = SmartQr.Api.Settings.Billing;
 
 namespace SmartQr.Tests;
 
 /// <summary>Unit tests for the billing command handlers using the fake gateway (no network, no real Stripe).</summary>
-public class BillingHandlersTests
+public class BillingHandlersTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
     private static BillingSettings Settings() => new()
     {
@@ -56,9 +57,8 @@ public class BillingHandlersTests
     [Fact]
     public async Task Portal_fails_with_NoCustomer_when_user_has_no_subscription()
     {
-        using var db = new SqliteTestDb();
         var handler = new BillingPortalCommandHandler(
-            new SubscriptionRepository(db.NewContext()), new FakeBillingGateway(), Settings(),
+            new SubscriptionRepository(Db.NewContext()), new FakeBillingGateway(), Settings(),
             NullLogger<BillingPortalCommandHandler>.Instance);
 
         var result = await handler.HandleAsync(new BillingPortalCommand { UserId = Guid.NewGuid() }, default);
@@ -70,9 +70,8 @@ public class BillingHandlersTests
     [Fact]
     public async Task Portal_returns_url_for_user_with_a_stripe_customer()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
-        await new SubscriptionRepository(db.NewContext()).UpsertByUserAsync(new SubscriptionEntity
+        await new SubscriptionRepository(Db.NewContext()).UpsertByUserAsync(new SubscriptionEntity
         {
             Id = Guid.NewGuid(), UserId = user, Plan = Plan.Pro, Status = SubscriptionStatus.Active,
             StripeCustomerId = "cus_portal", StripeSubscriptionId = "sub_1",
@@ -80,7 +79,7 @@ public class BillingHandlersTests
 
         var fake = new FakeBillingGateway { PortalUrl = "https://billing.stripe.com/p/session/test_xyz" };
         var handler = new BillingPortalCommandHandler(
-            new SubscriptionRepository(db.NewContext()), fake, Settings(), NullLogger<BillingPortalCommandHandler>.Instance);
+            new SubscriptionRepository(Db.NewContext()), fake, Settings(), NullLogger<BillingPortalCommandHandler>.Instance);
 
         var result = await handler.HandleAsync(new BillingPortalCommand { UserId = user }, default);
 
@@ -91,13 +90,12 @@ public class BillingHandlersTests
 
     // ── Webhook ──
 
-    private static BillingWebhookCommandHandler WebhookHandler(SqliteTestDb db, FakeBillingGateway fake) => new(
+    private static BillingWebhookCommandHandler WebhookHandler(SmartQrTestDb db, FakeBillingGateway fake) => new(
         new SubscriptionRepository(db.NewContext()), fake, Settings(), NullLogger<BillingWebhookCommandHandler>.Instance);
 
     [Fact]
     public async Task Webhook_checkout_completed_upserts_subscription_with_plan_from_price()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
         var fake = new FakeBillingGateway
         {
@@ -112,12 +110,12 @@ public class BillingHandlersTests
             },
         };
 
-        var result = await WebhookHandler(db, fake).HandleAsync(
+        var result = await WebhookHandler(Db, fake).HandleAsync(
             new BillingWebhookCommand { RawBody = "{}", StripeSignature = "sig" }, default);
 
         Assert.IsType<AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>.Success>(result);
 
-        var row = await new SubscriptionRepository(db.NewContext()).GetByUserAsync(user, default);
+        var row = await new SubscriptionRepository(Db.NewContext()).GetByUserAsync(user, default);
         Assert.NotNull(row);
         Assert.Equal(Plan.Pro, row!.Plan); // price_pro → Pro via inverse Billing:Prices
         Assert.Equal(SubscriptionStatus.Active, row.Status);
@@ -127,11 +125,10 @@ public class BillingHandlersTests
     [Fact]
     public async Task Webhook_subscription_deleted_flips_status_to_canceled_keeping_the_row()
     {
-        using var db = new SqliteTestDb();
         var user = Guid.NewGuid();
 
         // Seed an active subscription first (as if checkout already happened).
-        await new SubscriptionRepository(db.NewContext()).UpsertByUserAsync(new SubscriptionEntity
+        await new SubscriptionRepository(Db.NewContext()).UpsertByUserAsync(new SubscriptionEntity
         {
             Id = Guid.NewGuid(), UserId = user, Plan = Plan.Pro, Status = SubscriptionStatus.Active,
             StripeCustomerId = "cus_1", StripeSubscriptionId = "sub_del",
@@ -147,12 +144,12 @@ public class BillingHandlersTests
             },
         };
 
-        var result = await WebhookHandler(db, fake).HandleAsync(
+        var result = await WebhookHandler(Db, fake).HandleAsync(
             new BillingWebhookCommand { RawBody = "{}", StripeSignature = "sig" }, default);
 
         Assert.IsType<AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>.Success>(result);
 
-        var row = await new SubscriptionRepository(db.NewContext()).GetByUserAsync(user, default);
+        var row = await new SubscriptionRepository(Db.NewContext()).GetByUserAsync(user, default);
         Assert.NotNull(row); // row kept — codes are never deleted on downgrade
         Assert.Equal(SubscriptionStatus.Canceled, row!.Status);
     }
@@ -160,10 +157,9 @@ public class BillingHandlersTests
     [Fact]
     public async Task Webhook_bad_signature_returns_InvalidSignature_failure()
     {
-        using var db = new SqliteTestDb();
         var fake = new FakeBillingGateway { SignatureError = new Exception("bad signature") };
 
-        var result = await WebhookHandler(db, fake).HandleAsync(
+        var result = await WebhookHandler(Db, fake).HandleAsync(
             new BillingWebhookCommand { RawBody = "{}", StripeSignature = "wrong" }, default);
 
         var failure = Assert.IsType<AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>.Failure>(result);

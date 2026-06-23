@@ -1,3 +1,4 @@
+using WoW.Two.Sdk.Backend.Beta.Data;
 using WoW.Two.Sdk.Backend.Beta.Meta;
 
 namespace SmartQr.Api.Configurations;
@@ -42,7 +43,7 @@ public static partial class HostConfiguration
     public static WebApplication Configure(this WebApplication app)
     {
         // Apply pending migrations before serving — advisory-locked, blocks once at startup.
-        app.Services.MigrateDatabaseAsync().GetAwaiter().GetResult();
+        app.Services.MigrateBespokeOnStartupAsync().GetAwaiter().GetResult();
 
         // Serve the built React SPA before the SDK pipeline so static assets short-circuit.
         app.UseDefaultFiles();

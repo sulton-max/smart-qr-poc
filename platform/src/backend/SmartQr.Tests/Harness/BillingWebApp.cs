@@ -16,7 +16,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Common.Persistence.DataContexts;
+using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
+using WoW.Two.Sdk.Backend.Beta.Testing.Containers;
 using WoW.Two.Sdk.Backend.Beta.Testing.Data.EntityFrameworkCore;
 using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
@@ -28,14 +30,25 @@ using BillingPrices = SmartQr.Api.Settings.BillingPrices;
 
 namespace SmartQr.Tests.Harness;
 
-/// <summary>SQLite-backed two-host billing test app over real HTTP, both hosts sharing one in-memory connection; no Docker, no real Stripe.</summary>
-public sealed class BillingWebApp : IDisposable
+/// <summary>Provider-switchable two-host billing test app over real HTTP — both hosts share one database (in-memory SQLite or a Postgres container), with a fake Stripe gateway and a fixed current user; no real Stripe.</summary>
+/// <remarks>
+/// Selected by <see cref="TestSetupOptions.Current"/> (default Postgres). Used as an <c>IClassFixture</c> so the container / connection and both hosts build once; <see cref="ResetAsync"/> isolates each test.
+/// SQLite: both hosts repoint onto one shared in-memory connection and the bespoke migrator is neutered (schema via <c>EnsureCreated</c>). Postgres: a shared container, the real bespoke SQL migrator builds the schema at host startup, and Respawn truncates between tests.
+/// </remarks>
+public sealed class BillingWebApp : IAsyncLifetime
 {
     private const string DummyPgConnection = "Host=localhost;Port=5432;Database=smartqr_test;Username=test;Password=test";
 
-    private readonly SqliteConnection _connection;
-    private readonly WebApplicationFactory<ApiProgram> _apiFactory;
-    private readonly WebApplicationFactory<RedirectProgram> _redirectFactory;
+    private readonly DatabaseProvider _provider = TestSetupOptions.Current.Database;
+
+    // SQLite mode: the single shared in-memory connection both hosts (and seeding) bind to.
+    private SqliteConnection? _connection;
+
+    // Postgres mode: the shared container + Respawn reset.
+    private PostgresFixture? _postgres;
+
+    private WebApplicationFactory<ApiProgram> _apiFactory = null!;
+    private WebApplicationFactory<RedirectProgram> _redirectFactory = null!;
 
     /// <summary>The fake Stripe gateway wired into the Api host — set <see cref="FakeBillingGateway.NextEvent"/> to drive a webhook.</summary>
     public FakeBillingGateway Gateway { get; } = new();
@@ -49,20 +62,59 @@ public sealed class BillingWebApp : IDisposable
         Converters = { new JsonStringEnumConverter() },
     };
 
-    /// <summary>Builds both hosts over a single shared in-memory SQLite database with its schema created up front.</summary>
-    public BillingWebApp()
-    {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
+    /// <summary>The active database connection string both hosts read (SQLite or the started container).</summary>
+    private string ActiveConnectionString => _provider == DatabaseProvider.Sqlite
+        ? DummyPgConnection // SQLite hosts never open it — they're repointed onto the shared connection.
+        : _postgres!.ConnectionString;
 
-        // Create the schema with the same snake_case convention the hosts apply, or every read 500s.
-        using (var ctx = NewDbContext())
+    /// <summary>Brings up the database (container or shared in-memory connection), builds both hosts, and snapshots Respawn for Postgres.</summary>
+    public async Task InitializeAsync()
+    {
+        if (_provider == DatabaseProvider.Sqlite)
         {
-            ctx.Database.EnsureCreated();
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
+
+            // Create the schema with the same snake_case convention the hosts apply, or every read 500s.
+            await using (var ctx = NewDbContext())
+                await ctx.Database.EnsureCreatedAsync();
+        }
+        else
+        {
+            _postgres = new PostgresFixture();
+            await _postgres.StartAsync();
+
+            // Point both hosts at the shared container the way the app reads it — env DB_CONNECTION is the authoritative
+            // cross-host seam (wins over config), matching the proven E2E AppFixture; clear Redis so the DB config store is used.
+            Environment.SetEnvironmentVariable("DB_CONNECTION", _postgres.ConnectionString);
+            Environment.SetEnvironmentVariable("REDIS_CONNECTION", null);
         }
 
         _apiFactory = BuildApiHost();
         _redirectFactory = BuildRedirectHost();
+
+        if (_provider == DatabaseProvider.Postgres)
+        {
+            // Force both hosts to build (and run their startup migrator), creating the schema before Respawn snapshots it.
+            _apiFactory.CreateClient().Dispose();
+            _redirectFactory.CreateClient().Dispose();
+            await _postgres!.InitializeRespawnerAsync();
+        }
+    }
+
+    /// <summary>Resets the shared database to empty between tests (SQLite: drop and recreate the in-memory schema; Postgres: Respawn truncate).</summary>
+    public async Task ResetAsync()
+    {
+        if (_provider == DatabaseProvider.Sqlite)
+        {
+            await using var ctx = NewDbContext();
+            await ctx.Database.EnsureDeletedAsync();
+            await ctx.Database.EnsureCreatedAsync();
+        }
+        else
+        {
+            await _postgres!.ResetAsync();
+        }
     }
 
     /// <summary>A fresh Api client (owner-scoped via the fixed <see cref="CurrentUser"/>).</summary>
@@ -74,22 +126,25 @@ public sealed class BillingWebApp : IDisposable
         AllowAutoRedirect = false,
     });
 
-    /// <summary>A new <see cref="AppDbContext"/> on the shared DB (snake_case convention) for seeding and assertions.</summary>
-    public AppDbContext NewDbContext() =>
-        new(new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite(_connection)
-            .UseSnakeCaseNamingConvention()
-            .Options);
+    /// <summary>A new <see cref="AppDbContext"/> on the shared database (snake_case convention) for seeding and assertions.</summary>
+    public AppDbContext NewDbContext()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseSnakeCaseNamingConvention();
+        if (_provider == DatabaseProvider.Sqlite)
+            options.UseSqlite(_connection!);
+        else
+            options.UseNpgsql(_postgres!.ConnectionString);
+        return new AppDbContext(options.Options);
+    }
 
     private WebApplicationFactory<ApiProgram> BuildApiHost() =>
         new WebApplicationFactory<ApiProgram>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(Environments.Production);
-            InjectDummyConfig(builder);
+            InjectConfig(builder);
             builder.ConfigureTestServices(services =>
             {
-                UseSharedSqlite(services);
-                NeuterMigrator(services);
+                UseSharedDatabase(services);
 
                 // Swap the real Stripe gateway and cookie identity for in-test doubles.
                 services.RemoveAll<IBillingGateway>();
@@ -114,29 +169,29 @@ public sealed class BillingWebApp : IDisposable
         new WebApplicationFactory<RedirectProgram>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(Environments.Production);
-            InjectDummyConfig(builder);
-            builder.ConfigureTestServices(services =>
-            {
-                UseSharedSqlite(services);
-                NeuterMigrator(services);
-            });
+            InjectConfig(builder);
+            builder.ConfigureTestServices(UseSharedDatabase);
         });
 
-    private static void InjectDummyConfig(IWebHostBuilder builder) =>
+    private void InjectConfig(IWebHostBuilder builder) =>
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            // Read by the startup migrate hook (DB name) and the data-source builder; never opened.
-            ["DatabaseOptions:ConnectionString"] = DummyPgConnection,
+            // Read by the startup migrate hook (DB name) and the data-source builder.
+            // SQLite: a dummy never opened (the host is repointed); Postgres: the live container.
+            ["DatabaseOptions:ConnectionString"] = ActiveConnectionString,
         }));
 
-    /// <summary>Repoints EF off Npgsql onto the single shared SQLite connection so both hosts see the same data.</summary>
-    private void UseSharedSqlite(IServiceCollection services) =>
-        services.RepointDbContext<AppDbContext>(o => o
-            .UseSqlite(_connection)
-            .UseSnakeCaseNamingConvention());
+    /// <summary>Repoints EF onto the shared test database: SQLite onto the one in-memory connection (migrator neutered), Postgres left on the container (real migrator builds the schema).</summary>
+    private void UseSharedDatabase(IServiceCollection services)
+    {
+        if (_provider != DatabaseProvider.Sqlite)
+            return;
 
-    /// <summary>Disables the bespoke SQL migrator so the startup migrate hook touches nothing.</summary>
-    private static void NeuterMigrator(IServiceCollection services) => services.DisableBespokeMigrator();
+        services.RepointDbContext<AppDbContext>(o => o
+            .UseSqlite(_connection!)
+            .UseSnakeCaseNamingConvention());
+        services.DisableBespokeMigrator();
+    }
 
     /// <summary>POSTs <paramref name="value"/> as JSON (camelCase and string enums) to <paramref name="url"/> on the given client.</summary>
     public static Task<HttpResponseMessage> PostJsonAsync(HttpClient client, string url, object value) =>
@@ -169,11 +224,18 @@ public sealed class BillingWebApp : IDisposable
     }
 
     /// <inheritdoc />
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        _apiFactory.Dispose();
-        _redirectFactory.Dispose();
-        _connection.Dispose();
+        await _apiFactory.DisposeAsync();
+        await _redirectFactory.DisposeAsync();
+
+        if (_connection is not null)
+            await _connection.DisposeAsync();
+        if (_postgres is not null)
+        {
+            Environment.SetEnvironmentVariable("DB_CONNECTION", null);
+            await _postgres.DisposeAsync();
+        }
     }
 
     /// <summary>The success envelope every controller wraps payloads in (<c>ApiResponse&lt;T&gt;.Ok</c>).</summary>

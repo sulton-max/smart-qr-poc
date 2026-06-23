@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartQr.Common.Domain.Billing.Entities;
-using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Domain.Codes.Enums;
 using SmartQr.Common.Domain.Identity.Entities;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Naming;
+using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Sqlite;
 
 namespace SmartQr.Common.Persistence.DataContexts;
 
@@ -37,41 +35,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : AppDb
         // Base applies this assembly's IEntityTypeConfiguration<T> and SDK conventions first.
         base.OnModelCreating(modelBuilder);
 
-        // Store each domain enum as snake_case text via a converter instance — EnumCaseConverter has no parameterless ctor.
-        ApplyEnumConverter(modelBuilder, new EnumCaseConverter<CodeType>());
-        ApplyEnumConverter(modelBuilder, new EnumCaseConverter<BarcodeFormat>());
-        ApplyEnumConverter(modelBuilder, new EnumCaseConverter<RuleConditionType>());
-        ApplyEnumConverter(modelBuilder, new EnumCaseConverter<DeviceType>());
-        ApplyEnumConverter(modelBuilder, new EnumCaseConverter<Plan>());
-        ApplyEnumConverter(modelBuilder, new EnumCaseConverter<SubscriptionStatus>());
+        // Store every enum property (nullable and non-nullable) as snake_case text — bulk via the SDK helper.
+        modelBuilder.ApplyEnumStringConversions();
 
-        // SQLite (tests) has no native DateTimeOffset — store as binary long so ORDER BY / range reads work. Npgsql maps it natively, so this is SQLite-only.
+        // SQLite (tests) has no native DateTimeOffset — store as binary long so ORDER BY / range reads match Postgres. Npgsql maps it natively, so this is SQLite-only.
         if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
-        {
-            var dateTimeOffsetConverter = new DateTimeOffsetToBinaryConverter();
-
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
-                foreach (var property in entityType.GetProperties())
-                {
-                    if (property.ClrType == typeof(DateTimeOffset) || property.ClrType == typeof(DateTimeOffset?))
-                        property.SetValueConverter(dateTimeOffsetConverter);
-                }
-            }
-        }
-    }
-
-    /// <summary>Attaches an enum-to-snake_case-text converter to every <typeparamref name="TEnum"/> property (nullable and non-nullable) across the model.</summary>
-    private static void ApplyEnumConverter<TEnum>(ModelBuilder modelBuilder, EnumCaseConverter<TEnum> converter)
-        where TEnum : struct, Enum
-    {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            foreach (var property in entityType.GetProperties())
-            {
-                if (property.ClrType == typeof(TEnum) || property.ClrType == typeof(TEnum?))
-                    property.SetValueConverter(converter);
-            }
-        }
+            modelBuilder.ApplyDateTimeOffsetToBinaryConversion();
     }
 }

@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
@@ -7,16 +6,18 @@ using SmartQr.Redirect.Api.Application.Routing.Models;
 using SmartQr.Redirect.Api.Application.Routing.Services;
 using SmartQr.Redirect.Api.Infrastructure.Routing;
 using SmartQr.Redirect.Api.Settings;
+using SmartQr.Tests.Harness;
 
 namespace SmartQr.Tests;
 
-/// <summary>End-to-end redirect data path against SQLite — seed a code, the cached config store reads it, the evaluator resolves the destination.</summary>
-public class RedirectResolutionTests
+/// <summary>End-to-end redirect data path against the provider-switchable test database — seed a code, the cached config store reads it, the evaluator resolves the destination.</summary>
+public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
-    private static ServiceProvider BuildProvider(SqliteTestDb db)
+    /// <summary>Builds the redirect routing services over the shared test database — the config store resolves <see cref="AppDbContext"/> per scope from the fixture, so it reads the same data the seeder writes (both providers).</summary>
+    private ServiceProvider BuildProvider()
     {
         var services = new ServiceCollection();
-        services.AddDbContext<AppDbContext>(o => o.UseSqlite(db.Connection));
+        services.AddScoped(_ => Db.NewContext());
         services.AddMemoryCache();
         services.AddSingleton(new RedirectSettings { ConfigCacheSeconds = 30 });
         services.AddSingleton<IRoutingEvaluator, RoutingEvaluator>();
@@ -24,9 +25,9 @@ public class RedirectResolutionTests
         return services.BuildServiceProvider();
     }
 
-    private static async Task SeedCodeAsync(SqliteTestDb db, string slug)
+    private async Task SeedCodeAsync(string slug)
     {
-        await using var ctx = db.NewContext();
+        await using var ctx = NewContext();
         var id = Guid.NewGuid();
         ctx.Codes.Add(new CodeEntity
         {
@@ -58,9 +59,8 @@ public class RedirectResolutionTests
     [Fact]
     public async Task Ios_scan_routes_to_rule()
     {
-        using var db = new SqliteTestDb();
-        await SeedCodeAsync(db, "route123");
-        await using var sp = BuildProvider(db);
+        await SeedCodeAsync("route123");
+        await using var sp = BuildProvider();
 
         var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("route123", default);
         Assert.NotNull(config);
@@ -74,9 +74,8 @@ public class RedirectResolutionTests
     [Fact]
     public async Task Desktop_scan_falls_back()
     {
-        using var db = new SqliteTestDb();
-        await SeedCodeAsync(db, "route123");
-        await using var sp = BuildProvider(db);
+        await SeedCodeAsync("route123");
+        await using var sp = BuildProvider();
 
         var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("route123", default);
         var decision = sp.GetRequiredService<IRoutingEvaluator>().Evaluate(config!, Scan("route123", DeviceType.Desktop));
@@ -88,8 +87,7 @@ public class RedirectResolutionTests
     [Fact]
     public async Task Unknown_slug_resolves_to_null()
     {
-        using var db = new SqliteTestDb();
-        await using var sp = BuildProvider(db);
+        await using var sp = BuildProvider();
 
         var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("missing", default);
 
@@ -100,11 +98,10 @@ public class RedirectResolutionTests
     [Fact]
     public async Task Over_cap_owners_code_still_resolves()
     {
-        using var db = new SqliteTestDb();
         var owner = Guid.NewGuid();
 
         // Seed many codes for one owner (Free cap is 3) — all owned by the same over-cap user.
-        await using (var ctx = db.NewContext())
+        await using (var ctx = NewContext())
         {
             for (var i = 0; i < 10; i++)
                 ctx.Codes.Add(new CodeEntity
@@ -123,7 +120,7 @@ public class RedirectResolutionTests
             await ctx.SaveChangesAsync();
         }
 
-        await using var sp = BuildProvider(db);
+        await using var sp = BuildProvider();
 
         // The 1st code (way past the cap, no subscription row ⇒ Free) resolves like any other.
         var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("overcap1", default);

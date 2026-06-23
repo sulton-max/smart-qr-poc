@@ -8,12 +8,16 @@ using SmartQr.Tests.Harness;
 
 namespace SmartQr.Tests;
 
-/// <summary>HTTP-level billing tests over the shared in-memory SQLite DB with a fake gateway and fixed user — full controller → handler → repository stack, no Docker.</summary>
-public sealed class BillingHttpTests : IDisposable
+/// <summary>HTTP-level billing tests over the shared two-host test app (Postgres container by default, or in-memory SQLite) with a fake gateway and fixed user — full controller → handler → repository stack. The app builds once per class; each test resets the database first.</summary>
+public sealed class BillingHttpTests(BillingWebApp app) : IClassFixture<BillingWebApp>, IAsyncLifetime
 {
-    private readonly BillingWebApp _app = new();
+    private readonly BillingWebApp _app = app;
 
-    public void Dispose() => _app.Dispose();
+    /// <summary>Resets the shared database to empty before each test (Respawn truncate or SQLite recreate).</summary>
+    public async Task InitializeAsync() => await _app.ResetAsync();
+
+    /// <inheritdoc />
+    public Task DisposeAsync() => Task.CompletedTask;
 
     // ── (a) GET /api/billing/me defaults to Free with the right cap ──
 
