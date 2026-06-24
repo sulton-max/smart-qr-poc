@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, CopyButton } from "@wow-two-beta/ui/actions";
 import { ColorField, FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
 import { Card, Heading, Text } from "@wow-two-beta/ui/display";
@@ -7,8 +7,17 @@ import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/layout";
 import { ArrowLeft } from "lucide-react";
 import { QrPreview } from "../components/QrPreview";
 import { RuleBuilder } from "../components/RuleBuilder";
+import { ShapeControls } from "../components/ShapeControls";
 import { codeImageUrl, createCode, getCode, updateCode, REDIRECT_BASE } from "../api";
-import { BarcodeFormat, type CodeDto, type RuleDraft } from "../types";
+import {
+  BarcodeFormat,
+  FinderShape,
+  ModuleShape,
+  type CodeDto,
+  type CodeType,
+  type PreviewStyle,
+  type RuleDraft,
+} from "../types";
 
 const SYMBOLOGY_LABEL: Record<BarcodeFormat, string> = {
   QrCode: "QR code",
@@ -49,6 +58,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [symbology, setSymbology] = useState<BarcodeFormat>(BarcodeFormat.QrCode);
   const [foreground, setForeground] = useState("#18181b");
   const [background, setBackground] = useState("#ffffff");
+  // Code-styling shapes (v0.5) — default `square` so the render is unchanged until picked.
+  const [moduleShape, setModuleShape] = useState<ModuleShape>(ModuleShape.Square);
+  const [finderShape, setFinderShape] = useState<FinderShape>(FinderShape.Square);
+  const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
   const [rules, setRules] = useState<RuleDraft[]>([]);
   const [existing, setExisting] = useState<CodeDto | null>(null);
 
@@ -83,7 +96,29 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     };
   }, [codeId]);
 
+  // On edit, encode the code's permanent short link; on create (no code yet), a sample URL.
   const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
+
+  // The preview endpoint's coarse kind: QR symbology → "Qr", any other (1D/2D) → "Barcode".
+  const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? "Qr" : "Barcode";
+
+  // Defaults (transparent-bg / ECC / quiet-zone / logo) aren't surfaced in the builder yet —
+  // send the renderer's standard defaults. Surface them as inputs in a later iteration.
+  // Shapes default to `square`, so the render is unchanged until the user picks a style.
+  const previewStyle: PreviewStyle = useMemo(
+    () => ({
+      foregroundColor: foreground,
+      backgroundColor: background,
+      transparentBackground: false,
+      eccLevel: "Q",
+      quietZoneModules: 2,
+      logo: null,
+      moduleShape,
+      finderShape,
+      finderDotShape,
+    }),
+    [foreground, background, moduleShape, finderShape, finderDotShape],
+  );
 
   async function handleSubmit() {
     setSaving(true);
@@ -154,7 +189,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
       <Grid columns={{ base: "1", lg: "2" }} gap="6">
         {/* ── Builder ── */}
-        <Card className="flex flex-col gap-5 p-6">
+        <Card className="surface-soft flex flex-col gap-5 p-6">
           <Text as="span" size="sm" weight="medium">Destination</Text>
           {isEdit && existing && (
             <FormField label="Short link" helper="Encoded into the printed code — permanent and not editable.">
@@ -204,6 +239,16 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </FormField>
           </Grid>
 
+          <Text as="span" size="sm" weight="medium">Shape</Text>
+          <ShapeControls
+            moduleShape={moduleShape}
+            finderShape={finderShape}
+            finderDotShape={finderDotShape}
+            onModuleShapeChange={setModuleShape}
+            onFinderShapeChange={setFinderShape}
+            onFinderDotShapeChange={setFinderDotShape}
+          />
+
           <Stack gap="2">
             <Text as="span" size="sm" weight="medium">Routing rules</Text>
             <RuleBuilder rules={rules} onChange={setRules} />
@@ -223,11 +268,11 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         </Card>
 
         {/* ── Preview ── */}
-        <Card className="flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
-          <QrPreview value={previewValue} foreground={foreground} background={background} />
+        <Card className="surface-soft flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
+          <QrPreview value={previewValue} codeType={previewCodeType} style={previewStyle} />
           <Text size="xs" color="muted" align="center">
-            Live preview (client-side). The final downloadable asset is rendered server-side
-            (vector-first).
+            Live preview — the final asset rendered server-side (vector-first), so what you see
+            is what you download.
           </Text>
 
           {saved && (

@@ -13,9 +13,42 @@ import {
   Smartphone,
   X,
 } from "lucide-react";
-import { QrPreview } from "../components/QrPreview";
+import { QRCodeSVG } from "qrcode.react";
 import { COMPARISON, type Faq, type Feature, PRICING, type PricingTier, type Step } from "./data";
 import { type PostMeta } from "./blog/types";
+
+/**
+ * Static decorative QR for marketing pages — pure client-side render (no backend
+ * call). The builder's live preview uses the server-rendered `QrPreview` instead;
+ * these landing visuals are illustrative and must work without the API.
+ */
+function StaticQrPreview({
+  value,
+  foreground,
+  background,
+  size = 200,
+}: {
+  value: string;
+  foreground: string;
+  background: string;
+  size?: number;
+}) {
+  return (
+    <div
+      className="inline-flex items-center justify-center rounded-xl p-4"
+      style={{ backgroundColor: background }}
+    >
+      <QRCodeSVG
+        value={value || " "}
+        size={size}
+        level="Q"
+        fgColor={foreground}
+        bgColor={background}
+        marginSize={2}
+      />
+    </div>
+  );
+}
 
 /** Brand mark — shared by marketing header/footer and the app shell. */
 export function Logo({ className = "" }: { className?: string }) {
@@ -238,7 +271,7 @@ export function RoutingDemo() {
       className="grid items-center gap-8 rounded-3xl bg-card p-8 lg:grid-cols-2"
     >
       <div className="flex justify-center">
-        <QrPreview value="https://smartqr.app/demo" foreground="#18181b" background="#ffffff" size={200} />
+        <StaticQrPreview value="https://smartqr.app/demo" foreground="#18181b" background="#ffffff" size={200} />
       </div>
       <VStack gap="3">
         <Text size="sm" weight="medium" color="muted">
@@ -277,7 +310,7 @@ export function HeroVisual() {
     <div className="relative">
       <div className="absolute -inset-6 rounded-[2.5rem] bg-primary-soft/60 blur-2xl" aria-hidden />
       <div className="relative rounded-3xl border border-border bg-card p-6 shadow-xl shadow-primary/5">
-        <QrPreview value="https://smartqr.app/menu" foreground="#6d28d9" background="#ffffff" size={220} />
+        <StaticQrPreview value="https://smartqr.app/menu" foreground="#6d28d9" background="#ffffff" size={220} />
         <div className="mt-4 flex items-center justify-between gap-2 text-xs">
           <span className="font-medium text-muted-foreground">smartqr.app/menu</span>
           <span className="rounded-full bg-success-soft px-2 py-0.5 font-medium text-success">routes 4 ways</span>

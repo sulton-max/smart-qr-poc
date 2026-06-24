@@ -5,6 +5,7 @@ import type {
   CreateCodeRequest,
   Me,
   Plan,
+  PreviewRequest,
   SessionUrlDto,
   UpdateCodeRequest,
 } from "./types";
@@ -109,6 +110,29 @@ export async function deleteCode(id: string): Promise<void> {
 
 export function codeImageUrl(id: string, format: "svg" | "png"): string {
   return `${API_BASE}/api/codes/${id}/image?format=${format}`;
+}
+
+// Server-authoritative live preview: renders the code with the builder's current
+// value + style and returns raw SVG markup (Content-Type: image/svg+xml — NOT the
+// JSON envelope). Used by the builder so the preview matches the downloadable asset.
+// Pass an AbortSignal so superseded (debounced) requests can be cancelled.
+export async function previewCode(
+  request: PreviewRequest,
+  signal?: AbortSignal,
+): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/codes/preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "image/svg+xml" },
+    body: JSON.stringify(request),
+    credentials: "include",
+    signal,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Preview failed (HTTP ${res.status})`);
+  }
+
+  return res.text();
 }
 
 export async function getMe(): Promise<Me> {

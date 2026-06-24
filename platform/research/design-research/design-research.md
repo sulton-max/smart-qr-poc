@@ -15,8 +15,8 @@
 
 | token | hex | role |
 |---|---|---|
-| `canvas` | `#DCDFEA` | page background |
-| `surface` | `#FFFFFF` | cards, inputs |
+| `canvas` | `#D9DDE8` | page background (Visa-ref tuned) |
+| `surface` | `#EBEEF4` | cards, inputs (soft tint, not pure white) |
 | `surface-sunken` | `#F1F2F8` | read-only/disabled fields, short-link |
 | `surface-subtle` | `#F8F8FC` | nested / hover rows |
 | `border` | `#E4E6F0` | default border on white |
@@ -37,6 +37,9 @@
 | `pop-on-tint` | `#115E59` | text on pop-tint |
 | `off-bg` / `off-text` | `#F1F2F8` / `#6E7188` | inactive rule pill |
 | `warning` / `danger` / `info` | `#F59E0B` / `#EF4444` / `#3B82F6` | semantic (success reuses `pop`) |
+
+- **soft card bevel (light)** — `.surface-soft`: top-light inset `#EDF1F8` + soft bottom shadow `#D7DBE6` (Visa-ref); dark cards use the sheen instead.
+- **color mode** — SDK `ColorModeProvider` / `useColorMode` (`primitives/colorModeProvider`) toggles `.dark` on `<html>` + persists + follows OS; app has a header toggle (local mirror until the SDK bump).
 
 ## Palette — dark (tone T3 + T4 — neutral, calm)
 
