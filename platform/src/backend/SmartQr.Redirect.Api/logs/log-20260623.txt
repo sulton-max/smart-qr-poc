@@ -9,3 +9,30 @@
 2026-06-23 12:55:05.822 +05:00 [INF] Application started. Press Ctrl+C to shut down.
 2026-06-23 12:55:05.822 +05:00 [INF] Hosting environment: Development
 2026-06-23 12:55:05.822 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Redirect.Api
+2026-06-23 21:48:06.590 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-23 21:48:06.887 +05:00 [INF] Now listening on: https://localhost:7022
+2026-06-23 21:48:06.887 +05:00 [INF] Now listening on: http://localhost:7023
+2026-06-23 21:48:06.888 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-23 21:48:06.888 +05:00 [INF] Hosting environment: Development
+2026-06-23 21:48:06.888 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Redirect.Api
+2026-06-23 21:51:51.303 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-23 21:51:51.611 +05:00 [INF] Now listening on: https://localhost:7022
+2026-06-23 21:51:51.611 +05:00 [INF] Now listening on: http://localhost:7023
+2026-06-23 21:51:51.611 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-23 21:51:51.611 +05:00 [INF] Hosting environment: Development
+2026-06-23 21:51:51.611 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Redirect.Api
+2026-06-23 21:52:37.631 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7022/ - null null
+2026-06-23 21:52:37.664 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7022/ - 404 0 null 38.9902ms
+2026-06-23 21:52:37.665 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7022/, Response status code: 404
+2026-06-23 21:52:41.522 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7022/ - null null
+2026-06-23 21:52:41.523 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7022/ - 404 0 null 0.3849ms
+2026-06-23 21:52:41.523 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7022/, Response status code: 404
+2026-06-23 21:52:41.930 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7022/ - null null
+2026-06-23 21:52:41.930 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7022/ - 404 0 null 0.5449ms
+2026-06-23 21:52:41.930 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7022/, Response status code: 404
+2026-06-23 21:52:42.084 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7022/ - null null
+2026-06-23 21:52:42.084 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7022/ - 404 0 null 0.2199ms
+2026-06-23 21:52:42.084 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7022/, Response status code: 404
+2026-06-23 21:52:42.245 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7022/ - null null
+2026-06-23 21:52:42.245 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7022/ - 404 0 null 0.3827ms
+2026-06-23 21:52:42.245 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7022/, Response status code: 404

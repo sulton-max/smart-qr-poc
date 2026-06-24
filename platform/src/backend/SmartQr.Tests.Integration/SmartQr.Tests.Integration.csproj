@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <!-- Genuine integration tier: repository / config-store branches NOT observable over HTTP (cascade delete, ExecuteUpdate, audit stamping, single-row upsert, Stripe-id lookup, type round-trips, the cached config store). -->
+  <!-- SDK Testing.Data: the provider-switchable RelationalTestDb (Postgres container or in-memory SQLite, via TestSetupOptions) backing the repository tests. Transitively brings the base Testing package (PostgresFixture). -->
+  <ItemGroup>
+    <PackageReference Include="WoW2.Sdk.Backend.Beta.Testing.Data" Version="10.0.37-beta" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- The repositories under test live in SmartQr.Api; the routing/config-store types live in SmartQr.Redirect.Api. No host boot here — these tests drive the persistence layer directly against the test DB. -->
+  <ItemGroup>
+    <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
+    <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
+    <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" />
+    <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" />
+  </ItemGroup>
+
+</Project>

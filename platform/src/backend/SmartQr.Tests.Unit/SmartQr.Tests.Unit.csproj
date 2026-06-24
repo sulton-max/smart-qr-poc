@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Pure-logic tier: no I/O, no DB, no host boot. Just xUnit + the SUTs (routing evaluation, code rendering, plan-limit math). DB/host concerns live in SmartQr.Tests.Integration / SmartQr.Tests.E2E. -->
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- The systems under test: code generation (SmartQr.Codes), the routing evaluator (SmartQr.Redirect.Api), and PlanLimits (SmartQr.Api). Pure types only; the global `Program` of each host is never referenced, so no extern aliases are needed. -->
+  <ItemGroup>
+    <ProjectReference Include="..\SmartQr.Codes\SmartQr.Codes.csproj" />
+    <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
+    <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" />
+    <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" />
+  </ItemGroup>
+
+</Project>

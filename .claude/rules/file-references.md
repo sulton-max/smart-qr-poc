@@ -6,17 +6,20 @@
 
 ## Business (`business/`)
 
+> Core docs at root (`business-context.md`, `business-knowledge.md`); subfolders created as needed — `analysis/` (product/feature/market research), `marketing/`, `planning/`, `flows/`. Mirrors Haven.
+
 | File | Content |
 |---|---|
 | `business-context.md` | Current state, brand (name/tagline/domain), active business-side tasks, decisions log |
 | `business-knowledge.md` | Model, pricing tiers, positioning, GWDNBM, target users, kill gates |
-| `marketing.md` | App GTM — positioning v2 (free generator + forwarder), $1 pricing experiment, channels |
+| `analysis/feature-research.md` | QR/codes feature universe mapped against the ForeverPin wedge → v0.5 hand-pick shortlist |
+| `marketing/marketing.md` | App GTM — positioning v2 (free generator + forwarder), $1 pricing experiment, channels |
 
 ## Platform — Planning (`platform/planning/`)
 
 | File | Content |
 |---|---|
-| `smart-qr-planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions, log |
+| `smart-qr-planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions |
 
 ## Platform — Architecture (`platform/architecture/`)
 
@@ -50,7 +53,7 @@
 | `SmartQr.Codes` | generation library (QRCoder / ZXing.Net / ImageSharp) |
 | `SmartQr.Api` | management API (controllers + CQRS) |
 | `SmartQr.Redirect.Api` | redirect hot path (minimal API) |
-| `SmartQr.Tests` | xUnit |
+| `SmartQr.Tests.{Unit,Integration,E2E,Migrations}` | xUnit — units · integration · full-API E2E · migrator engine |
 
 ## Platform — Frontend (`platform/src/frontend/`)
 

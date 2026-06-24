@@ -23,7 +23,7 @@ Backend (`platform/src/backend/`) — refs go product → platform, never revers
 | `SmartQr.Codes` | code generation (QRCoder / ZXing / ImageSharp) |
 | `SmartQr.Api` | management API · https **7020** |
 | `SmartQr.Redirect.Api` | redirect hot path · https **7022** |
-| `SmartQr.Tests` · `.IntegrationTests` · `.Migrations.Tests` | xUnit · E2E (Testcontainers PG) · migrator engine |
+| `SmartQr.Tests.{Unit,Integration,E2E,Migrations}` | xUnit — pure-logic units · repo/DB integration · full-API E2E (Testcontainers PG) · migrator engine |
 
 Frontend (`platform/src/frontend/`) — React 19 + Vite + Tailwind v4 + `@wow-two-beta/ui`; **pnpm** (not npm — `workspace:` protocol); https dev server via mkcert (even port 7024).
 

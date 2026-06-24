@@ -155,6 +155,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       <Grid columns={{ base: "1", lg: "2" }} gap="6">
         {/* ── Builder ── */}
         <Card className="flex flex-col gap-5 p-6">
+          <Text as="span" size="sm" weight="medium">Destination</Text>
           {isEdit && existing && (
             <FormField label="Short link" helper="Encoded into the printed code — permanent and not editable.">
               <TextInput value={existing.shortUrl} readOnly disabled />
@@ -177,6 +178,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             />
           </FormField>
 
+          <Text as="span" size="sm" weight="medium">Appearance</Text>
           <FormField label="Code type">
             <Select<BarcodeFormat>
               value={symbology}
@@ -221,7 +223,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         </Card>
 
         {/* ── Preview ── */}
-        <Card className="flex flex-col items-center gap-4 p-6">
+        <Card className="flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
           <QrPreview value={previewValue} foreground={foreground} background={background} />
           <Text size="xs" color="muted" align="center">
             Live preview (client-side). The final downloadable asset is rendered server-side

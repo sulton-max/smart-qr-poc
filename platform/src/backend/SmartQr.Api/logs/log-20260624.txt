@@ -1,0 +1,1239 @@
+2026-06-24 08:44:32.166 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 08:44:32.284 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 08:44:32.586 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 08:44:32.587 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 08:44:32.587 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 08:44:32.587 +05:00 [INF] Hosting environment: Development
+2026-06-24 08:44:32.587 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 09:04:58.533 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/ - null null
+2026-06-24 09:04:58.553 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:04:58.574 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 09:04:58.574 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:04:58.578 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 50.9283ms
+2026-06-24 09:04:58.609 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - null null
+2026-06-24 09:04:58.609 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - null null
+2026-06-24 09:04:58.620 +05:00 [INF] Sending file. Request path: '/assets/index-CGGME6da.css'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-CGGME6da.css'
+2026-06-24 09:04:58.620 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - 200 126910 text/css 11.0631ms
+2026-06-24 09:04:58.622 +05:00 [INF] Sending file. Request path: '/assets/index-D8JuH2A-.js'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-D8JuH2A-.js'
+2026-06-24 09:04:58.622 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - 200 853383 text/javascript 12.8721ms
+2026-06-24 09:04:59.943 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/favicon.ico - null null
+2026-06-24 09:04:59.947 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/favicon.ico - 404 0 null 4.0344ms
+2026-06-24 09:04:59.949 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7020/favicon.ico, Response status code: 404
+2026-06-24 09:05:27.118 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:05:27.119 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:05:27.139 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:05:27.145 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:05:27.150 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 2.3678ms.
+2026-06-24 09:05:27.153 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:05:27.181 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 39.7655ms
+2026-06-24 09:05:27.181 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:05:27.181 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 63.487ms
+2026-06-24 09:05:27.441 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 09:05:27.442 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:27.449 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 09:05:27.540 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:05:28.245 +05:00 [INF] Executed DbCommand (8ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 09:05:28.254 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 714.3405ms.
+2026-06-24 09:05:28.255 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 09:05:28.279 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 830.2275ms
+2026-06-24 09:05:28.279 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:28.285 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 844.5714ms
+2026-06-24 09:05:37.535 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 09:05:37.535 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:37.535 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 09:05:37.536 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:05:37.548 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 09:05:37.549 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 12.1657ms.
+2026-06-24 09:05:37.549 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 09:05:37.549 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 13.4962ms
+2026-06-24 09:05:37.549 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:37.549 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 14.2575ms
+2026-06-24 09:05:39.060 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 09:05:39.060 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:39.060 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 09:05:39.061 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:05:39.064 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 09:05:39.065 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 3.3849ms.
+2026-06-24 09:05:39.065 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 09:05:39.065 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 4.6547ms
+2026-06-24 09:05:39.065 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:39.065 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 5.0535ms
+2026-06-24 09:05:40.887 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 09:05:40.888 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:40.888 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 09:05:40.889 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:05:40.892 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 09:05:40.892 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 3.0654ms.
+2026-06-24 09:05:40.892 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 09:05:40.892 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 4.1573ms
+2026-06-24 09:05:40.892 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 09:05:40.892 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 5.2763ms
+2026-06-24 09:19:25.791 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:25.791 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:25.792 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 09:19:25.792 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:25.792 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 1.2087ms
+2026-06-24 09:19:25.967 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:25.967 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:25.967 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:25.967 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:25.967 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:25.968 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:25.968 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:25.968 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:25.968 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.5657ms
+2026-06-24 09:19:25.968 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.026ms.
+2026-06-24 09:19:25.968 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:25.968 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.2089ms
+2026-06-24 09:19:25.968 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:25.968 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.6678ms
+2026-06-24 09:19:26.018 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:26.018 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.018 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:26.019 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:26.019 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.015ms.
+2026-06-24 09:19:26.019 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:26.019 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.8056ms
+2026-06-24 09:19:26.019 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.019 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.1037ms
+2026-06-24 09:19:26.140 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:26.140 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.140 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:26.140 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.140 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.3506ms
+2026-06-24 09:19:26.187 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:26.187 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.187 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:26.187 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:26.187 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0129ms.
+2026-06-24 09:19:26.188 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:26.188 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3551ms
+2026-06-24 09:19:26.188 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.188 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.7643ms
+2026-06-24 09:19:26.307 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:26.307 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.307 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:26.307 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.307 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.5297ms
+2026-06-24 09:19:26.354 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:26.354 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.354 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:26.354 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:26.354 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0284ms.
+2026-06-24 09:19:26.354 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:26.355 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.57ms
+2026-06-24 09:19:26.355 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.355 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.1704ms
+2026-06-24 09:19:26.631 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:26.631 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.631 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:26.631 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.631 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.5925ms
+2026-06-24 09:19:26.693 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:26.693 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.693 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:26.693 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:26.694 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0231ms.
+2026-06-24 09:19:26.694 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:26.694 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.4398ms
+2026-06-24 09:19:26.694 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.694 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.1382ms
+2026-06-24 09:19:26.807 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:26.807 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.807 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:26.807 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.807 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.3287ms
+2026-06-24 09:19:26.852 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:26.852 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.852 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:26.852 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:26.852 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.013ms.
+2026-06-24 09:19:26.852 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:26.852 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.196ms
+2026-06-24 09:19:26.852 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:26.852 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.5882ms
+2026-06-24 09:19:26.967 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:26.967 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.967 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:26.967 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:26.967 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.4059ms
+2026-06-24 09:19:27.020 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:27.020 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:27.020 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:27.020 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:27.020 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0164ms.
+2026-06-24 09:19:27.020 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:27.020 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.2231ms
+2026-06-24 09:19:27.020 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:27.020 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.7032ms
+2026-06-24 09:19:28.681 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:28.681 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:28.681 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:28.681 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:28.681 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.6198ms
+2026-06-24 09:19:28.743 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:28.743 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:28.744 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:28.744 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:28.744 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0236ms.
+2026-06-24 09:19:28.744 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:28.744 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.5052ms
+2026-06-24 09:19:28.744 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:28.744 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.2072ms
+2026-06-24 09:19:28.819 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:28.820 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:28.820 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:28.820 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:28.820 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.8265ms
+2026-06-24 09:19:28.863 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:28.864 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:28.864 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:28.864 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:28.864 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.049ms.
+2026-06-24 09:19:28.864 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:28.864 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.675ms
+2026-06-24 09:19:28.864 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:28.865 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.3137ms
+2026-06-24 09:19:28.986 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:28.987 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:28.987 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:28.987 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:28.987 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.8184ms
+2026-06-24 09:19:29.031 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:29.031 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.031 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:29.031 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:29.031 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0225ms.
+2026-06-24 09:19:29.031 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:29.032 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.5485ms
+2026-06-24 09:19:29.032 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.032 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.2067ms
+2026-06-24 09:19:29.365 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:29.365 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.366 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:29.366 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.366 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.8729ms
+2026-06-24 09:19:29.418 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:29.418 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.418 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:29.418 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:29.418 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0155ms.
+2026-06-24 09:19:29.418 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:29.418 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3701ms
+2026-06-24 09:19:29.418 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.418 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.8759ms
+2026-06-24 09:19:29.528 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:29.528 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.528 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:29.528 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.528 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.5281ms
+2026-06-24 09:19:29.574 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:29.574 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.574 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:29.575 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:29.575 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0219ms.
+2026-06-24 09:19:29.575 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:29.575 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3416ms
+2026-06-24 09:19:29.575 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.575 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.9607ms
+2026-06-24 09:19:29.698 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:29.698 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.698 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:29.698 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.698 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.6542ms
+2026-06-24 09:19:29.742 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:29.742 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.742 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:29.742 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:29.742 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0219ms.
+2026-06-24 09:19:29.742 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:29.743 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.4639ms
+2026-06-24 09:19:29.743 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.743 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.1601ms
+2026-06-24 09:19:29.870 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:29.870 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.870 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:29.870 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:29.870 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.6509ms
+2026-06-24 09:19:29.914 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:29.914 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.914 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:29.914 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:29.915 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0308ms.
+2026-06-24 09:19:29.915 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:29.915 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.6857ms
+2026-06-24 09:19:29.915 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:29.915 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.2892ms
+2026-06-24 09:19:30.079 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:30.080 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.080 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:30.080 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.080 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.6856ms
+2026-06-24 09:19:30.127 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:30.128 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.128 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:30.128 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:30.128 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0236ms.
+2026-06-24 09:19:30.128 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:30.128 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3492ms
+2026-06-24 09:19:30.128 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.128 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.8972ms
+2026-06-24 09:19:30.462 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:30.462 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.462 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:30.462 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.463 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.3446ms
+2026-06-24 09:19:30.514 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:30.515 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.515 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:30.515 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:30.515 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0213ms.
+2026-06-24 09:19:30.515 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:30.515 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.33ms
+2026-06-24 09:19:30.515 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.515 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.9124ms
+2026-06-24 09:19:30.662 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:30.662 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.662 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:30.662 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.663 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.3918ms
+2026-06-24 09:19:30.712 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:30.712 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.712 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:30.712 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:30.712 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.014ms.
+2026-06-24 09:19:30.712 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:30.712 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.2024ms
+2026-06-24 09:19:30.712 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.712 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.5937ms
+2026-06-24 09:19:30.837 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:30.838 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.838 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:30.838 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:30.838 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.4438ms
+2026-06-24 09:19:30.885 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:30.885 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.886 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:30.886 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:30.886 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0218ms.
+2026-06-24 09:19:30.886 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:30.886 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3395ms
+2026-06-24 09:19:30.886 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:30.886 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.853ms
+2026-06-24 09:19:31.003 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:31.003 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.003 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:31.003 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.003 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.5631ms
+2026-06-24 09:19:31.061 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:31.061 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.061 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:31.061 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:31.061 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.024ms.
+2026-06-24 09:19:31.061 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:31.061 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3349ms
+2026-06-24 09:19:31.062 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.062 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.8525ms
+2026-06-24 09:19:31.422 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:31.422 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.422 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:31.422 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.423 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 1.3164ms
+2026-06-24 09:19:31.483 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:31.483 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.483 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:31.484 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:31.484 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0255ms.
+2026-06-24 09:19:31.484 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:31.484 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.4471ms
+2026-06-24 09:19:31.484 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.484 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.1532ms
+2026-06-24 09:19:31.541 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:31.542 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.542 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:31.542 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.542 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 1.0165ms
+2026-06-24 09:19:31.599 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:31.600 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.600 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:31.600 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:31.600 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0222ms.
+2026-06-24 09:19:31.600 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:31.600 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3076ms
+2026-06-24 09:19:31.600 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.600 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.816ms
+2026-06-24 09:19:31.737 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:31.737 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.738 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:31.738 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.738 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 1.3286ms
+2026-06-24 09:19:31.780 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:31.780 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.780 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:31.780 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:31.780 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0232ms.
+2026-06-24 09:19:31.781 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:31.781 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.5674ms
+2026-06-24 09:19:31.781 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.781 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.0844ms
+2026-06-24 09:19:31.887 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 09:19:31.887 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.887 +05:00 [INF] The file /index.html was not modified
+2026-06-24 09:19:31.887 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 09:19:31.887 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.4019ms
+2026-06-24 09:19:31.943 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 09:19:31.943 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.943 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 09:19:31.943 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 09:19:31.943 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0319ms.
+2026-06-24 09:19:31.943 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 09:19:31.944 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.5395ms
+2026-06-24 09:19:31.944 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 09:19:31.944 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.0927ms
+2026-06-24 11:24:50.598 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 11:24:50.599 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:24:50.599 +05:00 [INF] The file /index.html was not modified
+2026-06-24 11:24:50.599 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:24:50.599 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 1.5992ms
+2026-06-24 11:24:50.688 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 11:24:50.688 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:24:50.688 +05:00 [INF] The file /index.html was not modified
+2026-06-24 11:24:50.688 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:24:50.688 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.4459ms
+2026-06-24 11:24:50.813 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 11:24:50.813 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:24:50.814 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 11:24:50.814 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:24:50.814 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0912ms.
+2026-06-24 11:24:50.814 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:24:50.815 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.9865ms
+2026-06-24 11:24:50.815 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:24:50.815 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.7198ms
+2026-06-24 11:24:50.865 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/new - null null
+2026-06-24 11:24:50.865 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:24:50.865 +05:00 [INF] The file /index.html was not modified
+2026-06-24 11:24:50.865 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:24:50.865 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.3875ms
+2026-06-24 11:24:50.921 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 11:24:50.921 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:24:50.922 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 11:24:50.922 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:24:50.922 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0128ms.
+2026-06-24 11:24:50.922 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:24:50.922 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.681ms
+2026-06-24 11:24:50.922 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:24:50.922 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.9837ms
+2026-06-24 11:24:56.473 +05:00 [INF] Request starting HTTP/2 POST https://localhost:7020/api/codes - application/json 103
+2026-06-24 11:24:56.474 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Create (SmartQr.Api)'
+2026-06-24 11:24:56.481 +05:00 [INF] Route matched with {action = "Create", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Create(SmartQr.Api.Requests.CreateCodeApiRequest, System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:24:56.514 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Create (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:24:56.563 +05:00 [INF] Executed DbCommand (2ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT s.id, s.created_at, s.current_period_end, s.plan, s.status, s.stripe_customer_id, s.stripe_subscription_id, s.updated_at, s.user_id
+FROM subscriptions AS s
+WHERE s.user_id = @userId
+LIMIT 1
+2026-06-24 11:24:56.585 +05:00 [INF] Executed DbCommand (2ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM codes AS c
+WHERE c.user_id = @userId
+2026-06-24 11:24:56.594 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@slug='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM codes AS c
+    WHERE c.slug = @slug)
+2026-06-24 11:24:56.686 +05:00 [INF] Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?', @p2='?', @p3='?' (DbType = DateTime), @p4='?' (DbType = DateTime), @p5='?', @p6='?' (DbType = Boolean), @p7='?', @p8='?' (DbType = Boolean), @p9='?' (DbType = Int64), @p10='?', @p11='?' (DbType = Object), @p12='?' (DbType = DateTime), @p13='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO codes (id, barcode_format, code_type, created_at, expires_at, fallback_url, is_active, name, never_expires, scan_count, slug, style_json, updated_at, user_id)
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13);
+2026-06-24 11:24:56.694 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Create (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 180.2631ms.
+2026-06-24 11:24:56.694 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:24:56.702 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Create (SmartQr.Api) in 220.8795ms
+2026-06-24 11:24:56.702 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Create (SmartQr.Api)'
+2026-06-24 11:24:56.702 +05:00 [INF] Request finished HTTP/2 POST https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 228.932ms
+2026-06-24 11:25:00.065 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 11:25:00.065 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 11:25:00.065 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:25:00.065 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:25:00.069 +05:00 [INF] Executed DbCommand (3ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 11:25:00.088 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 22.2142ms.
+2026-06-24 11:25:00.088 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 11:25:00.088 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 23.0464ms
+2026-06-24 11:25:00.088 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 11:25:00.088 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 23.6919ms
+2026-06-24 11:25:07.193 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 11:25:07.193 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:25:07.194 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 11:25:07.194 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:25:07.194 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 1.2214ms
+2026-06-24 11:25:07.251 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 11:25:07.251 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:25:07.251 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 11:25:07.251 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:25:07.251 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.016ms.
+2026-06-24 11:25:07.251 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:25:07.251 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.2265ms
+2026-06-24 11:25:07.251 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:25:07.251 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 0.66ms
+2026-06-24 11:25:07.513 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 11:25:07.514 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 11:25:07.514 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:25:07.514 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:25:07.516 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 11:25:07.517 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 2.6646ms.
+2026-06-24 11:25:07.517 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 11:25:07.517 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 3.2456ms
+2026-06-24 11:25:07.517 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 11:25:07.517 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 3.634ms
+2026-06-24 11:25:43.935 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - null null
+2026-06-24 11:25:43.937 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api)'
+2026-06-24 11:25:43.942 +05:00 [INF] Route matched with {action = "GetById", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(System.Guid, System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:25:43.945 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:25:43.966 +05:00 [INF] Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Guid), @userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c0.id, c0.barcode_format, c0.code_type, c0.created_at, c0.expires_at, c0.fallback_url, c0.is_active, c0.name, c0.never_expires, c0.scan_count, c0.slug, c0.style_json, c0.updated_at, c0.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM (
+    SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id
+    FROM codes AS c
+    WHERE c.id = @id AND c.user_id = @userId
+    LIMIT 1
+) AS c0
+LEFT JOIN routing_rules AS r ON c0.id = r.code_id
+ORDER BY c0.id
+2026-06-24 11:25:43.967 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 22.344ms.
+2026-06-24 11:25:43.967 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:25:43.968 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api) in 25.0833ms
+2026-06-24 11:25:43.968 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api)'
+2026-06-24 11:25:43.968 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - 200 null application/json; charset=utf-8 32.6993ms
+2026-06-24 11:26:00.340 +05:00 [INF] Request starting HTTP/2 PUT https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - application/json 108
+2026-06-24 11:26:00.340 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api)'
+2026-06-24 11:26:00.343 +05:00 [INF] Route matched with {action = "UpdateById", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] UpdateById(System.Guid, SmartQr.Api.Requests.UpdateCodeApiRequest, System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:26:00.350 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:26:00.360 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Guid), @userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c0.id, c0.barcode_format, c0.code_type, c0.created_at, c0.expires_at, c0.fallback_url, c0.is_active, c0.name, c0.never_expires, c0.scan_count, c0.slug, c0.style_json, c0.updated_at, c0.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM (
+    SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id
+    FROM codes AS c
+    WHERE c.id = @id AND c.user_id = @userId
+    LIMIT 1
+) AS c0
+LEFT JOIN routing_rules AS r ON c0.id = r.code_id
+ORDER BY c0.id
+2026-06-24 11:26:00.367 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@code_Id='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM routing_rules AS r
+WHERE r.code_id = @code_Id
+2026-06-24 11:26:00.376 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@p3='?' (DbType = Guid), @p0='?', @p1='?', @p2='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+UPDATE codes SET barcode_format = @p0, name = @p1, updated_at = @p2
+WHERE id = @p3;
+2026-06-24 11:26:00.377 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 26.9618ms.
+2026-06-24 11:26:00.377 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:26:00.377 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api) in 33.7051ms
+2026-06-24 11:26:00.377 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api)'
+2026-06-24 11:26:00.377 +05:00 [INF] Request finished HTTP/2 PUT https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - 200 null application/json; charset=utf-8 37.8068ms
+2026-06-24 11:26:01.726 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947/image?format=svg - null null
+2026-06-24 11:26:01.727 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.GetImageById (SmartQr.Api)'
+2026-06-24 11:26:01.732 +05:00 [INF] Route matched with {action = "GetImageById", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetImageById(System.Guid, System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:26:01.736 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.GetImageById (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:26:01.739 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Guid), @userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c0.id, c0.barcode_format, c0.code_type, c0.created_at, c0.expires_at, c0.fallback_url, c0.is_active, c0.name, c0.never_expires, c0.scan_count, c0.slug, c0.style_json, c0.updated_at, c0.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM (
+    SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id
+    FROM codes AS c
+    WHERE c.id = @id AND c.user_id = @userId
+    LIMIT 1
+) AS c0
+LEFT JOIN routing_rules AS r ON c0.id = r.code_id
+ORDER BY c0.id
+2026-06-24 11:26:01.775 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.GetImageById (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.FileContentResult in 38.402ms.
+2026-06-24 11:26:01.775 +05:00 [INF] Executing FileContentResult, sending file with download name '' ...
+2026-06-24 11:26:01.783 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.GetImageById (SmartQr.Api) in 50.9618ms
+2026-06-24 11:26:01.783 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.GetImageById (SmartQr.Api)'
+2026-06-24 11:26:01.783 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947/image?format=svg - 200 5413 image/svg+xml 57.7431ms
+2026-06-24 11:26:10.164 +05:00 [INF] Request starting HTTP/2 PUT https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - application/json 113
+2026-06-24 11:26:10.164 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api)'
+2026-06-24 11:26:10.164 +05:00 [INF] Route matched with {action = "UpdateById", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] UpdateById(System.Guid, SmartQr.Api.Requests.UpdateCodeApiRequest, System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:26:10.165 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:26:10.167 +05:00 [INF] Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Guid), @userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c0.id, c0.barcode_format, c0.code_type, c0.created_at, c0.expires_at, c0.fallback_url, c0.is_active, c0.name, c0.never_expires, c0.scan_count, c0.slug, c0.style_json, c0.updated_at, c0.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM (
+    SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id
+    FROM codes AS c
+    WHERE c.id = @id AND c.user_id = @userId
+    LIMIT 1
+) AS c0
+LEFT JOIN routing_rules AS r ON c0.id = r.code_id
+ORDER BY c0.id
+2026-06-24 11:26:10.169 +05:00 [INF] Executed DbCommand (0ms) [Parameters=[@code_Id='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM routing_rules AS r
+WHERE r.code_id = @code_Id
+2026-06-24 11:26:10.170 +05:00 [INF] Executed DbCommand (0ms) [Parameters=[@p2='?' (DbType = Guid), @p0='?', @p1='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+UPDATE codes SET fallback_url = @p0, updated_at = @p1
+WHERE id = @p2;
+2026-06-24 11:26:10.170 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 5.0694ms.
+2026-06-24 11:26:10.170 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:26:10.170 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api) in 6.1345ms
+2026-06-24 11:26:10.170 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.UpdateById (SmartQr.Api)'
+2026-06-24 11:26:10.170 +05:00 [INF] Request finished HTTP/2 PUT https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - 200 null application/json; charset=utf-8 6.6699ms
+2026-06-24 11:45:48.595 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/7ed82d81-2a52-4b88-a00b-d07e21e19947/edit - null null
+2026-06-24 11:45:48.596 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:45:48.597 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 11:45:48.597 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 11:45:48.598 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 2.7054ms
+2026-06-24 11:45:48.614 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - null null
+2026-06-24 11:45:48.614 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - null null
+2026-06-24 11:45:48.642 +05:00 [INF] Sending file. Request path: '/assets/index-CGGME6da.css'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-CGGME6da.css'
+2026-06-24 11:45:48.642 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - 200 126910 text/css 27.9923ms
+2026-06-24 11:45:48.644 +05:00 [INF] Sending file. Request path: '/assets/index-D8JuH2A-.js'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-D8JuH2A-.js'
+2026-06-24 11:45:48.644 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - 200 853383 text/javascript 30.1013ms
+2026-06-24 11:45:48.791 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 11:45:48.791 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:45:48.791 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 11:45:48.791 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:45:48.791 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0367ms.
+2026-06-24 11:45:48.791 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:45:48.792 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.559ms
+2026-06-24 11:45:48.792 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 11:45:48.792 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.2316ms
+2026-06-24 11:45:48.799 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - null null
+2026-06-24 11:45:48.800 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api)'
+2026-06-24 11:45:48.800 +05:00 [INF] Route matched with {action = "GetById", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(System.Guid, System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 11:45:48.800 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 11:45:48.809 +05:00 [INF] Executed DbCommand (3ms) [Parameters=[@id='?' (DbType = Guid), @userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c0.id, c0.barcode_format, c0.code_type, c0.created_at, c0.expires_at, c0.fallback_url, c0.is_active, c0.name, c0.never_expires, c0.scan_count, c0.slug, c0.style_json, c0.updated_at, c0.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM (
+    SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id
+    FROM codes AS c
+    WHERE c.id = @id AND c.user_id = @userId
+    LIMIT 1
+) AS c0
+LEFT JOIN routing_rules AS r ON c0.id = r.code_id
+ORDER BY c0.id
+2026-06-24 11:45:48.810 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 9.6871ms.
+2026-06-24 11:45:48.810 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 11:45:48.810 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api) in 10.2968ms
+2026-06-24 11:45:48.810 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api)'
+2026-06-24 11:45:48.810 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - 200 null application/json; charset=utf-8 10.6611ms
+2026-06-24 11:45:49.257 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/favicon.ico - null null
+2026-06-24 11:45:49.258 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/favicon.ico - 404 0 null 1.0424ms
+2026-06-24 11:45:49.258 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7020/favicon.ico, Response status code: 404
+2026-06-24 12:25:32.904 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 12:25:32.957 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 12:25:33.194 +05:00 [ERR] Hosting failed to start
+System.IO.IOException: Failed to bind to address https://127.0.0.1:7020: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Address already in use
+ ---> System.Net.Sockets.SocketException (48): Address already in use
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__14_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+   at Microsoft.Extensions.Hosting.Internal.Host.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+2026-06-24 12:25:48.736 +05:00 [INF] Request starting HTTP/2 HEAD https://localhost:7020/ - null null
+2026-06-24 12:25:48.737 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:25:48.738 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:25:48.738 +05:00 [INF] Request finished HTTP/2 HEAD https://localhost:7020/index.html - 200 1173 text/html 2.9118ms
+2026-06-24 12:25:48.791 +05:00 [INF] Request starting HTTP/2 HEAD https://localhost:7020/index.html - null null
+2026-06-24 12:25:48.792 +05:00 [INF] Request finished HTTP/2 HEAD https://localhost:7020/index.html - 200 1173 text/html 1.3299ms
+2026-06-24 12:27:41.266 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 12:27:41.308 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 12:27:41.351 +05:00 [INF] Now listening on: http://127.0.0.1:7120
+2026-06-24 12:27:41.351 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 12:27:41.351 +05:00 [INF] Hosting environment: Development
+2026-06-24 12:27:41.351 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 12:28:00.801 +05:00 [INF] Request starting HTTP/1.1 HEAD http://127.0.0.1:7120/ - null null
+2026-06-24 12:28:00.813 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:00.814 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:00.817 +05:00 [INF] Request finished HTTP/1.1 HEAD http://127.0.0.1:7120/index.html - 200 1173 text/html 20.1138ms
+2026-06-24 12:28:00.825 +05:00 [INF] Request starting HTTP/1.1 HEAD http://127.0.0.1:7120/api/me - null null
+2026-06-24 12:28:00.826 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:00.826 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:00.826 +05:00 [INF] Request finished HTTP/1.1 HEAD http://127.0.0.1:7120/index.html - 200 1173 text/html 1.2447ms
+2026-06-24 12:28:00.834 +05:00 [INF] Request starting HTTP/1.1 HEAD http://127.0.0.1:7120/health - null null
+2026-06-24 12:28:00.835 +05:00 [INF] Executing endpoint 'Health checks'
+2026-06-24 12:28:00.836 +05:00 [INF] Executed endpoint 'Health checks'
+2026-06-24 12:28:00.836 +05:00 [INF] Request finished HTTP/1.1 HEAD http://127.0.0.1:7120/health - 200 null text/plain 2.5008ms
+2026-06-24 12:28:14.923 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/api/auth/me - null null
+2026-06-24 12:28:14.924 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:14.928 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 12:28:14.928 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:14.928 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/index.html - 200 1173 text/html 5.2732ms
+2026-06-24 12:28:14.933 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/api/codes - null null
+2026-06-24 12:28:14.933 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 12:28:14.946 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 12:28:14.994 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 12:28:14.995 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.UnauthorizedResult in 0.6889ms.
+2026-06-24 12:28:14.996 +05:00 [INF] Executing ObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ProblemDetails'.
+2026-06-24 12:28:15.006 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 59.293ms
+2026-06-24 12:28:15.007 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 12:28:15.007 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/api/codes - 401 null application/problem+json; charset=utf-8 73.82ms
+2026-06-24 12:28:15.014 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/api/billing/me - null null
+2026-06-24 12:28:15.014 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.BillingController.Me (SmartQr.Api)'
+2026-06-24 12:28:15.017 +05:00 [INF] Route matched with {action = "Me", controller = "Billing"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Me(System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.BillingController (SmartQr.Api).
+2026-06-24 12:28:15.018 +05:00 [INF] Executing action method SmartQr.Api.Controllers.BillingController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 12:28:15.018 +05:00 [INF] Executed action method SmartQr.Api.Controllers.BillingController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.UnauthorizedResult in 0.2734ms.
+2026-06-24 12:28:15.018 +05:00 [INF] Executing ObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ProblemDetails'.
+2026-06-24 12:28:15.018 +05:00 [INF] Executed action SmartQr.Api.Controllers.BillingController.Me (SmartQr.Api) in 0.8939ms
+2026-06-24 12:28:15.018 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.BillingController.Me (SmartQr.Api)'
+2026-06-24 12:28:15.018 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/api/billing/me - 401 null application/problem+json; charset=utf-8 4.3126ms
+2026-06-24 12:28:15.026 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/api/identity/me - null null
+2026-06-24 12:28:15.026 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 12:28:15.027 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 12:28:15.027 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 12:28:15.028 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.2182ms.
+2026-06-24 12:28:15.028 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 12:28:15.033 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 6.4373ms
+2026-06-24 12:28:15.033 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 12:28:15.033 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/api/identity/me - 200 null application/json; charset=utf-8 7.345ms
+2026-06-24 12:28:22.421 +05:00 [INF] Request starting HTTP/1.1 HEAD http://127.0.0.1:7120/api/identity/me - null null
+2026-06-24 12:28:22.421 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:22.421 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:22.421 +05:00 [INF] Request finished HTTP/1.1 HEAD http://127.0.0.1:7120/index.html - 200 1173 text/html 0.9193ms
+2026-06-24 12:28:22.432 +05:00 [INF] Request starting HTTP/1.1 HEAD http://127.0.0.1:7120/api/codes - null null
+2026-06-24 12:28:22.432 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:22.433 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:22.433 +05:00 [INF] Request finished HTTP/1.1 HEAD http://127.0.0.1:7120/index.html - 200 1173 text/html 0.4347ms
+2026-06-24 12:28:32.572 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/api/identity/me - null null
+2026-06-24 12:28:32.572 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 12:28:32.572 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 12:28:32.573 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 12:28:32.573 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0219ms.
+2026-06-24 12:28:32.573 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 12:28:32.573 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.3975ms
+2026-06-24 12:28:32.573 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 12:28:32.573 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/api/identity/me - 200 null application/json; charset=utf-8 0.7736ms
+2026-06-24 12:28:32.582 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/api/codes - null null
+2026-06-24 12:28:32.582 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 12:28:32.582 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 12:28:32.585 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 12:28:32.585 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.UnauthorizedResult in 0.0236ms.
+2026-06-24 12:28:32.585 +05:00 [INF] Executing ObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ProblemDetails'.
+2026-06-24 12:28:32.585 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 3.3047ms
+2026-06-24 12:28:32.585 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 12:28:32.585 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/api/codes - 401 null application/problem+json; charset=utf-8 3.611ms
+2026-06-24 12:28:32.593 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/ - null null
+2026-06-24 12:28:32.593 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:32.594 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 12:28:32.594 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:28:32.594 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/index.html - 200 1173 text/html 0.9109ms
+2026-06-24 12:29:25.747 +05:00 [INF] Application is shutting down...
+2026-06-24 12:29:40.327 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 12:29:40.373 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 12:29:40.417 +05:00 [INF] Now listening on: http://127.0.0.1:7120
+2026-06-24 12:29:40.417 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 12:29:40.417 +05:00 [INF] Hosting environment: Development
+2026-06-24 12:29:40.417 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 12:29:41.141 +05:00 [INF] Request starting HTTP/1.1 GET http://localhost:7120/ - null null
+2026-06-24 12:29:41.157 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:29:41.167 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 12:29:41.167 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:29:41.168 +05:00 [INF] Request finished HTTP/1.1 GET http://localhost:7120/index.html - 200 null text/html 32.8542ms
+2026-06-24 12:29:41.171 +05:00 [INF] Request starting HTTP/1.1 GET http://localhost:7120/assets/index-D8JuH2A-.js - null null
+2026-06-24 12:29:41.171 +05:00 [INF] Request starting HTTP/1.1 GET http://localhost:7120/assets/index-CGGME6da.css - null null
+2026-06-24 12:29:41.175 +05:00 [INF] Sending file. Request path: '/assets/index-CGGME6da.css'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-CGGME6da.css'
+2026-06-24 12:29:41.175 +05:00 [INF] Request finished HTTP/1.1 GET http://localhost:7120/assets/index-CGGME6da.css - 200 126910 text/css 4.3875ms
+2026-06-24 12:29:41.176 +05:00 [INF] Sending file. Request path: '/assets/index-D8JuH2A-.js'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-D8JuH2A-.js'
+2026-06-24 12:29:41.176 +05:00 [INF] Request finished HTTP/1.1 GET http://localhost:7120/assets/index-D8JuH2A-.js - 200 853383 text/javascript 5.4692ms
+2026-06-24 12:29:42.952 +05:00 [INF] Request starting HTTP/1.1 HEAD http://localhost:7120/ - null null
+2026-06-24 12:29:42.954 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:29:42.954 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:29:42.954 +05:00 [INF] Request finished HTTP/1.1 HEAD http://localhost:7120/index.html - 200 null text/html 3.5362ms
+2026-06-24 12:29:56.767 +05:00 [INF] Request starting HTTP/1.1 GET http://localhost:7120/login - null null
+2026-06-24 12:29:56.770 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:29:56.771 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 12:29:56.771 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:29:56.771 +05:00 [INF] Request finished HTTP/1.1 GET http://localhost:7120/index.html - 200 null text/html 4.5624ms
+2026-06-24 12:30:09.869 +05:00 [INF] Request starting HTTP/1.1 GET http://127.0.0.1:7120/ - null null
+2026-06-24 12:30:09.870 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:30:09.870 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 12:30:09.870 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:30:09.870 +05:00 [INF] Request finished HTTP/1.1 GET http://127.0.0.1:7120/index.html - 200 1173 text/html 1.4954ms
+2026-06-24 12:30:41.235 +05:00 [INF] Request starting HTTP/1.1 GET http://localhost:7120/app - null null
+2026-06-24 12:30:41.236 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:30:41.236 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 12:30:41.237 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 12:30:41.237 +05:00 [INF] Request finished HTTP/1.1 GET http://localhost:7120/index.html - 200 null text/html 1.5639ms
+2026-06-24 12:30:41.258 +05:00 [INF] Request starting HTTP/1.1 GET http://localhost:7120/api/identity/me - null null
+2026-06-24 12:30:41.258 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 12:30:41.267 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 12:30:41.270 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 12:30:41.272 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.8376ms.
+2026-06-24 12:30:41.273 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 12:30:41.290 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 21.8689ms
+2026-06-24 12:30:41.290 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 12:30:41.291 +05:00 [INF] Request finished HTTP/1.1 GET http://localhost:7120/api/identity/me - 200 null application/json; charset=utf-8 32.772ms
+2026-06-24 12:31:20.356 +05:00 [INF] Application is shutting down...
+2026-06-24 13:14:43.653 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 13:14:43.768 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 13:14:44.058 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 13:14:44.058 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 13:14:44.058 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 13:14:44.058 +05:00 [INF] Hosting environment: Development
+2026-06-24 13:14:44.058 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 13:14:51.452 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/favicon.ico - null null
+2026-06-24 13:14:51.484 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/favicon.ico - 404 0 null 40.7272ms
+2026-06-24 13:14:51.485 +05:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7020/favicon.ico, Response status code: 404
+2026-06-24 13:14:51.868 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:14:51.870 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:14:51.882 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:14:51.886 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:14:51.889 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 1.4395ms.
+2026-06-24 13:14:51.891 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:14:51.921 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 37.5474ms
+2026-06-24 13:14:51.921 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:14:51.921 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 53.7279ms
+2026-06-24 13:14:52.181 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 13:14:52.182 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:14:52.188 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 13:14:52.278 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:14:52.989 +05:00 [INF] Executed DbCommand (6ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 13:14:53.048 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 769.9994ms.
+2026-06-24 13:14:53.050 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 13:14:53.080 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 891.1212ms
+2026-06-24 13:14:53.080 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:14:53.089 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 908.4527ms
+2026-06-24 13:46:41.550 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 13:46:41.655 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 13:46:41.953 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 13:46:41.954 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 13:46:41.954 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 13:46:41.954 +05:00 [INF] Hosting environment: Development
+2026-06-24 13:46:41.954 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 13:47:54.756 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:47:54.778 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:47:54.783 +05:00 [INF] The file /index.html was not modified
+2026-06-24 13:47:54.784 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:47:54.787 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 36.9381ms
+2026-06-24 13:47:55.009 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:47:55.010 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:47:55.041 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:47:55.045 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:47:55.047 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 1.1374ms.
+2026-06-24 13:47:55.050 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:47:55.083 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 40.4515ms
+2026-06-24 13:47:55.083 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:47:55.084 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 74.7097ms
+2026-06-24 13:47:55.344 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 13:47:55.345 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:47:55.349 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 13:47:55.435 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:47:56.237 +05:00 [ERR] CodeList failed for user "b4a46776-57f1-4f6a-96f8-82e2f411639b"
+System.OperationCanceledException: The operation was canceled.
+   at System.Threading.CancellationToken.ThrowOperationCanceledException()
+   at System.Threading.CancellationToken.ThrowIfCancellationRequested()
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at SmartQr.Api.Persistence.Repositories.CodeRepository.ListByUserAsync(Guid userId, String q, CancellationToken ct) in /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/Persistence/Repositories/CodeRepository.cs:line 43
+   at SmartQr.Api.Infrastructure.Codes.QueryHandlers.CodeListQueryHandler.HandleAsync(CodeListQuery request, CancellationToken ct) in /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/Infrastructure/Codes/QueryHandlers/CodeListQueryHandler.cs:line 26
+2026-06-24 13:47:56.238 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.ObjectResult in 803.074ms.
+2026-06-24 13:47:56.238 +05:00 [INF] Executing ObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ProblemDetails'.
+2026-06-24 13:47:56.254 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 904.3326ms
+2026-06-24 13:47:56.254 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:47:56.257 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 500 null application/problem+json; charset=utf-8 913.0123ms
+2026-06-24 13:48:01.254 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 13:48:01.376 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 13:48:01.722 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 13:48:01.722 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 13:48:01.723 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 13:48:01.723 +05:00 [INF] Hosting environment: Development
+2026-06-24 13:48:01.723 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 13:52:40.455 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 13:52:40.497 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 13:52:40.721 +05:00 [ERR] Hosting failed to start
+System.IO.IOException: Failed to bind to address https://127.0.0.1:7020: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Address already in use
+ ---> System.Net.Sockets.SocketException (48): Address already in use
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__14_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+   at Microsoft.Extensions.Hosting.Internal.Host.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+2026-06-24 13:53:01.023 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:53:01.049 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:53:01.061 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:53:01.061 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:53:01.062 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 1173 text/html 47.1738ms
+2026-06-24 13:53:01.090 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/ - null null
+2026-06-24 13:53:01.090 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:53:01.093 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:53:01.093 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:53:01.094 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 1173 text/html 4.9779ms
+2026-06-24 13:53:01.123 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/index.html - null null
+2026-06-24 13:53:01.125 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:53:01.125 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 1173 text/html 1.6353ms
+2026-06-24 13:53:01.151 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/health - null null
+2026-06-24 13:53:01.152 +05:00 [INF] Executing endpoint 'Health checks'
+2026-06-24 13:53:01.155 +05:00 [INF] Executed endpoint 'Health checks'
+2026-06-24 13:53:01.155 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/health - 200 null text/plain 3.3155ms
+2026-06-24 13:53:39.895 +05:00 [INF] Application is shutting down...
+2026-06-24 13:53:49.026 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 13:53:49.068 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 13:53:49.278 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 13:53:49.278 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 13:53:49.278 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 13:53:49.278 +05:00 [INF] Hosting environment: Development
+2026-06-24 13:53:49.278 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 13:54:04.043 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:54:04.054 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:54:04.062 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:54:04.063 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:54:04.063 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 25.2099ms
+2026-06-24 13:54:04.068 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - null null
+2026-06-24 13:54:04.068 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - null null
+2026-06-24 13:54:04.073 +05:00 [INF] Sending file. Request path: '/assets/index-CGGME6da.css'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-CGGME6da.css'
+2026-06-24 13:54:04.073 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - 200 126910 text/css 4.5652ms
+2026-06-24 13:54:04.073 +05:00 [INF] Sending file. Request path: '/assets/index-D8JuH2A-.js'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-D8JuH2A-.js'
+2026-06-24 13:54:04.074 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - 200 853383 text/javascript 5.2905ms
+2026-06-24 13:54:04.122 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:54:04.123 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:54:04.129 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:54:04.130 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:54:04.132 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.5694ms.
+2026-06-24 13:54:04.133 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:54:04.144 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 14.1786ms
+2026-06-24 13:54:04.144 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:54:04.144 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 21.836ms
+2026-06-24 13:54:19.363 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:54:19.364 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:54:19.364 +05:00 [INF] The file /index.html was not modified
+2026-06-24 13:54:19.364 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:54:19.365 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 1.7643ms
+2026-06-24 13:54:19.369 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - null null
+2026-06-24 13:54:19.369 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - null null
+2026-06-24 13:54:19.369 +05:00 [INF] The file /assets/index-CGGME6da.css was not modified
+2026-06-24 13:54:19.369 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - 304 null text/css 0.3781ms
+2026-06-24 13:54:19.369 +05:00 [INF] The file /assets/index-D8JuH2A-.js was not modified
+2026-06-24 13:54:19.369 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - 304 null text/javascript 0.4931ms
+2026-06-24 13:54:19.380 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:54:19.380 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:54:19.381 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:54:19.381 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:54:19.381 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0606ms.
+2026-06-24 13:54:19.381 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:54:19.381 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.6468ms
+2026-06-24 13:54:19.381 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:54:19.381 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.8197ms
+2026-06-24 13:56:25.215 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:56:25.215 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:56:25.216 +05:00 [INF] The file /index.html was not modified
+2026-06-24 13:56:25.216 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:56:25.216 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 0.7243ms
+2026-06-24 13:56:25.266 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - null null
+2026-06-24 13:56:25.266 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - null null
+2026-06-24 13:56:25.267 +05:00 [INF] The file /assets/index-CGGME6da.css was not modified
+2026-06-24 13:56:25.267 +05:00 [INF] The file /assets/index-D8JuH2A-.js was not modified
+2026-06-24 13:56:25.267 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - 304 null text/css 0.3183ms
+2026-06-24 13:56:25.267 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - 304 null text/javascript 0.3095ms
+2026-06-24 13:56:25.313 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:56:25.313 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:56:25.313 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:56:25.314 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:56:25.314 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.016ms.
+2026-06-24 13:56:25.314 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:56:25.315 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 1.0417ms
+2026-06-24 13:56:25.315 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:56:25.315 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.3626ms
+2026-06-24 13:58:05.443 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/ - null null
+2026-06-24 13:58:05.443 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:05.444 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:05.444 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:05.444 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 0.8755ms
+2026-06-24 13:58:05.445 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/index.html - null null
+2026-06-24 13:58:05.445 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:05.445 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 1173 text/html 0.2966ms
+2026-06-24 13:58:05.447 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:58:05.447 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:05.448 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:05.448 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:05.449 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/abc/edit - null null
+2026-06-24 13:58:05.449 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:05.449 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:05.449 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:05.449 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 0.4296ms
+2026-06-24 13:58:05.449 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 1.8845ms
+2026-06-24 13:58:05.450 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/health - null null
+2026-06-24 13:58:05.450 +05:00 [INF] Executing endpoint 'Health checks'
+2026-06-24 13:58:05.452 +05:00 [INF] Executed endpoint 'Health checks'
+2026-06-24 13:58:05.452 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/health - 200 null text/plain 1.936ms
+2026-06-24 13:58:26.499 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:58:26.500 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:58:26.500 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:58:26.500 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:58:26.500 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0661ms.
+2026-06-24 13:58:26.500 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:58:26.500 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.4015ms
+2026-06-24 13:58:26.500 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:58:26.500 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.3205ms
+2026-06-24 13:58:26.764 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 13:58:26.764 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:58:26.772 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 13:58:26.819 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:58:27.127 +05:00 [INF] Executed DbCommand (6ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 13:58:27.156 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 336.9222ms.
+2026-06-24 13:58:27.156 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 13:58:27.164 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 391.3101ms
+2026-06-24 13:58:27.164 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:58:27.165 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 401.8747ms
+2026-06-24 13:58:30.073 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 13:58:30.073 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:58:30.073 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 13:58:30.073 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:58:30.073 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0345ms.
+2026-06-24 13:58:30.074 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 13:58:30.074 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.4646ms
+2026-06-24 13:58:30.074 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 13:58:30.074 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 1.1115ms
+2026-06-24 13:58:30.333 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 13:58:30.333 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:58:30.333 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 13:58:30.334 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 13:58:30.359 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 13:58:30.360 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 25.747ms.
+2026-06-24 13:58:30.360 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 13:58:30.360 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 26.9533ms
+2026-06-24 13:58:30.360 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 13:58:30.360 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 27.501ms
+2026-06-24 13:58:33.969 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 13:58:33.969 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:33.969 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:33.969 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:33.969 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 0.576ms
+2026-06-24 13:58:33.970 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/ - null null
+2026-06-24 13:58:33.970 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:33.970 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:33.970 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 13:58:33.970 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 0.32ms
+2026-06-24 13:58:33.972 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/index.html - null null
+2026-06-24 13:58:33.972 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 13:58:33.973 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 1173 text/html 0.2519ms
+2026-06-24 13:59:20.701 +05:00 [INF] Application is shutting down...
+2026-06-24 13:59:56.493 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 13:59:56.533 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 13:59:56.757 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 13:59:56.757 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 13:59:56.757 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 13:59:56.757 +05:00 [INF] Hosting environment: Development
+2026-06-24 13:59:56.757 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 14:00:09.156 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 14:00:09.168 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:09.169 +05:00 [INF] The file /index.html was not modified
+2026-06-24 14:00:09.169 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:09.171 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 304 null text/html 19.5185ms
+2026-06-24 14:00:09.177 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - null null
+2026-06-24 14:00:09.177 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - null null
+2026-06-24 14:00:09.179 +05:00 [INF] The file /assets/index-CGGME6da.css was not modified
+2026-06-24 14:00:09.179 +05:00 [INF] The file /assets/index-D8JuH2A-.js was not modified
+2026-06-24 14:00:09.179 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CGGME6da.css - 304 null text/css 1.2943ms
+2026-06-24 14:00:09.179 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-D8JuH2A-.js - 304 null text/javascript 1.295ms
+2026-06-24 14:00:09.223 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 14:00:09.224 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:00:09.230 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 14:00:09.232 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:00:09.233 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.4586ms.
+2026-06-24 14:00:09.235 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 14:00:09.250 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 18.1103ms
+2026-06-24 14:00:09.250 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:00:09.250 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 26.4514ms
+2026-06-24 14:00:09.880 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 14:00:09.882 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:00:09.882 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 14:00:09.882 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:00:09.882 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.0307ms.
+2026-06-24 14:00:09.882 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 14:00:09.883 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 0.5758ms
+2026-06-24 14:00:09.883 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:00:09.883 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 2.8425ms
+2026-06-24 14:00:18.979 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/health - null null
+2026-06-24 14:00:18.979 +05:00 [INF] Executing endpoint 'Health checks'
+2026-06-24 14:00:18.981 +05:00 [INF] Executed endpoint 'Health checks'
+2026-06-24 14:00:18.982 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/health - 200 null text/plain 2.8038ms
+2026-06-24 14:00:18.983 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/ - null null
+2026-06-24 14:00:18.983 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:18.984 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 14:00:18.984 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:18.984 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 1.291ms
+2026-06-24 14:00:18.986 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/index.html - null null
+2026-06-24 14:00:18.987 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 14:00:18.988 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 14:00:18.988 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 1173 text/html 2.4163ms
+2026-06-24 14:00:18.988 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:18.988 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 14:00:18.989 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:18.989 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 1.4656ms
+2026-06-24 14:00:18.989 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app/x/edit - null null
+2026-06-24 14:00:18.990 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:18.990 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 14:00:18.990 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:00:18.990 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 0.5899ms
+2026-06-24 14:00:43.313 +05:00 [INF] Application is shutting down...
+2026-06-24 14:29:54.657 +05:00 [INF] Migrations up to date (4 applied).
+2026-06-24 14:29:54.766 +05:00 [INF] User profile is available. Using '/Users/max/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-24 14:29:55.034 +05:00 [INF] Now listening on: https://localhost:7020
+2026-06-24 14:29:55.034 +05:00 [INF] Now listening on: http://localhost:7021
+2026-06-24 14:29:55.034 +05:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-24 14:29:55.034 +05:00 [INF] Hosting environment: Development
+2026-06-24 14:29:55.034 +05:00 [INF] Content root path: /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api
+2026-06-24 14:29:59.076 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/app - null null
+2026-06-24 14:29:59.096 +05:00 [INF] Executing endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:29:59.113 +05:00 [INF] Sending file. Request path: '/index.html'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/index.html'
+2026-06-24 14:29:59.113 +05:00 [INF] Executed endpoint 'Fallback {*path:nonfile}'
+2026-06-24 14:29:59.114 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/index.html - 200 null text/html 42.976ms
+2026-06-24 14:29:59.133 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-BFAD0eWQ.css - null null
+2026-06-24 14:29:59.133 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/assets/index-CeLJYV8_.js - null null
+2026-06-24 14:29:59.143 +05:00 [INF] Sending file. Request path: '/assets/index-BFAD0eWQ.css'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-BFAD0eWQ.css'
+2026-06-24 14:29:59.144 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-BFAD0eWQ.css - 200 128010 text/css 11.1634ms
+2026-06-24 14:29:59.144 +05:00 [INF] Sending file. Request path: '/assets/index-CeLJYV8_.js'. Physical path: '/Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ventures/smart-qr-poc/platform/src/backend/SmartQr.Api/wwwroot/assets/index-CeLJYV8_.js'
+2026-06-24 14:29:59.145 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/assets/index-CeLJYV8_.js - 200 854794 text/javascript 11.6357ms
+2026-06-24 14:29:59.316 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 14:29:59.316 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:29:59.327 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 14:29:59.331 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:29:59.334 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 1.5477ms.
+2026-06-24 14:29:59.336 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 14:29:59.361 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 32.0872ms
+2026-06-24 14:29:59.361 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:29:59.361 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 45.1993ms
+2026-06-24 14:29:59.634 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 14:29:59.635 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 14:29:59.669 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 14:29:59.799 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:30:00.538 +05:00 [INF] Executed DbCommand (11ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 14:30:00.605 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 805.9118ms.
+2026-06-24 14:30:00.606 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 14:30:00.638 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 969.2957ms
+2026-06-24 14:30:00.639 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 14:30:00.648 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 1014.1745ms
+2026-06-24 14:30:16.232 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/identity/me - null null
+2026-06-24 14:30:16.234 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:30:16.234 +05:00 [INF] Route matched with {action = "Me", controller = "Identity"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Me() on controller SmartQr.Api.Controllers.IdentityController (SmartQr.Api).
+2026-06-24 14:30:16.235 +05:00 [INF] Executing action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:30:16.235 +05:00 [INF] Executed action method SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 0.072ms.
+2026-06-24 14:30:16.235 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Identity.Core.Models.CurrentUserDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 14:30:16.236 +05:00 [INF] Executed action SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api) in 1.6436ms
+2026-06-24 14:30:16.236 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.IdentityController.Me (SmartQr.Api)'
+2026-06-24 14:30:16.236 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/identity/me - 200 null application/json; charset=utf-8 3.5697ms
+2026-06-24 14:30:16.498 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes - null null
+2026-06-24 14:30:16.499 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 14:30:16.499 +05:00 [INF] Route matched with {action = "Get", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Get(System.Threading.CancellationToken, System.String) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 14:30:16.501 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:30:16.523 +05:00 [INF] Executed DbCommand (2ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM codes AS c
+LEFT JOIN routing_rules AS r ON c.id = r.code_id
+WHERE c.user_id = @userId
+ORDER BY c.created_at DESC, c.id
+2026-06-24 14:30:16.525 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 23.8212ms.
+2026-06-24 14:30:16.525 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[System.Collections.Generic.IReadOnlyList`1[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-06-24 14:30:16.525 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api) in 25.6644ms
+2026-06-24 14:30:16.525 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.Get (SmartQr.Api)'
+2026-06-24 14:30:16.525 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes - 200 null application/json; charset=utf-8 27.4184ms
+2026-06-24 14:30:18.015 +05:00 [INF] Request starting HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - null null
+2026-06-24 14:30:18.016 +05:00 [INF] Executing endpoint 'SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api)'
+2026-06-24 14:30:18.021 +05:00 [INF] Route matched with {action = "GetById", controller = "Codes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(System.Guid, System.Threading.CancellationToken) on controller SmartQr.Api.Controllers.CodesController (SmartQr.Api).
+2026-06-24 14:30:18.024 +05:00 [INF] Executing action method SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api) - Validation state: "Valid"
+2026-06-24 14:30:18.053 +05:00 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Guid), @userId='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT c0.id, c0.barcode_format, c0.code_type, c0.created_at, c0.expires_at, c0.fallback_url, c0.is_active, c0.name, c0.never_expires, c0.scan_count, c0.slug, c0.style_json, c0.updated_at, c0.user_id, r.id, r.code_id, r.condition_type, r.condition_value, r.created_at, r.destination, r."order"
+FROM (
+    SELECT c.id, c.barcode_format, c.code_type, c.created_at, c.expires_at, c.fallback_url, c.is_active, c.name, c.never_expires, c.scan_count, c.slug, c.style_json, c.updated_at, c.user_id
+    FROM codes AS c
+    WHERE c.id = @id AND c.user_id = @userId
+    LIMIT 1
+) AS c0
+LEFT JOIN routing_rules AS r ON c0.id = r.code_id
+ORDER BY c0.id
+2026-06-24 14:30:18.055 +05:00 [INF] Executed action method SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 31.6921ms.
+2026-06-24 14:30:18.055 +05:00 [INF] Executing OkObjectResult, writing value of type 'WoW.Two.Sdk.Backend.Beta.Web.Contracts.ApiResponse`1+Success[[SmartQr.Api.Application.Codes.Core.Models.CodeDto, SmartQr.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-24 14:30:18.056 +05:00 [INF] Executed action SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api) in 35.7247ms
+2026-06-24 14:30:18.056 +05:00 [INF] Executed endpoint 'SmartQr.Api.Controllers.CodesController.GetById (SmartQr.Api)'
+2026-06-24 14:30:18.057 +05:00 [INF] Request finished HTTP/2 GET https://localhost:7020/api/codes/7ed82d81-2a52-4b88-a00b-d07e21e19947 - 200 null application/json; charset=utf-8 42.3403ms
