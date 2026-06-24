@@ -9,16 +9,18 @@
    Light @theme defaults + .dark overrides. `accent` (teal "pop") is app-defined here until the
    first-class SDK token ships in a published bump. */
 @theme {
-  /* surfaces — light (lavender canvas → white cards) */
-  --color-background: #dcdfea;
-  --color-card: #ffffff;
+  /* surfaces — light (lavender canvas → soft tinted cards; tuned to the Visa ref) */
+  --color-background: #d9dde8;
+  --color-card: #ebeef4;
+  --color-popover: #ebeef4;
+  --color-popover-foreground: #1c1d26;
   --color-muted: #f1f2f8;
   --color-foreground: #1c1d26;
   --color-muted-foreground: #6e7188;
   --color-subtle-foreground: #9b9fb5;
   --color-border: #e4e6f0;
   --color-border-strong: #c7cad9;
-  --color-input: #dcdfea;
+  --color-input: #e4e6f0;
   --color-ring: #8b5cf6;
   /* brand — violet */
   --color-primary: #7c3aed;
@@ -39,6 +41,8 @@
 .dark {
   --color-background: #121214;
   --color-card: #1c1c1f;
+  --color-popover: #1c1c1f;
+  --color-popover-foreground: #e7e7e9;
   --color-muted: #18181b;
   --color-foreground: #e7e7e9;
   --color-muted-foreground: #a1a1aa;
@@ -61,6 +65,11 @@
 
 /* Geist as the app's default sans (mono available via the `font-mono` utility / --font-mono). */
 body { font-family: var(--font-sans); }
+
+/* Soft card bevel (light) — tinted top-light inset + soft bottom shadow, tuned to the Visa ref.
+   Pair with Card `variant="flat"` so the SDK border/shadow doesn't double up. Dark cards use the sheen. */
+.surface-soft { box-shadow: inset 0 1px 0 0 #edf1f8, 0 8px 22px -10px #d7dbe6, 0 2px 6px -3px #d7dbe6; }
+.dark .surface-soft { box-shadow: none; }
 
 /* Blog article typography. Authored posts wrap their body in <article class="prose"> and use plain
    HTML elements; these rules give them rhythm using the lib's semantic color tokens (so they track

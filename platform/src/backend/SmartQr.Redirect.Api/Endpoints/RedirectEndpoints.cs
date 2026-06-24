@@ -16,9 +16,9 @@ public static class RedirectEndpoints
     private static async Task<IResult> HandleAsync(
         string slug,
         HttpContext http,
-        IRedirectConfigStore store,
-        IRoutingEvaluator evaluator,
-        IDeviceDetector deviceDetector,
+        IRedirectConfigRepository store,
+        IRoutingService routingService,
+        IDeviceResolver deviceResolver,
         IGeoResolver geoResolver,
         IScanRecorder recorder,
         CancellationToken ct)
@@ -33,7 +33,7 @@ public static class RedirectEndpoints
         var context = new ScanContext
         {
             Slug = slug,
-            Device = deviceDetector.Detect(userAgent),
+            Device = deviceResolver.Resolve(userAgent),
             CountryCode = geoResolver.ResolveCountry(ip),
             Language = ParsePrimaryLanguage(http.Request.Headers.AcceptLanguage.ToString()),
             NowUtc = DateTimeOffset.UtcNow,
@@ -42,7 +42,7 @@ public static class RedirectEndpoints
             IpAddress = ip,
         };
 
-        var decision = evaluator.Evaluate(config, context);
+        var decision = routingService.Evaluate(config, context);
 
         switch (decision.Outcome)
         {

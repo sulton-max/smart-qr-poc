@@ -1,15 +1,18 @@
-using SmartQr.Codes.Models;
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Enums;
 using ZXing.Common;
 
 namespace SmartQr.Codes.Rendering;
 
-/// <summary>ZXing.Net-backed barcode renderer. Emits SVG (vector, managed — no native deps).</summary>
+/// <summary>Provides a ZXing.Net-backed <see cref="IBarcodeRenderer"/> that emits plain managed SVG.</summary>
 public sealed class BarcodeRenderer : IBarcodeRenderer
 {
     /// <inheritdoc />
-    public string RenderSvg(string payload, BarcodeFormat format, CodeRenderOptions options)
+    public string RenderSvg(string payload, BarcodeFormat format, StyleSpec style)
     {
+        // Barcodes render plain, so the style is not consumed yet.
+        _ = style;
+
         var writer = new ZXing.BarcodeWriterSvg
         {
             Format = MapFormat(format),

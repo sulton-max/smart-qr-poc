@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@wow-two-beta/ui/actions";
-import { Badge, Card, Heading, Text } from "@wow-two-beta/ui/display";
+import { Card, Heading, Text } from "@wow-two-beta/ui/display";
 import { Alert, Banner, MeterBar, Spinner } from "@wow-two-beta/ui/feedback";
 import { Center, Grid, HStack, Stack } from "@wow-two-beta/ui/layout";
 import { ArrowUpRight, Check, CreditCard, Infinity as InfinityIcon } from "lucide-react";
@@ -160,14 +160,15 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
       ) : (
         <>
           {/* ── Current plan + usage ── */}
-          <Card className="flex flex-col gap-5 p-6">
+          <Card className="surface-soft flex flex-col gap-5 p-6">
             <HStack wrap="wrap" align="start" justify="between" gap="4">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">{PLAN_META[currentPlan].name}</span>
-                  <Badge variant={currentPlan === Plan.Free ? "neutral" : "success"} size="sm">
+                  <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    <span className={`size-1.5 rounded-full ${currentPlan === Plan.Free ? "bg-subtle-foreground" : "bg-accent"}`} />
                     {currentPlan === Plan.Free ? "Free plan" : "Active"}
-                  </Badge>
+                  </span>
                 </div>
                 <Text size="sm" color="muted" className="mt-1">{PLAN_META[currentPlan].tagline}</Text>
               </div>
@@ -226,7 +227,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                 {upgradePlans.map((plan) => {
                   const meta = PLAN_META[plan];
                   return (
-                    <Card key={plan} className="flex flex-col gap-4 p-5">
+                    <Card key={plan} className="surface-soft flex flex-col gap-4 p-5">
                       <div>
                         <HStack align="baseline" justify="between" gap="2">
                           <span className="text-base font-semibold">{meta.name}</span>
@@ -262,7 +263,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
               </Grid>
             </Stack>
           ) : (
-            <Card className="p-6">
+            <Card className="surface-soft p-6">
               <Text size="sm" color="muted">
                 You're on the top plan — nothing more to upgrade to. Use{" "}
                 <span className="font-medium text-foreground">Manage billing</span> to update your payment

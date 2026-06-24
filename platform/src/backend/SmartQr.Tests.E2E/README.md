@@ -14,7 +14,7 @@ The rule: a behavior observable through an endpoint is proven **here** (E2E); on
 
 ## Why E2E-first (not unit / mock-heavy integration)
 
-smart-qr has **no external 3rd-party APIs in the hot paths** (geo = `NoopGeoResolver`, device detection = in-proc UA parse, analytics = in-proc channel, code-gen = managed). Only Postgres is external; Redis is optional; Google and Stripe are the two outbound seams, both faked at the host boundary (`FakeGoogleTokenVerifier`, `FakeBillingGateway`). So E2E mocks almost nothing and covers the whole flow — including the two-host wedge that handler/unit tests can't see.
+smart-qr has **no external 3rd-party APIs in the hot paths** (geo = `NoopGeoResolver`, device detection = in-proc UA parse, analytics = in-proc channel, code-gen = managed). Only Postgres is external; Redis is optional; Google and Stripe are the two outbound seams, both faked at the host boundary (`FakeGoogleTokenVerifier`, `FakeBillingBroker`). So E2E mocks almost nothing and covers the whole flow — including the two-host wedge that handler/unit tests can't see.
 
 ## Prerequisite: Docker
 
@@ -26,7 +26,7 @@ Testcontainers spins an ephemeral `postgres:16-alpine` per run. **Docker must be
 dotnet test SmartQr.E2ETests/SmartQr.E2ETests.csproj
 ```
 
-One shared container for the whole run (xUnit collection fixture); both hosts boot in-proc against it; migrations auto-apply on startup; **Respawn** truncates the data tables (never `migration_history`) between tests. The shared `FakeBillingGateway` is reset between tests alongside the DB.
+One shared container for the whole run (xUnit collection fixture); both hosts boot in-proc against it; migrations auto-apply on startup; **Respawn** truncates the data tables (never `migration_history`) between tests. The shared `FakeBillingBroker` is reset between tests alongside the DB.
 
 ## Coverage
 
@@ -40,4 +40,4 @@ One shared container for the whole run (xUnit collection fixture); both hosts bo
 
 ## Harness
 
-`Harness/` rides the wow-two backend-beta SDK testing package (`WebApiTestHost<T>`, `MultiHostFixture`, `PostgresFixture` + Respawn). `AppFixture` boots both hosts over one shared container and swaps the two external seams (`IGoogleIdTokenVerifier`, `IBillingGateway`) plus fake Stripe settings for deterministic E2E. Billing tests stage a webhook event on the shared `FakeBillingGateway` and assert the result through `/api/billing/me` and the redirect host.
+`Harness/` rides the wow-two backend-beta SDK testing package (`WebApiTestHost<T>`, `MultiHostFixture`, `PostgresFixture` + Respawn). `AppFixture` boots both hosts over one shared container and swaps the two external seams (`IGoogleIdTokenVerifier`, `IBillingBroker`) plus fake Stripe settings for deterministic E2E. Billing tests stage a webhook event on the shared `FakeBillingBroker` and assert the result through `/api/billing/me` and the redirect host.

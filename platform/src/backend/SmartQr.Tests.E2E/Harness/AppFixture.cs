@@ -20,9 +20,9 @@ using WoW.Two.Sdk.Backend.Beta.Testing.MultiHost;
 // Disambiguate the two top-level `Program` types (both live in the global namespace of their assembly).
 using ApiProgram = apihost::Program;
 using RedirectProgram = redirecthost::Program;
-// Billing config type — alias to the API settings class (vs the unrelated SDK Billing namespace).
-using BillingSettings = SmartQr.Api.Settings.Billing;
-using BillingPrices = SmartQr.Api.Settings.BillingPrices;
+// Billing config types — aliased to the API settings classes (vs the unrelated SDK Billing namespace).
+using BillingSettings = SmartQr.Api.Settings.BillingSettings;
+using BillingPricesSettings = SmartQr.Api.Settings.BillingPricesSettings;
 
 namespace SmartQr.Tests.E2E.Harness;
 
@@ -49,8 +49,8 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
 
     private readonly PostgresFixture _postgres;
 
-    /// <summary>The fake Stripe gateway wired into the Api host — set <see cref="FakeBillingGateway.NextEvent"/> to drive a webhook, read its captured last-call fields after a checkout/portal. No real Stripe.</summary>
-    public FakeBillingGateway Gateway { get; } = new();
+    /// <summary>The fake Stripe broker wired into the Api host — set <see cref="FakeBillingBroker.NextEvent"/> to drive a webhook, read its captured last-call fields after a checkout/portal. No real Stripe.</summary>
+    public FakeBillingBroker Gateway { get; } = new();
 
     /// <summary>The shared Postgres fixture (container and Respawn).</summary>
     public PostgresFixture Postgres => _postgres;
@@ -81,9 +81,9 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
                 services.RemoveAll<IGoogleIdTokenVerifier>();
                 services.AddScoped<IGoogleIdTokenVerifier>(_ => new FakeGoogleTokenVerifier());
 
-                // Fake billing gateway (no network) shared across the run so a test can stage a webhook event.
-                services.RemoveAll<IBillingGateway>();
-                services.AddSingleton<IBillingGateway>(Gateway);
+                // Fake billing broker (no network) shared across the run so a test can stage a webhook event.
+                services.RemoveAll<IBillingBroker>();
+                services.AddSingleton<IBillingBroker>(Gateway);
 
                 // Fake Stripe settings with known price ids — the host loads the real (empty) Billing singleton
                 // from config before this hook, so replace it. Webhook plan resolution reads Billing:Prices.
@@ -92,7 +92,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
                 {
                     SecretKey = "sk_test_fake",
                     WebhookSecret = "whsec_fake",
-                    Prices = new BillingPrices { Solo = PriceSolo, Pro = PricePro, Agency = PriceAgency },
+                    Prices = new BillingPricesSettings { Solo = PriceSolo, Pro = PricePro, Agency = PriceAgency },
                     SuccessUrl = "https://app.example/ok",
                     CancelUrl = "https://app.example/cancel",
                 });
@@ -143,7 +143,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION", _postgres.ConnectionString);
         Environment.SetEnvironmentVariable("REDIRECT_BASE_URL", RedirectBaseUrl);
-        Environment.SetEnvironmentVariable("REDIS_CONNECTION", null); // ensure DbRedirectConfigStore path
+        Environment.SetEnvironmentVariable("REDIS_CONNECTION", null); // ensure DbRedirectConfigRepository path
     }
 
     /// <summary>Snapshots the post-migration schema for Respawn, after both hosts have applied migrations.</summary>

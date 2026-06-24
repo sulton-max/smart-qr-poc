@@ -3,7 +3,7 @@
 *Last updated: 2026-06-15*
 
 > Stripe subscription billing for Smart QR — **international only, TEST mode**, Hosted Checkout (`mode=subscription`) + Customer Portal, **no on-site card capture**.
-> Keyed by the existing guest `UserId` (`ICurrentUser.Id` / `CodeEntity.UserId`); **no auth built this pass**. Stripe behind `IBillingGateway`; this doc points to code paths, never restates code.
+> Keyed by the existing guest `UserId` (`ICurrentUser.Id` / `CodeEntity.UserId`); **no auth built this pass**. Stripe behind `IBillingBroker`; this doc points to code paths, never restates code.
 > **Status: built (backend + frontend + 23 new units), 2026-06-15.** Sections below describe the as-built shape.
 
 ## Scope & invariants
@@ -116,7 +116,7 @@ Response `ApiResponse<CheckoutSessionDto>.Ok`, `CheckoutSessionDto { string Url 
 { "data": { "url": "https://checkout.stripe.com/c/pay/cs_test_…" } }
 ```
 
-Flow: controller → `BillingCheckoutCommand { UserId, Plan }` → handler resolves the price id via `PlanPriceMap.PriceIdFor(billing, plan)` (`Free`/unconfigured ⇒ `Failure { InvalidPlan = true }` → 400), calls `IBillingGateway.CreateCheckoutSessionAsync(userId, priceId, successUrl, cancelUrl, ct)` (sets `client_reference_id = UserId`, `mode=subscription`, URLs from config) → returns the hosted URL. Frontend redirects the browser to it.
+Flow: controller → `BillingCheckoutCommand { UserId, Plan }` → handler resolves the price id via `PlanPriceMap.PriceIdFor(billing, plan)` (`Free`/unconfigured ⇒ `Failure { InvalidPlan = true }` → 400), calls `IBillingBroker.CreateCheckoutSessionAsync(userId, priceId, successUrl, cancelUrl, ct)` (sets `client_reference_id = UserId`, `mode=subscription`, URLs from config) → returns the hosted URL. Frontend redirects the browser to it.
 
 ### 2. `POST /api/billing/portal` → `{ url }`
 
@@ -127,11 +127,11 @@ Request: none (body-less). Response `ApiResponse<PortalSessionDto>.Ok`, `PortalS
 { "data": { "url": "https://billing.stripe.com/p/session/test_…" } }
 ```
 
-Flow: `BillingPortalCommand { UserId }` → handler looks up `subscriptions` by `UserId` (`ISubscriptionRepository.GetByUserAsync`) → if no row / no `StripeCustomerId` ⇒ `Failure { NoCustomer = true }` → 404 → else `IBillingGateway.CreatePortalSessionAsync(stripeCustomerId, returnUrl, ct)` (return URL = `CancelUrl`) → hosted URL.
+Flow: `BillingPortalCommand { UserId }` → handler looks up `subscriptions` by `UserId` (`ISubscriptionRepository.GetByUserAsync`) → if no row / no `StripeCustomerId` ⇒ `Failure { NoCustomer = true }` → 404 → else `IBillingBroker.CreatePortalSessionAsync(stripeCustomerId, returnUrl, ct)` (return URL = `CancelUrl`) → hosted URL.
 
 ### 3. `POST /api/billing/webhook` → `200`/`400`
 
-**Not** owner-scoped, **no** `ApiResponse` envelope. The controller reads the raw body verbatim (`StreamReader` on `Request.Body` — no model binding, since signature hashing needs the exact bytes) + the `Stripe-Signature` header → `BillingWebhookCommand { RawBody, StripeSignature }`. The handler calls `IBillingGateway.ParseWebhookEvent(rawBody, signature)` (**synchronous**; verifies against `Billing:WebhookSecret`, throws ⇒ `Failure { InvalidSignature = true }` → 400) which flattens the Stripe event to a `BillingWebhookEvent` (`Models/`) tagged with a `BillingWebhookEventType` enum (`Ignored` / `CheckoutSessionCompleted` / `SubscriptionUpdated` / `SubscriptionDeleted`) — **no Stripe SDK type crosses the gateway**. Handles:
+**Not** owner-scoped, **no** `ApiResponse` envelope. The controller reads the raw body verbatim (`StreamReader` on `Request.Body` — no model binding, since signature hashing needs the exact bytes) + the `Stripe-Signature` header → `BillingWebhookCommand { RawBody, StripeSignature }`. The handler calls `IBillingBroker.ParseWebhookEvent(rawBody, signature)` (**synchronous**; verifies against `Billing:WebhookSecret`, throws ⇒ `Failure { InvalidSignature = true }` → 400) which flattens the Stripe event to a `BillingWebhookEvent` (`Models/`) tagged with a `BillingWebhookEventType` enum (`Ignored` / `CheckoutSessionCompleted` / `SubscriptionUpdated` / `SubscriptionDeleted`) — **no Stripe SDK type crosses the gateway**. Handles:
 
 | `BillingWebhookEventType` | Action |
 |---|---|
@@ -175,7 +175,7 @@ Agency (`cap = int.MaxValue`) never trips. The gate is a **count vs cap**, no St
 
 ## Stripe gateway abstraction
 
-`IBillingGateway` (`SmartQr.Api/Application/Billing/Core/Services/IBillingGateway.cs`) — **no Stripe SDK type crosses the seam**:
+`IBillingBroker` (`SmartQr.Api/Application/Billing/Core/Services/IBillingBroker.cs`) — **no Stripe SDK type crosses the seam**:
 
 - `CreateCheckoutSessionAsync(userId, priceId, successUrl, cancelUrl, ct) → string url`
 - `CreatePortalSessionAsync(stripeCustomerId, returnUrl, ct) → string url`
@@ -183,16 +183,16 @@ Agency (`cap = int.MaxValue`) never trips. The gate is a **count vs cap**, no St
 
 Implementations:
 
-- **`StripeBillingGateway`** (real) — `SmartQr.Api/Infrastructure/Billing/Services/StripeBillingGateway.cs`, uses **Stripe.net** (`SmartQr.Api.csproj` pins `Stripe.net` `52.0.0`). Constructs `SessionService` / `Stripe.BillingPortal.SessionService`, verifies via `EventUtility.ConstructEvent(rawBody, sig, Billing.WebhookSecret)` and flattens the event into a `BillingWebhookEvent`.
-- **`FakeBillingGateway`** (tests) — in `SmartQr.Tests`, returns canned URLs + lets a test hand-craft the returned `BillingWebhookEvent`; **no network, no real Stripe**.
+- **`StripeBillingBroker`** (real) — `SmartQr.Api/Infrastructure/Billing/Services/StripeBillingBroker.cs`, uses **Stripe.net** (`SmartQr.Api.csproj` pins `Stripe.net` `52.0.0`). Constructs `SessionService` / `Stripe.BillingPortal.SessionService`, verifies via `EventUtility.ConstructEvent(rawBody, sig, BillingSettings.WebhookSecret)` and flattens the event into a `BillingWebhookEvent`.
+- **`FakeBillingBroker`** (tests) — in `SmartQr.Tests.E2E/Harness/FakeBillingBroker.cs`, returns canned URLs + lets a test hand-craft the returned `BillingWebhookEvent`; **no network, no real Stripe**.
 
-DI: register `IBillingGateway → StripeBillingGateway` and `ISubscriptionRepository → SubscriptionRepository` in a new `HostConfiguration.AddBilling()` step (`SmartQr.Api/Configurations/HostConfiguration.Extensions.cs`), added to the `Configure(builder)` chain in `HostConfiguration.cs`.
+DI: register `IBillingBroker → StripeBillingBroker` and `ISubscriptionRepository → SubscriptionRepository` in a new `HostConfiguration.AddBilling()` step (`SmartQr.Api/Configurations/HostConfiguration.Extensions.cs`), added to the `Configure(builder)` chain in `HostConfiguration.cs`.
 
 ---
 
 ## Config
 
-New settings class **named `Billing`** (`SmartQr.Api/Settings/Billing.cs`) — **the class name is the appsettings section name** (`ConfigurationLoader.Load<T>` binds `GetSection(typeof(T).Name)`), so it must be `Billing` to match `Billing:Prices:{…}`. Registered as singleton in `HostConfiguration.Extensions.cs::AddSettings()` alongside `ApiSettings` (`builder.Services.AddSingleton(ConfigurationLoader.Load<Billing>(builder.Configuration))`). Secrets carry `[EnvironmentVariable("…")]` for env override (like `SmartQrDbSettings.ConnectionString`).
+Settings class **`BillingSettings`** (`SmartQr.Api/Settings/BillingSettings.cs`) binds the **`Billing`** appsettings section. `ConfigurationLoader.Load<T>` defaults the section to `typeof(T).Name`, so the `Settings`-suffixed type passes the section name explicitly — `Load<BillingSettings>(builder.Configuration, "Billing")` — keeping the config keys (`Billing:Prices:{…}`) and any existing user-secrets unchanged. Registered as a singleton in `HostConfiguration.Extensions.cs::AddSettings()` alongside `ApiSettings`. Secrets carry `[EnvironmentVariable("…")]` for env override.
 
 | Property | Env var | appsettings |
 |---|---|---|
@@ -230,11 +230,11 @@ Once `SubscriptionEntity` is on `SmartQrDbContext`, `SqliteTestDb` builds the `s
 | `SubscriptionRepositoryTests.cs` | upsert by `UserId` / by `StripeSubscriptionId`, unique-per-user, status transition (`active`→`canceled`), `CurrentPeriodEnd` round-trips under SQLite. |
 | `PlanLimitsTests.cs` | `MaxCodes` raw (Free=3, Solo=25, Pro=200, Agency=`int.MaxValue`) + `MaxCodesForApi` Agency collapse to `-1`. |
 | `CodeCreateLimitTests.cs` | **the 402 gate** — construct `CodeCreateCommandHandler` with `CodeRepository` (SQLite) + a Free/Solo subscription; seed N codes; assert create succeeds at `count < cap` and returns `Failure { LimitReached = true }` at `count == cap`; Agency never trips. |
-| `BillingHandlersTests.cs` | checkout handler rejects `Free`, resolves price from config, calls `FakeBillingGateway` and returns its URL; portal handler fails when no `StripeCustomerId`; webhook handler upserts a row from a Fake-parsed `checkout.session.completed` and flips status on `…deleted`. |
+| `BillingHandlersTests.cs` | checkout handler rejects `Free`, resolves price from config, calls `FakeBillingBroker` and returns its URL; portal handler fails when no `StripeCustomerId`; webhook handler upserts a row from a Fake-parsed `checkout.session.completed` and flips status on `…deleted`. |
 | `BillingMeQueryTests.cs` | no row ⇒ `Free/active`, correct `maxCodes` + live `codeCount`; with a Pro row ⇒ Pro limits. |
 | (assert) `RedirectResolutionTests.cs` | **negative guard** — a code whose owner is over-cap still resolves (redirect stays plan-agnostic). Confirm `SmartQr.Redirect.Api` gains **no** billing reference. |
 
-`FakeBillingGateway` lives in `SmartQr.Tests` (implements `IBillingGateway`): canned checkout/portal URLs; `ParseWebhookEvent` returns a test-supplied `BillingWebhookEvent` so webhook-handler logic is exercised without signature/network.
+`FakeBillingBroker` lives in `SmartQr.Tests.E2E/Harness/FakeBillingBroker.cs` (implements `IBillingBroker`): canned checkout/portal URLs; `ParseWebhookEvent` returns a test-supplied `BillingWebhookEvent` so webhook-handler logic is exercised without signature/network.
 
 **As built:** 23 billing units (`PlanLimits` 4 · `CodeCreateLimit` 4 · `SubscriptionRepository` 5 · `BillingHandlers` 7 · `BillingMeQuery` 3) → `SmartQr.Tests` is **44 green** (was 20). `SmartQr.IntegrationTests` unchanged at 18 (no billing E2E this pass).
 
@@ -244,9 +244,9 @@ Once `SubscriptionEntity` is on `SmartQrDbContext`, `SqliteTestDb` builds the `s
 
 As built — paths relative to `SmartQr.Api/` unless prefixed.
 
-**New** — domain: `SmartQr.Common.Domain/Billing/Entities/SubscriptionEntity.cs`, `Billing/Enums/{Plan,SubscriptionStatus}.cs`. Persistence: `SmartQr.Common.Persistence/Configurations/SubscriptionEntityConfiguration.cs`, `Migrations/002-billing/{Apply,Rollback}.sql`. Api application (`Application/Billing/Core/`): `PlanLimits.cs`, `PlanPriceMap.cs`, `Services/{IBillingGateway,ISubscriptionRepository}.cs`, `Commands/{BillingCheckoutCommand,BillingPortalCommand,BillingWebhookCommand}.cs`, `Queries/BillingMeQuery.cs`, `Models/{CheckoutSessionDto,PortalSessionDto,BillingStatusDto,LimitsDto,UsageDto,BillingWebhookEvent,BillingWebhookEventType}.cs` + the per-op results `Models/{BillingCheckoutResult,BillingPortalResult,BillingWebhookResult,BillingMeResult}.cs`. Api infra (`Infrastructure/Billing/`): `CommandHandlers/{BillingCheckoutCommandHandler,BillingPortalCommandHandler,BillingWebhookCommandHandler}.cs`, `QueryHandlers/BillingMeQueryHandler.cs`, `Services/StripeBillingGateway.cs`. Api persistence: `Persistence/Repositories/SubscriptionRepository.cs`. Presentation: `Controllers/BillingController.cs`, `Requests/CheckoutRequest.cs`, `Settings/Billing.cs` (incl. nested `BillingPrices`). Tests (`SmartQr.Tests/`): `{PlanLimitsTests,CodeCreateLimitTests,SubscriptionRepositoryTests,BillingHandlersTests,BillingMeQueryTests}.cs` + `FakeBillingGateway.cs`.
+**New** — domain: `SmartQr.Common.Domain/Billing/Entities/SubscriptionEntity.cs`, `Billing/Enums/{Plan,SubscriptionStatus}.cs`. Persistence: `SmartQr.Common.Persistence/Configurations/SubscriptionEntityConfiguration.cs`, `Migrations/002-billing/{Apply,Rollback}.sql`. Api application (`Application/Billing/Core/`): `PlanLimits.cs`, `PlanPriceMap.cs`, `Services/{IBillingBroker,ISubscriptionRepository}.cs`, `Commands/{BillingCheckoutCommand,BillingPortalCommand,BillingWebhookCommand}.cs`, `Queries/BillingMeQuery.cs`, `Models/{CheckoutSessionDto,PortalSessionDto,BillingStatusDto,LimitsDto,UsageDto,BillingWebhookEvent,BillingWebhookEventType}.cs` + the per-op results `Models/{BillingCheckoutResult,BillingPortalResult,BillingWebhookResult,BillingMeResult}.cs`. Api infra (`Infrastructure/Billing/`): `CommandHandlers/{BillingCheckoutCommandHandler,BillingPortalCommandHandler,BillingWebhookCommandHandler}.cs`, `QueryHandlers/BillingMeQueryHandler.cs`, `Services/StripeBillingBroker.cs`. Api persistence: `Persistence/Repositories/SubscriptionRepository.cs`. Presentation: `Controllers/BillingController.cs`, `Requests/CheckoutRequest.cs`, `Settings/BillingSettings.cs` (incl. nested `BillingPricesSettings`). Tests (`SmartQr.Tests/`): `{PlanLimitsTests,CodeCreateLimitTests,SubscriptionRepositoryTests,BillingHandlersTests,BillingMeQueryTests}.cs` + `FakeBillingBroker.cs`.
 
-**Edited** — `SmartQrDbContext.cs` (`DbSet<SubscriptionEntity>` + `Plan`/`SubscriptionStatus` conversions), `CodeCreateCommandHandler.cs` (limit gate), `CodesController.cs` (`Create` → 402 arm), `ICodeRepository.cs` + `CodeRepository.cs` (`CountByUserAsync`), `CodeCreateResult.cs` (`LimitReached` flag), `HostConfiguration.Extensions.cs` (`AddBilling` + `Billing` settings in `AddSettings`), `HostConfiguration.cs` (chain `.AddBilling()`), `SmartQr.Api.csproj` (`Stripe.net` 52.0.0), `appsettings.json` (empty `Billing` block).
+**Edited** — `SmartQrDbContext.cs` (`DbSet<SubscriptionEntity>` + `Plan`/`SubscriptionStatus` conversions), `CodeCreateCommandHandler.cs` (limit gate), `CodesController.cs` (`Create` → 402 arm), `ICodeRepository.cs` + `CodeRepository.cs` (`CountByUserAsync`), `CodeCreateResult.cs` (`LimitReached` flag), `HostConfiguration.Extensions.cs` (`AddBilling` + `BillingSettings` in `AddSettings`), `HostConfiguration.cs` (chain `.AddBilling()`), `SmartQr.Api.csproj` (`Stripe.net` 52.0.0), `appsettings.json` (empty `Billing` block).
 
 ### Frontend (as built)
 

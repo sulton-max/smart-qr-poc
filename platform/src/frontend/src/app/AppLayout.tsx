@@ -7,6 +7,7 @@ import { Text } from "@wow-two-beta/ui/display";
 import { Logo } from "../marketing/components";
 import { LoginScreen } from "../screens/LoginScreen";
 import { GoogleSignInButton } from "../components/GoogleSignInButton";
+import { ColorModeToggle } from "../components/ColorModeToggle";
 import { getMe, logout } from "../api";
 import type { Me } from "../types";
 
@@ -59,6 +60,7 @@ export function AppLayout() {
         }
         end={
           <HStack as="nav" align="center" gap="5" className="text-sm">
+            <ColorModeToggle />
             {status === "ready" && (
               <Link
                 to="/app/billing"

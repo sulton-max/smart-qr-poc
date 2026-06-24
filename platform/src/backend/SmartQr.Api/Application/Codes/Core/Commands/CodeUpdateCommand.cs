@@ -1,4 +1,5 @@
 using SmartQr.Api.Application.Codes.Core.Models;
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -29,4 +30,7 @@ public sealed record CodeUpdateCommand
 
     /// <summary>Replacement ordered routing rules (the whole set).</summary>
     public IReadOnlyList<RuleDto> Rules { get; init; } = [];
+
+    /// <summary>Optional style to persist; null preserves the code's saved style.</summary>
+    public StyleSpec? Style { get; init; }
 }

@@ -1,19 +1,20 @@
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Enums;
 
 namespace SmartQr.Codes.Models;
 
-/// <summary>A request to render a single code image.</summary>
+/// <summary>Represents a request to render a single code image.</summary>
 public sealed record CodeRenderRequest
 {
-    /// <summary>The data to encode — typically the short redirect URL for a dynamic code.</summary>
+    /// <summary>Gets the data to encode — typically the short redirect URL for a dynamic code.</summary>
     public required string Payload { get; init; }
 
-    /// <summary>Symbology to render. <see cref="BarcodeFormat.QrCode"/> by default.</summary>
-    public BarcodeFormat Symbology { get; init; } = BarcodeFormat.QrCode;
+    /// <summary>Gets the symbology to render.</summary>
+    public required BarcodeFormat Symbology { get; init; }
 
-    /// <summary>Output format. <see cref="ImageFormat.Svg"/> by default (vector-first).</summary>
-    public ImageFormat Format { get; init; } = ImageFormat.Svg;
+    /// <summary>Gets the output image format.</summary>
+    public required ImageFormat Format { get; init; }
 
-    /// <summary>Visual options.</summary>
-    public CodeRenderOptions Options { get; init; } = new();
+    /// <summary>Gets the style contract the emitter consumes.</summary>
+    public required StyleSpec Style { get; init; }
 }

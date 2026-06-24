@@ -20,6 +20,9 @@ public sealed record UpdateCodeApiRequest
 
     /// <summary>Gets the replacement ordered routing rules (the whole set).</summary>
     public IReadOnlyList<RuleApiRequest> Rules { get; init; } = [];
+
+    /// <summary>Gets the optional style to persist — omitted preserves the code's saved style.</summary>
+    public StyleApiRequest? Style { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="UpdateCodeApiRequest"/>.</summary>
@@ -37,6 +40,7 @@ public static class UpdateCodeApiRequestExtensions
             BarcodeFormat = request.BarcodeFormat,
             FallbackUrl = request.FallbackUrl,
             Rules = request.Rules.ToRuleDtos(),
+            Style = request.Style?.ToStyleSpec(),
         };
 
         return command;

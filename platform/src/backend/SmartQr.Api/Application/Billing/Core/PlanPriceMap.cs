@@ -1,5 +1,5 @@
 using SmartQr.Common.Domain.Billing.Enums;
-using BillingSettings = SmartQr.Api.Settings.Billing;
+using BillingSettings = SmartQr.Api.Settings.BillingSettings;
 
 namespace SmartQr.Api.Application.Billing.Core;
 

@@ -18,8 +18,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@wow-two-beta/ui':
-        specifier: 0.0.60
-        version: 0.0.60(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.0)
+        specifier: 0.0.62
+        version: 0.0.62(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.0)
       lucide-react:
         specifier: ^0.460.0
         version: 0.460.0(react@19.2.7)
@@ -674,8 +674,8 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
-  '@wow-two-beta/ui@0.0.60':
-    resolution: {integrity: sha512-lJWni7OQHCiaMd8npDjDRxtXQVAseV3bBpvwxT0j4nOn0wwxvMVWmiCvix0xXAkcrwd3yZ9EXtryy29yOGGlxw==}
+  '@wow-two-beta/ui@0.0.62':
+    resolution: {integrity: sha512-8IA1VSE1RvZ9lHKnBxug2o9emZeRa6ltU5IKeGc7cwlMmmFGYNVvQHMaIPWSL4grsw+HQxJpkto6KvNzCPMGHg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: ^19.0.0
@@ -1515,7 +1515,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@wow-two-beta/ui@0.0.60(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.0)':
+  '@wow-two-beta/ui@0.0.62(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.0)':
     dependencies:
       '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-focus-scope': 1.1.9(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

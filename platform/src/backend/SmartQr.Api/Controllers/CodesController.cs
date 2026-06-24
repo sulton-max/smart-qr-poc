@@ -4,6 +4,8 @@ using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Queries;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Requests;
+using SmartQr.Codes;
+using SmartQr.Codes.Models;
 using SmartQr.Common.Domain.Codes.Enums;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
@@ -19,8 +21,31 @@ public sealed class CodesController(
     ISender sender,
     ICodeRepository repository,
     ICodeImageService imageService,
+    ICodeRenderer renderer,
     ICurrentUser currentUser) : ControllerBase
 {
+    /// <summary>Renders a live, unsaved SVG preview from the supplied style — stateless, no DB. The builder previews the exact bytes the export produces.</summary>
+    /// <remarks>Anonymous-or-guest allowed: it is a pure render with no ownership. <c>value</c> is encoded verbatim into the symbol.</remarks>
+    [HttpPost("preview")]
+    [Produces("image/svg+xml")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IActionResult Preview([FromBody] PreviewCodeApiRequest request)
+    {
+        if (request.CodeType == CodeType.Link)
+            return Problem(detail: "Link codes have no rendered image.", statusCode: StatusCodes.Status400BadRequest);
+
+        var rendered = renderer.Render(new CodeRenderRequest
+        {
+            Payload = request.Value,
+            Symbology = request.ResolveSymbology(),
+            Format = ImageFormat.Svg,
+            Style = request.ToStyleSpec(),
+        });
+
+        return File(rendered.Content, rendered.ContentType);
+    }
+
     /// <summary>Creates a code.</summary>
     [HttpPost]
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]

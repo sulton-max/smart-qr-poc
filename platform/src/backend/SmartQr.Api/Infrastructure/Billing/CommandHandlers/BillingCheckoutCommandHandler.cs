@@ -7,13 +7,13 @@ using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Results;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
-using BillingSettings = SmartQr.Api.Settings.Billing;
+using BillingSettings = SmartQr.Api.Settings.BillingSettings;
 
 namespace SmartQr.Api.Infrastructure.Billing.CommandHandlers;
 
 /// <summary>Handles <see cref="BillingCheckoutCommand"/> — resolves the plan's price id from config and creates a hosted Checkout session.</summary>
 public sealed class BillingCheckoutCommandHandler(
-    IBillingGateway gateway,
+    IBillingBroker gateway,
     BillingSettings settings,
     ILogger<BillingCheckoutCommandHandler> logger)
     : ICommandHandler<BillingCheckoutCommand, AppResult<BillingCheckoutResult.Success, BillingCheckoutResult.Failure>>

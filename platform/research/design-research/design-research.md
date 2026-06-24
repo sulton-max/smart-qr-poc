@@ -21,7 +21,7 @@
 | `surface-subtle` | `#F8F8FC` | nested / hover rows |
 | `border` | `#E4E6F0` | default border on white |
 | `border-strong` | `#C7CAD9` | hover, secondary button |
-| `field-border` | `#DCDFEA` | inputs/selects |
+| `field-border` | `#E4E6F0` | inputs/selects (lightened to match the shape tiles) |
 | `text` | `#1C1D26` | ink / headings / values |
 | `label` | `#3F4152` | field labels |
 | `text-muted` | `#6E7188` | helper-strong, meta |
@@ -109,6 +109,16 @@ Override in `index.css`. ✓ = var confirmed present in lib; ? = standard shadcn
 - Padding: canvas `20`, card `20`; field gap `13`; section divider `0.5px border` + `16` margin.
 - Radii: card `16` · input/select `9` · button `10` · condition chip `7` · state pill `999` · color swatch `5`.
 - Depth: hairline border + `box-shadow: 0 1px 2px rgba(28,29,38,.04)`. **No heavy/colored shadows.**
+
+## Builder layout (v0.5 — tabbed)
+
+- create/edit builder groups into **tabs** — `Destination · Style · Routing` — with the **live preview sticky** in the right pane (always visible). Tabs = SDK `SegmentedControl`.
+- chosen over accordion / section-rail / long-scroll: short panels, scales to v0.5's style controls, preview always beside, mobile-friendly.
+- **Destination** — short link (read-only) · name · fallback URL.
+- **Style** (sub-sections, in order) — Colors (fg/bg + `Solid / Gradient / Transparent bg` toggle) · Body shape · Finder eyes · Logo (upload + size) · Frame + caption.
+- **Routing** — the dense joined rule list (see *Routing rules layout*).
+- one violet **Save** per tab footer; sub-section labels = `text-subtle` 11/500.
+- mobile — tabs persist (or collapse to a select); preview becomes a top strip.
 
 ## Components
 

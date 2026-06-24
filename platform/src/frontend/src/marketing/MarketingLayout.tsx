@@ -3,6 +3,7 @@ import { Button } from "@wow-two-beta/ui/actions";
 import { Container, HStack } from "@wow-two-beta/ui/layout";
 import { Logo } from "./components";
 import { MarketingFooter } from "./MarketingFooter";
+import { ColorModeToggle } from "../components/ColorModeToggle";
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
   return `text-sm transition-colors ${
@@ -31,6 +32,7 @@ export function MarketingLayout() {
             </NavLink>
           </nav>
           <HStack align="center" gap="2">
+            <ColorModeToggle />
             <Button asChild variant="ghost" tone="neutral" size="sm" className="hidden sm:inline-flex">
               <Link to="/app">Open app</Link>
             </Button>

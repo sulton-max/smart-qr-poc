@@ -8,14 +8,14 @@ using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Results;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
-using BillingSettings = SmartQr.Api.Settings.Billing;
+using BillingSettings = SmartQr.Api.Settings.BillingSettings;
 
 namespace SmartQr.Api.Infrastructure.Billing.CommandHandlers;
 
 /// <summary>Handles <see cref="BillingWebhookCommand"/> — verifies the signature and upserts the affected subscription; a bad signature maps to 400 so Stripe retries.</summary>
 public sealed class BillingWebhookCommandHandler(
     ISubscriptionRepository subscriptions,
-    IBillingGateway gateway,
+    IBillingBroker gateway,
     BillingSettings settings,
     ILogger<BillingWebhookCommandHandler> logger)
     : ICommandHandler<BillingWebhookCommand, AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>>

@@ -6,6 +6,7 @@ using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Results;
@@ -64,7 +65,9 @@ public sealed class CodeCreateCommandHandler(
                 FallbackUrl = request.FallbackUrl,
                 IsActive = true,                       // new codes resolve immediately
                 NeverExpires = true,                   // the create request carries no expiry → the never-expire promise holds
-                StyleJson = "{}",                      // empty style placeholder (real default-style content is a future product decision)
+                StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
+                    ? StyleSpecJson.Serialize(style)
+                    : "{}",
                 Rules = request.Rules
                     .Select(r => new RoutingRuleEntity
                     {

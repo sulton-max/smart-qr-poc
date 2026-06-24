@@ -5,14 +5,14 @@ using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Common.Domain.Results;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
-using BillingSettings = SmartQr.Api.Settings.Billing;
+using BillingSettings = SmartQr.Api.Settings.BillingSettings;
 
 namespace SmartQr.Api.Infrastructure.Billing.CommandHandlers;
 
 /// <summary>Handles <see cref="BillingPortalCommand"/> — opens a Customer Portal session from the caller's stored Stripe customer id.</summary>
 public sealed class BillingPortalCommandHandler(
     ISubscriptionRepository subscriptions,
-    IBillingGateway gateway,
+    IBillingBroker gateway,
     BillingSettings settings,
     ILogger<BillingPortalCommandHandler> logger)
     : ICommandHandler<BillingPortalCommand, AppResult<BillingPortalResult.Success, BillingPortalResult.Failure>>

@@ -30,7 +30,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
 
   return (
     <Center className="min-h-[60vh]">
-      <Card className="w-full max-w-sm p-8">
+      <Card className="surface-soft w-full max-w-sm p-8">
         <Stack gap="5">
           <div>
             <Heading level={1} size="xl" weight="bold">

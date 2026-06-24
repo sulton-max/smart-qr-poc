@@ -17,7 +17,7 @@ Serve every scan fast and survive viral spikes (a code on a billboard can do mil
 
 ```
 GET /{slug}                          (minimal API — RedirectEndpoints)
-   → IRedirectConfigStore.GetAsync   (Redis prod / in-memory cache default — O(1), no primary DB)
+   → IRedirectConfigRepository.GetAsync   (Redis prod / in-memory cache default — O(1), no primary DB)
    → resolve device / lang / country  (UA parse + local geo; never an external call)
    → IRoutingEvaluator.Evaluate       (pure, µs — see routing-engine.md)
    → IScanRecorder.Enqueue            (fire-and-forget; drops on overload)
@@ -31,9 +31,9 @@ Analytics is decoupled: `ChannelScanRecorder` is a bounded in-memory queue (drop
 | Type | File |
 |---|---|
 | Endpoint `GET /{slug}` | `platform/src/backend/SmartQr.Redirect.Api/Endpoints/RedirectEndpoints.cs` |
-| `IRedirectConfigStore` | `SmartQr.Redirect.Api/Application/Routing/Services/IRedirectConfigStore.cs` |
-| `CachedRedirectConfigStore` (default: IMemoryCache over DB) | `SmartQr.Redirect.Api/Infrastructure/Routing/CachedRedirectConfigStore.cs` |
-| `RedisRedirectConfigStore` (production) | `SmartQr.Redirect.Api/Infrastructure/Routing/RedisRedirectConfigStore.cs` |
+| `IRedirectConfigRepository` | `SmartQr.Redirect.Api/Application/Routing/Services/IRedirectConfigRepository.cs` |
+| `CachedRedirectConfigRepository` (default: IMemoryCache over DB) | `SmartQr.Redirect.Api/Infrastructure/Routing/CachedRedirectConfigRepository.cs` |
+| `RedisRedirectConfigRepository` (production) | `SmartQr.Redirect.Api/Infrastructure/Routing/RedisRedirectConfigRepository.cs` |
 | `ChannelScanRecorder` (queue) | `SmartQr.Redirect.Api/Infrastructure/Analytics/ChannelScanRecorder.cs` |
 | `ScanFlushBackgroundService` (batch flush) | `SmartQr.Redirect.Api/Infrastructure/Analytics/ScanFlushBackgroundService.cs` |
 | Store/recorder selection (DI) | `SmartQr.Redirect.Api/Configurations/HostConfiguration.Extensions.cs` |

@@ -34,7 +34,7 @@ platform/src/backend/SmartQr.sln
 
 The **redirect** is the only thing that scales under load (a code on a billboard can spike to millions of scans). It's isolated as a slim, stateless, horizontally-scalable minimal-API process that:
 
-- reads the route config from an **`IRedirectConfigStore`** — `CachedRedirectConfigStore` (IMemoryCache over the DB) by default, **`RedisRedirectConfigStore`** in production (one Redis GET/scan, never touches the primary DB);
+- reads the route config from an **`IRedirectConfigRepository`** — `CachedRedirectConfigRepository` (IMemoryCache over the DB) by default, **`RedisRedirectConfigRepository`** in production (one Redis GET/scan, never touches the primary DB);
 - evaluates rules with a **pure `RoutingEvaluator`** (microseconds, no I/O);
 - logs scans through **`ChannelScanRecorder`** (a bounded in-memory queue that *drops* on overload — analytics is best-effort) drained by **`ScanFlushBackgroundService`** in batches. The 302 never waits on a DB write.
 
@@ -85,7 +85,7 @@ Local-only overrides go in `appsettings.Local.json` (gitignored).
 
 - **DB schema / migrations** — entities map to PostgreSQL **enum types** (`code_type`, `barcode_format`, `rule_condition_type`, `device_type`) via Npgsql. A migration/bootstrap that `CREATE TYPE`s those enums + tables is still TODO (mirror Haven's `Haven.Database` service). Until then, data-touching endpoints need a DB whose schema matches.
 - **Geo** — `NoopGeoResolver` returns null; swap for a MaxMind GeoLite2 in-memory lookup to activate country rules.
-- **Redis config writer** — the API should publish/refresh each code's `route:{slug}` JSON to Redis on create/edit (the `RedisRedirectConfigStore` read side is done).
+- **Redis config writer** — the API should publish/refresh each code's `route:{slug}` JSON to Redis on create/edit (the `RedisRedirectConfigRepository` read side is done).
 - **Auth/billing, password interstitial, frontend (React)** — out of POC scope.
 
 ## Status

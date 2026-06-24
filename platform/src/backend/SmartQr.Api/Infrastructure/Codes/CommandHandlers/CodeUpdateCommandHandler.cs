@@ -4,6 +4,7 @@ using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Results;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
@@ -35,6 +36,10 @@ public sealed class CodeUpdateCommandHandler(
             code.CodeType = request.CodeType;
             code.BarcodeFormat = request.BarcodeFormat;
             code.FallbackUrl = request.FallbackUrl;
+
+            // Persist style only when the request carries one — an omitted block preserves the saved style.
+            if (request.Style is { } style)
+                code.StyleJson = StyleSpecJson.Serialize(style);
 
             // Full replace of the rule set.
             code.Rules = request.Rules

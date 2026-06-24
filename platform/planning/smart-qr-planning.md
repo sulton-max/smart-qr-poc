@@ -36,7 +36,7 @@ Shipped + the active/next version only — future work lives in the ordered back
 | Minimal API for Redirect, controllers for Api | Lean hot path; familiar CRUD surface for management. |
 | ImageSharp (2.1, Apache-2.0) for logo, not SkiaSharp | Fully managed, no native-asset friction, license-clean. QR core (QRCoder) needs no native deps. |
 | API-layer folders at host root (no `Api/` wrapper) | Avoids `SmartQr.Api.Api.*`; the project name already says `.Api`. |
-| ~~In-memory config store default~~ → **redirect reads Postgres directly** for v1.0; Redis swap via settings | Edits hit the next scan with **zero invalidation logic**. Cache (in-memory/Redis) deferred — `CachedRedirectConfigStore` kept but unwired; re-enable when scan volume warrants (backlog). |
+| ~~In-memory config store default~~ → **redirect reads Postgres directly** for v1.0; Redis swap via settings | Edits hit the next scan with **zero invalidation logic**. Cache (in-memory/Redis) deferred — `CachedRedirectConfigRepository` kept but unwired; re-enable when scan volume warrants (backlog). |
 | Enums as **text** (not native PG enums) | Removes runtime-migration gotchas; easier schema evolution; consistent across Postgres + SQLite tests. **v0.4:** stored as **snake_case** labels via the SDK `EnumCaseConverter` (Postgres-native casing). |
 | ~~Runtime schema bootstrap (`EnsureCreated` on startup)~~ → **bespoke SQL migrator** | `EnsureCreated` never alters → stale-schema 500 on `user_id`. Replaced with raw-`.sql` Apply/Rollback migrator, auto-applied at startup. EF becomes a pure mapper (schema-first). |
 | Bespoke SQL migrator over EF Migrations / DbUp / Grate | Schema-first, easy squash, Apply/Rollback symmetry, normalized-checksum drift guard, host-agnostic engine reused by a CLI + (later) HTTP endpoint. Also the **proving ground** for the wow-two backend-beta SDK migrator (extract once stable). |
@@ -55,7 +55,7 @@ Shipped + the active/next version only — future work lives in the ordered back
 | `SmartQr.Common.Persistence` (EF Core, Npgsql) | ✅ built — EF mapper + embedded `Migrations/` SQL; **migrator consumed from the SDK** (`WoW2.Sdk.Backend.Beta`, `AddDatabaseBespokeMigrations`) |
 | `SmartQr.Codes` (QR/barcode/logo generation) | ✅ built + tested |
 | `SmartQr.Api` (management API) | ✅ create + manage (edit / toggle / delete / search) |
-| `SmartQr.Redirect.Api` (hot path + async analytics) | ✅ built — direct-DB config read (cache deferred; `CachedRedirectConfigStore` unwired) |
+| `SmartQr.Redirect.Api` (hot path + async analytics) | ✅ built — direct-DB config read (cache deferred; `CachedRedirectConfigRepository` unwired) |
 | `SmartQr.Tests.Unit` | ✅ **16 green** — pure-logic units only, no I/O: routing permutations · render formats (svg/png) · plan-limit math. Container-free (~40ms) |
 | `SmartQr.Tests.Integration` | ✅ **18 green** — genuine integration: below-HTTP DB branches only (code/subscription repo edge cases — cascade delete · `ExecuteUpdate` · audit stamping · single-row upsert · Stripe-id lookup · type round-trip) + cached redirect config store. Provider-switchable (Postgres default / SQLite via `TestSetupOptions`) |
 | `SmartQr.Tests.E2E` | ✅ **45 green** — **primary tier, E2E over real Postgres** (Testcontainers, both hosts): identity · auth (Google sign-in / claim / cross-device / logout) · codes CRUD/search · ownership edges · render · two-host wedge · **billing (checkout · portal · `/me` · 402 cap · webhook subscribe/upgrade/cancel + never-deactivate-on-downgrade)** over a fake Stripe gateway. Needs Docker |
@@ -71,7 +71,7 @@ Shipped + the active/next version only — future work lives in the ordered back
 | Frontend — codes builder + management | ✅ create + codes list + edit (toggle / delete / search) |
 | Frontend — marketing surface (landing · pricing · blog) | ✅ built — public pages at `/`, `/pricing`, `/blog/*` on `react-router`; app moved under `/app/*`; per-page meta/OG; 4 SEO seed posts |
 | Frontend — auth (Google sign-in · signed-in header · logout) | ✅ built — `@react-oauth/google` `GoogleLogin` on the gate (gated on `VITE_GOOGLE_CLIENT_ID`; guest-only when unset), `AppLayout` shows account name + Log out, wired to `/api/auth/{google,logout}`. `tsc` + `vite build` green. **pnpm** (not npm — `workspace:` protocol) |
-| Billing — backend (Stripe hosted, `UserId`-keyed sub) | ✅ built — `api/billing` (`checkout`·`portal`·`webhook`·`me`), `IBillingGateway`+`StripeBillingGateway`, `subscriptions` table (`002-billing`), config-driven prices, 402 create-time gate (`PlanLimits`). Live Stripe test-mode pass pending. See `architecture/billing.md` |
+| Billing — backend (Stripe hosted, `UserId`-keyed sub) | ✅ built — `api/billing` (`checkout`·`portal`·`webhook`·`me`), `IBillingBroker`+`StripeBillingBroker`, `subscriptions` table (`002-billing`), config-driven prices, 402 create-time gate (`PlanLimits`). Live Stripe test-mode pass pending. See `architecture/billing.md` |
 | Billing — frontend (`/app/billing`) | ✅ built — `BillingScreen` (current plan + usage `MeterBar` w/ ∞ sentinel + upgrade cards → Checkout, Manage → Portal, return `Banner`); header nav link; pricing CTAs route paid tiers → `/app/billing` |
 | Plan enforcement (per-plan code cap, 402) | ✅ create-time only in `CodeCreateCommandHandler` (count vs `PlanLimits` cap → `LimitReached` → 402); redirect stays plan-agnostic (never-deactivate) |
 
@@ -118,7 +118,7 @@ strike-through + ✅ when done (kept for traceability).
 
 | Item | Type | Notes |
 |---|---|---|
-| Re-enable redirect config cache (+ invalidation) | feature | v1.0 reads Postgres directly per scan; restore IMemoryCache/Redis with edit-invalidation when scan volume warrants. `CachedRedirectConfigStore` is kept for this. |
+| Re-enable redirect config cache (+ invalidation) | feature | v1.0 reads Postgres directly per scan; restore IMemoryCache/Redis with edit-invalidation when scan volume warrants. `CachedRedirectConfigRepository` is kept for this. |
 | Redis as prod config store | feature | flip from direct-DB; harden the write side |
 | Geo (MaxMind GeoLite2) activation | feature | turns on country routing (resolver is a Noop stub today) |
 | ~~EF Migrations~~ → bespoke SQL migrator | check | ✅ 2026-06-11 — SQL migrator + `smart-qr-migrate` CLI replaced `EnsureCreated`. Follow-up: extract engine → backend-beta SDK |

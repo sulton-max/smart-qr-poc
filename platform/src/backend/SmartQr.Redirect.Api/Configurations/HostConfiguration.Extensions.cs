@@ -31,8 +31,8 @@ public static partial class HostConfiguration
     private static WebApplicationBuilder AddRoutingServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMemoryCache();
-        builder.Services.AddSingleton<IRoutingEvaluator, RoutingEvaluator>();
-        builder.Services.AddSingleton<IDeviceDetector, UserAgentDeviceDetector>();
+        builder.Services.AddSingleton<IRoutingService, RoutingService>();
+        builder.Services.AddSingleton<IDeviceResolver, UserAgentDeviceResolver>();
         builder.Services.AddSingleton<IGeoResolver, NoopGeoResolver>();
 
         // Hot config store: Redis when configured, else read route config directly from the DB per scan.
@@ -41,11 +41,11 @@ public static partial class HostConfiguration
         {
             builder.Services.AddSingleton<IConnectionMultiplexer>(
                 _ => ConnectionMultiplexer.Connect(settings.RedisConnectionString));
-            builder.Services.AddSingleton<IRedirectConfigStore, RedisRedirectConfigStore>();
+            builder.Services.AddSingleton<IRedirectConfigRepository, RedisRedirectConfigRepository>();
         }
         else
         {
-            builder.Services.AddSingleton<IRedirectConfigStore, DbRedirectConfigStore>();
+            builder.Services.AddSingleton<IRedirectConfigRepository, DbRedirectConfigRepository>();
         }
 
         // Async analytics: one recorder (producer) and one hosted flusher (consumer).

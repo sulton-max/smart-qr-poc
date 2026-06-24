@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, CopyButton } from "@wow-two-beta/ui/actions";
 import { SearchInput } from "@wow-two-beta/ui/forms";
-import { Badge, Card, EmptyState, Heading, Text } from "@wow-two-beta/ui/display";
+import { Card, EmptyState, Heading, Text } from "@wow-two-beta/ui/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
 import { Center, HStack, Stack } from "@wow-two-beta/ui/layout";
 import {
@@ -110,7 +110,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
           <Spinner size="lg" label="Loading codes" />
         </Center>
       ) : codes.length === 0 ? (
-        <Card className="p-6">
+        <Card className="surface-soft p-6">
           <EmptyState
             icon={<QrCode size={32} />}
             title={query ? "No matching codes" : "No codes yet"}
@@ -131,15 +131,16 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
       ) : (
         <Stack gap="3">
           {codes.map((code) => (
-            <Card key={code.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+            <Card key={code.id} className="surface-soft flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="truncate font-medium" title={code.name}>
                     {code.name}
                   </span>
-                  <Badge variant={code.isActive ? "success" : "neutral"} size="sm">
+                  <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    <span className={`size-1.5 rounded-full ${code.isActive ? "bg-accent" : "bg-subtle-foreground"}`} />
                     {code.isActive ? "Active" : "Inactive"}
-                  </Badge>
+                  </span>
                 </div>
                 <div className="mt-1 flex items-center gap-2">
                   <a

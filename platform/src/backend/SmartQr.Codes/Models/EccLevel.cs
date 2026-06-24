@@ -1,17 +1,17 @@
 namespace SmartQr.Codes.Models;
 
-/// <summary>QR error-correction level. Higher = more redundancy = tolerates a center logo / damage, at the cost of density.</summary>
+/// <summary>Defines the QR error-correction level — higher levels add redundancy that tolerates a center logo or damage at the cost of density.</summary>
 public enum EccLevel
 {
-    /// <summary>~7% recovery.</summary>
+    /// <summary>About 7% recovery.</summary>
     L,
 
-    /// <summary>~15% recovery.</summary>
+    /// <summary>About 15% recovery.</summary>
     M,
 
-    /// <summary>~25% recovery — default; safe for a center logo.</summary>
+    /// <summary>About 25% recovery — safe for a center logo.</summary>
     Q,
 
-    /// <summary>~30% recovery — use with large logos.</summary>
+    /// <summary>About 30% recovery — use with large logos.</summary>
     H,
 }

@@ -31,7 +31,7 @@
 
     <!--
       Both hosts expose a top-level `Program` in the global namespace; each keeps `global` (so the Api/Common
-      types — IBillingGateway, AppDbContext, billing settings — resolve unqualified in the billing harness) and
+      types — IBillingBroker, AppDbContext, billing settings — resolve unqualified in the billing harness) and
       ALSO gains a named alias (`apihost` / `redirecthost`) the factory uses to disambiguate the two `Program`s.
     -->
     <ItemGroup>

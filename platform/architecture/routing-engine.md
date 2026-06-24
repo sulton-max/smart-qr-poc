@@ -8,7 +8,7 @@ Resolve a single scanned slug to one destination based on the scanner's context 
 
 ## How it works
 
-A code owns an **ordered** rule list + a fallback URL. The evaluator:
+A code owns an **ordered** rule list + a fallback URL. The routing service:
 
 1. If the code is inactive → **NotFound**.
 2. If not `NeverExpires`: past `ExpiresAt` or over `MaxScans` → **Gone** (410). `NeverExpires` (the default) bypasses both.
@@ -30,10 +30,10 @@ Condition matching (`RuleConditionType`):
 
 | Type | File |
 |---|---|
-| `RoutingEvaluator` (the logic) | `platform/src/backend/SmartQr.Redirect.Api/Infrastructure/Routing/RoutingEvaluator.cs` |
-| `IRoutingEvaluator` | `SmartQr.Redirect.Api/Application/Routing/Services/IRoutingEvaluator.cs` |
+| `RoutingService` (the logic) | `platform/src/backend/SmartQr.Redirect.Api/Infrastructure/Routing/RoutingService.cs` |
+| `IRoutingService` | `SmartQr.Redirect.Api/Application/Routing/Services/IRoutingService.cs` |
 | `CodeRouteConfig` / `RouteRule` / `ScanContext` / `RouteDecision` / `RouteOutcome` | `SmartQr.Redirect.Api/Application/Routing/Models/` |
-| `UserAgentDeviceDetector` | `SmartQr.Redirect.Api/Infrastructure/Routing/UserAgentDeviceDetector.cs` |
+| `UserAgentDeviceResolver` | `SmartQr.Redirect.Api/Infrastructure/Routing/UserAgentDeviceResolver.cs` |
 | `IGeoResolver` / `NoopGeoResolver` | `SmartQr.Redirect.Api/.../Routing/` (geo is a stub — see below) |
 | `RuleConditionType` / `DeviceType` (enums) | `SmartQr.Common.Domain/Codes/Enums/` |
 | Persisted: `RoutingRuleEntity` / `CodeEntity` | `SmartQr.Common.Domain/Codes/Entities/` |
@@ -42,7 +42,7 @@ Condition matching (`RuleConditionType`):
 
 ## Decisions & tradeoffs
 
-- **Pure evaluator, no I/O** — testable in isolation (see `SmartQr.Tests/RoutingEvaluatorTests.cs`), fast on the hot path. Context (device/geo/lang) is resolved *before* evaluation, in the endpoint.
+- **Pure routing service, no I/O** — testable in isolation (see `SmartQr.Tests/RoutingServiceTests.cs`), fast on the hot path. Context (device/geo/lang) is resolved *before* evaluation, in the endpoint.
 - **Never-expire is the default** and overrides expiry/cap checks — the product promise, enforced in code.
 - **First-match-wins, ordered** — simple, predictable, matches how incumbents present "smart rules."
 

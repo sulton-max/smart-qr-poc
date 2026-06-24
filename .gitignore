@@ -16,3 +16,7 @@ appsettings.Local.json
 
 # Rider/EF tooling
 *.received.*
+
+# Serilog file output (per-service runtime logs — never committed)
+platform/src/backend/SmartQr.Api/logs/
+platform/src/backend/SmartQr.Redirect.Api/logs/

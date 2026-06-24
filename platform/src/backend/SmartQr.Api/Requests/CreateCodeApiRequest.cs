@@ -21,6 +21,9 @@ public sealed record CreateCodeApiRequest
 
     /// <summary>Gets the optional ordered routing rules.</summary>
     public IReadOnlyList<RuleApiRequest> Rules { get; init; } = [];
+
+    /// <summary>Gets the optional style to persist — omitted leaves the code on the default style.</summary>
+    public StyleApiRequest? Style { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>
@@ -37,6 +40,7 @@ public static class CreateCodeApiRequestExtensions
             BarcodeFormat = request.BarcodeFormat,
             FallbackUrl = request.FallbackUrl,
             Rules = request.Rules.ToRuleDtos(),
+            Style = request.Style?.ToStyleSpec(),
         };
 
         return command;

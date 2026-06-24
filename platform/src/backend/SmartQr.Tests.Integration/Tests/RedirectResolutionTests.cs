@@ -20,8 +20,8 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         services.AddScoped(_ => Db.NewContext());
         services.AddMemoryCache();
         services.AddSingleton(new RedirectSettings { ConfigCacheSeconds = 30 });
-        services.AddSingleton<IRoutingEvaluator, RoutingEvaluator>();
-        services.AddSingleton<IRedirectConfigStore, CachedRedirectConfigStore>();
+        services.AddSingleton<IRoutingService, RoutingService>();
+        services.AddSingleton<IRedirectConfigRepository, CachedRedirectConfigRepository>();
         return services.BuildServiceProvider();
     }
 
@@ -62,10 +62,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await SeedCodeAsync("route123");
         await using var sp = BuildProvider();
 
-        var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("route123", default);
+        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("route123", default);
         Assert.NotNull(config);
 
-        var decision = sp.GetRequiredService<IRoutingEvaluator>().Evaluate(config!, Scan("route123", DeviceType.Ios));
+        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("route123", DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://apple.example", decision.DestinationUrl);
@@ -77,8 +77,8 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await SeedCodeAsync("route123");
         await using var sp = BuildProvider();
 
-        var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("route123", default);
-        var decision = sp.GetRequiredService<IRoutingEvaluator>().Evaluate(config!, Scan("route123", DeviceType.Desktop));
+        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("route123", default);
+        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("route123", DeviceType.Desktop));
 
         Assert.Equal("https://fallback.example", decision.DestinationUrl);
         Assert.Null(decision.MatchedRuleId);
@@ -89,7 +89,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
     {
         await using var sp = BuildProvider();
 
-        var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("missing", default);
+        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("missing", default);
 
         Assert.Null(config); // endpoint maps this to 404
     }
@@ -123,10 +123,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await using var sp = BuildProvider();
 
         // The 1st code (way past the cap, no subscription row ⇒ Free) resolves like any other.
-        var config = await sp.GetRequiredService<IRedirectConfigStore>().GetAsync("overcap1", default);
+        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("overcap1", default);
         Assert.NotNull(config);
 
-        var decision = sp.GetRequiredService<IRoutingEvaluator>().Evaluate(config!, Scan("overcap1", DeviceType.Desktop));
+        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("overcap1", DeviceType.Desktop));
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://still-works.example", decision.DestinationUrl);
     }

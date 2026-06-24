@@ -7,8 +7,10 @@ using SmartQr.Api.Infrastructure.Codes.Services;
 using SmartQr.Api.Persistence.Repositories;
 using SmartQr.Api.Settings;
 using SmartQr.Codes;
-using SmartQr.Codes.Logo;
 using SmartQr.Codes.Rendering;
+using SmartQr.Codes.Rendering.Matrix;
+using SmartQr.Codes.Rendering.Raster;
+using SmartQr.Codes.Rendering.Svg;
 using SmartQr.Common.Persistence.DataContexts;
 using WoW.Two.Sdk.Backend.Beta.Data;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
@@ -20,8 +22,6 @@ using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Validation;
 using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
 using WoW.Two.Sdk.Backend.Beta.Web.Json;
-using AuthSettings = SmartQr.Api.Settings.Auth;
-using BillingSettings = SmartQr.Api.Settings.Billing;
 
 namespace SmartQr.Api.Configurations;
 
@@ -31,8 +31,8 @@ public static partial class HostConfiguration
     private static WebApplicationBuilder AddSettings(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
-        builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration));
-        builder.Services.AddSingleton(ConfigurationLoader.Load<AuthSettings>(builder.Configuration));
+        builder.Services.AddSingleton(ConfigurationLoader.Load<BillingSettings>(builder.Configuration, "Billing"));
+        builder.Services.AddSingleton(ConfigurationLoader.Load<AuthSettings>(builder.Configuration, "Auth"));
         return builder;
     }
 
@@ -43,10 +43,12 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the code generation library (stateless renderers and the logo compositor as singletons) and the image service.</summary>
+    /// <summary>Registers the code generation library — the matrix generator, the custom SVG renderer, the Svg.Skia rasterizer, the stateless renderers (all singletons), and the image service.</summary>
     private static WebApplicationBuilder AddCodeServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<ILogoCompositor, ImageSharpLogoCompositor>();
+        builder.Services.AddSingleton<IQrMatrixGenerator, QrMatrixGenerator>();
+        builder.Services.AddSingleton<SvgRenderer>();
+        builder.Services.AddSingleton<ISvgRasterizer, SkiaSvgRasterizer>();
         builder.Services.AddSingleton<IQrCodeRenderer, QrCodeRenderer>();
         builder.Services.AddSingleton<IBarcodeRenderer, BarcodeRenderer>();
         builder.Services.AddSingleton<ICodeRenderer, CodeRenderer>();
@@ -82,7 +84,7 @@ public static partial class HostConfiguration
         builder.Services.AddScoped<IUserRepository, UserRepository>();
 
         // Verify Google ID tokens against the Web client id (same id the SPA uses via VITE_GOOGLE_CLIENT_ID).
-        var auth = ConfigurationLoader.Load<AuthSettings>(builder.Configuration);
+        var auth = ConfigurationLoader.Load<AuthSettings>(builder.Configuration, "Auth");
         builder.Services.AddGoogleIdTokenVerifier(o => o.WithClientId(auth.Google.ClientId));
 
         // API mode returns 401/403 (not a 302) so the SPA reacts; HttpOnly/Secure/SameSite=Lax come from SDK defaults.
@@ -98,11 +100,11 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the billing seam — subscription repository and swappable Stripe gateway.</summary>
+    /// <summary>Registers the billing seam — subscription repository and swappable Stripe broker.</summary>
     private static WebApplicationBuilder AddBilling(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
-        builder.Services.AddScoped<IBillingGateway, StripeBillingGateway>();
+        builder.Services.AddScoped<IBillingBroker, StripeBillingBroker>();
         return builder;
     }
 

@@ -1,6 +1,9 @@
-using SmartQr.Codes.Logo;
 using SmartQr.Codes.Models;
+using SmartQr.Codes.Models.Style;
 using SmartQr.Codes.Rendering;
+using SmartQr.Codes.Rendering.Matrix;
+using SmartQr.Codes.Rendering.Raster;
+using SmartQr.Codes.Rendering.Svg;
 using SmartQr.Common.Domain.Codes.Enums;
 
 namespace SmartQr.Tests.Unit;
@@ -9,7 +12,7 @@ namespace SmartQr.Tests.Unit;
 public class CodeRenderingTests
 {
     private readonly CodeRenderer _renderer = new(
-        new QrCodeRenderer(new ImageSharpLogoCompositor()),
+        new QrCodeRenderer(new QrMatrixGenerator(), new SvgRenderer(), new SkiaSvgRasterizer()),
         new BarcodeRenderer());
 
     [Fact]
@@ -20,6 +23,7 @@ public class CodeRenderingTests
             Payload = "https://smartqr.app/abc1234",
             Symbology = BarcodeFormat.QrCode,
             Format = ImageFormat.Svg,
+            Style = StyleSpec.Default,
         });
 
         Assert.Equal("image/svg+xml", result.ContentType);
@@ -34,6 +38,7 @@ public class CodeRenderingTests
             Payload = "https://smartqr.app/abc1234",
             Symbology = BarcodeFormat.QrCode,
             Format = ImageFormat.Png,
+            Style = StyleSpec.Default,
         });
 
         Assert.Equal("image/png", result.ContentType);
@@ -50,9 +55,29 @@ public class CodeRenderingTests
             Payload = "12345678",
             Symbology = BarcodeFormat.Code128,
             Format = ImageFormat.Svg,
+            Style = StyleSpec.Default,
         });
 
         Assert.Equal("image/svg+xml", result.ContentType);
         Assert.Contains("<svg", result.AsText());
+    }
+
+    [Fact]
+    public void Default_style_svg_is_byte_for_byte_identical_to_qrcoder()
+    {
+        // The regression gate: the emitter under StyleSpec.Default must reproduce the retired QRCoder SvgQRCode output exactly.
+        const string payload = "https://smartqr.app/abc1234";
+
+        var emitted = _renderer.Render(new CodeRenderRequest
+        {
+            Payload = payload,
+            Symbology = BarcodeFormat.QrCode,
+            Format = ImageFormat.Svg,
+            Style = StyleSpec.Default,
+        }).AsText();
+
+        var qrCoder = QrCoderReference.Svg(payload);
+
+        Assert.Equal(qrCoder, emitted);
     }
 }

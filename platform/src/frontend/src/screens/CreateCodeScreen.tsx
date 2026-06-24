@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, CopyButton } from "@wow-two-beta/ui/actions";
-import { ColorField, FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
+import { Button, CopyButton, SegmentedControl, ToggleButton } from "@wow-two-beta/ui/actions";
+import { ColorPicker, FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
 import { Card, Heading, Text } from "@wow-two-beta/ui/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
 import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/layout";
@@ -59,6 +59,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [foreground, setForeground] = useState("#18181b");
   const [background, setBackground] = useState("#ffffff");
   // Code-styling shapes (v0.5) — default `square` so the render is unchanged until picked.
+  const [tab, setTab] = useState<"destination" | "style" | "routing">("destination");
   const [moduleShape, setModuleShape] = useState<ModuleShape>(ModuleShape.Square);
   const [finderShape, setFinderShape] = useState<FinderShape>(FinderShape.Square);
   const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
@@ -190,69 +191,80 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       <Grid columns={{ base: "1", lg: "2" }} gap="6">
         {/* ── Builder ── */}
         <Card className="surface-soft flex flex-col gap-5 p-6">
-          <Text as="span" size="sm" weight="medium">Destination</Text>
-          {isEdit && existing && (
-            <FormField label="Short link" helper="Encoded into the printed code — permanent and not editable.">
-              <TextInput value={existing.shortUrl} readOnly disabled />
-            </FormField>
+          <SegmentedControl
+            type="single"
+            value={tab}
+            onValueChange={(v) => v && setTab(v as typeof tab)}
+            aria-label="Builder section"
+          >
+            <ToggleButton value="destination" className="flex-1">Destination</ToggleButton>
+            <ToggleButton value="style" className="flex-1">Style</ToggleButton>
+            <ToggleButton value="routing" className="flex-1">Routing</ToggleButton>
+          </SegmentedControl>
+
+          {tab === "destination" && (
+            <>
+              {isEdit && existing && (
+                <FormField label="Short link" helper="Encoded into the printed code — permanent and not editable.">
+                  <TextInput value={existing.shortUrl} readOnly disabled />
+                </FormField>
+              )}
+              <FormField label="Name">
+                <TextInput
+                  value={name}
+                  placeholder="Spring menu table tent"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </FormField>
+              <FormField label="Fallback URL" helper="Where scans go when no rule matches.">
+                <TextInput
+                  value={fallbackUrl}
+                  placeholder="https://example.com"
+                  onChange={(e) => setFallbackUrl(e.target.value)}
+                />
+              </FormField>
+            </>
           )}
 
-          <FormField label="Name">
-            <TextInput
-              value={name}
-              placeholder="Spring menu table tent"
-              onChange={(e) => setName(e.target.value)}
-            />
-          </FormField>
+          {tab === "style" && (
+            <>
+              <Text as="span" size="sm" weight="medium">Appearance</Text>
+              <FormField label="Code type">
+                <Select<BarcodeFormat>
+                  value={symbology}
+                  onValueChange={(opt) => opt && setSymbology(opt.itemKey)}
+                >
+                  <Select.Trigger>
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {Object.values(BarcodeFormat).map((f) => (
+                      <Select.Item key={f} itemKey={f} label={SYMBOLOGY_LABEL[f]} />
+                    ))}
+                  </Select.Content>
+                </Select>
+              </FormField>
+              <Grid columns="2" gap="4">
+                <FormField label="Foreground">
+                  <ColorPicker value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
+                </FormField>
+                <FormField label="Background">
+                  <ColorPicker value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
+                </FormField>
+              </Grid>
+              <Text as="span" size="sm" weight="medium">Shape</Text>
+              <ShapeControls
+                moduleShape={moduleShape}
+                finderShape={finderShape}
+                finderDotShape={finderDotShape}
+                onModuleShapeChange={setModuleShape}
+                onFinderShapeChange={setFinderShape}
+                onFinderDotShapeChange={setFinderDotShape}
+              />
+            </>
+          )}
 
-          <FormField label="Fallback URL" helper="Where scans go when no rule matches.">
-            <TextInput
-              value={fallbackUrl}
-              placeholder="https://example.com"
-              onChange={(e) => setFallbackUrl(e.target.value)}
-            />
-          </FormField>
-
-          <Text as="span" size="sm" weight="medium">Appearance</Text>
-          <FormField label="Code type">
-            <Select<BarcodeFormat>
-              value={symbology}
-              onValueChange={(opt) => opt && setSymbology(opt.itemKey)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                {Object.values(BarcodeFormat).map((f) => (
-                  <Select.Item key={f} itemKey={f} label={SYMBOLOGY_LABEL[f]} />
-                ))}
-              </Select.Content>
-            </Select>
-          </FormField>
-
-          <Grid columns="2" gap="4">
-            <FormField label="Foreground">
-              <ColorField value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
-            </FormField>
-            <FormField label="Background">
-              <ColorField value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
-            </FormField>
-          </Grid>
-
-          <Text as="span" size="sm" weight="medium">Shape</Text>
-          <ShapeControls
-            moduleShape={moduleShape}
-            finderShape={finderShape}
-            finderDotShape={finderDotShape}
-            onModuleShapeChange={setModuleShape}
-            onFinderShapeChange={setFinderShape}
-            onFinderDotShapeChange={setFinderDotShape}
-          />
-
-          <Stack gap="2">
-            <Text as="span" size="sm" weight="medium">Routing rules</Text>
-            <RuleBuilder rules={rules} onChange={setRules} />
-          </Stack>
+          {tab === "routing" && <RuleBuilder rules={rules} onChange={setRules} />}
 
           <Button
             tone="primary"

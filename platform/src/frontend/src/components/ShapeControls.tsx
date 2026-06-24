@@ -1,4 +1,4 @@
-import { ToggleButton, ToggleButtonGroup, SegmentedControl } from "@wow-two-beta/ui/actions";
+import { ToggleButton, SegmentedControl } from "@wow-two-beta/ui/actions";
 import { FormField } from "@wow-two-beta/ui/forms";
 import { Text } from "@wow-two-beta/ui/display";
 import { Stack } from "@wow-two-beta/ui/layout";
@@ -146,28 +146,25 @@ export function ShapeControls({
   return (
     <Stack gap="4">
       <FormField label="Body shape" helper="How the data modules are drawn.">
-        <ToggleButtonGroup
+        <SegmentedControl
           type="single"
           value={moduleShape}
           onValueChange={(v) => v && onModuleShapeChange(v as ModuleShape)}
-          isAttached={false}
-          className="grid grid-cols-4 gap-2"
           aria-label="Body module shape"
+          className="w-full"
         >
           {MODULE_ORDER.map((shape) => (
             <ToggleButton
               key={shape}
               value={shape}
-              variant="outline"
-              shape="square"
               aria-label={MODULE_LABEL[shape]}
               title={MODULE_LABEL[shape]}
-              className="aspect-square h-auto w-full p-0"
+              className="flex-1 px-0"
             >
               <ModuleSwatch shape={shape} />
             </ToggleButton>
           ))}
-        </ToggleButtonGroup>
+        </SegmentedControl>
       </FormField>
 
       <FormField label="External eye" helper="The outer frame of the three corner markers.">
