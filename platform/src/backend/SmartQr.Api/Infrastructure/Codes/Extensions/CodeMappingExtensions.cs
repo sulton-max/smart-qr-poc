@@ -1,4 +1,5 @@
 using SmartQr.Api.Application.Codes.Core.Models;
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Entities;
 
 namespace SmartQr.Api.Infrastructure.Codes.Extensions;
@@ -30,5 +31,6 @@ public static class CodeMappingExtensions
                 Destination = r.Destination,
             })
             .ToList(),
+        Style = StyleSpecJson.Deserialize(e.StyleJson),
     };
 }

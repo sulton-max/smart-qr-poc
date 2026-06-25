@@ -110,15 +110,16 @@ Override in `index.css`. ✓ = var confirmed present in lib; ? = standard shadcn
 - Radii: card `16` · input/select `9` · button `10` · condition chip `7` · state pill `999` · color swatch `5`.
 - Depth: hairline border + `box-shadow: 0 1px 2px rgba(28,29,38,.04)`. **No heavy/colored shadows.**
 
-## Builder layout (v0.5 — tabbed)
+## Builder layout (v0.6 — grouped tabs + accordion)
 
-- create/edit builder groups into **tabs** — `Destination · Style · Routing` — with the **live preview sticky** in the right pane (always visible). Tabs = SDK `SegmentedControl`.
-- chosen over accordion / section-rail / long-scroll: short panels, scales to v0.5's style controls, preview always beside, mobile-friendly.
-- **Destination** — short link (read-only) · name · fallback URL.
-- **Style** (sub-sections, in order) — Colors (fg/bg + `Solid / Gradient / Transparent bg` toggle) · Body shape · Finder eyes · Logo (upload + size) · Frame + caption.
+- builder = **3 grouped tabs** `Content · Design · Routing` (SDK `SegmentedControl`) with the **live preview sticky** right. Revised from v0.5's flat tabs (`Destination · Style · …`): as styling + content sections grow (colors/fill · shape & eyes · center · CTA · content-type forms), flat tabs sprawl and each panel scrolls long.
+- **Design tab = SDK `Accordion` (`type="single"`)** of sub-sections — `Colors & fill · Shape & eyes · Center · CTA` — one open at a time → caps tab count AND height; scales to any number of styling sections.
+- chosen (variant **D**) over flat tabs (A — sprawls) / pure accordion (B — runner-up, simplest + most mobile-friendly) / section-rail (C — desktop-clean, weak on mobile): D keeps a stable 3-tab IA and bounds height via the accordion.
+- **Content** — short link (read-only) · name · fallback URL · (v0.7) content-type picker + per-type form.
+- **Design** (accordion) — Colors & fill (fg/bg + `Solid / Gradient / Transparent`) · Shape & eyes · Center (emoji; logo later) · (v0.7) CTA caption.
 - **Routing** — the dense joined rule list (see *Routing rules layout*).
-- one violet **Save** per tab footer; sub-section labels = `text-subtle` 11/500.
-- mobile — tabs persist (or collapse to a select); preview becomes a top strip.
+- one violet **Save** in the card footer; sub-section labels = `text-subtle` 11/500.
+- mobile — tabs persist (or collapse to a select); the Design accordion stays; preview becomes a top strip.
 
 ## Components
 

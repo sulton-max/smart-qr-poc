@@ -221,6 +221,75 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         (await previewResponse.Content.ReadAsStringAsync()).Should().Be(savedImage);
     }
 
+    [Fact]
+    public async Task Preview_LinearGradient_EmitsGradientDefAndStops()
+    {
+        var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+        {
+            value = "https://smartqr.app/abc1234",
+            codeType = "Qr",
+            style = StyleWith(("gradient", new
+            {
+                type = "Linear",
+                angle = 45.0,
+                stops = new[]
+                {
+                    new { color = "#FF0000", offset = 0.0 },
+                    new { color = "#0000FF", offset = 1.0 },
+                },
+            })),
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var svg = await response.Content.ReadAsStringAsync();
+        // A linear gradient def is emitted and the foreground references it instead of a solid color.
+        svg.Should().Contain("<linearGradient");
+        svg.Should().Contain("stop-color=\"#FF0000\"");
+        svg.Should().Contain("stop-color=\"#0000FF\"");
+        svg.Should().Contain("url(#sqr-fg)");
+    }
+
+    [Fact]
+    public async Task Preview_RadialGradient_EmitsRadialDef()
+    {
+        var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+        {
+            value = "https://smartqr.app/abc1234",
+            codeType = "Qr",
+            style = StyleWith(("gradient", new
+            {
+                type = "Radial",
+                angle = 0.0,
+                stops = new[]
+                {
+                    new { color = "#11FF00", offset = 0.0 },
+                    new { color = "#0011FF", offset = 1.0 },
+                },
+            })),
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var svg = await response.Content.ReadAsStringAsync();
+        svg.Should().Contain("<radialGradient");
+        svg.Should().Contain("url(#sqr-fg)");
+    }
+
+    [Fact]
+    public async Task Preview_Emoji_EmitsCenterTextGlyph()
+    {
+        var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+        {
+            value = "https://smartqr.app/abc1234",
+            codeType = "Qr",
+            style = StyleWith(("emoji", new { @char = "🎉", sizeRatio = 0.25 })),
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var svg = await response.Content.ReadAsStringAsync();
+        svg.Should().Contain("<text");      // emoji glyph
+        svg.Should().Contain("🎉");
+    }
+
     private static HttpContent JsonBody(object body) =>
         new StringContent(System.Text.Json.JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
 }

@@ -20,7 +20,7 @@ Backend (`platform/src/backend/`) — refs go product → platform, never revers
 |---|---|
 | `SmartQr.Common*` | shared libs — mediator/settings · domain entities · EF Core + SQL migrations |
 | `SmartQr.Platform.*` | SDK-bound infra (mediator/result/config · migrator · E2E harness) → extracts to backend-beta |
-| `SmartQr.Codes` | code generation (QRCoder / ZXing / ImageSharp) |
+| `SmartQr.Codes` | code generation (QRCoder / ZXing / Svg.Skia) → extracts to backend-beta SDK (`…Beta.Codes`) in v0.6 |
 | `SmartQr.Api` | management API · https **7020** |
 | `SmartQr.Redirect.Api` | redirect hot path · https **7022** |
 | `SmartQr.Tests.{Unit,Integration,E2E,Migrations}` | xUnit — pure-logic units · repo/DB integration · full-API E2E (Testcontainers PG) · migrator engine |

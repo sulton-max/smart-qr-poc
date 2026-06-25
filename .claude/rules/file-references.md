@@ -50,7 +50,7 @@
 | Project | Role |
 |---|---|
 | `SmartQr.Common*` | shared libs (mediator, domain entities, EF Core persistence) |
-| `SmartQr.Codes` | generation library (QRCoder / ZXing.Net / ImageSharp) |
+| `SmartQr.Codes` | generation library (QRCoder / ZXing.Net / Svg.Skia + SkiaSharp) — extracts to backend-beta SDK in v0.6 |
 | `SmartQr.Api` | management API (controllers + CQRS) |
 | `SmartQr.Redirect.Api` | redirect hot path (minimal API) |
 | `SmartQr.Tests.{Unit,Integration,E2E,Migrations}` | xUnit — units · integration · full-API E2E · migrator engine |

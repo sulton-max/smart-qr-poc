@@ -45,17 +45,18 @@
 
 > **Styling-emitter epic (L):** module-shapes + finder-eye + gradients all depend on one shared styling capability not yet built — they're one L epic, not three Ms.
 
-- **Preview/export parity** - on-screen preview = byte-for-byte the download (single render source kills client/server drift); the substrate the styling epic + "it always scans" promise sit on. `core-wedge · M`
-- **Module (data dot) shapes** - rounded / dots / classy / classy-rounded / extra-rounded body modules; square = max scannability, per-shape cost → pair higher ECC + quiet zone. Anchor of the styling epic. `core-wedge · L`
-- **Finder-eye (corner) styling** - style the three finder patterns separately (outer frame + inner pupil, independent color); highest brand-recognition lever, but keep eye contrast ≥ body (over-stylizing = #1 designer-code failure). Sub-task of the styling epic. `core-wedge · L`
-- **Foreground color & gradients** - solid colors expose in the builder now; gradients (linear/radial, color-stops, per dots/bg/corners) ride the styling epic. Contrast floor: ISO 18004 4:1 / WCAG AA 4.5:1. `core-wedge · S` (solid) / `L` (gradients, epic)
-- **Center logo embedding** - drop a brand logo, engine clears modules behind it; expose logo size/margin + auto-bump ECC=H. `core-wedge · S`
-- **Error-correction level control** - L/M/Q/H redundancy selector (7/15/25/30%); auto-bump Q/H on logo / heavy styling / small print. `core-wedge · S`
-- **Frames + CTA captions** - outer frame + call-to-action label ("Scan for menu") with PRESERVED quiet zone; specific CTA lifts conversion (~161%), pre-set templates per use-case. Rides the styling epic. `core-wedge · M`
-- **Background color / transparency** - bg color or transparent bg to sit on colored surfaces; inverted (light-on-dark) RISKY. Hard-gate behind the contrast validator so it can't brick. `adjacent · S`
-- **Quiet-zone (margin) control** - configurable blank margin with a guarded non-removable floor (ISO 18004 min 4 modules); #1 cause of "works on screen, fails in print". `core-wedge · S`
-- **Color/contrast scannability validator** - live guardrail scoring fg-vs-bg contrast, warns below 4:1 (ISO) / 4.5:1 (WCAG AA) before a brick; calm passive inline state, never a modal/email. `core-wedge · S`
-- **Export format set (vector-first)** - SVG (default) + PNG 300+ DPI + PDF (backlog) + EPS (dev/agency); avoid JPEG (lossy → decode failures). `core-wedge · M`
+- `[shipped]` **Preview/export parity** - on-screen preview = byte-for-byte the download (single render source kills client/server drift); the substrate the styling epic + "it always scans" promise sit on. `core-wedge · M`
+- `[shipped]` **Module (data dot) shapes** - rounded / dots / classy / classy-rounded / extra-rounded body modules; square = max scannability, per-shape cost → pair higher ECC + quiet zone. Anchor of the styling epic. `core-wedge · L`
+- `[shipped]` **Finder-eye (corner) styling** - style the three finder patterns separately (outer frame + inner pupil, independent color); highest brand-recognition lever, but keep eye contrast ≥ body (over-stylizing = #1 designer-code failure). Sub-task of the styling epic. `core-wedge · L`
+- `[shipped: solid + linear/radial gradients]` **Foreground color & gradients** - solid colors expose in the builder now; gradients (linear/radial, color-stops, per dots/bg/corners) ride the styling epic. Contrast floor: ISO 18004 4:1 / WCAG AA 4.5:1. `core-wedge · S` (solid) / `L` (gradients, epic)
+- `[deferred: image upload later]` **Center logo embedding** - drop a brand logo, engine clears modules behind it; expose logo size/margin + auto-bump ECC=H. `core-wedge · S`
+- `[shipped]` **Center emoji / mark** - place an emoji at the code center (no file upload); a knockout hole + ECC=H keep it scannable. The no-upload path to a branded center while logo-image upload is deferred. `core-wedge · S`
+- `[shipped: auto-bump · manual selector deferred]` **Error-correction level control** - L/M/Q/H redundancy selector (7/15/25/30%); auto-bump Q/H on logo / heavy styling / small print. `core-wedge · S`
+- `[next: simple top/bottom CTA label · decorative frame borders deferred—research first]` **Frames + CTA captions** - outer frame + call-to-action label ("Scan for menu") with PRESERVED quiet zone; specific CTA lifts conversion (~161%), pre-set templates per use-case. Rides the styling epic. `core-wedge · M`
+- `[shipped: bg color + transparent toggle + contrast hint]` **Background color / transparency** - bg color or transparent bg to sit on colored surfaces; inverted (light-on-dark) RISKY. Hard-gate behind the contrast validator so it can't brick. `adjacent · S`
+- `[shipped: enforced floor · UI control deferred]` **Quiet-zone (margin) control** - configurable blank margin with a guarded non-removable floor (ISO 18004 min 4 modules); #1 cause of "works on screen, fails in print". `core-wedge · S`
+- `[shipped]` **Color/contrast scannability validator** - live guardrail scoring fg-vs-bg contrast, warns below 4:1 (ISO) / 4.5:1 (WCAG AA) before a brick; calm passive inline state, never a modal/email. `core-wedge · S`
+- `[shipped: SVG + PNG ≥300 DPI · PDF/EPS backlog]` **Export format set (vector-first)** - SVG (default) + PNG 300+ DPI + PDF (backlog) + EPS (dev/agency); avoid JPEG (lossy → decode failures). `core-wedge · M`
 - **Print-readiness / DPI guidance** - size + resolution guardrails (300 DPI, ≥3–4px/module, rule-of-10); builder shows "prints safely down to X cm". The physical-world half of never-brick; calm one-time hint. `core-wedge · S`
 - **Style presets / brand templates** - one-click curated bundles (shape+eyes+gradient+frame) pre-VALIDATED to always pass contrast/ECC; serves no-designer SMB ICP, protects the "always scans" promise. Depends on the styling epic. `core-wedge · M`
 - **Halftone / image-blended artistic codes** - algorithmic code resembling a target image (compute-only, no AI/GPU); styling-vanity orthogonal to never-expire + routing, endangers scannability. `off-wedge · L` — defer/drop for v1
@@ -143,4 +144,4 @@ Hand-pick shortlist for the two focus areas (Rendering + Gen-form).
 | 9 | Print-readiness / DPI guidance | Rendering | S |
 | 10 | Frames + CTA captions | Rendering | M |
 
-> Sequencing: #1–4 + #9 are S quick wins. #8 (preview/export parity) unlocks #10 frames + the deferred styling epic (module-shapes / finder-eye / gradients = one L, not picked for v0.5). #5–7 are the routing-builder core. Hold the full adaptive content-template engine, A/B, composable AND/OR, and the styling epic for v0.6+.
+> Sequencing: #1–4 + #9 are S quick wins. #8 (preview/export parity) unlocked #10 frames + the styling epic — **the styling epic (module-shapes / finder-eye / gradients) was pulled into v0.5 and shipped** (`[shipped]` above), ahead of the original "v0.6+" plan. #5–7 are the routing-builder core. Hold the full adaptive content-template engine, A/B, composable AND/OR, and the styling epic for v0.6+.

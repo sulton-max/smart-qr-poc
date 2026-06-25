@@ -39,6 +39,8 @@ export interface CreateCodeRequest {
     conditionValue: string;
     destination: string;
   }>;
+  // The visual style to persist (server defaults it when omitted; the builder always sends it).
+  style: PreviewStyle;
 }
 
 // `PUT /api/codes/{id}` — full replace; slug, scan count, creation time are server-preserved.
@@ -67,6 +69,12 @@ export interface PreviewLogo {
   sizeRatio: number;
 }
 
+// Optional center emoji overlay for the preview render (no file upload).
+export interface PreviewEmoji {
+  char: string;
+  sizeRatio: number; // fraction of the code's width (0–1)
+}
+
 // QR data-module body shape; mirrors backend `style.moduleShape`. Default `square`.
 export const ModuleShape = {
   Square: "square",
@@ -88,6 +96,28 @@ export const FinderShape = {
 } as const;
 export type FinderShape = (typeof FinderShape)[keyof typeof FinderShape];
 
+// Foreground gradient projection; mirrors backend `GradientType`. Sent lowercase —
+// the server reads enum names case-insensitively, but writes them verbatim (PascalCase),
+// so values read back from a response are normalized case-insensitively on the client.
+export const GradientType = {
+  Linear: "linear",
+  Radial: "radial",
+} as const;
+export type GradientType = (typeof GradientType)[keyof typeof GradientType];
+
+// One color stop of a foreground gradient.
+export interface PreviewGradientStop {
+  color: string; // #RRGGBB
+  offset: number; // 0..1
+}
+
+// Foreground gradient — replaces the solid foreground when set (needs ≥2 stops).
+export interface PreviewGradient {
+  type: GradientType;
+  stops: PreviewGradientStop[];
+  angle: number; // degrees; 0 = left→right, 90 = top→bottom (linear only)
+}
+
 // Visual style sent with a preview request. Field names match the pinned wire
 // contract (camelCase), not the internal C# `CodeRenderOptions` shape.
 export interface PreviewStyle {
@@ -100,6 +130,8 @@ export interface PreviewStyle {
   moduleShape: ModuleShape; // default "square"
   finderShape: FinderShape; // outer eye frame; default "square"
   finderDotShape: FinderShape; // inner eye pupil; default "square"
+  gradient: PreviewGradient | null; // foreground gradient; null = solid foregroundColor
+  emoji: PreviewEmoji | null; // center emoji overlay; null = none
 }
 
 export interface PreviewRequest {
@@ -127,6 +159,8 @@ export interface CodeDto {
     conditionValue: string | null;
     destination: string;
   }>;
+  // Persisted visual style (enum values come back verbatim/PascalCase — normalize on read).
+  style: PreviewStyle;
 }
 
 // Backend `ApiResponse<T>.Success` envelope (camelCased).

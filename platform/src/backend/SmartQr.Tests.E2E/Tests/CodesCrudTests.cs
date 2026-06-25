@@ -199,4 +199,66 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest, "the fallback URL must be an absolute http(s) URL");
     }
+
+    // ── Style persistence round-trip (create → edit → re-render reflects the new style) ──
+
+    [Fact]
+    public async Task Update_ReplacesPersistedStyle_ReflectedInImage()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        // Create with a gradient → the saved image carries the gradient def (style persisted on create).
+        var created = await (await owner.Client.PostJsonAsync("/api/codes", new
+        {
+            name = "Styled",
+            codeType = "Qr",
+            barcodeFormat = "QrCode",
+            fallbackUrl = "https://example.com",
+            rules = Array.Empty<object>(),
+            style = Style(gradient: true),
+        })).ReadEnvelopeAsync<CodeDtoModel>();
+
+        var withGradient = await owner.Client.GetStringAsync($"/api/codes/{created.Id}/image?format=svg");
+        withGradient.Should().Contain("<linearGradient");
+
+        // Edit to a solid style → the saved image must no longer carry the gradient (style round-trips on update, no clobber-to-default).
+        await owner.Client.PutJsonAsync($"/api/codes/{created.Id}", new
+        {
+            name = "Styled",
+            codeType = "Qr",
+            barcodeFormat = "QrCode",
+            fallbackUrl = "https://example.com",
+            rules = Array.Empty<object>(),
+            style = Style(gradient: false),
+        });
+
+        var solid = await owner.Client.GetStringAsync($"/api/codes/{created.Id}/image?format=svg");
+        solid.Should().NotContain("<linearGradient");
+    }
+
+    /// <summary>A full style block; <paramref name="gradient"/> toggles a linear foreground gradient.</summary>
+    private static object Style(bool gradient) => new
+    {
+        foregroundColor = "#000000",
+        backgroundColor = "#FFFFFF",
+        transparentBackground = false,
+        eccLevel = "Q",
+        quietZoneModules = 4,
+        logo = (object?)null,
+        moduleShape = "square",
+        finderShape = "square",
+        finderDotShape = "square",
+        gradient = gradient
+            ? (object)new
+            {
+                type = "Linear",
+                angle = 0.0,
+                stops = new[]
+                {
+                    new { color = "#111111", offset = 0.0 },
+                    new { color = "#333333", offset = 1.0 },
+                },
+            }
+            : null,
+    };
 }

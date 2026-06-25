@@ -19,6 +19,9 @@ public sealed record StyleSpec
     /// <summary>Gets whether the background rectangle is omitted, rendering the code on a transparent canvas.</summary>
     public required bool TransparentBackground { get; init; }
 
+    /// <summary>Gets the optional foreground gradient; when set (≥2 stops) it replaces <see cref="ForegroundColor"/> across the data body and finder eyes.</summary>
+    public GradientSpec? Gradient { get; init; }
+
     /// <summary>Gets the error-correction level, floored to <see cref="EccLevel.H"/> by the normalizer when a <see cref="Logo"/> is present.</summary>
     public required EccLevel EccLevel { get; init; }
 
@@ -27,6 +30,9 @@ public sealed record StyleSpec
 
     /// <summary>Gets the optional center logo overlay, forcing ECC to <see cref="EccLevel.H"/> when set.</summary>
     public LogoSpec? Logo { get; init; }
+
+    /// <summary>Gets the optional center emoji overlay, forcing ECC to <see cref="EccLevel.H"/> when set.</summary>
+    public EmojiSpec? Emoji { get; init; }
 
     /// <summary>Gets the geometry of the data modules (the code body, excluding finder eyes); a non-<see cref="ModuleShape.Square"/> value floors ECC to <see cref="EccLevel.Q"/>.</summary>
     public required ModuleShape ModuleShape { get; init; }

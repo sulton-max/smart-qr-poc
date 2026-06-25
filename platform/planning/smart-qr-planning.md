@@ -106,6 +106,7 @@ strike-through + ✅ when done (kept for traceability).
 |---|---|---|
 | Backend QR in live preview | issue | the builder preview is client-side and now differs from the server-rendered downloadable asset — render the preview from the backend so they match |
 | Request validation + slug uniqueness | feature | FluentValidation (via the SDK) for create / update; enforce slug uniqueness |
+| Per-setting info popups | feature | info icon next to each settings-group header → popover explaining the setting + a GIF demoing how it changes the QR (builder onboarding/help) |
 
 ### Scan insights
 
@@ -162,8 +163,9 @@ strike-through + ✅ when done (kept for traceability).
 | Item | Type | Notes |
 |---|---|---|
 | Logo UI wiring | feature | compositing already built in `SmartQr.Codes`; expose it in the builder |
-| Module shapes + gradients | feature | rounded / dots, foreground gradient |
-| Frames + captions | feature | border, badge, CTA handle |
+| ~~Module shapes + gradients~~ | feature | ✅ shipped v0.5 — 7 module + 3+3 finder shapes, linear/radial foreground gradient |
+| Frames + CTA captions | feature | outer frame + a call-to-action label ("Scan me"); **research which frame styles actually lift conversion first** before building |
+| `StyleSpec` schema-evolution upgrader | infra | versioned model + lazy on-read `vN→current` upgrade chain (additive fields need none — new fields go in optional); build at the first breaking change, then extract the versioned-model + upgrader pattern to the backend-beta SDK |
 | PDF export | feature | alongside SVG + PNG |
 
 ### Code & content breadth

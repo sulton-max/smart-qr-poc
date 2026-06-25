@@ -21,8 +21,8 @@ public static class StyleSpecNormalizer
     /// <param name="spec">The style whose ECC level is being resolved.</param>
     private static EccLevel ResolveEcc(StyleSpec spec)
     {
-        // A center logo occludes modules, so force maximum error correction.
-        if (spec.Logo is not null)
+        // A center logo or emoji occludes modules, so force maximum error correction.
+        if (spec.Logo is not null || spec.Emoji is not null)
             return EccLevel.H;
 
         // A stylised body shrinks the decode margin, so floor ECC to Q; square keeps the caller's choice.

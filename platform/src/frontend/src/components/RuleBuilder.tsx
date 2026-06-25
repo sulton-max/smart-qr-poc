@@ -94,6 +94,7 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
               </Select>
 
               <TextInput
+                ring="sm"
                 value={rule.conditionValue}
                 placeholder={VALUE_PLACEHOLDER[rule.conditionType]}
                 onChange={(e) => update(rule.id, { conditionValue: e.target.value })}
@@ -102,6 +103,7 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
               <div className="flex items-center gap-2 sm:col-span-2">
                 <ArrowRight size={14} className="shrink-0 text-subtle-foreground" />
                 <TextInput
+                  ring="sm"
                   className="flex-1"
                   value={rule.destination}
                   placeholder="https://destination-for-this-rule.com"

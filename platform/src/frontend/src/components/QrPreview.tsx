@@ -31,6 +31,9 @@ export function QrPreview({
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  // Style of the currently-shown svg. The frame bg follows THIS (not the in-flight `style`), so the
+  // background never recolors before the matching server render arrives — no perceived lag.
+  const [rendered, setRendered] = useState<PreviewStyle>(style);
 
   // Serialize style so the effect re-runs on any individual field change.
   const styleKey = JSON.stringify(style);
@@ -50,6 +53,7 @@ export function QrPreview({
         .then((markup) => {
           if (controller.signal.aborted) return;
           setSvg(markup);
+          setRendered(style);
           setLoading(false);
         })
         .catch((e: unknown) => {
@@ -70,7 +74,7 @@ export function QrPreview({
   // Cancel any in-flight request on unmount.
   useEffect(() => () => controllerRef.current?.abort(), []);
 
-  const frameBackground = style.transparentBackground ? "transparent" : style.backgroundColor;
+  const frameBackground = rendered.transparentBackground ? "transparent" : rendered.backgroundColor;
 
   return (
     <div

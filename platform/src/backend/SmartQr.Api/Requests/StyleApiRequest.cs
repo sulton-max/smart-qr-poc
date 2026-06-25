@@ -32,6 +32,12 @@ public sealed record StyleApiRequest
 
     /// <summary>Gets the inner finder-pupil (3×3) shape, independent of <see cref="FinderShape"/>.</summary>
     public required FinderDotShape FinderDotShape { get; init; }
+
+    /// <summary>Gets the optional foreground gradient — replaces the solid foreground when present.</summary>
+    public GradientApiRequest? Gradient { get; init; }
+
+    /// <summary>Gets the optional center emoji overlay.</summary>
+    public EmojiApiRequest? Emoji { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="StyleApiRequest"/>.</summary>
@@ -52,5 +58,18 @@ public static class StyleApiRequestExtensions
         ModuleShape = style.ModuleShape,
         FinderShape = style.FinderShape,
         FinderDotShape = style.FinderDotShape,
+        Gradient = style.Gradient is { } gradient
+            ? new GradientSpec
+            {
+                Type = gradient.Type,
+                Angle = gradient.Angle,
+                Stops = gradient.Stops
+                    .Select(stop => new GradientStopSpec { Color = stop.Color, Offset = stop.Offset })
+                    .ToList(),
+            }
+            : null,
+        Emoji = style.Emoji is { } emoji
+            ? new EmojiSpec { Char = emoji.Char, SizeRatio = emoji.SizeRatio }
+            : null,
     };
 }

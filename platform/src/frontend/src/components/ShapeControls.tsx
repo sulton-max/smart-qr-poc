@@ -158,7 +158,7 @@ export function ShapeControls({
               key={shape}
               value={shape}
               aria-label={MODULE_LABEL[shape]}
-              title={MODULE_LABEL[shape]}
+              tooltip={MODULE_LABEL[shape]}
               className="flex-1 px-0"
             >
               <ModuleSwatch shape={shape} />
@@ -173,13 +173,14 @@ export function ShapeControls({
           value={finderShape}
           onValueChange={(v) => v && onFinderShapeChange(v as FinderShape)}
           aria-label="External eye shape"
+          className="w-full"
         >
           {FINDER_ORDER.map((shape) => (
             <ToggleButton
               key={shape}
               value={shape}
               aria-label={FINDER_LABEL[shape]}
-              className="flex items-center gap-2"
+              className="flex flex-1 items-center justify-center gap-2"
             >
               <FinderSwatch shape={shape} />
               <Text as="span" size="sm">
@@ -196,13 +197,14 @@ export function ShapeControls({
           value={finderDotShape}
           onValueChange={(v) => v && onFinderDotShapeChange(v as FinderShape)}
           aria-label="Internal eye shape"
+          className="w-full"
         >
           {FINDER_ORDER.map((shape) => (
             <ToggleButton
               key={shape}
               value={shape}
               aria-label={FINDER_LABEL[shape]}
-              className="flex items-center gap-2"
+              className="flex flex-1 items-center justify-center gap-2"
             >
               <FinderSwatch shape={shape} dot />
               <Text as="span" size="sm">

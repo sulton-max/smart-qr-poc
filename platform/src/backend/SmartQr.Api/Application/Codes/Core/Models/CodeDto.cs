@@ -1,3 +1,4 @@
+using SmartQr.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Enums;
 
 namespace SmartQr.Api.Application.Codes.Core.Models;
@@ -40,4 +41,7 @@ public sealed record CodeDto
 
     /// <summary>Ordered routing rules.</summary>
     public IReadOnlyList<RuleDto> Rules { get; init; } = [];
+
+    /// <summary>The persisted visual style (deserialized from <c>StyleJson</c>; the render default when none was saved) — lets the builder round-trip a saved style on edit.</summary>
+    public required StyleSpec Style { get; init; }
 }

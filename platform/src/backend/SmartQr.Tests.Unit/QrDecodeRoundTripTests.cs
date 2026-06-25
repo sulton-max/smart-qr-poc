@@ -50,6 +50,54 @@ public sealed class QrDecodeRoundTripTests
         Assert.Equal(Payload, decoded);
     }
 
+    [Fact]
+    public void Gradient_qr_still_decodes_to_its_payload()
+    {
+        // A foreground gradient is a fill change only (geometry untouched) — proves Skia rasterizes the gradient AND it scans.
+        var style = StyleSpec.Default with
+        {
+            Gradient = new GradientSpec
+            {
+                Type = GradientType.Linear,
+                Angle = 45,
+                Stops =
+                [
+                    new GradientStopSpec { Color = "#1a1a2e", Offset = 0 },
+                    new GradientStopSpec { Color = "#16213e", Offset = 1 },
+                ],
+            },
+        };
+
+        Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
+    }
+
+    [Fact]
+    public void Transparent_background_qr_still_decodes_to_its_payload()
+    {
+        // Transparent bg rasterizes with no background rect; the decoder flattens transparency to white so contrast survives.
+        var style = StyleSpec.Default with { TransparentBackground = true };
+
+        Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
+    }
+
+    [Fact]
+    public void Center_emoji_qr_still_decodes_to_its_payload()
+    {
+        // The emoji halo clears the center; the auto-bumped ECC=H reconstructs the occluded modules.
+        var style = StyleSpec.Default with { Emoji = new EmojiSpec { Char = "🎉", SizeRatio = 0.25 } };
+
+        Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
+    }
+
+    [Fact]
+    public void Max_size_center_emoji_qr_still_decodes_to_its_payload()
+    {
+        // Worst case — the max-clamped emoji size (0.27). The halo + ECC=H must still leave the symbol readable.
+        var style = StyleSpec.Default with { Emoji = new EmojiSpec { Char = "🔥", SizeRatio = 0.27 } };
+
+        Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
+    }
+
     /// <summary>Decodes a PNG QR back to its text via ZXing over the SkiaSharp-decoded RGBA pixels. Returns null if undecodable.</summary>
     private static string? Decode(byte[] png)
     {

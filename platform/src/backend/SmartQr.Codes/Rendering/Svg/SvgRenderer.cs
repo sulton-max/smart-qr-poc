@@ -21,6 +21,14 @@ public sealed class SvgRenderer
     /// <summary>The smallest QR symbol side (version 1 is 21×21); below this, corner regions are shaped as data rather than finders.</summary>
     private const int QrMinSize = 21;
 
+    /// <summary>The id of the foreground gradient def, referenced by the data + eye fills when a gradient is set.</summary>
+    private const string ForegroundGradientId = "sqr-fg";
+
+    /// <summary>Center-emoji size bounds (fraction of the canvas) + the hole/halo radius factor — shared by the matrix knockout and the emoji emit so the blank hole and the glyph align.</summary>
+    private const double EmojiMinRatio = 0.1;
+    private const double EmojiMaxRatio = 0.27;
+    private const double EmojiHoleFactor = 0.62;
+
     /// <summary>Emits the styled SVG for <paramref name="matrix"/> under <paramref name="style"/>. The style is consumed as-is — run <see cref="StyleSpecNormalizer"/> first.</summary>
     public string Emit(ModuleMatrix matrix, StyleSpec style)
     {
@@ -41,14 +49,30 @@ public sealed class SvgRenderer
             sb.Append("<rect x=\"0\" y=\"0\" width=\"").Append(size).Append("\" height=\"").Append(size)
                 .Append("\" fill=\"").Append(style.BackgroundColor).Append("\"/>\n");
 
+        // L1b — foreground gradient def (when set, ≥2 stops); referenced by the data + eye fills below.
+        var hasGradient = style.Gradient is { Stops.Count: >= 2 };
+        if (hasGradient)
+            EmitForegroundGradientDefs(sb, style.Gradient!, size);
+
+        var foregroundFill = hasGradient ? $"url(#{ForegroundGradientId})" : style.ForegroundColor;
+
+        // A center emoji knocks its footprint out of the data matrix — a genuine blank center (not an overlay over live
+        // modules), so a transparent background reads as a real hole. The auto-bumped ECC=H reconstructs the cleared modules.
+        var bodyMatrix = style.Emoji is { } emoji
+            ? matrix.WithCenterHole(size * Math.Clamp(emoji.SizeRatio, EmojiMinRatio, EmojiMaxRatio) * EmojiHoleFactor)
+            : matrix;
+
         // L2 — foreground. The legacy look takes the byte-parity fast path; any styling takes the split (data body + eyes) path.
         if (IsLegacySquare(style))
-            EmitLegacyForegroundPath(sb, matrix, style, quietZone);
+            EmitLegacyForegroundPath(sb, bodyMatrix, foregroundFill, quietZone);
         else
-            EmitStyledForeground(sb, matrix, style, quietZone);
+            EmitStyledForeground(sb, bodyMatrix, style, foregroundFill, quietZone);
 
         // Overlay the optional center logo as an <image> (no module knockout).
         EmitLogo(sb, size, style.Logo);
+
+        // Overlay the optional center emoji as <text> over a knockout halo (ECC=H compensates for the occlusion).
+        EmitEmoji(sb, size, style.BackgroundColor, style.TransparentBackground, style.Emoji);
 
         // L3 — document close.
         sb.Append("</svg>");
@@ -65,9 +89,9 @@ public sealed class SvgRenderer
     #region Legacy fast path (byte-parity)
 
     /// <summary>Appends the single foreground <c>&lt;path&gt;</c> with dark modules merged into horizontal runs, shifted by the quiet zone.</summary>
-    private static void EmitLegacyForegroundPath(StringBuilder sb, ModuleMatrix matrix, StyleSpec style, int quietZone)
+    private static void EmitLegacyForegroundPath(StringBuilder sb, ModuleMatrix matrix, string foregroundFill, int quietZone)
     {
-        sb.Append("<path fill=\"").Append(style.ForegroundColor).Append("\" d=\"");
+        sb.Append("<path fill=\"").Append(foregroundFill).Append("\" d=\"");
 
         for (var row = 0; row < matrix.Size; row++)
             AppendRowRuns(sb, matrix, row, quietZone);
@@ -108,7 +132,7 @@ public sealed class SvgRenderer
     #region Styled path (data body + finder eyes)
 
     /// <summary>Emits the foreground as a styled data body plus, on a real QR symbol, three independently styled finder eyes.</summary>
-    private static void EmitStyledForeground(StringBuilder sb, ModuleMatrix matrix, StyleSpec style, int quietZone)
+    private static void EmitStyledForeground(StringBuilder sb, ModuleMatrix matrix, StyleSpec style, string foregroundFill, int quietZone)
     {
         var finders = DetectFinders(matrix.Size);
 
@@ -116,7 +140,7 @@ public sealed class SvgRenderer
         var body = new StringBuilder();
         EmitDataBody(body, matrix, style.ModuleShape, finders, quietZone);
         if (body.Length > 0)
-            sb.Append("<path fill=\"").Append(style.ForegroundColor).Append("\" d=\"").Append(body).Append("\"/>\n");
+            sb.Append("<path fill=\"").Append(foregroundFill).Append("\" d=\"").Append(body).Append("\"/>\n");
 
         // L2b — finder eyes: outer frame (FinderShape) + inner pupil (FinderDotShape), one group each, drawn from geometry
         // (not the matrix bits) so the eyes are always complete and crisp regardless of body shape.
@@ -127,7 +151,7 @@ public sealed class SvgRenderer
         foreach (var f in finders)
             AppendFinderEye(eyes, f, style.FinderShape, style.FinderDotShape, quietZone);
 
-        sb.Append("<path fill=\"").Append(style.ForegroundColor).Append("\" fill-rule=\"evenodd\" d=\"").Append(eyes).Append("\"/>\n");
+        sb.Append("<path fill=\"").Append(foregroundFill).Append("\" fill-rule=\"evenodd\" d=\"").Append(eyes).Append("\"/>\n");
     }
 
     /// <summary>The top-left corners (in matrix coordinates) of the three 7×7 finder regions, or an empty list when <paramref name="size"/> is below a real QR symbol.</summary>
@@ -458,6 +482,52 @@ public sealed class SvgRenderer
             .Append("\" width=\"").Append(Num(side)).Append("\" height=\"").Append(Num(side))
             .Append("\" href=\"").Append(EscapeAttr(logo.DataUrl))
             .Append("\" preserveAspectRatio=\"xMidYMid meet\"/>\n");
+    }
+
+    /// <summary>Emits the optional center emoji — a knockout halo (bg color, or white when transparent) plus a centered SVG <c>&lt;text&gt;</c> glyph.</summary>
+    private static void EmitEmoji(StringBuilder sb, int sizeModules, string backgroundColor, bool transparent, EmojiSpec? emoji)
+    {
+        if (emoji is null)
+            return;
+
+        var ratio = Math.Clamp(emoji.SizeRatio, EmojiMinRatio, EmojiMaxRatio);
+        var side = sizeModules * ratio;
+        var center = sizeModules / 2.0;
+
+        // The data modules under the glyph are already knocked out of the matrix (a genuine blank center). On a solid
+        // background, smooth the matrix-quantized hole edge with a bg-colored disc; on a transparent background, leave the real hole.
+        if (!transparent)
+            sb.Append("<circle cx=\"").Append(Num(center)).Append("\" cy=\"").Append(Num(center))
+                .Append("\" r=\"").Append(Num(side * EmojiHoleFactor)).Append("\" fill=\"").Append(backgroundColor).Append("\"/>\n");
+
+        sb.Append("<text x=\"").Append(Num(center)).Append("\" y=\"").Append(Num(center))
+            .Append("\" font-size=\"").Append(Num(side))
+            .Append("\" text-anchor=\"middle\" dominant-baseline=\"central\">")
+            .Append(EscapeAttr(emoji.Char)).Append("</text>\n");
+    }
+
+    /// <summary>Emits the foreground gradient <c>&lt;defs&gt;</c> in user space spanning the full canvas — linear rotated by <see cref="GradientSpec.Angle"/> about the center, or radial from the center — referenced as <c>url(#sqr-fg)</c> by the data + eye fills.</summary>
+    private static void EmitForegroundGradientDefs(StringBuilder sb, GradientSpec gradient, int size)
+    {
+        var mid = size / 2.0;
+        sb.Append("<defs>");
+
+        if (gradient.Type == GradientType.Radial)
+            sb.Append("<radialGradient id=\"").Append(ForegroundGradientId)
+                .Append("\" gradientUnits=\"userSpaceOnUse\" cx=\"").Append(Num(mid))
+                .Append("\" cy=\"").Append(Num(mid)).Append("\" r=\"").Append(Num(mid)).Append("\">");
+        else
+            sb.Append("<linearGradient id=\"").Append(ForegroundGradientId)
+                .Append("\" gradientUnits=\"userSpaceOnUse\" x1=\"0\" y1=\"0\" x2=\"").Append(size)
+                .Append("\" y2=\"0\" gradientTransform=\"rotate(").Append(Num(gradient.Angle))
+                .Append(' ').Append(Num(mid)).Append(' ').Append(Num(mid)).Append(")\">");
+
+        foreach (var stop in gradient.Stops)
+            sb.Append("<stop offset=\"").Append(Num(Math.Clamp(stop.Offset, 0.0, 1.0)))
+                .Append("\" stop-color=\"").Append(stop.Color).Append("\"/>");
+
+        sb.Append(gradient.Type == GradientType.Radial ? "</radialGradient>" : "</linearGradient>")
+            .Append("</defs>\n");
     }
 
     /// <summary>Invariant decimal formatting (no thousands separators, '.' radix) so SVG numerics are culture-stable.</summary>

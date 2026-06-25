@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, CopyButton, SegmentedControl, ToggleButton } from "@wow-two-beta/ui/actions";
-import { ColorPicker, FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
+import { ColorPicker, FormField, Select, SwitchField, TextInput } from "@wow-two-beta/ui/forms";
 import { Card, Heading, Text } from "@wow-two-beta/ui/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
 import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/layout";
@@ -8,13 +8,19 @@ import { ArrowLeft } from "lucide-react";
 import { QrPreview } from "../components/QrPreview";
 import { RuleBuilder } from "../components/RuleBuilder";
 import { ShapeControls } from "../components/ShapeControls";
+import { GradientControls } from "../components/GradientControls";
+import { EmojiControls } from "../components/EmojiControls";
+import { ContrastHint } from "../components/ContrastHint";
 import { codeImageUrl, createCode, getCode, updateCode, REDIRECT_BASE } from "../api";
 import {
   BarcodeFormat,
   FinderShape,
+  GradientType,
   ModuleShape,
   type CodeDto,
   type CodeType,
+  type PreviewEmoji,
+  type PreviewGradient,
   type PreviewStyle,
   type RuleDraft,
 } from "../types";
@@ -40,6 +46,21 @@ function toDrafts(code: CodeDto): RuleDraft[] {
   }));
 }
 
+/** Case-insensitively resolves a wire enum value (written verbatim/PascalCase) to a frontend const value. */
+function enumFromWire<T extends string>(values: readonly T[], wire: string, fallback: T): T {
+  return values.find((v) => v.toLowerCase() === wire.toLowerCase()) ?? fallback;
+}
+
+/** Maps a persisted gradient (wire shape) back to the builder's gradient, or null for a solid foreground. */
+function gradientFromDto(g: CodeDto["style"]["gradient"]): PreviewGradient | null {
+  if (!g) return null;
+  return {
+    type: enumFromWire(Object.values(GradientType), g.type, GradientType.Linear),
+    angle: g.angle,
+    stops: g.stops.map((s) => ({ color: s.color, offset: s.offset })),
+  };
+}
+
 export interface CreateCodeScreenProps {
   /** Set → edit this code (PUT); unset → create (POST). */
   codeId?: string;
@@ -59,10 +80,13 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [foreground, setForeground] = useState("#18181b");
   const [background, setBackground] = useState("#ffffff");
   // Code-styling shapes (v0.5) — default `square` so the render is unchanged until picked.
-  const [tab, setTab] = useState<"destination" | "style" | "routing">("destination");
+  const [tab, setTab] = useState<"destination" | "style" | "center" | "routing">("destination");
   const [moduleShape, setModuleShape] = useState<ModuleShape>(ModuleShape.Square);
   const [finderShape, setFinderShape] = useState<FinderShape>(FinderShape.Square);
   const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
+  const [gradient, setGradient] = useState<PreviewGradient | null>(null);
+  const [transparentBackground, setTransparentBackground] = useState(false);
+  const [emoji, setEmoji] = useState<PreviewEmoji | null>(null);
   const [rules, setRules] = useState<RuleDraft[]>([]);
   const [existing, setExisting] = useState<CodeDto | null>(null);
 
@@ -85,6 +109,14 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         setFallbackUrl(code.fallbackUrl);
         setSymbology(code.barcodeFormat);
         setRules(toDrafts(code));
+        setForeground(code.style.foregroundColor);
+        setBackground(code.style.backgroundColor);
+        setModuleShape(enumFromWire(Object.values(ModuleShape), code.style.moduleShape, ModuleShape.Square));
+        setFinderShape(enumFromWire(Object.values(FinderShape), code.style.finderShape, FinderShape.Square));
+        setFinderDotShape(enumFromWire(Object.values(FinderShape), code.style.finderDotShape, FinderShape.Square));
+        setGradient(gradientFromDto(code.style.gradient));
+        setTransparentBackground(code.style.transparentBackground);
+        setEmoji(code.style.emoji ?? null);
       })
       .catch((e: unknown) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load the code");
@@ -103,22 +135,24 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   // The preview endpoint's coarse kind: QR symbology → "Qr", any other (1D/2D) → "Barcode".
   const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? "Qr" : "Barcode";
 
-  // Defaults (transparent-bg / ECC / quiet-zone / logo) aren't surfaced in the builder yet —
-  // send the renderer's standard defaults. Surface them as inputs in a later iteration.
-  // Shapes default to `square`, so the render is unchanged until the user picks a style.
+  // Defaults (ECC / quiet-zone / logo) aren't surfaced in the builder yet — send the renderer's
+  // standard defaults. Surface them as inputs in a later iteration. Shapes default to `square`,
+  // so the render is unchanged until the user picks a style.
   const previewStyle: PreviewStyle = useMemo(
     () => ({
       foregroundColor: foreground,
       backgroundColor: background,
-      transparentBackground: false,
+      transparentBackground,
       eccLevel: "Q",
       quietZoneModules: 2,
       logo: null,
       moduleShape,
       finderShape,
       finderDotShape,
+      gradient,
+      emoji,
     }),
-    [foreground, background, moduleShape, finderShape, finderDotShape],
+    [foreground, background, transparentBackground, moduleShape, finderShape, finderDotShape, gradient, emoji],
   );
 
   async function handleSubmit() {
@@ -135,6 +169,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         conditionValue: r.conditionValue.trim(),
         destination: r.destination.trim(),
       })),
+      style: previewStyle,
     };
     try {
       const dto = codeId ? await updateCode(codeId, request) : await createCode(request);
@@ -199,9 +234,12 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           >
             <ToggleButton value="destination" className="flex-1">Destination</ToggleButton>
             <ToggleButton value="style" className="flex-1">Style</ToggleButton>
+            <ToggleButton value="center" className="flex-1">Center</ToggleButton>
             <ToggleButton value="routing" className="flex-1">Routing</ToggleButton>
           </SegmentedControl>
 
+          {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
+          <div key={tab} className="flex flex-col gap-5 motion-safe:animate-(--animate-fade-in)">
           {tab === "destination" && (
             <>
               {isEdit && existing && (
@@ -211,6 +249,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
               )}
               <FormField label="Name">
                 <TextInput
+                  ring="sm"
                   value={name}
                   placeholder="Spring menu table tent"
                   onChange={(e) => setName(e.target.value)}
@@ -218,6 +257,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
               </FormField>
               <FormField label="Fallback URL" helper="Where scans go when no rule matches.">
                 <TextInput
+                  ring="sm"
                   value={fallbackUrl}
                   placeholder="https://example.com"
                   onChange={(e) => setFallbackUrl(e.target.value)}
@@ -244,14 +284,35 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   </Select.Content>
                 </Select>
               </FormField>
-              <Grid columns="2" gap="4">
-                <FormField label="Foreground">
-                  <ColorPicker value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
-                </FormField>
-                <FormField label="Background">
+              {gradient === null ? (
+                <Grid columns="2" gap="4">
+                  <FormField label="Foreground">
+                    <ColorPicker value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
+                  </FormField>
+                  <FormField label="Background">
+                    <ColorPicker value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
+                  </FormField>
+                </Grid>
+              ) : (
+                // The gradient overrides the solid foreground, so only the background remains here.
+                <FormField label="Background" helper="Foreground is set by the gradient below.">
                   <ColorPicker value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
                 </FormField>
-              </Grid>
+              )}
+              <SwitchField
+                label="Transparent background"
+                description="Drop the background so the code sits on any surface."
+                side="right"
+                checked={transparentBackground}
+                onChange={(e) => setTransparentBackground(e.currentTarget.checked)}
+              />
+              <GradientControls gradient={gradient} foreground={foreground} onChange={setGradient} />
+              <ContrastHint
+                foreground={foreground}
+                background={background}
+                transparent={transparentBackground}
+                gradient={gradient}
+              />
               <Text as="span" size="sm" weight="medium">Shape</Text>
               <ShapeControls
                 moduleShape={moduleShape}
@@ -264,7 +325,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </>
           )}
 
+          {tab === "center" && <EmojiControls emoji={emoji} onChange={setEmoji} />}
+
           {tab === "routing" && <RuleBuilder rules={rules} onChange={setRules} />}
+          </div>
 
           <Button
             tone="primary"
