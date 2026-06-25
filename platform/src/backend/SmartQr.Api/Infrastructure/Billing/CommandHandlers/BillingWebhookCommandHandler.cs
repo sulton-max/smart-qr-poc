@@ -5,7 +5,7 @@ using SmartQr.Api.Application.Billing.Core.Models;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Common.Domain.Billing.Entities;
 using SmartQr.Common.Domain.Billing.Enums;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 using BillingSettings = SmartQr.Api.Settings.BillingSettings;
@@ -18,10 +18,10 @@ public sealed class BillingWebhookCommandHandler(
     IBillingBroker gateway,
     BillingSettings settings,
     ILogger<BillingWebhookCommandHandler> logger)
-    : ICommandHandler<BillingWebhookCommand, AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>>
+    : ICommandHandler<BillingWebhookCommand, AppResult<BillingWebhookResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<BillingWebhookResult.Success>> HandleAsync(
         BillingWebhookCommand request, CancellationToken ct)
     {
         BillingWebhookEvent webhookEvent;
@@ -33,8 +33,7 @@ public sealed class BillingWebhookCommandHandler(
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Stripe webhook signature verification failed");
-            return new AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>
-                .Failure(new BillingWebhookResult.Failure(ex.Message, FailureCategory.Validation));
+            return AppResult<BillingWebhookResult.Success>.Fail(AppError.Of(AppErrorType.Validation, ex.Message));
         }
 
         try
@@ -59,14 +58,12 @@ public sealed class BillingWebhookCommandHandler(
                     break;
             }
 
-            return new AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>
-                .Success(new BillingWebhookResult.Success());
+            return AppResult<BillingWebhookResult.Success>.Ok(new BillingWebhookResult.Success());
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "BillingWebhook processing failed for event {EventType}", webhookEvent.Type);
-            return new AppResult<BillingWebhookResult.Success, BillingWebhookResult.Failure>
-                .Failure(new BillingWebhookResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<BillingWebhookResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 

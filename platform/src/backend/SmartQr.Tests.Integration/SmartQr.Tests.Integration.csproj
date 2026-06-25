@@ -11,7 +11,7 @@
   <!-- Genuine integration tier: repository / config-store branches NOT observable over HTTP (cascade delete, ExecuteUpdate, audit stamping, single-row upsert, Stripe-id lookup, type round-trips, the cached config store). -->
   <!-- SDK Testing.Data: the provider-switchable RelationalTestDb (Postgres container or in-memory SQLite, via TestSetupOptions) backing the repository tests. Transitively brings the base Testing package (PostgresFixture). -->
   <ItemGroup>
-    <PackageReference Include="WoW2.Sdk.Backend.Beta.Testing.Data" Version="10.0.37-beta" />
+    <PackageReference Include="WoW2.Sdk.Backend.Beta.Testing.Data" Version="10.0.40-beta" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />

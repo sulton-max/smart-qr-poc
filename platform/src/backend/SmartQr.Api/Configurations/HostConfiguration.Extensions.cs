@@ -6,11 +6,7 @@ using SmartQr.Api.Infrastructure.Billing.Services;
 using SmartQr.Api.Infrastructure.Codes.Services;
 using SmartQr.Api.Persistence.Repositories;
 using SmartQr.Api.Settings;
-using SmartQr.Codes;
-using SmartQr.Codes.Rendering;
-using SmartQr.Codes.Rendering.Matrix;
-using SmartQr.Codes.Rendering.Raster;
-using SmartQr.Codes.Rendering.Svg;
+using WoW.Two.Sdk.Backend.Beta.Codes;
 using SmartQr.Common.Persistence.DataContexts;
 using WoW.Two.Sdk.Backend.Beta.Data;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
@@ -43,15 +39,10 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the code generation library — the matrix generator, the custom SVG renderer, the Svg.Skia rasterizer, the stateless renderers (all singletons), and the image service.</summary>
+    /// <summary>Registers the SDK code-rendering engine (matrix generator, SVG renderer, Svg.Skia rasterizer, renderers — all singletons) plus the product's image service.</summary>
     private static WebApplicationBuilder AddCodeServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<IQrMatrixGenerator, QrMatrixGenerator>();
-        builder.Services.AddSingleton<SvgRenderer>();
-        builder.Services.AddSingleton<ISvgRasterizer, SkiaSvgRasterizer>();
-        builder.Services.AddSingleton<IQrCodeRenderer, QrCodeRenderer>();
-        builder.Services.AddSingleton<IBarcodeRenderer, BarcodeRenderer>();
-        builder.Services.AddSingleton<ICodeRenderer, CodeRenderer>();
+        builder.Services.AddCodeRendering();
         builder.Services.AddScoped<ICodeImageService, CodeImageService>();
         return builder;
     }

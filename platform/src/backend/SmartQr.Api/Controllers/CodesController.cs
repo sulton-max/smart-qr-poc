@@ -3,9 +3,10 @@ using SmartQr.Api.Application.Codes.Core.Commands;
 using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Queries;
 using SmartQr.Api.Application.Codes.Core.Services;
+using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Requests;
-using SmartQr.Codes;
-using SmartQr.Codes.Models;
+using WoW.Two.Sdk.Backend.Beta.Codes;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using SmartQr.Common.Domain.Codes.Enums;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
@@ -38,7 +39,7 @@ public sealed class CodesController(
         var rendered = renderer.Render(new CodeRenderRequest
         {
             Payload = request.Value,
-            Symbology = request.ResolveSymbology(),
+            Symbology = request.ResolveSymbology().ToRender(),
             Format = ImageFormat.Svg,
             Style = request.ToStyleSpec(),
         });
@@ -61,7 +62,7 @@ public sealed class CodesController(
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Gets a code by id.</summary>
@@ -79,7 +80,7 @@ public sealed class CodesController(
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Gets all codes.</summary>
@@ -96,7 +97,7 @@ public sealed class CodesController(
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<IReadOnlyList<CodeDto>>.Ok(ok.Data.Codes)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Updates a code by id.</summary>
@@ -114,7 +115,7 @@ public sealed class CodesController(
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Sets a code's active state by id.</summary>
@@ -132,7 +133,7 @@ public sealed class CodesController(
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CodeDto>.Ok(ok.Data.Code)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Deletes a code by id.</summary>
@@ -150,7 +151,7 @@ public sealed class CodesController(
 
         return result.Match<IActionResult>(
             NoContent,
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Gets a code's rendered image by id.</summary>

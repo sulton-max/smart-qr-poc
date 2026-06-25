@@ -6,7 +6,7 @@ namespace SmartQr.Api.Application.Codes.Core.Commands;
 
 /// <summary>Hard-deletes a code (its rules cascade). Owner-scoped.</summary>
 public sealed record CodeDeleteCommand
-    : ICommand<AppResult<CodeDeleteResult.Success, CodeDeleteResult.Failure>>
+    : ICommand<AppResult<CodeDeleteResult.Success>>
 {
     /// <summary>Id of the code to delete.</summary>
     public required Guid Id { get; init; }

@@ -6,7 +6,7 @@ namespace SmartQr.Api.Application.Codes.Core.Queries;
 
 /// <summary>Fetches a single code (with its rules) by id.</summary>
 public sealed record CodeGetByIdQuery
-    : IQuery<AppResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>>
+    : IQuery<AppResult<CodeGetByIdResult.Success>>
 {
     /// <summary>Code id.</summary>
     public required Guid Id { get; init; }

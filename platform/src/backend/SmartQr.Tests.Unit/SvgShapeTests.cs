@@ -1,7 +1,7 @@
-using SmartQr.Codes.Models;
-using SmartQr.Codes.Models.Style;
-using SmartQr.Codes.Rendering.Matrix;
-using SmartQr.Codes.Rendering.Svg;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
+using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Matrix;
+using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
 
 namespace SmartQr.Tests.Unit;
 

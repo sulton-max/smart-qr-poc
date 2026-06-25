@@ -6,10 +6,10 @@ using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Codes.Models.Style;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Common.Domain.Billing.Enums;
 using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
@@ -22,10 +22,10 @@ public sealed class CodeCreateCommandHandler(
     ISlugGenerator slugGenerator,
     ApiSettings settings,
     ILogger<CodeCreateCommandHandler> logger)
-    : ICommandHandler<CodeCreateCommand, AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>>
+    : ICommandHandler<CodeCreateCommand, AppResult<CodeCreateResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<CodeCreateResult.Success>> HandleAsync(
         CodeCreateCommand request, CancellationToken ct)
     {
         try
@@ -39,10 +39,9 @@ public sealed class CodeCreateCommandHandler(
             var cap = PlanLimits.MaxCodes(plan);
 
             if (await repository.CountByUserAsync(request.UserId, ct) >= cap)
-                return new AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>
-                    .Failure(new CodeCreateResult.Failure(
-                        $"Plan '{plan}' allows at most {cap} codes. Upgrade to create more.",
-                        FailureCategory.PaymentRequired));
+                return AppResult<CodeCreateResult.Success>.Fail(AppError.Of(
+                    AppErrorType.PaymentRequired,
+                    $"Plan '{plan}' allows at most {cap} codes. Upgrade to create more."));
 
             // Allocate a slug that isn't already taken.
             string slug;
@@ -83,14 +82,12 @@ public sealed class CodeCreateCommandHandler(
 
             await repository.AddAsync(entity, ct);
 
-            return new AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>
-                .Success(new CodeCreateResult.Success(entity.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeCreateResult.Success>.Ok(new CodeCreateResult.Success(entity.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeCreate failed for user {UserId}", request.UserId);
-            return new AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>
-                .Failure(new CodeCreateResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<CodeCreateResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 }

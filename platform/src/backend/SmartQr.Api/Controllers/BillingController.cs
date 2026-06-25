@@ -30,7 +30,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<CheckoutSessionDto>.Ok(ok.Data.Session)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Opens a billing portal session.</summary>
@@ -48,7 +48,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<PortalSessionDto>.Ok(ok.Data.Session)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Handles a Stripe webhook event.</summary>
@@ -68,7 +68,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         return result.Match<IActionResult>(
             _ => Ok(),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Gets the current billing status.</summary>
@@ -85,6 +85,6 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
 
         return result.Match<IActionResult>(
             ok => Ok(ApiResponse<BillingStatusDto>.Ok(ok.Data.Status)),
-            fail => Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category)));
+            fail => this.ToProblem(fail.Error));
     }
 }

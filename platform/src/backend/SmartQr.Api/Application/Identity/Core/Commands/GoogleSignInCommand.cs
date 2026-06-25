@@ -6,7 +6,7 @@ namespace SmartQr.Api.Application.Identity.Core.Commands;
 
 /// <summary>Signs in with a Google ID token — verifies it, finds or creates the account, and claims the caller's guest codes.</summary>
 public sealed record GoogleSignInCommand
-    : ICommand<AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure>>
+    : ICommand<AppResult<GoogleSignInResult.Success>>
 {
     /// <summary>The Google ID token (JWT credential) issued to the client by Google Sign-In.</summary>
     public required string IdToken { get; init; }

@@ -4,7 +4,7 @@ using SmartQr.Api.Application.Identity.Core.Commands;
 using SmartQr.Api.Application.Identity.Core.Models;
 using SmartQr.Api.Application.Identity.Core.Services;
 using SmartQr.Common.Domain.Identity.Entities;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -17,18 +17,17 @@ public sealed class GoogleSignInCommandHandler(
     IUserRepository users,
     ICodeRepository codes,
     ILogger<GoogleSignInCommandHandler> logger)
-    : ICommandHandler<GoogleSignInCommand, AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure>>
+    : ICommandHandler<GoogleSignInCommand, AppResult<GoogleSignInResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<GoogleSignInResult.Success>> HandleAsync(
         GoogleSignInCommand request, CancellationToken ct)
     {
         try
         {
             var identity = await verifier.VerifyAsync(request.IdToken, ct);
             if (identity is null)
-                return new AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure>
-                    .Failure(new GoogleSignInResult.Failure("The Google token could not be verified.", FailureCategory.Unauthorized));
+                return AppResult<GoogleSignInResult.Success>.Fail(AppError.Of(AppErrorType.Unauthorized, "The Google token could not be verified."));
 
             var existing = await users.FindByGoogleSubjectAsync(identity.Subject, ct);
 
@@ -64,12 +63,10 @@ public sealed class GoogleSignInCommandHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Google sign-in failed.");
-            return new AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure>
-                .Failure(new GoogleSignInResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<GoogleSignInResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 
-    private static AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure> Ok(UserEntity user) =>
-        new AppResult<GoogleSignInResult.Success, GoogleSignInResult.Failure>
-            .Success(new GoogleSignInResult.Success(new UserSummaryDto(user.Id, user.Name, user.Email)));
+    private static AppResult<GoogleSignInResult.Success> Ok(UserEntity user) =>
+        AppResult<GoogleSignInResult.Success>.Ok(new GoogleSignInResult.Success(new UserSummaryDto(user.Id, user.Name, user.Email)));
 }

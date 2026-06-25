@@ -1,5 +1,5 @@
 using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Codes.Models.Style;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -8,7 +8,7 @@ namespace SmartQr.Api.Application.Codes.Core.Commands;
 
 /// <summary>Creates a dynamic code with an optional ordered rule set.</summary>
 public sealed record CodeCreateCommand
-    : ICommand<AppResult<CodeCreateResult.Success, CodeCreateResult.Failure>>
+    : ICommand<AppResult<CodeCreateResult.Success>>
 {
     /// <summary>Id of the user creating the code.</summary>
     public required Guid UserId { get; init; }

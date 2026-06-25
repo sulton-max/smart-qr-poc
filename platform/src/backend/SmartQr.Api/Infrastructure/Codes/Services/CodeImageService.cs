@@ -1,8 +1,9 @@
 using SmartQr.Api.Application.Codes.Core.Services;
+using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Codes;
-using SmartQr.Codes.Models;
-using SmartQr.Codes.Models.Style;
+using WoW.Two.Sdk.Backend.Beta.Codes;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
 
@@ -22,7 +23,7 @@ public sealed class CodeImageService(ICodeRenderer renderer, ApiSettings setting
         return renderer.Render(new CodeRenderRequest
         {
             Payload = shortUrl,
-            Symbology = code.BarcodeFormat,
+            Symbology = code.BarcodeFormat.ToRender(),
             Format = format,
             Style = style,
         });

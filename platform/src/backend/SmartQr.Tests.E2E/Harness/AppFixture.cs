@@ -15,6 +15,7 @@ using Testcontainers.PostgreSql;
 using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 using WoW.Two.Sdk.Backend.Beta.Testing;
 using WoW.Two.Sdk.Backend.Beta.Testing.Containers;
+using WoW.Two.Sdk.Backend.Beta.Testing.Containers.Postgres;
 using WoW.Two.Sdk.Backend.Beta.Testing.MultiHost;
 
 // Disambiguate the two top-level `Program` types (both live in the global namespace of their assembly).

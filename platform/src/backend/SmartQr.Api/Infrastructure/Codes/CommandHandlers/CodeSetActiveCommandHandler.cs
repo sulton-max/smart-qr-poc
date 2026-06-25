@@ -4,7 +4,7 @@ using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
@@ -15,10 +15,10 @@ public sealed class CodeSetActiveCommandHandler(
     ICodeRepository repository,
     ApiSettings settings,
     ILogger<CodeSetActiveCommandHandler> logger)
-    : ICommandHandler<CodeSetActiveCommand, AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>>
+    : ICommandHandler<CodeSetActiveCommand, AppResult<CodeSetActiveResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<CodeSetActiveResult.Success>> HandleAsync(
         CodeSetActiveCommand request, CancellationToken ct)
     {
         try
@@ -26,17 +26,14 @@ public sealed class CodeSetActiveCommandHandler(
             var code = await repository.SetActiveAsync(request.Id, request.UserId, request.IsActive, ct);
 
             if (code is null)
-                return new AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
-                    .Failure(new CodeSetActiveResult.Failure("Code not found", FailureCategory.NotFound));
+                return AppResult<CodeSetActiveResult.Success>.Fail(AppError.Of(AppErrorType.NotFound, "Code not found"));
 
-            return new AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
-                .Success(new CodeSetActiveResult.Success(code.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeSetActiveResult.Success>.Ok(new CodeSetActiveResult.Success(code.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeSetActive failed for {CodeId} user {UserId}", request.Id, request.UserId);
-            return new AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>
-                .Failure(new CodeSetActiveResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<CodeSetActiveResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 }

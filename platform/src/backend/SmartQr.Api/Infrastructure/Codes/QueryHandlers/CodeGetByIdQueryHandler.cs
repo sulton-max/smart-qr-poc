@@ -4,7 +4,7 @@ using SmartQr.Api.Application.Codes.Core.Queries;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
@@ -15,10 +15,10 @@ public sealed class CodeGetByIdQueryHandler(
     ICodeRepository repository,
     ApiSettings settings,
     ILogger<CodeGetByIdQueryHandler> logger)
-    : IQueryHandler<CodeGetByIdQuery, AppResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>>
+    : IQueryHandler<CodeGetByIdQuery, AppResult<CodeGetByIdResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<CodeGetByIdResult.Success>> HandleAsync(
         CodeGetByIdQuery request, CancellationToken ct)
     {
         try
@@ -26,17 +26,14 @@ public sealed class CodeGetByIdQueryHandler(
             var code = await repository.GetByIdForUserAsync(request.Id, request.UserId, ct);
 
             if (code is null)
-                return new AppResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>
-                    .Failure(new CodeGetByIdResult.Failure("Code not found", FailureCategory.NotFound));
+                return AppResult<CodeGetByIdResult.Success>.Fail(AppError.Of(AppErrorType.NotFound, "Code not found"));
 
-            return new AppResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>
-                .Success(new CodeGetByIdResult.Success(code.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeGetByIdResult.Success>.Ok(new CodeGetByIdResult.Success(code.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeGetById failed for {CodeId}", request.Id);
-            return new AppResult<CodeGetByIdResult.Success, CodeGetByIdResult.Failure>
-                .Failure(new CodeGetByIdResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<CodeGetByIdResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 }

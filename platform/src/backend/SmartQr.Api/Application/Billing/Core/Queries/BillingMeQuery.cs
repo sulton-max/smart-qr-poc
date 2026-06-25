@@ -6,7 +6,7 @@ namespace SmartQr.Api.Application.Billing.Core.Queries;
 
 /// <summary>Reads the caller's billing snapshot — plan, status, limits, and live code usage.</summary>
 public sealed record BillingMeQuery
-    : IQuery<AppResult<BillingMeResult.Success, BillingMeResult.Failure>>
+    : IQuery<AppResult<BillingMeResult.Success>>
 {
     /// <summary>The id of the user whose snapshot is read.</summary>
     public required Guid UserId { get; init; }

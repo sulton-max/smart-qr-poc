@@ -6,7 +6,7 @@ namespace SmartQr.Api.Application.Codes.Core.Commands;
 
 /// <summary>Enables or disables a code (toggles <c>is_active</c> only). Owner-scoped.</summary>
 public sealed record CodeSetActiveCommand
-    : ICommand<AppResult<CodeSetActiveResult.Success, CodeSetActiveResult.Failure>>
+    : ICommand<AppResult<CodeSetActiveResult.Success>>
 {
     /// <summary>Id of the code to toggle.</summary>
     public required Guid Id { get; init; }

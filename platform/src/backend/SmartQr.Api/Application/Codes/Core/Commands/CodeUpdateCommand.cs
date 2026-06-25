@@ -1,5 +1,5 @@
 using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Codes.Models.Style;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Common.Domain.Codes.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -8,7 +8,7 @@ namespace SmartQr.Api.Application.Codes.Core.Commands;
 
 /// <summary>Updates a code's editable fields and replaces its whole rule set. Owner-scoped; the slug, scan count, and creation timestamp are preserved.</summary>
 public sealed record CodeUpdateCommand
-    : ICommand<AppResult<CodeUpdateResult.Success, CodeUpdateResult.Failure>>
+    : ICommand<AppResult<CodeUpdateResult.Success>>
 {
     /// <summary>Id of the code to update.</summary>
     public required Guid Id { get; init; }

@@ -9,7 +9,7 @@
     <ItemGroup>
         <!-- Mediator (ISender.SendAsync) and AppResult.Match for the controllers. -->
         <PackageReference Include="Google.Apis.Auth" Version="1.75.0" />
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.37-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.40-beta" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.*" />
         <PackageReference Include="Stripe.net" Version="52.0.0" />
     </ItemGroup>
@@ -17,7 +17,6 @@
     <ItemGroup>
         <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
         <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
-        <ProjectReference Include="..\SmartQr.Codes\SmartQr.Codes.csproj" />
     </ItemGroup>
 
     <PropertyGroup>

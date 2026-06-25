@@ -1,4 +1,4 @@
-using SmartQr.Codes.Models;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using SmartQr.Common.Domain.Codes.Entities;
 using SmartQr.Common.Domain.Codes.Enums;
 

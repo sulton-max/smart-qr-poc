@@ -4,7 +4,7 @@ using SmartQr.Api.Application.Codes.Core.Queries;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
@@ -15,10 +15,10 @@ public sealed class CodeListQueryHandler(
     ICodeRepository repository,
     ApiSettings settings,
     ILogger<CodeListQueryHandler> logger)
-    : IQueryHandler<CodeListQuery, AppResult<CodeListResult.Success, CodeListResult.Failure>>
+    : IQueryHandler<CodeListQuery, AppResult<CodeListResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<CodeListResult.Success, CodeListResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<CodeListResult.Success>> HandleAsync(
         CodeListQuery request, CancellationToken ct)
     {
         try
@@ -26,14 +26,12 @@ public sealed class CodeListQueryHandler(
             var codes = await repository.ListByUserAsync(request.UserId, request.Q, ct);
             var dtos = codes.Select(c => c.ToDto(settings.RedirectBaseUrl)).ToList();
 
-            return new AppResult<CodeListResult.Success, CodeListResult.Failure>
-                .Success(new CodeListResult.Success(dtos));
+            return AppResult<CodeListResult.Success>.Ok(new CodeListResult.Success(dtos));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "CodeList failed for user {UserId}", request.UserId);
-            return new AppResult<CodeListResult.Success, CodeListResult.Failure>
-                .Failure(new CodeListResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<CodeListResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 }

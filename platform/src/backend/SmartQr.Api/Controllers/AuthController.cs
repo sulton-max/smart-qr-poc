@@ -36,8 +36,7 @@ public sealed class AuthController(ISender sender, ICurrentUser currentUser, IGu
                 guestSession.Clear();   // the auth cookie is now the identity — drop the redundant guest cookie.
                 return Ok(ApiResponse<CurrentUserDto>.Ok(new CurrentUserDto(UserKind.User, ok.Data.User)));
             },
-            fail => Task.FromResult<IActionResult>(
-                Problem(detail: fail.Error.ErrorMessage, statusCode: ApiResults.ToStatusCode(fail.Error.Category))));
+            fail => Task.FromResult<IActionResult>(this.ToProblem(fail.Error)));
     }
 
     /// <summary>Signs out — clears both the session cookie and the guest cookie, returning the caller to anonymous.</summary>

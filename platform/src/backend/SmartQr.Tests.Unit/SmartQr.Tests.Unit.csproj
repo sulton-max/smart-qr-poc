@@ -13,6 +13,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <!-- Code-rendering engine now lives in the SDK (extracted v0.6); these tests exercise it directly. -->
+    <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.40-beta" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +23,6 @@
 
   <!-- The systems under test: code generation (SmartQr.Codes), the routing evaluator (SmartQr.Redirect.Api), and PlanLimits (SmartQr.Api). Pure types only; the global `Program` of each host is never referenced, so no extern aliases are needed. -->
   <ItemGroup>
-    <ProjectReference Include="..\SmartQr.Codes\SmartQr.Codes.csproj" />
     <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
     <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" />
     <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" />

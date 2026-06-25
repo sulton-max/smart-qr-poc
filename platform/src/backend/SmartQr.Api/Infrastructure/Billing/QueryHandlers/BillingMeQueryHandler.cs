@@ -5,7 +5,7 @@ using SmartQr.Api.Application.Billing.Core.Queries;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Common.Domain.Billing.Enums;
-using SmartQr.Common.Domain.Results;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
@@ -16,10 +16,10 @@ public sealed class BillingMeQueryHandler(
     ISubscriptionRepository subscriptions,
     ICodeRepository codes,
     ILogger<BillingMeQueryHandler> logger)
-    : IQueryHandler<BillingMeQuery, AppResult<BillingMeResult.Success, BillingMeResult.Failure>>
+    : IQueryHandler<BillingMeQuery, AppResult<BillingMeResult.Success>>
 {
     /// <inheritdoc />
-    public async ValueTask<AppResult<BillingMeResult.Success, BillingMeResult.Failure>> HandleAsync(
+    public async ValueTask<AppResult<BillingMeResult.Success>> HandleAsync(
         BillingMeQuery request, CancellationToken ct)
     {
         try
@@ -40,14 +40,12 @@ public sealed class BillingMeQueryHandler(
                 Usage = new UsageDto { CodeCount = codeCount },
             };
 
-            return new AppResult<BillingMeResult.Success, BillingMeResult.Failure>
-                .Success(new BillingMeResult.Success(dto));
+            return AppResult<BillingMeResult.Success>.Ok(new BillingMeResult.Success(dto));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "BillingMe failed for user {UserId}", request.UserId);
-            return new AppResult<BillingMeResult.Success, BillingMeResult.Failure>
-                .Failure(new BillingMeResult.Failure(ex.Message, FailureCategory.Unexpected));
+            return AppResult<BillingMeResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
         }
     }
 }
