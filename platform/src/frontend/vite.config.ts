@@ -8,7 +8,9 @@ import path from "node:path";
 export default defineConfig({
   // mkcert → HTTPS dev server (locally-trusted cert). Keeps `Secure` auth cookies + secure-context
   // working; convention: frontend/project-structure.md §Dev server.
-  plugins: [react(), tailwindcss(), mkcert()],
+  // Set `VITE_HTTPS=false` to skip mkcert and serve plain HTTP (e.g. headless preview tools whose
+  // browser doesn't trust the local mkcert CA). Normal dev stays HTTPS.
+  plugins: [react(), tailwindcss(), ...(process.env.VITE_HTTPS === "false" ? [] : [mkcert()])],
   server: {
     port: 7024,
     // Proxy /api to the backend's HTTPS (even) port with secure:false (self-signed .NET dev cert) — per

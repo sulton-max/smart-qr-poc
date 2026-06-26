@@ -116,6 +116,9 @@ export interface PreviewGradient {
   type: GradientType;
   stops: PreviewGradientStop[];
   angle: number; // degrees; 0 = left→right, 90 = top→bottom (linear only)
+  // Radial extent (0..1) — frontend-only for now: the backend ignores unknown gradient
+  // fields (System.Text.Json) until a feature version wires it, so this is not persisted yet.
+  radius?: number; // radial only
 }
 
 // Visual style sent with a preview request. Field names match the pinned wire

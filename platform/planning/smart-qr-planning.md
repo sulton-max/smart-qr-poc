@@ -167,6 +167,7 @@ strike-through + ✅ when done (kept for traceability).
 | Frames + CTA captions | feature | outer frame + a call-to-action label ("Scan me"); **research which frame styles actually lift conversion first** before building |
 | `StyleSpec` schema-evolution upgrader | infra | versioned model + lazy on-read `vN→current` upgrade chain (additive fields need none — new fields go in optional); build at the first breaking change, then extract the versioned-model + upgrader pattern to the backend-beta SDK |
 | PDF export | feature | alongside SVG + PNG |
+| Download, not preview | fix | the SVG/PNG buttons open the asset in a new tab — should trigger a real file download (`Content-Disposition: attachment` or a client-side blob download); add a download icon to the buttons |
 
 ### Code & content breadth
 

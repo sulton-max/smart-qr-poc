@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, CopyButton, SegmentedControl, ToggleButton } from "@wow-two-beta/ui/actions";
-import { ColorPicker, FormField, Select, SwitchField, TextInput } from "@wow-two-beta/ui/forms";
-import { Card, Heading, Text } from "@wow-two-beta/ui/display";
+import { FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
+import { Accordion, Card, Heading, Text } from "@wow-two-beta/ui/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
 import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/layout";
 import { ArrowLeft } from "lucide-react";
 import { QrPreview } from "../components/QrPreview";
 import { RuleBuilder } from "../components/RuleBuilder";
 import { ShapeControls } from "../components/ShapeControls";
-import { GradientControls } from "../components/GradientControls";
+import { FillControls } from "../components/FillControls";
+import { TileColorPicker } from "../components/TileColorPicker";
 import { EmojiControls } from "../components/EmojiControls";
 import { ContrastHint } from "../components/ContrastHint";
 import { codeImageUrl, createCode, getCode, updateCode, REDIRECT_BASE } from "../api";
@@ -34,6 +35,12 @@ const SYMBOLOGY_LABEL: Record<BarcodeFormat, string> = {
   Ean13: "EAN-13",
   UpcA: "UPC-A",
 };
+
+// Force symmetric accordion-panel padding. Installed @wow-two-beta/ui@0.0.64 renders the
+// Accordion content as `px-3 pb-3` (zero top padding → content hugs the trigger, 12px gap at
+// the bottom). The SDK source already fixes this to `py-3`; this override targets the inner
+// padding div and is a redundant no-op once that ui bump lands (safe to drop then).
+const PANEL_PADDING = "[&>div>div]:!py-3";
 
 /** Persisted rules → builder draft shape (adds client-side keys). */
 function toDrafts(code: CodeDto): RuleDraft[] {
@@ -80,7 +87,8 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [foreground, setForeground] = useState("#18181b");
   const [background, setBackground] = useState("#ffffff");
   // Code-styling shapes (v0.5) — default `square` so the render is unchanged until picked.
-  const [tab, setTab] = useState<"destination" | "style" | "center" | "routing">("destination");
+  // Layout D (v0.6): 3 grouped tabs — Content · Design (accordion) · Routing.
+  const [tab, setTab] = useState<"content" | "design" | "routing">("content");
   const [moduleShape, setModuleShape] = useState<ModuleShape>(ModuleShape.Square);
   const [finderShape, setFinderShape] = useState<FinderShape>(FinderShape.Square);
   const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
@@ -232,15 +240,14 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             onValueChange={(v) => v && setTab(v as typeof tab)}
             aria-label="Builder section"
           >
-            <ToggleButton value="destination" className="flex-1">Destination</ToggleButton>
-            <ToggleButton value="style" className="flex-1">Style</ToggleButton>
-            <ToggleButton value="center" className="flex-1">Center</ToggleButton>
+            <ToggleButton value="content" className="flex-1">Content</ToggleButton>
+            <ToggleButton value="design" className="flex-1">Design</ToggleButton>
             <ToggleButton value="routing" className="flex-1">Routing</ToggleButton>
           </SegmentedControl>
 
           {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
           <div key={tab} className="flex flex-col gap-5 motion-safe:animate-(--animate-fade-in)">
-          {tab === "destination" && (
+          {tab === "content" && (
             <>
               {isEdit && existing && (
                 <FormField label="Short link" helper="Encoded into the printed code — permanent and not editable.">
@@ -266,9 +273,9 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </>
           )}
 
-          {tab === "style" && (
+          {tab === "design" && (
             <>
-              <Text as="span" size="sm" weight="medium">Appearance</Text>
+              {/* Code type stays outside the accordion — it gates which style options apply (QR vs 1D/2D). */}
               <FormField label="Code type">
                 <Select<BarcodeFormat>
                   value={symbology}
@@ -284,48 +291,81 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   </Select.Content>
                 </Select>
               </FormField>
-              {gradient === null ? (
-                <Grid columns="2" gap="4">
-                  <FormField label="Foreground">
-                    <ColorPicker value={foreground} onValueChange={(hex) => setForeground(hex ?? "#000000")} />
-                  </FormField>
-                  <FormField label="Background">
-                    <ColorPicker value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
-                  </FormField>
-                </Grid>
-              ) : (
-                // The gradient overrides the solid foreground, so only the background remains here.
-                <FormField label="Background" helper="Foreground is set by the gradient below.">
-                  <ColorPicker value={background} onValueChange={(hex) => setBackground(hex ?? "#ffffff")} />
-                </FormField>
-              )}
-              <SwitchField
-                label="Transparent background"
-                description="Drop the background so the code sits on any surface."
-                side="right"
-                checked={transparentBackground}
-                onChange={(e) => setTransparentBackground(e.currentTarget.checked)}
-              />
-              <GradientControls gradient={gradient} foreground={foreground} onChange={setGradient} />
-              <ContrastHint
-                foreground={foreground}
-                background={background}
-                transparent={transparentBackground}
-                gradient={gradient}
-              />
-              <Text as="span" size="sm" weight="medium">Shape</Text>
-              <ShapeControls
-                moduleShape={moduleShape}
-                finderShape={finderShape}
-                finderDotShape={finderDotShape}
-                onModuleShapeChange={setModuleShape}
-                onFinderShapeChange={setFinderShape}
-                onFinderDotShapeChange={setFinderDotShape}
-              />
+
+              {/* Layout D: one styling section open at a time — caps height, scales to any number of sections. */}
+              <Accordion
+                type="single"
+                defaultValue="colors"
+                isCollapsible
+                className="overflow-hidden rounded-lg border border-border"
+              >
+                <Accordion.Item value="colors">
+                  <Accordion.Trigger>Colors &amp; fill</Accordion.Trigger>
+                  <Accordion.Content className={PANEL_PADDING}>
+                    <Stack gap="0">
+                      <FillControls
+                        foreground={foreground}
+                        onForegroundChange={setForeground}
+                        gradient={gradient}
+                        onGradientChange={setGradient}
+                      />
+
+                      {/* Background row — a [swatch][Color | Transparent] segmented control.
+                          The swatch edits the bg color and greys when Transparent is selected. The
+                          swatch is a sibling of the toggle (not nested) — a ColorPicker renders its own
+                          <button>, and a button-in-button is invalid/inaccessible markup. */}
+                      <div className="flex min-h-10 items-center justify-between gap-4 border-t border-border pt-2">
+                        <span className="text-sm text-muted-foreground">Background</span>
+                        <div className="flex items-center gap-2">
+                          <span className={transparentBackground ? "pointer-events-none opacity-40" : undefined}>
+                            <TileColorPicker
+                              value={background}
+                              onValueChange={setBackground}
+                              ariaLabel="Background color"
+                              size="md"
+                            />
+                          </span>
+                          <SegmentedControl
+                            type="single"
+                            value={transparentBackground ? "transparent" : "color"}
+                            onValueChange={(v) => {
+                              if (v === "color") setTransparentBackground(false);
+                              else if (v === "transparent") setTransparentBackground(true);
+                            }}
+                            aria-label="Background fill"
+                          >
+                            <ToggleButton value="color" size="sm">Color</ToggleButton>
+                            <ToggleButton value="transparent" size="sm">Transparent</ToggleButton>
+                          </SegmentedControl>
+                        </div>
+                      </div>
+                    </Stack>
+                  </Accordion.Content>
+                </Accordion.Item>
+
+                <Accordion.Item value="shape">
+                  <Accordion.Trigger>Shape &amp; eyes</Accordion.Trigger>
+                  <Accordion.Content className={PANEL_PADDING}>
+                    <ShapeControls
+                      moduleShape={moduleShape}
+                      finderShape={finderShape}
+                      finderDotShape={finderDotShape}
+                      onModuleShapeChange={setModuleShape}
+                      onFinderShapeChange={setFinderShape}
+                      onFinderDotShapeChange={setFinderDotShape}
+                    />
+                  </Accordion.Content>
+                </Accordion.Item>
+
+                <Accordion.Item value="center">
+                  <Accordion.Trigger>Center</Accordion.Trigger>
+                  <Accordion.Content className={PANEL_PADDING}>
+                    <EmojiControls emoji={emoji} onChange={setEmoji} />
+                  </Accordion.Content>
+                </Accordion.Item>
+              </Accordion>
             </>
           )}
-
-          {tab === "center" && <EmojiControls emoji={emoji} onChange={setEmoji} />}
 
           {tab === "routing" && <RuleBuilder rules={rules} onChange={setRules} />}
           </div>
@@ -350,6 +390,16 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             Live preview — the final asset rendered server-side (vector-first), so what you see
             is what you download.
           </Text>
+
+          {/* Scannability note — lives under the preview (not in the form) so it reads against the actual render. */}
+          <div className="w-full">
+            <ContrastHint
+              foreground={foreground}
+              background={background}
+              transparent={transparentBackground}
+              gradient={gradient}
+            />
+          </div>
 
           {saved && (
             <Surface
