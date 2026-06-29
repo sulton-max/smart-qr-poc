@@ -3,8 +3,8 @@ bin/
 obj/
 *.user
 
-# Frontend build output served by the Api (regenerate via `pnpm -C platform/src/frontend build`)
-platform/src/backend/SmartQr.Api/wwwroot/
+# Frontend build output served by the Api (regenerate via `pnpm -C engineering/codebase/smartqr.frontend-services build`)
+engineering/codebase/smartqr.backend-services/SmartQr.Api/wwwroot/
 
 # Local config overrides (loaded by HostConfiguration; never committed)
 appsettings.Local.json
@@ -18,5 +18,5 @@ appsettings.Local.json
 *.received.*
 
 # Serilog file output (per-service runtime logs — never committed)
-platform/src/backend/SmartQr.Api/logs/
-platform/src/backend/SmartQr.Redirect.Api/logs/
+engineering/codebase/smartqr.backend-services/SmartQr.Api/logs/
+engineering/codebase/smartqr.backend-services/SmartQr.Redirect.Api/logs/

@@ -9,12 +9,12 @@ Dynamic QR / barcode / link platform — programmable routing ("one code, many d
 
 ## Structure
 
-Two top-level layers (mirrors Haven):
+Two top-level layers (per `conventions/development/repo/repo-structure.md`):
 
-- **`business/`** — venture layer: model, pricing, positioning, GTM.
-- **`platform/`** — technical layer: `src/` (the .NET solution + `frontend/`) · `architecture/` · `planning/` · `versions/`.
+- **`product/`** — venture layer: model, pricing, positioning, GTM.
+- **`engineering/`** — technical layer: `codebase/` (the .NET + React services) · `architecture/` · `planning/` (incl. `version-track/`) · `development/` · `deployment/` · `operations/` · `research/`.
 
-Backend (`platform/src/backend/`) — refs go product → platform, never reverse:
+Backend (`engineering/codebase/smartqr.backend-services/`) — refs go product → platform, never reverse:
 
 | Project | Role |
 |---|---|
@@ -25,7 +25,7 @@ Backend (`platform/src/backend/`) — refs go product → platform, never revers
 | `SmartQr.Redirect.Api` | redirect hot path · https **7022** |
 | `SmartQr.Tests.{Unit,Integration,E2E,Migrations}` | xUnit — pure-logic units · repo/DB integration · full-API E2E (Testcontainers PG) · migrator engine |
 
-Frontend (`platform/src/frontend/`) — React 19 + Vite + Tailwind v4 + `@wow-two-beta/ui`; **pnpm** (not npm — `workspace:` protocol); https dev server via mkcert (even port 7024).
+Frontend (`engineering/codebase/smartqr.frontend-services/`) — React 19 + Vite + Tailwind v4 + `@wow-two-beta/ui`; **pnpm** (not npm — `workspace:` protocol); https dev server via mkcert (even port 7024).
 
 ## Conventions
 

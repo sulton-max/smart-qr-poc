@@ -1,0 +1,19 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/services/">
+    <Project Path="SmartQr.Api/SmartQr.Api.csproj" />
+    <Project Path="SmartQr.Common.Domain/SmartQr.Common.Domain.csproj" />
+    <Project Path="SmartQr.Common.Persistence/SmartQr.Common.Persistence.csproj" />
+    <Project Path="SmartQr.Redirect.Api/SmartQr.Redirect.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="SmartQr.Tests.E2E/SmartQr.Tests.E2E.csproj" />
+    <Project Path="SmartQr.Tests.Integration/SmartQr.Tests.Integration.csproj" />
+    <Project Path="SmartQr.Tests.Migrations/SmartQr.Tests.Migrations.csproj" />
+    <Project Path="SmartQr.Tests.Unit/SmartQr.Tests.Unit.csproj" />
+  </Folder>
+</Solution>

@@ -18,7 +18,7 @@ The thin slice from the spec, end-to-end in code:
 Clean Architecture, mirroring the Haven backend (`Api / Application / Domain / Infrastructure / Persistence` layers over shared `Common*` libraries). Two deployable services share the libraries.
 
 ```
-platform/src/backend/SmartQr.sln
+engineering/codebase/smartqr.backend-services/smartqr.backend-services.slnx
 ├── SmartQr.Common            # mediator (wraps MediatR), ApiResponse, result pattern, config loader, CORS, settings
 ├── SmartQr.Common.Domain     # entities (Code / RoutingRule / ScanEvent) + enums (IEntity, no deps)
 ├── SmartQr.Common.Persistence # EF Core DbContext, entity configs, Npgsql enum-mapped data source (snake_case)
@@ -52,22 +52,22 @@ This is the "cache the decision, not the picture; make analytics async" design f
 Requires **.NET 9** (SDK 10 builds it) and **PostgreSQL** for the data-touching endpoints. The Api **auto-creates the `smartqr` database + schema on startup** (idempotent) — just have Postgres running (default `localhost:5432`, `postgres`/`postgres`).
 
 ```bash
-cd platform/src/backend
-dotnet build SmartQr.sln
-dotnet test SmartQr.Tests        # no DB needed — generation + routing + SQLite integration
+cd engineering/codebase/smartqr.backend-services
+dotnet build smartqr.backend-services.slnx
+dotnet test SmartQr.Tests.Unit   # no DB needed — generation + routing + SQLite integration
 
 # Build the React UI into the Api's wwwroot so the backend serves it:
-pnpm -C ../frontend install && pnpm -C ../frontend build
+pnpm -C ../smartqr.frontend-services install && pnpm -C ../smartqr.frontend-services build
 
 dotnet run --project SmartQr.Api       # → http://localhost:7021  — serves the UI + /api
 dotnet run --project SmartQr.Redirect.Api  # → http://localhost:7023  — redirect hot path
 ```
 
-**Open the app at http://localhost:7021.** Default `dotnet run` uses the **http** profile (`:7021`); for `https://localhost:7020` add `--launch-profile https` (and `dotnet dev-certs https --trust`). Re-run `pnpm -C ../frontend build` after UI changes.
+**Open the app at http://localhost:7021.** Default `dotnet run` uses the **http** profile (`:7021`); for `https://localhost:7020` add `--launch-profile https` (and `dotnet dev-certs https --trust`). Re-run `pnpm -C ../smartqr.frontend-services build` after UI changes.
 
 Health checks need no DB: `GET http://localhost:7021/health`, `GET http://localhost:7023/health`.
 
-For live frontend dev with hot reload: `pnpm -C ../frontend dev` (http://localhost:7025, proxies `/api` → the Api).
+For live frontend dev with hot reload: `pnpm -C ../smartqr.frontend-services dev` (http://localhost:7025, proxies `/api` → the Api).
 
 Try the API flows in `SmartQr.Api/SmartQr.Api.http` and `SmartQr.Redirect.Api/SmartQr.Redirect.Api.http`.
 

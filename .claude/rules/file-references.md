@@ -1,27 +1,27 @@
 # File References
 
 > **Lookup table only.** Do NOT pre-read — open a file only when the task needs it.
-> Tracks docs outside `platform/src/` (source is navigated via `tree`/`find`/`grep`).
+> Tracks docs outside `engineering/codebase/` (source is navigated via `tree`/`find`/`grep`).
 > **Maintenance:** doc added → add row · removed → remove · renamed → update path.
 
-## Business (`business/`)
+## Product (`product/`)
 
-> Core docs at root (`business-context.md`, `business-knowledge.md`); subfolders created as needed — `analysis/` (product/feature/market research), `marketing/`, `planning/`, `flows/`. Mirrors Haven.
+> Core docs at root (`context.md`, `product.md`); subfolders created as needed — `analysis/` (product/feature/market research), `marketing/`, `planning/`, `flows/`. Mirrors Haven.
 
 | File | Content |
 |---|---|
-| `business-context.md` | Current state, brand (name/tagline/domain), active business-side tasks, decisions log |
-| `business-knowledge.md` | Model, pricing tiers, positioning, GWDNBM, target users, kill gates |
+| `context.md` | Current state, brand (name/tagline/domain), active business-side tasks, decisions log |
+| `product.md` | Model, pricing tiers, positioning, GWDNBM, target users, kill gates |
 | `analysis/feature-research.md` | QR/codes feature universe mapped against the ForeverPin wedge → v0.5 hand-pick shortlist |
 | `marketing/marketing.md` | App GTM — positioning v2 (free generator + forwarder), $1 pricing experiment, channels |
 
-## Platform — Planning (`platform/planning/`)
+## Engineering — Planning (`engineering/planning/`)
 
 | File | Content |
 |---|---|
-| `smart-qr-planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions |
+| `planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions |
 
-## Platform — Architecture (`platform/architecture/`)
+## Engineering — Architecture (`engineering/architecture/`)
 
 | File | Content |
 |---|---|
@@ -31,9 +31,9 @@
 | `billing.md` | Stripe billing (hosted Checkout + Portal + webhook + `/me`), `UserId`-keyed subscription, `002-billing` migration, `PlanLimits` create-time 402 gate, config, tests, frontend wiring |
 | `frontend.md` | React+TS+Tailwind4 frontend — beta-UI consumption pattern, missing-component workflow, Create-Code builder |
 
-## Platform — Versions (`platform/versions/`)
+## Engineering — Version Track (`engineering/planning/version-track/`)
 
-> Per-release scope + log. Status table + lifecycle in `platform/planning/smart-qr-planning.md` § Versions.
+> Per-release scope + log. Status table + lifecycle in `engineering/planning/planning.md` § Versions. Lead doc: `version-track.md`.
 
 | File | Content |
 |---|---|
@@ -43,7 +43,7 @@
 | `v0.4/v0.4.md` | v0.4 (SDK adoption) — extract non-business infra to backend-beta + adopt `@wow-two-beta/ui` fully |
 | `v0.5/v0.5.md` | v0.5 (TBD — brainstorm) — planning scaffold seeded from v0.4 deferrals + backlog |
 
-## Platform — Source (`platform/src/backend/`)
+## Engineering — Codebase: Backend (`engineering/codebase/smartqr.backend-services/`)
 
 > Not file-indexed — use `tree`/`find`/`grep`. Overview in `README.md`; per-subsystem detail in `architecture/`.
 
@@ -55,9 +55,9 @@
 | `SmartQr.Redirect.Api` | redirect hot path (minimal API) |
 | `SmartQr.Tests.{Unit,Integration,E2E,Migrations}` | xUnit — units · integration · full-API E2E · migrator engine |
 
-## Platform — Frontend (`platform/src/frontend/`)
+## Engineering — Codebase: Frontend (`engineering/codebase/smartqr.frontend-services/`)
 
-> React 19 + Vite + Tailwind v4 web app consuming `@wow-two-beta/ui`. See `platform/architecture/frontend.md`. Navigate source via `tree`/`find`/`grep`.
+> React 19 + Vite + Tailwind v4 web app consuming `@wow-two-beta/ui`. See `engineering/architecture/frontend.md`. Navigate source via `tree`/`find`/`grep`.
 
 | Area | What |
 |---|---|
