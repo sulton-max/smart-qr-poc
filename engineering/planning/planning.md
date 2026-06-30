@@ -20,7 +20,8 @@ Shipped + the active/next version only — future work lives in the ordered back
 | v0.3 | Accounts & ownership | Feature | sign in with Google · claim guest codes · cross-device management | ✅ |
 | v0.4 | SDK adoption | Adoption | extract all non-business-logic infra to the SDK (incl. the test baseline + the migrator/EF test harness → `Testing.Data`); adopt `@wow-two-beta/ui` fully | ✅ |
 | v0.5 | Code styling | Feature | server-authoritative render (preview == download) · module + finder-eye shapes · linear/radial gradients · transparency · center emoji · design system (lavender/violet/teal · Geist) + dark mode · builder tabs + sticky preview | ✅ |
-| v0.6 | Code-rendering SDK extraction | Adoption | extract QR/barcode render engine + style contract → SDK; adopt it + the SDK result/error model; builder grouped into accordion sections + colors-panel dense-row redesign | 🚧 |
+| v0.6 | Code-rendering SDK extraction | Adoption | extract QR/barcode render engine + style contract → SDK; adopt it + the SDK result/error model; builder grouped into accordion sections + colors-panel dense-row redesign | ✅ |
+| v0.7 | Static content and export | Feature | static content types (URL · vCard · WiFi · calendar · geo · email/SMS/phone · text) · barcodes UI · download + print-ready export · builder validation/slug + info popovers + server-preview parity | 🚧 |
 
 > Work hierarchy (Version → Iteration → Task), lifecycle, and numbering → `wow-two-ws/conventions/planning/`.
 
@@ -151,7 +152,8 @@ strike-through + ✅ when done (kept for traceability).
 | ~~Blog / content engine~~ | feature | ✅ 2026-06-12 — `/blog` index + 4 SEO seed posts (never-expire · smart-routing · best-practices · dynamic-vs-static), `.prose` typography. Authored as typed TSX registry; MDX/SSG + content-type long-tail pages (`/vcard`, `/wifi-qr-code`) + `sitemap.xml` are the next layer. |
 | ~~Landing + pricing pages~~ | feature | ✅ 2026-06-12 — public landing (hero · features · how-it-works · routing demo · pricing teaser · comparison · FAQ · CTA) + dedicated `/pricing` (tiers + incumbent comparison + FAQ). |
 | Paywall + plan limits + billing (Stripe) | feature | 🔄 **in progress** (2026-06-15) — built: Stripe hosted Checkout/Portal + webhook, `UserId`-keyed sub (`002-billing`), create-time 402 cap (`PlanLimits`), `/app/billing` UI. **Remaining:** live Stripe test-mode end-to-end (real keys/webhook), then auth so the sub survives a lost cookie. |
-| Never-deactivate-on-downgrade | feature | codes keep resolving when a plan lapses (core promise) |
+| ~~Never-deactivate-on-downgrade~~ | feature | ✅ already true — redirect is plan-agnostic (enforcement is create-time only); codes keep resolving when a plan lapses |
+| ~~Unlimited scans on every tier (incl. free)~~ | feature | ✅ already true — the redirect never caps scans (no `MaxScans`); a free-tier selling point |
 
 ### Custom domain
 
@@ -163,12 +165,14 @@ strike-through + ✅ when done (kept for traceability).
 
 | Item | Type | Notes |
 |---|---|---|
-| Logo UI wiring | feature | compositing already built in `SmartQr.Codes`; expose it in the builder |
+| Logo UI wiring | feature | → **v0.8 (file upload)** — compositing already built in the SDK Codes engine; expose in the builder (needs image upload) |
 | ~~Module shapes + gradients~~ | feature | ✅ shipped v0.5 — 7 module + 3+3 finder shapes, linear/radial foreground gradient |
-| Frames + CTA captions | feature | outer frame + a call-to-action label ("Scan me"); **research which frame styles actually lift conversion first** before building |
+| ~~Radial gradient radius~~ | feature | ✅ v0.6 — `GradientSpec.Radius` scales the SvgRenderer radial `r`; wired request→spec→render + edit round-trip |
+| Frames + CTA captions | feature | → **decoration era** (with logo/file-upload) — outer frame + a "Scan me" label; **research which frame styles lift conversion first** before building |
 | `StyleSpec` schema-evolution upgrader | infra | versioned model + lazy on-read `vN→current` upgrade chain (additive fields need none — new fields go in optional); build at the first breaking change, then extract the versioned-model + upgrader pattern to the backend-beta SDK |
-| PDF export | feature | alongside SVG + PNG |
-| Download, not preview | fix | the SVG/PNG buttons open the asset in a new tab — should trigger a real file download (`Content-Disposition: attachment` or a client-side blob download); add a download icon to the buttons |
+| PDF export | feature | → **v0.8 (file upload)** — print/file era, alongside SVG + PNG |
+| Download, not preview | feature | → **v0.7** — SVG/PNG buttons open a tab; make them download (`Content-Disposition: attachment` / client blob) + a download icon. On-demand render, nothing saved server-side |
+| Print readiness | feature | → **v0.7** — print-grade export (vector + quiet zone + ECC headroom + size guidance); **extensible** — output-fidelity contract that composes new render layers (logo bumps ECC, frames add margin) without restructuring |
 | Shape & eyes panel redesign | feature | 🔄 Axis 1 locked (Variant D — body `32px` grid + paired eyes), applied to `ShapeControls.tsx` + spec appended to `engineering/research/design-research/design-research.md`. Remaining axes: 2 eye-pair · 3 glyph anatomy · 4 dividers/labels · 5 states |
 | Colors-panel SDK follow-ups | issue | Done (`@wow-two-beta/ui` → 0.0.67): dropped `PANEL_PADDING` + `TileColorPicker` hack (ColorPicker `trigger` slot); SDK `Accordion.Content` default padding **removed** → panels own padding via an app `px-3 py-2` wrapper (any value); SDK `ToggleButton as="div"` opt-in → bg swatch now nests **inside** the Color segment (valid markup). Remaining: section border `#C8CAD8`; accordion order Shape→Colors→Center |
 
@@ -176,9 +180,9 @@ strike-through + ✅ when done (kept for traceability).
 
 | Item | Type | Notes |
 |---|---|---|
-| Barcodes UI | feature | Code128 / EAN / UPC / DataMatrix / PDF417 / Aztec (engine exists) |
-| Content-type templates | feature | vCard / WiFi / geo / email-SMS / calendar / app-store / menu |
-| Link-in-bio | feature | one code → mini link hub |
+| Barcodes UI | feature | → **v0.7** — Code128 / EAN / UPC / DataMatrix / PDF417 / Aztec (engine exists) |
+| Content-type templates | feature | → **v0.7** static set (URL · vCard · WiFi · calendar · geo · email/SMS/phone · text). app-store needs **device routing → routing version**; menu → dynamic pages |
+| Link-in-bio | feature | → **dynamic pages micro-SaaS** (a mini link hub is a hosted, editable page) |
 | Bulk generation | feature | CSV in → ZIP out |
 | Animated / GIF export | feature | viral angle; heavy Tier-0, async/queued (spec §5c) |
 
@@ -189,7 +193,8 @@ strike-through + ✅ when done (kept for traceability).
 | GS1 Digital Link | idea | 2027 retail sunrise |
 | Public REST API + keys | idea | developer tier |
 | White-label / agency workspaces | idea | client workspaces, per-client domains |
-| Advanced rules (A/B weighting, AND/OR, scheduling) | idea | routing power |
+| Advanced rules (A/B weighting, AND/OR, scheduling) | idea | routing power → routing versions |
+| Dynamic content pages | idea | hosted **editable** pages (dynamic vCard / business card · app-store device-routing landing · dynamic calendar · link-in-bio · menus) → a **separate site-builder micro-SaaS**; smart-qr creates the page + forwards to it; integrated **last**, after routing |
 
 ### Ecosystem migration (future)
 

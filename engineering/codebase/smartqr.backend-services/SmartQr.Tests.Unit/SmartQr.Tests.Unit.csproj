@@ -14,7 +14,7 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <!-- Code-rendering engine now lives in the SDK (extracted v0.6); these tests exercise it directly. -->
-    <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.40-beta" />
+    <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.41-beta" />
   </ItemGroup>
 
   <ItemGroup>

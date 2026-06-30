@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CONTENT_TYPES, encodeContent, toICalDate } from "./contentTypes";
+import { appStoreRules, CONTENT_TYPES, encodeContent, toICalDate } from "./contentTypes";
 
 describe("encodeContent", () => {
   it("url / text are passed through (trimmed for url)", () => {
@@ -67,6 +67,21 @@ describe("toICalDate", () => {
     expect(toICalDate("2026-07-01T18:30:45")).toBe("20260701T183045");
     expect(toICalDate("2026-07-01")).toBe("20260701");
     expect(toICalDate("")).toBe("");
+  });
+});
+
+describe("appstore (dynamic, device-routed)", () => {
+  it("has iOS/Android/fallback fields and maps to device rules", () => {
+    const def = CONTENT_TYPES.find((c) => c.id === "appstore")!;
+    expect(def.mode).toBe("dynamic");
+    expect(def.fields.map((f) => f.key)).toEqual(["ios", "android", "fallback"]);
+    expect(appStoreRules({ ios: "https://apps.apple.com/x", android: "https://play.google.com/y" })).toEqual([
+      { device: "iOS", url: "https://apps.apple.com/x" },
+      { device: "Android", url: "https://play.google.com/y" },
+    ]);
+    expect(appStoreRules({ android: "https://play.google.com/y" })).toEqual([
+      { device: "Android", url: "https://play.google.com/y" },
+    ]);
   });
 });
 

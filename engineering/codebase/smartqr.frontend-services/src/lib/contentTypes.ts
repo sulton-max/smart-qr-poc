@@ -4,6 +4,7 @@
 
 export type ContentTypeId =
   | "url"
+  | "appstore"
   | "text"
   | "email"
   | "sms"
@@ -62,6 +63,20 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
     mode: "dynamic",
     fields: [{ key: "url", label: "Destination URL", kind: "url", placeholder: "https://example.com", required: true }],
     encode: (v) => t(v.url),
+  },
+  {
+    // Dynamic + device-routed: the QR carries the forwarder short link; the redirect resolves the
+    // scanner's OS (User-Agent) and sends iOS → App Store, Android → Google Play, else → fallback.
+    // Mapped to the existing device/OS routing rules at save (see `appStoreRules`).
+    id: "appstore",
+    label: "App Store",
+    mode: "dynamic",
+    fields: [
+      { key: "ios", label: "App Store (iOS) URL", kind: "url", placeholder: "https://apps.apple.com/app/…" },
+      { key: "android", label: "Google Play URL", kind: "url", placeholder: "https://play.google.com/store/apps/…" },
+      { key: "fallback", label: "Other devices URL", kind: "url", placeholder: "https://yourapp.com" },
+    ],
+    encode: (v) => t(v.fallback) || t(v.ios) || t(v.android),
   },
   {
     id: "text",
@@ -206,3 +221,11 @@ export const contentType = (id: ContentTypeId): ContentTypeDef => BY_ID[id];
 
 /** Build the QR payload string for a content type from collected field values. */
 export const encodeContent = (id: ContentTypeId, values: FieldValues): string => BY_ID[id].encode(values);
+
+/** App Store device-routing → device-conditional destinations (iOS / Android); everything else uses the `fallback` field. Consumed when saving an `appstore` code into the existing device/OS routing rules. */
+export function appStoreRules(v: FieldValues): { device: "iOS" | "Android"; url: string }[] {
+  const rules: { device: "iOS" | "Android"; url: string }[] = [];
+  if (t(v.ios)) rules.push({ device: "iOS", url: t(v.ios) });
+  if (t(v.android)) rules.push({ device: "Android", url: t(v.android) });
+  return rules;
+}

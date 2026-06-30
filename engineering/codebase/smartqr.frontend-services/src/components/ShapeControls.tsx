@@ -212,8 +212,8 @@ export function ShapeControls({
   onFinderDotShapeChange,
 }: ShapeControlsProps) {
   return (
-    <Stack gap="0">
-      <div className="py-2 first:pt-0">
+    <Stack gap="2">
+      <div>
         <div className="mb-2 text-sm text-muted-foreground">Body</div>
         <div className="flex flex-wrap gap-2">
           {MODULE_ORDER.map((shape) => (
@@ -230,7 +230,7 @@ export function ShapeControls({
         </div>
       </div>
 
-      <div className="border-t border-border pt-2">
+      <div>
         <div className="mb-2 text-sm text-muted-foreground">Eyes</div>
         <div className="flex items-start gap-3">
           <EyeColumn
