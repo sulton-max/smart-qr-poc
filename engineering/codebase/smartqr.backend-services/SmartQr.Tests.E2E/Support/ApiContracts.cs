@@ -46,6 +46,17 @@ public sealed record CodeDtoModel
     public long ScanCount { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];
+
+    /// <summary>Structured content descriptor (content type + fields + baked static payload); null for a legacy/plain code.</summary>
+    public ContentDtoModel? Content { get; init; }
+}
+
+/// <summary>Wire shape of <c>ContentSpec</c> — <c>Payload</c> is non-null for a static code.</summary>
+public sealed record ContentDtoModel
+{
+    public string Type { get; init; } = "";
+    public IReadOnlyDictionary<string, string> Fields { get; init; } = new Dictionary<string, string>();
+    public string? Payload { get; init; }
 }
 
 /// <summary>Wire shape of <c>RuleDto</c>.</summary>

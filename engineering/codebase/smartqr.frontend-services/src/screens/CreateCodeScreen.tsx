@@ -12,6 +12,8 @@ import { FillControls } from "../components/FillControls";
 import { TileColorPicker } from "../components/TileColorPicker";
 import { EmojiControls } from "../components/EmojiControls";
 import { ContrastHint } from "../components/ContrastHint";
+import { ContentTypeForm } from "../components/ContentTypeForm";
+import { CONTENT_TYPES, contentType, encodeContent, type ContentTypeId, type FieldValues } from "../lib/contentTypes";
 import { codeImageUrl, createCode, getCode, updateCode, REDIRECT_BASE } from "../api";
 import {
   BarcodeFormat,
@@ -92,6 +94,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [emoji, setEmoji] = useState<PreviewEmoji | null>(null);
   const [rules, setRules] = useState<RuleDraft[]>([]);
   const [existing, setExisting] = useState<CodeDto | null>(null);
+  // v0.7 iter1: the chosen content type + its form values. `url` is the dynamic forwarder
+  // (its single field binds to `fallbackUrl`); other types drive the preview from their payload.
+  const [contentTypeId, setContentTypeId] = useState<ContentTypeId>("url");
+  const [contentValues, setContentValues] = useState<FieldValues>({});
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -120,6 +126,12 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         setGradient(gradientFromDto(code.style.gradient));
         setTransparentBackground(code.style.transparentBackground);
         setEmoji(code.style.emoji ?? null);
+        // Round-trip the content form: restore the saved content type + field values (legacy codes carry none).
+        if (code.content) {
+          setContentTypeId(code.content.type as ContentTypeId);
+          if (code.content.type === "url") setFallbackUrl(code.content.fields.url ?? code.fallbackUrl);
+          else setContentValues(code.content.fields);
+        }
       })
       .catch((e: unknown) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load the code");
@@ -132,8 +144,13 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     };
   }, [codeId]);
 
-  // On edit, encode the code's permanent short link; on create (no code yet), a sample URL.
-  const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
+  // Static content bakes its payload directly into the QR; dynamic (url/appstore) encodes the
+  // permanent short link (a sample URL before the code is saved).
+  const contentDef = contentType(contentTypeId);
+  const previewValue =
+    contentDef.mode === "static"
+      ? encodeContent(contentTypeId, contentValues) || " "
+      : (saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`);
 
   // The preview endpoint's coarse kind: QR symbology → "Qr", any other (1D/2D) → "Barcode".
   const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? "Qr" : "Barcode";
@@ -161,18 +178,36 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   async function handleSubmit() {
     setSaving(true);
     setError(null);
+    // Content shapes the request: static bakes its payload (no redirect, no rules); a self-routed type
+    // (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
+    const isStatic = contentDef.mode === "static";
+    const selfRouted = contentTypeId === "mobileApp"; // backend derives fallback + device rules from the fields
+    const fields = contentTypeId === "url" ? { url: fallbackUrl } : contentValues;
+    const content = {
+      type: contentTypeId,
+      // Persist only non-empty field values so the saved form round-trips cleanly.
+      fields: Object.fromEntries(
+        Object.entries(fields).filter(([, v]) => v != null && v !== ""),
+      ) as Record<string, string>,
+      payload: isStatic ? encodeContent(contentTypeId, contentValues) : null,
+    };
     const request = {
       name: name.trim() || "Untitled code",
       codeType: "Qr" as const,
       barcodeFormat: symbology,
-      fallbackUrl: fallbackUrl.trim(),
-      rules: rules.map((r) => ({
-        order: r.order,
-        conditionType: r.conditionType,
-        conditionValue: r.conditionValue.trim(),
-        destination: r.destination.trim(),
-      })),
+      // Static bakes a payload; mobileApp's fallback + rules are derived on the server — both send empty here.
+      fallbackUrl: isStatic || selfRouted ? "" : fallbackUrl.trim(),
+      rules:
+        isStatic || selfRouted
+          ? []
+          : rules.map((r) => ({
+              order: r.order,
+              conditionType: r.conditionType,
+              conditionValue: r.conditionValue.trim(),
+              destination: r.destination.trim(),
+            })),
       style: previewStyle,
+      content,
     };
     try {
       const dto = codeId ? await updateCode(codeId, request) : await createCode(request);
@@ -244,7 +279,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           <div key={tab} className="flex flex-col gap-5 motion-safe:animate-fade-in">
           {tab === "content" && (
             <>
-              {isEdit && existing && (
+              {isEdit && existing && contentDef.mode !== "static" && (
                 <FormField label="Short link">
                   <TextInput value={existing.shortUrl} readOnly disabled />
                 </FormField>
@@ -257,14 +292,28 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   onChange={(e) => setName(e.target.value)}
                 />
               </FormField>
-              <FormField label="Fallback URL">
-                <TextInput
-                  ring="sm"
-                  value={fallbackUrl}
-                  placeholder="https://example.com"
-                  onChange={(e) => setFallbackUrl(e.target.value)}
-                />
+              <FormField label="Content type">
+                <Select
+                  value={contentTypeId}
+                  onValueChange={(o) => o && setContentTypeId(o.itemKey as ContentTypeId)}
+                >
+                  <Select.Trigger>
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {CONTENT_TYPES.map((c) => (
+                      <Select.Item key={c.id} itemKey={c.id} label={c.label} />
+                    ))}
+                  </Select.Content>
+                </Select>
               </FormField>
+              <ContentTypeForm
+                typeId={contentTypeId}
+                values={contentTypeId === "url" ? { url: fallbackUrl } : contentValues}
+                onChange={(next) =>
+                  contentTypeId === "url" ? setFallbackUrl(next.url ?? "") : setContentValues(next)
+                }
+              />
             </>
           )}
 
@@ -414,13 +463,21 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
               className="w-full"
             >
               <Text size="sm" weight="medium">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
-              <Text size="sm" color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
-                {saved.shortUrl}
-              </Text>
+              {saved.content?.payload == null ? (
+                <Text size="sm" color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
+                  {saved.shortUrl}
+                </Text>
+              ) : (
+                <Text size="sm" color="muted" className="mt-1">
+                  Payload baked into the code — it works offline, with no redirect.
+                </Text>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <CopyButton size="sm" text={saved.shortUrl} aria-label="Copy short URL">
-                  Copy link
-                </CopyButton>
+                {saved.content?.payload == null && (
+                  <CopyButton size="sm" text={saved.shortUrl} aria-label="Copy short URL">
+                    Copy link
+                  </CopyButton>
+                )}
                 <Button asChild size="sm" variant="outline" tone="neutral">
                   <a href={codeImageUrl(saved.id, "svg")} target="_blank" rel="noreferrer">
                     SVG

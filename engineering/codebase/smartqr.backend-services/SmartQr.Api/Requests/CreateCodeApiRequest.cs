@@ -24,6 +24,9 @@ public sealed record CreateCodeApiRequest
 
     /// <summary>Gets the optional style to persist — omitted leaves the code on the default style.</summary>
     public StyleApiRequest? Style { get; init; }
+
+    /// <summary>Gets the optional structured content (type + field values + baked payload); a non-null payload marks a static code.</summary>
+    public ContentSpec? Content { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>
@@ -41,6 +44,7 @@ public static class CreateCodeApiRequestExtensions
             FallbackUrl = request.FallbackUrl,
             Rules = request.Rules.ToRuleDtos(),
             Style = request.Style?.ToStyleSpec(),
+            Content = request.Content,
         };
 
         return command;

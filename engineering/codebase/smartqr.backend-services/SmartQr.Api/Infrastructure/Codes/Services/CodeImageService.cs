@@ -1,3 +1,4 @@
+using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
 using SmartQr.Api.Settings;
@@ -17,12 +18,16 @@ public sealed class CodeImageService(ICodeRenderer renderer, ApiSettings setting
     {
         var shortUrl = $"{settings.RedirectBaseUrl.TrimEnd('/')}/{code.Slug}";
 
+        // Static codes bake their own payload (WiFi / vCard / geo / …) into the symbol; dynamic and legacy codes encode the redirect short link.
+        var content = ContentSpecJson.Deserialize(code.ContentJson);
+        var payload = content?.Payload ?? shortUrl;
+
         // Read the persisted style off the entity, falling back to the default for an empty StyleJson.
         var style = StyleSpecJson.Deserialize(code.StyleJson);
 
         return renderer.Render(new CodeRenderRequest
         {
-            Payload = shortUrl,
+            Payload = payload,
             Symbology = code.BarcodeFormat.ToRender(),
             Format = format,
             Style = style,

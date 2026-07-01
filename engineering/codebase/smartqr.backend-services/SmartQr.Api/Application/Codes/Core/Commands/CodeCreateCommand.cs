@@ -30,4 +30,7 @@ public sealed record CodeCreateCommand
 
     /// <summary>Optional style to persist; null leaves the code on the default style.</summary>
     public StyleSpec? Style { get; init; }
+
+    /// <summary>Optional structured content (type + field values + baked payload); a non-null payload marks a static code.</summary>
+    public ContentSpec? Content { get; init; }
 }

@@ -33,4 +33,7 @@ public sealed record CodeUpdateCommand
 
     /// <summary>Optional style to persist; null preserves the code's saved style.</summary>
     public StyleSpec? Style { get; init; }
+
+    /// <summary>Optional structured content (type + field values + baked payload); null preserves the code's saved content.</summary>
+    public ContentSpec? Content { get; init; }
 }

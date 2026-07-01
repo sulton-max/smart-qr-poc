@@ -24,6 +24,11 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
             .HasColumnType(PostgresColumnTypes.Jsonb)
             .IsRequired();
 
+        // Nullable — legacy codes predate content types; a null resolves as a dynamic short link.
+        builder
+            .Property(e => e.ContentJson)
+            .HasColumnType(PostgresColumnTypes.Jsonb);
+
         // ── Relationships ──
         builder
             .HasMany(e => e.Rules)

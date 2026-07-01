@@ -18,6 +18,31 @@ export const REDIRECT_BASE: string = import.meta.env.VITE_REDIRECT_BASE ?? "http
 // Public; also the backend's token audience. Empty leaves sign-in inert.
 export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
+// Extracts a human message from a validation / ProblemDetails error body — our validation
+// `errors[]` shape ([{ property, message, code }]) first, then ASP.NET's ModelState object
+// shape, then `detail`/`title`, falling back to the status. So the UI shows "Add at least one
+// link — App Store, …" instead of a bare "HTTP 400".
+async function problemMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const body = (await res.json()) as {
+      errors?: Array<{ message?: string }> | Record<string, string[]>;
+      detail?: string;
+      title?: string;
+    };
+    const errs = body?.errors;
+    if (Array.isArray(errs)) {
+      const msgs = errs.map((e) => e?.message).filter((m): m is string => Boolean(m));
+      if (msgs.length) return msgs.join(" ");
+    } else if (errs && typeof errs === "object") {
+      const msgs = Object.values(errs).flat().filter(Boolean);
+      if (msgs.length) return msgs.join(" ");
+    }
+    return body?.detail ?? body?.title ?? `${fallback} (HTTP ${res.status})`;
+  } catch {
+    return `${fallback} (HTTP ${res.status})`;
+  }
+}
+
 export async function createCode(request: CreateCodeRequest): Promise<CodeDto> {
   const res = await fetch(`${API_BASE}/api/codes`, {
     method: "POST",
@@ -27,7 +52,7 @@ export async function createCode(request: CreateCodeRequest): Promise<CodeDto> {
   });
 
   if (!res.ok) {
-    throw new Error(`Create failed (HTTP ${res.status})`);
+    throw new Error(await problemMessage(res, "Create failed"));
   }
 
   const json = (await res.json()) as ApiSuccess<CodeDto>;
@@ -73,7 +98,7 @@ export async function updateCode(id: string, request: UpdateCodeRequest): Promis
   });
 
   if (!res.ok) {
-    throw new Error(`Update failed (HTTP ${res.status})`);
+    throw new Error(await problemMessage(res, "Update failed"));
   }
 
   const json = (await res.json()) as ApiSuccess<CodeDto>;

@@ -39,4 +39,20 @@ public sealed class CodeImageTests(AppFixture fixture) : E2EBase(fixture)
         var body = await response.Content.ReadAsByteArrayAsync();
         body.Should().NotBeEmpty();
     }
+
+    [Fact]
+    public async Task GetImage_StaticCode_Svg_ReturnsNonEmpty()
+    {
+        // A static code renders its baked payload rather than a short link — the full stack still returns a valid image.
+        var owner = await CreateGuestClientAsync();
+        var code = await (await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.StaticCode("WiFi svg", "wifi", "WIFI:T:WPA;S:Net;P:pw;;", new { ssid = "Net" })))
+            .ReadEnvelopeAsync<CodeDtoModel>();
+
+        var response = await owner.Client.GetAsync($"/api/codes/{code.Id}/image?format=svg");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType!.MediaType.Should().Be("image/svg+xml");
+        (await response.Content.ReadAsByteArrayAsync()).Should().NotBeEmpty();
+    }
 }

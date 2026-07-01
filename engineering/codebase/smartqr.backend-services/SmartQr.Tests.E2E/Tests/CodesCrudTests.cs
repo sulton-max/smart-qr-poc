@@ -200,6 +200,114 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest, "the fallback URL must be an absolute http(s) URL");
     }
 
+    // ── Static content (v0.7) — the payload is baked into the symbol; no fallback URL, no routing ──
+
+    [Fact]
+    public async Task Create_StaticCode_WithEmptyFallback_Returns200_AndRoundTripsContent()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var response = await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.StaticCode("Cafe WiFi", "wifi", "WIFI:T:WPA;S:Cafe;P:beans123;;",
+                new { ssid = "Cafe", password = "beans123" }));
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK, "static codes carry a non-URL payload, so the fallback URL rule is skipped");
+        var code = await response.ReadEnvelopeAsync<CodeDtoModel>();
+
+        code.Content.Should().NotBeNull();
+        code.Content!.Type.Should().Be("wifi");
+        code.Content.Payload.Should().Be("WIFI:T:WPA;S:Cafe;P:beans123;;");
+        code.Content.Fields["ssid"].Should().Be("Cafe");
+    }
+
+    [Fact]
+    public async Task StaticCode_PersistsContent_SurvivesGetById()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var created = await (await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.StaticCode("Contact", "vcard", "BEGIN:VCARD\nVERSION:3.0\nFN:Ada\nEND:VCARD",
+                new { firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
+
+        var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
+
+        fetched.Content.Should().NotBeNull();
+        fetched.Content!.Type.Should().Be("vcard");
+        fetched.Content.Payload.Should().Be("BEGIN:VCARD\nVERSION:3.0\nFN:Ada\nEND:VCARD");
+        fetched.Content.Fields["firstName"].Should().Be("Ada");
+    }
+
+    [Fact]
+    public async Task Create_DynamicCode_WithEmptyFallback_StillReturns400()
+    {
+        // The static relaxation stays scoped: a dynamic code (no baked payload) still requires a fallback URL.
+        var owner = await CreateGuestClientAsync();
+
+        var response = await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.Code("No fallback", ""));
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    // ── Mobile app link (v0.7) — backend derives device rules + fallback; content-aware validation ──
+
+    [Fact]
+    public async Task Create_MobileApp_WithOnlyIosLink_Returns200_DerivesRuleAndFallback()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var code = await (await owner.Client.PostJsonAsync("/api/codes",
+                CodeRequests.MobileApp("Notion", ios: "https://apps.apple.com/us/app/notion/id1232780281")))
+            .ReadEnvelopeAsync<CodeDtoModel>();
+
+        // One store link is enough — the server derives the iOS device rule and the fallback destination.
+        code.FallbackUrl.Should().Be("https://apps.apple.com/us/app/notion/id1232780281");
+        code.Rules.Should().ContainSingle().Which.ConditionValue.Should().Be("Ios");
+        code.Content!.Type.Should().Be("mobileApp");
+    }
+
+    [Fact]
+    public async Task Create_MobileApp_WithNoLinks_Returns400_WithStoreLinkMessage_NotFallbackUrl()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.MobileApp("Empty app"));
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var body = await response.Content.ReadAsStringAsync();
+        body.Should().Contain("at least one", "the message must be content-aware")
+            .And.NotContain("fallback URL is required", "the app-link UI has no fallback-URL field");
+    }
+
+    [Fact]
+    public async Task Create_MobileApp_WithNonHttpLink_Returns400_WithStoreLabel()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var response = await owner.Client.PostJsonAsync("/api/codes",
+            CodeRequests.MobileApp("Bad", ios: "notaurl"));
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        (await response.Content.ReadAsStringAsync()).Should().Contain("App Store link");
+    }
+
+    [Fact]
+    public async Task Update_MobileApp_ReDerivesRoutingFromLinks()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var created = await (await owner.Client.PostJsonAsync("/api/codes",
+                CodeRequests.MobileApp("App", ios: "https://apps.apple.com/a")))
+            .ReadEnvelopeAsync<CodeDtoModel>();
+
+        var updated = await (await owner.Client.PutJsonAsync($"/api/codes/{created.Id}",
+                CodeRequests.MobileApp("App", ios: "https://apps.apple.com/a", android: "https://play.google.com/b")))
+            .ReadEnvelopeAsync<CodeDtoModel>();
+
+        updated.Rules.Should().HaveCount(2);
+        updated.Rules.Select(r => r.ConditionValue).Should().BeEquivalentTo(["Ios", "Android"]);
+    }
+
     // ── Style persistence round-trip (create → edit → re-render reflects the new style) ──
 
     [Fact]

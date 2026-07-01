@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using SmartQr.Api.Application.Billing.Core;
 using SmartQr.Api.Application.Billing.Core.Services;
 using SmartQr.Api.Application.Codes.Core.Commands;
+using SmartQr.Api.Application.Codes.Core.Content;
 using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
@@ -51,6 +52,12 @@ public sealed class CodeCreateCommandHandler(
             }
             while (await repository.SlugExistsAsync(slug, ct));
 
+            // A backend content spec (e.g. mobileApp) owns its routing — derive the fallback + device rules from the
+            // content and override the client. Types without a spec keep the request's fallback + rules.
+            var projection = request.Content is { } routed && ContentTypes.Resolve(routed.Type) is { } spec
+                ? spec.Project(routed)
+                : null;
+
             var codeId = Guid.NewGuid();
             var entity = new CodeEntity
             {
@@ -61,13 +68,16 @@ public sealed class CodeCreateCommandHandler(
                 CodeType = request.CodeType,
                 // Defaults that used to live on the entity now originate here, at creation.
                 BarcodeFormat = request.BarcodeFormat, // command defaults this to QrCode
-                FallbackUrl = request.FallbackUrl,
+                FallbackUrl = projection?.FallbackUrl ?? request.FallbackUrl,
                 IsActive = true,                       // new codes resolve immediately
                 NeverExpires = true,                   // the create request carries no expiry → the never-expire promise holds
                 StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
                     ? StyleSpecJson.Serialize(style)
                     : "{}",
-                Rules = request.Rules
+                ContentJson = request.Content is { } content  // a static payload here bakes into the symbol; null → dynamic short link
+                    ? ContentSpecJson.Serialize(content)
+                    : null,
+                Rules = (projection?.Rules ?? request.Rules)
                     .Select(r => new RoutingRuleEntity
                     {
                         Id = Guid.NewGuid(),

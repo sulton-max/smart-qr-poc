@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SmartQr.Api.Application.Codes.Core.Commands;
+using SmartQr.Api.Application.Codes.Core.Content;
 using SmartQr.Api.Application.Codes.Core.Models;
 using SmartQr.Api.Application.Codes.Core.Services;
 using SmartQr.Api.Infrastructure.Codes.Extensions;
@@ -30,18 +31,27 @@ public sealed class CodeUpdateCommandHandler(
             if (code is null)
                 return AppResult<CodeUpdateResult.Success>.Fail(AppError.Of(AppErrorType.NotFound, "Code not found"));
 
+            // A backend content spec (e.g. mobileApp) owns its routing — derive the fallback + device rules from the content.
+            var projection = request.Content is { } routed && ContentTypes.Resolve(routed.Type) is { } spec
+                ? spec.Project(routed)
+                : null;
+
             // Apply editable fields — slug, scan count, and creation timestamp are deliberately untouched.
             code.Name = request.Name;
             code.CodeType = request.CodeType;
             code.BarcodeFormat = request.BarcodeFormat;
-            code.FallbackUrl = request.FallbackUrl;
+            code.FallbackUrl = projection?.FallbackUrl ?? request.FallbackUrl;
 
             // Persist style only when the request carries one — an omitted block preserves the saved style.
             if (request.Style is { } style)
                 code.StyleJson = StyleSpecJson.Serialize(style);
 
-            // Full replace of the rule set.
-            code.Rules = request.Rules
+            // Persist content only when the request carries it — an omitted block preserves saved content (mirrors style).
+            if (request.Content is { } content)
+                code.ContentJson = ContentSpecJson.Serialize(content);
+
+            // Full replace of the rule set — the spec's derived rules when it owns routing, else the request's.
+            code.Rules = (projection?.Rules ?? request.Rules)
                 .Select(r => new RoutingRuleEntity
                 {
                     Id = Guid.NewGuid(),

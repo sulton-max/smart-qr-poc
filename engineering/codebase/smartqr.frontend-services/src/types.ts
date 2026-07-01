@@ -28,6 +28,15 @@ export interface RuleDraft {
   destination: string;
 }
 
+// Structured content descriptor mirroring the backend `ContentSpec`. `payload != null`
+// marks a static code (the payload is baked into the symbol); `type` + `fields` round-trip
+// the builder form on edit.
+export interface ContentSpec {
+  type: string;
+  fields: Record<string, string>;
+  payload: string | null;
+}
+
 export interface CreateCodeRequest {
   name: string;
   codeType: "Qr" | "Barcode" | "Link";
@@ -41,6 +50,8 @@ export interface CreateCodeRequest {
   }>;
   // The visual style to persist (server defaults it when omitted; the builder always sends it).
   style: PreviewStyle;
+  // The structured content (type + fields + baked static payload); the builder always sends it.
+  content: ContentSpec;
 }
 
 // `PUT /api/codes/{id}` — full replace; slug, scan count, creation time are server-preserved.
@@ -164,6 +175,8 @@ export interface CodeDto {
   }>;
   // Persisted visual style (enum values come back verbatim/PascalCase — normalize on read).
   style: PreviewStyle;
+  // Persisted structured content (content type + field values + baked static payload); null for a legacy/plain code.
+  content: ContentSpec | null;
 }
 
 // Backend `ApiResponse<T>.Success` envelope (camelCased).
