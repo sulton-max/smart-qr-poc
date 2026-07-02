@@ -25,9 +25,10 @@
 
   <!-- The repositories under test live in SmartQr.Api; the routing/config-store types live in SmartQr.Redirect.Api. No host boot here — these tests drive the persistence layer directly against the test DB. -->
   <ItemGroup>
-    <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
-    <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
-    <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" />
+    <ProjectReference Include="..\SmartQr.Domain\SmartQr.Domain.csproj" />
+    <ProjectReference Include="..\SmartQr.Persistence\SmartQr.Persistence.csproj" />
+    <ProjectReference Include="..\SmartQr.Application\SmartQr.Application.csproj" />
+    <ProjectReference Include="..\SmartQr.Infrastructure\SmartQr.Infrastructure.csproj" />
     <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" />
   </ItemGroup>
 

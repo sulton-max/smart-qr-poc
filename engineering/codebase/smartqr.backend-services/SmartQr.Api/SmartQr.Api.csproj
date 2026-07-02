@@ -15,8 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
-        <ProjectReference Include="..\SmartQr.Common.Persistence\SmartQr.Common.Persistence.csproj" />
+        <ProjectReference Include="..\SmartQr.Application\SmartQr.Application.csproj" />
+        <ProjectReference Include="..\SmartQr.Infrastructure\SmartQr.Infrastructure.csproj" />
     </ItemGroup>
 
     <PropertyGroup>

@@ -1,13 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
-using SmartQr.Api.Application.Billing.Core.Services;
-using SmartQr.Api.Application.Codes.Core.Services;
-using SmartQr.Api.Application.Identity.Core.Services;
-using SmartQr.Api.Infrastructure.Billing.Services;
-using SmartQr.Api.Infrastructure.Codes.Services;
-using SmartQr.Api.Persistence.Repositories;
-using SmartQr.Api.Settings;
+using SmartQr.Application.Billing.Core.Services;
+using SmartQr.Application.Codes.Core.Services;
+using SmartQr.Application.Identity.Core.Services;
+using SmartQr.Infrastructure.Billing.Services;
+using SmartQr.Infrastructure.Codes.Services;
+using SmartQr.Infrastructure.Persistence.Repositories;
+using SmartQr.Application.Settings;
 using WoW.Two.Sdk.Backend.Beta.Codes;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Persistence.DataContexts;
 using WoW.Two.Sdk.Backend.Beta.Data;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 using WoW.Two.Sdk.Backend.Beta.Identity.Cookies;
@@ -50,7 +50,7 @@ public static partial class HostConfiguration
     /// <summary>Registers the mediator (handler scanning), the FluentValidation pipeline behavior, and application services.</summary>
     private static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddMediator(typeof(HostConfiguration).Assembly);
+        builder.Services.AddMediator(typeof(SmartQr.Infrastructure.InfrastructureAssembly).Assembly);
 
         // Validators run in the pipeline before each handler; a failure throws ValidationException (400 via ValidationExceptionFilter).
         builder.Services.AddMediatorValidationBehavior();

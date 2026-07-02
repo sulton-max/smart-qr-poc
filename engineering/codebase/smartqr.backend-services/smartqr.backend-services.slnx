@@ -6,8 +6,12 @@
   </Configurations>
   <Folder Name="/services/">
     <Project Path="SmartQr.Api/SmartQr.Api.csproj" />
+    <Project Path="SmartQr.Application/SmartQr.Application.csproj" />
     <Project Path="SmartQr.Common.Domain/SmartQr.Common.Domain.csproj" />
     <Project Path="SmartQr.Common.Persistence/SmartQr.Common.Persistence.csproj" />
+    <Project Path="SmartQr.Domain/SmartQr.Domain.csproj" />
+    <Project Path="SmartQr.Infrastructure/SmartQr.Infrastructure.csproj" />
+    <Project Path="SmartQr.Persistence/SmartQr.Persistence.csproj" />
     <Project Path="SmartQr.Redirect.Api/SmartQr.Redirect.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">

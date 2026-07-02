@@ -1,5 +1,5 @@
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Enums;
 
 namespace SmartQr.Api.Requests;
 
@@ -20,8 +20,8 @@ public sealed record PreviewCodeApiRequest
 
     /// <summary>Gets the symbology to render — QR for <see cref="CodeType.Qr"/>, else the supplied <see cref="BarcodeFormat"/> (Code128 when absent).</summary>
     public BarcodeFormat ResolveSymbology() => CodeType == CodeType.Qr
-        ? Common.Domain.Codes.Enums.BarcodeFormat.QrCode
-        : BarcodeFormat ?? Common.Domain.Codes.Enums.BarcodeFormat.Code128;
+        ? SmartQr.Domain.Codes.Enums.BarcodeFormat.QrCode
+        : BarcodeFormat ?? SmartQr.Domain.Codes.Enums.BarcodeFormat.Code128;
 }
 
 /// <summary>Provides mapping for <see cref="PreviewCodeApiRequest"/>.</summary>

@@ -1,8 +1,8 @@
 using SkiaSharp;
-using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Api.Infrastructure.Codes.Services;
-using SmartQr.Api.Settings;
-using SmartQr.Common.Domain.Codes.Entities;
+using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Infrastructure.Codes.Services;
+using SmartQr.Application.Settings;
+using SmartQr.Domain.Codes.Entities;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Matrix;
@@ -10,8 +10,8 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Raster;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
 using ZXing;
 using ZXing.Common;
-using DomainBarcodeFormat = SmartQr.Common.Domain.Codes.Enums.BarcodeFormat;
-using DomainCodeType = SmartQr.Common.Domain.Codes.Enums.CodeType;
+using DomainBarcodeFormat = SmartQr.Domain.Codes.Enums.BarcodeFormat;
+using DomainCodeType = SmartQr.Domain.Codes.Enums.CodeType;
 
 namespace SmartQr.Tests.Unit;
 

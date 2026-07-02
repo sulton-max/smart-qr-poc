@@ -73,7 +73,7 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
     id: "mobileApp",
     label: "Mobile app link",
     mode: "dynamic",
-    note: "Add at least one — iPhone scanners open the App Store, Android opens Google Play, and every other device uses the fallback.",
+    note: "Add at least one. iPhone opens the App Store, Android opens Google Play; choose which link every other device opens.",
     fields: [
       { key: "ios", label: "App Store (iOS) URL", kind: "url", placeholder: "https://apps.apple.com/app/…" },
       { key: "android", label: "Google Play URL", kind: "url", placeholder: "https://play.google.com/store/apps/…" },

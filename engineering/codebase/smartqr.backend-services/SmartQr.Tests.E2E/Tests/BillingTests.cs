@@ -1,15 +1,15 @@
 using System.Net;
 using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
-using SmartQr.Common.Domain.Billing.Entities;
-using SmartQr.Common.Domain.Billing.Enums;
-using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Domain.Billing.Entities;
+using SmartQr.Domain.Billing.Enums;
+using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Enums;
 using SmartQr.Tests.E2E.Harness;
 using SmartQr.Tests.E2E.Support;
 using WoW.Two.Sdk.Backend.Beta.Testing.Web;
-using BillingWebhookEvent = SmartQr.Api.Application.Billing.Core.Models.BillingWebhookEvent;
-using BillingWebhookEventType = SmartQr.Api.Application.Billing.Core.Models.BillingWebhookEventType;
+using BillingWebhookEvent = SmartQr.Application.Billing.Core.Models.BillingWebhookEvent;
+using BillingWebhookEventType = SmartQr.Application.Billing.Core.Models.BillingWebhookEventType;
 
 namespace SmartQr.Tests.E2E.Tests;
 

@@ -1,5 +1,6 @@
 import { FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
 import { contentType, type ContentTypeId, type FieldValues } from "../lib/contentTypes";
+import { MobileAppFields } from "./MobileAppFields";
 
 export interface ContentTypeFormProps {
   /** Which content type's fields to render. */
@@ -23,7 +24,10 @@ export function ContentTypeForm({ typeId, values, onChange }: ContentTypeFormPro
   return (
     <>
       {def.note && <p className="text-sm text-muted-foreground">{def.note}</p>}
-      {def.fields.map((f) => (
+      {typeId === "mobileApp" ? (
+        <MobileAppFields values={values} onChange={onChange} />
+      ) : (
+        def.fields.map((f) => (
         <FormField key={f.key} label={f.label}>
           {f.kind === "textarea" ? (
             <textarea
@@ -63,7 +67,8 @@ export function ContentTypeForm({ typeId, values, onChange }: ContentTypeFormPro
             />
           )}
         </FormField>
-      ))}
+        ))
+      )}
     </>
   );
 }

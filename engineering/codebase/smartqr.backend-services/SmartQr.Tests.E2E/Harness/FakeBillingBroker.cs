@@ -1,5 +1,5 @@
-using SmartQr.Api.Application.Billing.Core.Models;
-using SmartQr.Api.Application.Billing.Core.Services;
+using SmartQr.Application.Billing.Core.Models;
+using SmartQr.Application.Billing.Core.Services;
 
 namespace SmartQr.Tests.E2E.Harness;
 

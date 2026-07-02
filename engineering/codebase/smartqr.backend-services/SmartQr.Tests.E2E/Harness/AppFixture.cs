@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SmartQr.Api.Application.Billing.Core.Services;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Application.Billing.Core.Services;
+using SmartQr.Persistence.DataContexts;
 using Testcontainers.PostgreSql;
 // The Google-verifier seam (SDK type, global namespace) — swapped for a deterministic fake in the test host.
 using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
@@ -22,8 +22,8 @@ using WoW.Two.Sdk.Backend.Beta.Testing.MultiHost;
 using ApiProgram = apihost::Program;
 using RedirectProgram = redirecthost::Program;
 // Billing config types — aliased to the API settings classes (vs the unrelated SDK Billing namespace).
-using BillingSettings = SmartQr.Api.Settings.BillingSettings;
-using BillingPricesSettings = SmartQr.Api.Settings.BillingPricesSettings;
+using BillingSettings = SmartQr.Application.Settings.BillingSettings;
+using BillingPricesSettings = SmartQr.Application.Settings.BillingPricesSettings;
 
 namespace SmartQr.Tests.E2E.Harness;
 

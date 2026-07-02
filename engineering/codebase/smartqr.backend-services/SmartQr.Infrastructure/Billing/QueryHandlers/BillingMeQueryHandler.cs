@@ -1,0 +1,51 @@
+using Microsoft.Extensions.Logging;
+using SmartQr.Application.Billing.Core;
+using SmartQr.Application.Billing.Core.Models;
+using SmartQr.Application.Billing.Core.Queries;
+using SmartQr.Application.Billing.Core.Services;
+using SmartQr.Application.Codes.Core.Services;
+using SmartQr.Domain.Billing.Enums;
+using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
+using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
+
+namespace SmartQr.Infrastructure.Billing.QueryHandlers;
+
+/// <summary>Handles <see cref="BillingMeQuery"/> — joins the caller's subscription (or a Free default) with plan limits and live code count.</summary>
+public sealed class BillingMeQueryHandler(
+    ISubscriptionRepository subscriptions,
+    ICodeRepository codes,
+    ILogger<BillingMeQueryHandler> logger)
+    : IQueryHandler<BillingMeQuery, AppResult<BillingMeResult.Success>>
+{
+    /// <inheritdoc />
+    public async ValueTask<AppResult<BillingMeResult.Success>> HandleAsync(
+        BillingMeQuery request, CancellationToken ct)
+    {
+        try
+        {
+            var subscription = await subscriptions.GetByUserAsync(request.UserId, ct);
+
+            // No row ⇒ Free / active (the synthesized default; no row is ever required to use the app).
+            var plan = subscription?.Plan ?? Plan.Free;
+            var status = subscription is null ? "active" : subscription.Status.ToString().ToLowerInvariant();
+
+            var codeCount = await codes.CountByUserAsync(request.UserId, ct);
+
+            var dto = new BillingStatusDto
+            {
+                Plan = plan,
+                Status = status,
+                Limits = new LimitsDto { MaxCodes = PlanLimits.MaxCodesForApi(plan) },
+                Usage = new UsageDto { CodeCount = codeCount },
+            };
+
+            return AppResult<BillingMeResult.Success>.Ok(new BillingMeResult.Success(dto));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "BillingMe failed for user {UserId}", request.UserId);
+            return AppResult<BillingMeResult.Success>.Fail(AppError.Of(AppErrorType.Unexpected, ex.Message));
+        }
+    }
+}

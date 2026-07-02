@@ -1,6 +1,6 @@
-using SmartQr.Api.Application.Codes.Core.Content;
-using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Application.Codes.Core.Content;
+using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Enums;
 
 namespace SmartQr.Tests.Unit;
 
@@ -64,13 +64,38 @@ public sealed class MobileAppLinkContentSpecTests
     }
 
     [Fact]
-    public void Project_prefers_the_explicit_other_link_over_a_store_link_for_the_fallback()
+    public void Project_without_a_choice_defaults_to_the_first_available_store_link()
     {
         var projection = _spec.Project(Content(
             ("ios", "https://apps.apple.com/a"),
             ("other", "https://web.example")));
 
+        // No explicit fallback → the first store link (iOS) is the default, not "other".
+        Assert.Equal("https://apps.apple.com/a", projection.FallbackUrl);
+        Assert.Single(projection.Rules); // the iOS rule only — "other" is a fallback target, not a rule
+    }
+
+    [Fact]
+    public void Project_honors_the_chosen_fallback_link()
+    {
+        var projection = _spec.Project(Content(
+            ("ios", "https://apps.apple.com/a"),
+            ("android", "https://play.google.com/b"),
+            ("fallback", "android")));
+
+        Assert.Equal("https://play.google.com/b", projection.FallbackUrl);
+        Assert.Equal(2, projection.Rules.Count); // both device rules remain
+    }
+
+    [Fact]
+    public void Project_honors_other_as_the_chosen_fallback()
+    {
+        var projection = _spec.Project(Content(
+            ("ios", "https://apps.apple.com/a"),
+            ("other", "https://web.example"),
+            ("fallback", "other")));
+
         Assert.Equal("https://web.example", projection.FallbackUrl);
-        Assert.Single(projection.Rules); // the iOS rule only — "other" is the fallback, not a rule
+        Assert.Single(projection.Rules); // iOS rule only
     }
 }

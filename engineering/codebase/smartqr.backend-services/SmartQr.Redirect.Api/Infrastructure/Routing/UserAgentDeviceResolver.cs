@@ -1,4 +1,4 @@
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Enums;
 using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;

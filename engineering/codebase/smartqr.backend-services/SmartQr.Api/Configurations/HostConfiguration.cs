@@ -20,8 +20,8 @@ public static partial class HostConfiguration
             o.EnableOutputCache = false;
             o.EnableRateLimiting = false;
 
-            // Scan this assembly's FluentValidation validators so AddApiDefaults registers them behind the SDK adapter.
-            o.ValidatorAssemblies.Add(typeof(HostConfiguration).Assembly);
+            // Scan the Application assembly's FluentValidation validators so AddApiDefaults registers them behind the SDK adapter.
+            o.ValidatorAssemblies.Add(typeof(SmartQr.Application.ApplicationAssembly).Assembly);
         });
 
         builder

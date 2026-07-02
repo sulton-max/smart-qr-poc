@@ -41,13 +41,14 @@ public static class CodeRequests
         content = new { type, fields = fields ?? new { }, payload },
     };
 
-    /// <summary>A mobile-app-link create/update body — sends only the raw store links; the backend derives the device rules + fallback.</summary>
-    public static object MobileApp(string name, string? ios = null, string? android = null, string? other = null)
+    /// <summary>A mobile-app-link create/update body — sends only the raw store links + fallback choice; the backend derives the device rules + fallback URL.</summary>
+    public static object MobileApp(string name, string? ios = null, string? android = null, string? other = null, string? fallback = null)
     {
         var fields = new Dictionary<string, string>();
         if (ios is not null) fields["ios"] = ios;
         if (android is not null) fields["android"] = android;
         if (other is not null) fields["other"] = other;
+        if (fallback is not null) fields["fallback"] = fallback;
         return new
         {
             name,

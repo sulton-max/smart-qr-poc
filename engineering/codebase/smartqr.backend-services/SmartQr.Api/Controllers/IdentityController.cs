@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using SmartQr.Api.Application.Identity.Core.Models;
+using SmartQr.Application.Identity.Core.Models;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Identity.Guest;
 using WoW.Two.Sdk.Backend.Beta.Web.Contracts;

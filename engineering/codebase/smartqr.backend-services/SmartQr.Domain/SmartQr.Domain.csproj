@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Entity trait interfaces (IKeyedEntity / IAuditable / IHasTableName) + result-pattern markers. -->
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.41-beta" />
+    </ItemGroup>
+
+</Project>

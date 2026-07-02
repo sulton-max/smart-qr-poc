@@ -1,4 +1,4 @@
-using SmartQr.Api.Application.Codes.Core.Commands;
+using SmartQr.Application.Codes.Core.Commands;
 
 namespace SmartQr.Api.Requests;
 

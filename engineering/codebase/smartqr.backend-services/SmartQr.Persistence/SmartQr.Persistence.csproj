@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
+        <PackageReference Include="EFCore.NamingConventions" Version="10.*" />
+        <PackageReference Include="Dapper" Version="2.*" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.*" />
+        <!-- SQL migrator engine (Data.Migrations.Bespoke) — consumed from the published SDK; brings Data.Abstractions (IDbConnectionFactory) transitively. -->
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.41-beta" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartQr.Domain\SmartQr.Domain.csproj" />
+    </ItemGroup>
+
+    <!-- SQL migrations under Migrations/ ship embedded (logical name "Migrations/NNN-name/Apply.sql"), resolved by the SDK migrator via EmbeddedResourceMigrationSource. -->
+    <ItemGroup>
+        <!-- Exclude Dev/ drafts — unpromoted dev SQL must never ship in the binary. -->
+        <EmbeddedResource Include="Migrations\**\*.sql" Exclude="Migrations\Dev\**\*.sql">
+            <LogicalName>Migrations/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
+</Project>

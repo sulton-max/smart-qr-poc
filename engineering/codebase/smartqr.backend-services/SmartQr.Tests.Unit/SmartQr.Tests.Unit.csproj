@@ -23,8 +23,9 @@
 
   <!-- The systems under test: code generation (SmartQr.Codes), the routing evaluator (SmartQr.Redirect.Api), and PlanLimits (SmartQr.Api). Pure types only; the global `Program` of each host is never referenced, so no extern aliases are needed. -->
   <ItemGroup>
-    <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
-    <ProjectReference Include="..\SmartQr.Api\SmartQr.Api.csproj" />
+    <ProjectReference Include="..\SmartQr.Domain\SmartQr.Domain.csproj" />
+    <ProjectReference Include="..\SmartQr.Application\SmartQr.Application.csproj" />
+    <ProjectReference Include="..\SmartQr.Infrastructure\SmartQr.Infrastructure.csproj" />
     <ProjectReference Include="..\SmartQr.Redirect.Api\SmartQr.Redirect.Api.csproj" />
   </ItemGroup>
 

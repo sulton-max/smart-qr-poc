@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*" />
+        <PackageReference Include="Stripe.net" Version="52.0.0" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.41-beta" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartQr.Application\SmartQr.Application.csproj" />
+        <ProjectReference Include="..\SmartQr.Domain\SmartQr.Domain.csproj" />
+        <ProjectReference Include="..\SmartQr.Persistence\SmartQr.Persistence.csproj" />
+    </ItemGroup>
+
+</Project>

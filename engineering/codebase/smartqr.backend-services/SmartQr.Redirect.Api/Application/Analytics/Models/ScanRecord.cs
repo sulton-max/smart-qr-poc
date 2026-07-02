@@ -1,4 +1,4 @@
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Enums;
 
 namespace SmartQr.Redirect.Api.Application.Analytics.Models;
 

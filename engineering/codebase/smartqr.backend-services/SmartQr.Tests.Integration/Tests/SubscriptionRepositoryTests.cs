@@ -1,6 +1,6 @@
-using SmartQr.Api.Persistence.Repositories;
-using SmartQr.Common.Domain.Billing.Entities;
-using SmartQr.Common.Domain.Billing.Enums;
+using SmartQr.Infrastructure.Persistence.Repositories;
+using SmartQr.Domain.Billing.Entities;
+using SmartQr.Domain.Billing.Enums;
 using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;

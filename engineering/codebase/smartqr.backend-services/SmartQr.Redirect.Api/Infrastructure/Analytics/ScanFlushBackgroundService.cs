@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Domain.Codes.Entities;
+using SmartQr.Persistence.DataContexts;
 using SmartQr.Redirect.Api.Application.Analytics.Models;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Analytics;

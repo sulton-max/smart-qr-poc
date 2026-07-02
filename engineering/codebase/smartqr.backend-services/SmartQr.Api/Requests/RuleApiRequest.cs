@@ -1,5 +1,5 @@
-using SmartQr.Api.Application.Codes.Core.Models;
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Enums;
 
 namespace SmartQr.Api.Requests;
 

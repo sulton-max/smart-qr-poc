@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Persistence.DataContexts;
 using SmartQr.Redirect.Api.Application.Analytics.Services;
 using SmartQr.Redirect.Api.Application.Routing.Services;
 using SmartQr.Redirect.Api.Infrastructure.Analytics;

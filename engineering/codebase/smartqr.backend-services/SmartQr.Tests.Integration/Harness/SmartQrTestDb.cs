@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Persistence.DataContexts;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Audit;
 using WoW.Two.Sdk.Backend.Beta.Testing.Data.EntityFrameworkCore;
 

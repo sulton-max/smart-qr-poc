@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Domain.Codes.Entities;
+using SmartQr.Persistence.DataContexts;
 using SmartQr.Redirect.Api.Application.Routing.Models;
 using SmartQr.Redirect.Api.Application.Routing.Services;
 using SmartQr.Redirect.Api.Settings;

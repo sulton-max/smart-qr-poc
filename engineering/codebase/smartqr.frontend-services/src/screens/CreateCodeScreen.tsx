@@ -176,8 +176,13 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   );
 
   async function handleSubmit() {
-    setSaving(true);
     setError(null);
+    // Client-side guard (the backend still validates): a mobile app link needs at least one destination.
+    if (contentTypeId === "mobileApp" && !["ios", "android", "other"].some((k) => (contentValues[k] ?? "").trim())) {
+      setError("Add at least one link — App Store, Google Play, or a custom URL for other devices.");
+      return;
+    }
+    setSaving(true);
     // Content shapes the request: static bakes its payload (no redirect, no rules); a self-routed type
     // (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
     const isStatic = contentDef.mode === "static";

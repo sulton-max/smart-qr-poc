@@ -1,4 +1,4 @@
-using SmartQr.Common.Persistence.DataContexts;
+using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Tests.Integration.Harness;
 

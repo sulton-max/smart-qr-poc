@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using SmartQr.Api.Application.Identity.Core.Models;
+using SmartQr.Application.Identity.Core.Models;
 using SmartQr.Api.Requests;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Identity.Guest;

@@ -4,7 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Rendering;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Matrix;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Raster;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Enums;
 // Render tests target the SDK engine's symbology enum (not the persisted domain one).
 using BarcodeFormat = WoW.Two.Sdk.Backend.Beta.Codes.Models.BarcodeFormat;
 

@@ -308,6 +308,40 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         updated.Rules.Select(r => r.ConditionValue).Should().BeEquivalentTo(["Ios", "Android"]);
     }
 
+    [Fact]
+    public async Task Create_MobileApp_HonorsChosenFallbackLink()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        var code = await (await owner.Client.PostJsonAsync("/api/codes",
+                CodeRequests.MobileApp("App", ios: "https://apps.apple.com/a", android: "https://play.google.com/b", fallback: "android")))
+            .ReadEnvelopeAsync<CodeDtoModel>();
+
+        // Other devices resolve to the chosen link (Android), not the default first store (iOS).
+        code.FallbackUrl.Should().Be("https://play.google.com/b");
+        code.Rules.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task Create_WithUnsupportedContentType_Returns400()
+    {
+        var owner = await CreateGuestClientAsync();
+
+        // A known-but-not-yet-buildable content type (youtube) is rejected with a content-aware message.
+        var response = await owner.Client.PostJsonAsync("/api/codes", new
+        {
+            name = "Later",
+            codeType = "Qr",
+            barcodeFormat = "QrCode",
+            fallbackUrl = "https://example.com",
+            rules = Array.Empty<object>(),
+            content = new { type = "youtube", fields = new { }, payload = (string?)null },
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        (await response.Content.ReadAsStringAsync()).Should().Contain("isn't supported");
+    }
+
     // ── Style persistence round-trip (create → edit → re-render reflects the new style) ──
 
     [Fact]

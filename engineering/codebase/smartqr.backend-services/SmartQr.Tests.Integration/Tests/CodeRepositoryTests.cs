@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SmartQr.Api.Persistence.Repositories;
-using SmartQr.Common.Domain.Codes.Entities;
-using SmartQr.Common.Domain.Codes.Enums;
+using SmartQr.Infrastructure.Persistence.Repositories;
+using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Enums;
 using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
