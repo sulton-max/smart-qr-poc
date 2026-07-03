@@ -1,5 +1,6 @@
 import { FormField, Select, TextInput } from "@wow-two-beta/ui/forms";
-import type { FieldValues } from "../lib/contentTypes";
+import type { FieldValues } from "../../lib/contentTypes";
+import type { ContentControlsProps } from "./fields";
 
 // The fallback destination is chosen among the links the user actually filled; "other" is an
 // optional custom catch-all. Order defines the default (first filled link wins).
@@ -9,18 +10,11 @@ const FALLBACK_OPTIONS = [
   { key: "other", label: "Other devices URL" },
 ] as const;
 
-export interface MobileAppFieldsProps {
-  /** Current field values (`ios` / `android` / `other` URLs + the `fallback` key). */
-  values: FieldValues;
-  /** Emit the next values record. */
-  onChange: (next: FieldValues) => void;
-}
-
 /**
- * Mobile-app-link fields — store links plus a "default for other devices" picker chosen among the
+ * Mobile-app-link controls — store links plus a "default for other devices" picker chosen among the
  * filled links (the separate "other" URL is optional). The backend derives the device rules + fallback.
  */
-export function MobileAppFields({ values, onChange }: MobileAppFieldsProps) {
+export function MobileAppControls({ values, onChange }: ContentControlsProps) {
   const filled = FALLBACK_OPTIONS.filter((o) => (values[o.key] ?? "").trim());
   // The active fallback: the saved choice if it's still a filled link, else the first filled link.
   const fallback = filled.some((o) => o.key === values.fallback) ? values.fallback : filled[0]?.key;

@@ -28,22 +28,23 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
             .IsRequired();
 
         // Typed polymorphic content ⇄ content_json jsonb, via the one STJ options object shared with the wire (CodeContentJson).
-        // Nullable — legacy codes predate content types; a null resolves as a dynamic short link.
-        var contentConverter = new ValueConverter<CodeContent?, string?>(
-            content => content == null ? null : CodeContentJson.Serialize(content),
-            json => CodeContentJson.Deserialize(json));
+        // Required — every code carries a typed content (a url content over its fallback when none was chosen); the column is NOT NULL.
+        var contentConverter = new ValueConverter<CodeContent, string>(
+            content => CodeContentJson.Serialize(content),
+            json => CodeContentJson.Deserialize(json)!);
 
         // Records give structural equality; the comparer lets EF change-track the reference-typed jsonb graph (content is immutable → the snapshot is the same instance).
-        var contentComparer = new ValueComparer<CodeContent?>(
+        var contentComparer = new ValueComparer<CodeContent>(
             (left, right) => left == right,
-            content => content == null ? 0 : content.GetHashCode(),
+            content => content.GetHashCode(),
             content => content);
 
         builder
             .Property(e => e.Content)
             .HasColumnName("content_json")
             .HasColumnType(PostgresColumnTypes.Jsonb)
-            .HasConversion(contentConverter, contentComparer);
+            .HasConversion(contentConverter, contentComparer)
+            .IsRequired();
 
         // ── Relationships ──
         builder

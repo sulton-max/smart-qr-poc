@@ -3,6 +3,7 @@ using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
 using SmartQr.Domain.Billing.Entities;
 using SmartQr.Domain.Billing.Enums;
+using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Tests.E2E.Harness;
@@ -374,6 +375,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
                 StyleJson = "{}",
                 IsActive = true,
                 NeverExpires = true,
+                Content = new UrlContent { Url = "https://seed.example" },
             });
         await ctx.SaveChangesAsync();
     }

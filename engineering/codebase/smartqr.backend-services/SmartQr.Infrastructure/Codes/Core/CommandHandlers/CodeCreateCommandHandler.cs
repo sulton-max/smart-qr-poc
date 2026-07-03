@@ -9,6 +9,7 @@ using SmartQr.Infrastructure.Codes.Core.Extensions;
 using SmartQr.Application.Settings;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Domain.Billing.Enums;
+using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
@@ -74,7 +75,9 @@ public sealed class CodeCreateCommandHandler(
                 StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
                     ? StyleSpecJson.Serialize(style)
                     : "{}",
-                Content = request.Content,             // typed content persisted via the EF value converter; null → a dynamic short-link code
+                // Typed content persisted via the EF value converter. A create with no explicit content defaults to a
+                // plain url content pointing at the code's fallback — every code carries a content (the column is NOT NULL).
+                Content = request.Content ?? new UrlContent { Url = request.FallbackUrl },
                 Rules = (projection?.Rules ?? request.Rules)
                     .Select(r => new RoutingRuleEntity
                     {

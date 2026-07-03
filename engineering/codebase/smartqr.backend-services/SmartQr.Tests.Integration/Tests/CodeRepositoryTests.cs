@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartQr.Infrastructure.Persistence.Repositories;
+using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Tests.Integration.Harness;
@@ -21,6 +22,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         StyleJson = "{}",
         IsActive = true,
         NeverExpires = true,
+        Content = new UrlContent { Url = "https://fallback.example" },
         Rules = rules.ToList(),
     };
 
@@ -40,6 +42,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
+            Content = new UrlContent { Url = "https://site.example" },
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 2, ConditionType = RuleConditionType.Device, ConditionValue = "Android", Destination = "https://play.example" },
@@ -127,6 +130,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
+            Content = new UrlContent { Url = "https://old.example" },
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://old.example/ios" },
@@ -201,6 +205,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
+            Content = new UrlContent { Url = "https://site.example" },
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://ios.example" },
@@ -249,6 +254,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         StyleJson = "{}",
         IsActive = true,
         NeverExpires = true,
+        Content = new UrlContent { Url = fallback },
         Rules = [],
     };
 }

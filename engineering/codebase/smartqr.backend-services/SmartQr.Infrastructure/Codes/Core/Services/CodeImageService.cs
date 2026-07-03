@@ -17,8 +17,8 @@ public sealed class CodeImageService(ICodeRenderer renderer, ApiSettings setting
     {
         var shortUrl = $"{settings.RedirectBaseUrl.TrimEnd('/')}/{code.Slug}";
 
-        // Static codes bake their own payload (WiFi / vCard / geo / …) into the symbol; dynamic and legacy codes encode the redirect short link.
-        var payload = code.Content?.Encode() ?? shortUrl;
+        // Static codes bake their own payload (WiFi / vCard / geo / …) into the symbol; dynamic codes (Encode() null) encode the redirect short link.
+        var payload = code.Content.Encode() ?? shortUrl;
 
         // Read the persisted style off the entity, falling back to the default for an empty StyleJson.
         var style = StyleSpecJson.Deserialize(code.StyleJson);

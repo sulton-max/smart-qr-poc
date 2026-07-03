@@ -45,9 +45,10 @@ public sealed class CodeImageServiceTests
     }
 
     [Fact]
-    public void Dynamic_code_with_null_content_encodes_the_redirect_short_link()
+    public void Dynamic_code_encodes_the_redirect_short_link()
     {
-        var code = Code(slug: "abc1234", content: null);
+        // A dynamic content whose Encode() is null (url) → the symbol carries the redirect short link, not a baked payload.
+        var code = Code(slug: "abc1234", content: new UrlContent { Url = "https://example.com" });
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -63,7 +64,7 @@ public sealed class CodeImageServiceTests
         Assert.Equal($"{RedirectBase}/xyz9999", Decode(_service.Render(code, ImageFormat.Png).Content));
     }
 
-    private static CodeEntity Code(string slug = "slug0001", CodeContent? content = null) => new()
+    private static CodeEntity Code(CodeContent content, string slug = "slug0001") => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,

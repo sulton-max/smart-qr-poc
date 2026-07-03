@@ -31,28 +31,102 @@ export interface RuleDraft {
 // Typed content mirroring the backend polymorphic `CodeContent` — discriminated on `type`
 // (the camelCase content id). The backend owns encoding: static types bake a payload from these
 // fields, dynamic types (url / mobileApp) resolve the redirect short link. No `payload` on the wire.
+// One named interface per member (mirrors the backend record names + field names exactly), then a
+// union alias — so each content type has a nameable, referenceable shape.
+
+/** Dynamic forwarder — the QR carries the redirect short link to this destination. */
+export interface UrlContent {
+  type: "url";
+  url: string;
+}
+
+/** Dynamic + device-routed — server derives the App Store / Google Play / fallback rules from these links. */
+export interface MobileAppLinkContent {
+  type: "mobileApp";
+  appStore?: string;
+  playStore?: string;
+  other?: string;
+  fallback?: string;
+}
+
+/** Static free text. */
+export interface TextContent {
+  type: "text";
+  text: string;
+}
+
+/** Static `mailto:` — recipient plus optional subject/body. */
+export interface EmailContent {
+  type: "email";
+  to: string;
+  subject?: string;
+  body?: string;
+}
+
+/** Static `sms:` — recipient phone plus optional prefilled message. */
+export interface SmsContent {
+  type: "sms";
+  phone: string;
+  message?: string;
+}
+
+/** Static `tel:` dial link. */
+export interface PhoneContent {
+  type: "phone";
+  phone: string;
+}
+
+/** Static `geo:` coordinates (lat/long as strings — the wire carries them verbatim). */
+export interface GeoContent {
+  type: "geo";
+  latitude: string;
+  longitude: string;
+}
+
+/** Static WiFi join — `hidden` is a real bool (the only non-string field). */
+export interface WifiContent {
+  type: "wifi";
+  ssid: string;
+  password?: string;
+  encryption?: string;
+  hidden: boolean;
+}
+
+/** Static vCard contact — only `firstName` is required. */
+export interface VCardContent {
+  type: "vcard";
+  firstName: string;
+  lastName?: string;
+  org?: string;
+  title?: string;
+  phone?: string;
+  email?: string;
+  url?: string;
+  address?: string;
+  note?: string;
+}
+
+/** Static iCalendar event — `title` + `start` required, everything else optional. */
+export interface CalendarContent {
+  type: "calendar";
+  title: string;
+  start: string;
+  end?: string;
+  location?: string;
+  description?: string;
+}
+
 export type CodeContent =
-  | { type: "url"; url: string }
-  | { type: "mobileApp"; appStore?: string; playStore?: string; other?: string; fallback?: string }
-  | { type: "text"; text: string }
-  | { type: "email"; to: string; subject?: string; body?: string }
-  | { type: "sms"; phone: string; message?: string }
-  | { type: "phone"; phone: string }
-  | { type: "geo"; latitude: string; longitude: string }
-  | { type: "wifi"; ssid: string; password?: string; encryption?: string; hidden: boolean }
-  | {
-      type: "vcard";
-      firstName: string;
-      lastName?: string;
-      org?: string;
-      title?: string;
-      phone?: string;
-      email?: string;
-      url?: string;
-      address?: string;
-      note?: string;
-    }
-  | { type: "calendar"; title: string; start: string; end?: string; location?: string; description?: string };
+  | UrlContent
+  | MobileAppLinkContent
+  | TextContent
+  | EmailContent
+  | SmsContent
+  | PhoneContent
+  | GeoContent
+  | WifiContent
+  | VCardContent
+  | CalendarContent;
 
 export interface CreateCodeRequest {
   name: string;

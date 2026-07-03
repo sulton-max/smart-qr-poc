@@ -185,7 +185,9 @@ export function buildContent(id: ContentTypeId, values: FieldValues): CodeConten
   // The mobile-app fallback picker isn't a registry field — carry the chosen store key through when set.
   if (id === "mobileApp" && values.fallback) out.fallback = values.fallback;
 
-  return out as CodeContent;
+  // Structural cast via `unknown`: `out` is assembled dynamically, so it can't be narrowed to a single
+  // union member statically — the per-type field loop guarantees the right shape at runtime.
+  return out as unknown as CodeContent;
 }
 
 /** Projects a persisted `CodeContent` back to the builder's flat field values (for the edit round-trip). Inverse of `buildContent`. */

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Persistence.DataContexts;
@@ -41,6 +42,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
+            Content = new UrlContent { Url = "https://fallback.example" },
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://apple.example" },
@@ -116,6 +118,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     StyleJson = "{}",
                     IsActive = true,
                     NeverExpires = true,
+                    Content = new UrlContent { Url = "https://still-works.example" },
                 });
             await ctx.SaveChangesAsync();
         }
