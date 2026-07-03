@@ -215,7 +215,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var code = await response.ReadEnvelopeAsync<CodeDtoModel>();
 
         code.Content.Should().NotBeNull();
-        code.Content!.Type.Should().Be("wifi");
+        code.Content!.Type.Should().Be("Wifi");
         code.Content.Payload.Should().Be("WIFI:T:WPA;S:Cafe;P:beans123;;");
         code.Content.Fields["ssid"].Should().Be("Cafe");
     }
@@ -232,7 +232,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
 
         fetched.Content.Should().NotBeNull();
-        fetched.Content!.Type.Should().Be("vcard");
+        fetched.Content!.Type.Should().Be("VCard");
         fetched.Content.Payload.Should().Be("BEGIN:VCARD\nVERSION:3.0\nFN:Ada\nEND:VCARD");
         fetched.Content.Fields["firstName"].Should().Be("Ada");
     }
@@ -257,13 +257,13 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-                CodeRequests.MobileApp("Notion", ios: "https://apps.apple.com/us/app/notion/id1232780281")))
+                CodeRequests.MobileApp("Notion", appStore: "https://apps.apple.com/us/app/notion/id1232780281")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         // One store link is enough — the server derives the iOS device rule and the fallback destination.
         code.FallbackUrl.Should().Be("https://apps.apple.com/us/app/notion/id1232780281");
         code.Rules.Should().ContainSingle().Which.ConditionValue.Should().Be("Ios");
-        code.Content!.Type.Should().Be("mobileApp");
+        code.Content!.Type.Should().Be("MobileApp");
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.MobileApp("Bad", ios: "notaurl"));
+            CodeRequests.MobileApp("Bad", appStore: "notaurl"));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         (await response.Content.ReadAsStringAsync()).Should().Contain("App Store link");
@@ -297,11 +297,11 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-                CodeRequests.MobileApp("App", ios: "https://apps.apple.com/a")))
+                CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         var updated = await (await owner.Client.PutJsonAsync($"/api/codes/{created.Id}",
-                CodeRequests.MobileApp("App", ios: "https://apps.apple.com/a", android: "https://play.google.com/b")))
+                CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a", playStore: "https://play.google.com/b")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         updated.Rules.Should().HaveCount(2);
@@ -314,7 +314,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-                CodeRequests.MobileApp("App", ios: "https://apps.apple.com/a", android: "https://play.google.com/b", fallback: "android")))
+                CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a", playStore: "https://play.google.com/b", fallback: "playStore")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         // Other devices resolve to the chosen link (Android), not the default first store (iOS).

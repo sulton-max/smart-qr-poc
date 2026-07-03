@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Application.Codes.Core.Models;
 
@@ -11,8 +12,8 @@ namespace SmartQr.Application.Codes.Core.Models;
 /// </remarks>
 public sealed record ContentSpec
 {
-    /// <summary>Content-type id, verbatim from the builder registry (e.g. <c>url</c>, <c>wifi</c>, <c>vcard</c>).</summary>
-    public required string Type { get; init; }
+    /// <summary>The content type this descriptor is for (e.g. <see cref="CodeContentType.Url"/>, <see cref="CodeContentType.Wifi"/>).</summary>
+    public required CodeContentType Type { get; init; }
 
     /// <summary>Raw field values the builder collected, keyed by field name — persisted only to repopulate the form on edit.</summary>
     public IReadOnlyDictionary<string, string> Fields { get; init; } = new Dictionary<string, string>();
@@ -28,7 +29,11 @@ public sealed record ContentSpec
 /// <summary>(De)serializes a <see cref="ContentSpec"/> to/from the raw <c>content_json</c> jsonb string. Mirrors <c>StyleSpecJson</c>.</summary>
 public static class ContentSpecJson
 {
-    private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web)
+    {
+        // Store the content type as its enum name (not an ordinal) so the jsonb round-trips readably.
+        Converters = { new JsonStringEnumConverter() },
+    };
 
     /// <summary>Serializes a spec to its jsonb string form.</summary>
     public static string Serialize(ContentSpec spec) => JsonSerializer.Serialize(spec, Options);

@@ -42,11 +42,11 @@ public static class CodeRequests
     };
 
     /// <summary>A mobile-app-link create/update body — sends only the raw store links + fallback choice; the backend derives the device rules + fallback URL.</summary>
-    public static object MobileApp(string name, string? ios = null, string? android = null, string? other = null, string? fallback = null)
+    public static object MobileApp(string name, string? appStore = null, string? playStore = null, string? other = null, string? fallback = null)
     {
         var fields = new Dictionary<string, string>();
-        if (ios is not null) fields["ios"] = ios;
-        if (android is not null) fields["android"] = android;
+        if (appStore is not null) fields["appStore"] = appStore;
+        if (playStore is not null) fields["playStore"] = playStore;
         if (other is not null) fields["other"] = other;
         if (fallback is not null) fields["fallback"] = fallback;
         return new

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Core.Entities;
 
 namespace SmartQr.Persistence.Configurations;
 

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using SmartQr.Domain.Codes.Entities;
-using SmartQr.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Core.Entities;
+using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Persistence.DataContexts;
 using SmartQr.Redirect.Api.Application.Routing.Models;
 using SmartQr.Redirect.Api.Application.Routing.Services;

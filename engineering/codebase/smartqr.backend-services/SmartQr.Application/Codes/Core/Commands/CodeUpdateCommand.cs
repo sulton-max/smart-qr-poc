@@ -1,6 +1,6 @@
 using SmartQr.Application.Codes.Core.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
-using SmartQr.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 

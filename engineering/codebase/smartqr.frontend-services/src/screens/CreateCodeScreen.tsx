@@ -126,10 +126,12 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         setGradient(gradientFromDto(code.style.gradient));
         setTransparentBackground(code.style.transparentBackground);
         setEmoji(code.style.emoji ?? null);
-        // Round-trip the content form: restore the saved content type + field values (legacy codes carry none).
+        // Round-trip the content form: the wire type is PascalCase (e.g. "MobileApp") — normalize to the
+        // camelCase content-type id, then restore the saved field values (legacy codes carry none).
         if (code.content) {
-          setContentTypeId(code.content.type as ContentTypeId);
-          if (code.content.type === "url") setFallbackUrl(code.content.fields.url ?? code.fallbackUrl);
+          const typeId = enumFromWire(CONTENT_TYPES.map((c) => c.id), code.content.type, "url");
+          setContentTypeId(typeId);
+          if (typeId === "url") setFallbackUrl(code.content.fields.url ?? code.fallbackUrl);
           else setContentValues(code.content.fields);
         }
       })
@@ -178,7 +180,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   async function handleSubmit() {
     setError(null);
     // Client-side guard (the backend still validates): a mobile app link needs at least one destination.
-    if (contentTypeId === "mobileApp" && !["ios", "android", "other"].some((k) => (contentValues[k] ?? "").trim())) {
+    if (contentTypeId === "mobileApp" && !["appStore", "playStore", "other"].some((k) => (contentValues[k] ?? "").trim())) {
       setError("Add at least one link — App Store, Google Play, or a custom URL for other devices.");
       return;
     }

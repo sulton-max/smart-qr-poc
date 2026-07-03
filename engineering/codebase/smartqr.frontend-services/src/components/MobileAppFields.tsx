@@ -4,8 +4,8 @@ import type { FieldValues } from "../lib/contentTypes";
 // The fallback destination is chosen among the links the user actually filled; "other" is an
 // optional custom catch-all. Order defines the default (first filled link wins).
 const FALLBACK_OPTIONS = [
-  { key: "ios", label: "App Store (iOS)" },
-  { key: "android", label: "Google Play" },
+  { key: "appStore", label: "App Store (iOS)" },
+  { key: "playStore", label: "Google Play" },
   { key: "other", label: "Other devices URL" },
 ] as const;
 
@@ -38,17 +38,17 @@ export function MobileAppFields({ values, onChange }: MobileAppFieldsProps) {
       <FormField label="App Store (iOS) URL">
         <TextInput
           ring="sm"
-          value={values.ios ?? ""}
+          value={values.appStore ?? ""}
           placeholder="https://apps.apple.com/app/…"
-          onChange={(e) => setLink("ios", e.target.value)}
+          onChange={(e) => setLink("appStore", e.target.value)}
         />
       </FormField>
       <FormField label="Google Play URL">
         <TextInput
           ring="sm"
-          value={values.android ?? ""}
+          value={values.playStore ?? ""}
           placeholder="https://play.google.com/store/apps/…"
-          onChange={(e) => setLink("android", e.target.value)}
+          onChange={(e) => setLink("playStore", e.target.value)}
         />
       </FormField>
       <FormField label="Other devices URL (optional)">

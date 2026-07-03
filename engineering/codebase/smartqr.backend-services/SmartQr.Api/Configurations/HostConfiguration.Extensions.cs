@@ -3,7 +3,7 @@ using SmartQr.Application.Billing.Core.Services;
 using SmartQr.Application.Codes.Core.Services;
 using SmartQr.Application.Identity.Core.Services;
 using SmartQr.Infrastructure.Billing.Services;
-using SmartQr.Infrastructure.Codes.Services;
+using SmartQr.Infrastructure.Codes.Core.Services;
 using SmartQr.Infrastructure.Persistence.Repositories;
 using SmartQr.Application.Settings;
 using WoW.Two.Sdk.Backend.Beta.Codes;

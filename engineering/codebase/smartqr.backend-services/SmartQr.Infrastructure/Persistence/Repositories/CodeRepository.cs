@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartQr.Application.Codes.Core.Services;
-using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Infrastructure.Persistence.Repositories;

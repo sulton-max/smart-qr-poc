@@ -1,8 +1,8 @@
 using SkiaSharp;
 using SmartQr.Application.Codes.Core.Models;
-using SmartQr.Infrastructure.Codes.Services;
+using SmartQr.Infrastructure.Codes.Core.Services;
 using SmartQr.Application.Settings;
-using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Core.Entities;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Matrix;
@@ -10,8 +10,9 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Raster;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
 using ZXing;
 using ZXing.Common;
-using DomainBarcodeFormat = SmartQr.Domain.Codes.Enums.BarcodeFormat;
-using DomainCodeType = SmartQr.Domain.Codes.Enums.CodeType;
+using DomainBarcodeFormat = SmartQr.Domain.Codes.Core.Enums.BarcodeFormat;
+using DomainCodeType = SmartQr.Domain.Codes.Core.Enums.CodeType;
+using DomainContentType = SmartQr.Domain.Codes.Core.Enums.CodeContentType;
 
 namespace SmartQr.Tests.Unit;
 
@@ -36,7 +37,7 @@ public sealed class CodeImageServiceTests
         const string payload = "WIFI:T:WPA;S:CoffeeShop;P:latte123;;";
         var code = Code(contentJson: ContentSpecJson.Serialize(new ContentSpec
         {
-            Type = "wifi",
+            Type = DomainContentType.Wifi,
             Fields = new Dictionary<string, string> { ["ssid"] = "CoffeeShop", ["password"] = "latte123" },
             Payload = payload,
         }));
@@ -62,7 +63,7 @@ public sealed class CodeImageServiceTests
         // A url/appstore code persists its content descriptor but no baked payload → the symbol carries the short link, not the fields.
         var code = Code(slug: "xyz9999", contentJson: ContentSpecJson.Serialize(new ContentSpec
         {
-            Type = "url",
+            Type = DomainContentType.Url,
             Fields = new Dictionary<string, string> { ["url"] = "https://example.com" },
             Payload = null,
         }));

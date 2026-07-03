@@ -1,6 +1,6 @@
-using SmartQr.Application.Codes.Core.Content;
+using SmartQr.Application.Codes.Content.MobileApp;
 using SmartQr.Application.Codes.Core.Models;
-using SmartQr.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Tests.Unit;
 
@@ -11,7 +11,7 @@ public sealed class MobileAppLinkContentSpecTests
 
     private static ContentSpec Content(params (string key, string value)[] fields) => new()
     {
-        Type = "mobileApp",
+        Type = CodeContentType.MobileApp,
         Fields = fields.ToDictionary(f => f.key, f => f.value),
     };
 
@@ -26,31 +26,31 @@ public sealed class MobileAppLinkContentSpecTests
     [Fact]
     public void Validate_with_one_store_link_is_valid()
     {
-        Assert.Empty(_spec.Validate(Content(("ios", "https://apps.apple.com/app/id1"))));
+        Assert.Empty(_spec.Validate(Content(("appStore", "https://apps.apple.com/app/id1"))));
     }
 
     [Fact]
     public void Validate_rejects_a_non_http_link_with_a_field_scoped_message()
     {
-        var errors = _spec.Validate(Content(("android", "notaurl")));
+        var errors = _spec.Validate(Content(("playStore", "notaurl")));
 
         var error = Assert.Single(errors);
-        Assert.Equal("android", error.Property);
+        Assert.Equal("playStore", error.Property);
         Assert.Contains("Google Play link", error.Message);
     }
 
     [Fact]
-    public void Project_maps_ios_and_android_to_device_rules_and_derives_fallback_from_the_first_store()
+    public void Project_maps_stores_to_device_rules_and_derives_fallback_from_the_first_store()
     {
         var projection = _spec.Project(Content(
-            ("ios", "https://apps.apple.com/a"),
-            ("android", "https://play.google.com/b")));
+            ("appStore", "https://apps.apple.com/a"),
+            ("playStore", "https://play.google.com/b")));
 
         Assert.Equal(2, projection.Rules.Count);
         Assert.Contains(projection.Rules, r =>
             r.ConditionType == RuleConditionType.Device && r.ConditionValue == "Ios" && r.Destination == "https://apps.apple.com/a");
         Assert.Contains(projection.Rules, r => r.ConditionValue == "Android" && r.Destination == "https://play.google.com/b");
-        // No explicit "other" → the fallback derives from the first available store link (iOS).
+        // No explicit fallback → derives from the first available store link (App Store).
         Assert.Equal("https://apps.apple.com/a", projection.FallbackUrl);
     }
 
@@ -67,21 +67,21 @@ public sealed class MobileAppLinkContentSpecTests
     public void Project_without_a_choice_defaults_to_the_first_available_store_link()
     {
         var projection = _spec.Project(Content(
-            ("ios", "https://apps.apple.com/a"),
+            ("appStore", "https://apps.apple.com/a"),
             ("other", "https://web.example")));
 
-        // No explicit fallback → the first store link (iOS) is the default, not "other".
+        // No explicit fallback → the first store link (App Store) is the default, not "other".
         Assert.Equal("https://apps.apple.com/a", projection.FallbackUrl);
-        Assert.Single(projection.Rules); // the iOS rule only — "other" is a fallback target, not a rule
+        Assert.Single(projection.Rules); // the App Store rule only — "other" is a fallback target, not a rule
     }
 
     [Fact]
-    public void Project_honors_the_chosen_fallback_link()
+    public void Project_honors_the_chosen_fallback_store()
     {
         var projection = _spec.Project(Content(
-            ("ios", "https://apps.apple.com/a"),
-            ("android", "https://play.google.com/b"),
-            ("fallback", "android")));
+            ("appStore", "https://apps.apple.com/a"),
+            ("playStore", "https://play.google.com/b"),
+            ("fallback", "playStore")));
 
         Assert.Equal("https://play.google.com/b", projection.FallbackUrl);
         Assert.Equal(2, projection.Rules.Count); // both device rules remain
@@ -91,11 +91,11 @@ public sealed class MobileAppLinkContentSpecTests
     public void Project_honors_other_as_the_chosen_fallback()
     {
         var projection = _spec.Project(Content(
-            ("ios", "https://apps.apple.com/a"),
+            ("appStore", "https://apps.apple.com/a"),
             ("other", "https://web.example"),
             ("fallback", "other")));
 
         Assert.Equal("https://web.example", projection.FallbackUrl);
-        Assert.Single(projection.Rules); // iOS rule only
+        Assert.Single(projection.Rules); // App Store rule only
     }
 }

@@ -1,9 +1,8 @@
 using FluentValidation;
 using FluentValidation.Results;
-using SmartQr.Application.Codes.Core.Content;
+using SmartQr.Application.Codes.Content;
 using SmartQr.Application.Codes.Core.Models;
-using SmartQr.Domain.Codes.Enums;
-using SmartQr.Domain.Codes.Extensions;
+using SmartQr.Domain.Codes.Core.Extensions;
 
 namespace SmartQr.Application.Codes.Core.Validation;
 
@@ -16,8 +15,8 @@ internal static class ContentValidation
         if (content is null)
             return;
 
-        // Reject content types the builder can't create yet — unknown, or known-but-unsupported (e.g. youtube).
-        if (!Enum.TryParse<CodeContentType>(content.Type, ignoreCase: true, out var contentType) || !contentType.IsSupported())
+        // Reject content types the builder can't create yet (known-but-unsupported, e.g. youtube).
+        if (!content.Type.IsSupported())
         {
             ctx.AddFailure(new ValidationFailure("content.type", $"The '{content.Type}' content type isn't supported yet.") { ErrorCode = "UnsupportedContentType" });
             return;

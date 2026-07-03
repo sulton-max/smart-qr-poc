@@ -1,6 +1,6 @@
 using FluentValidation;
 using SmartQr.Application.Codes.Core.Commands;
-using SmartQr.Application.Codes.Core.Content;
+using SmartQr.Application.Codes.Content;
 
 namespace SmartQr.Application.Codes.Core.Validation;
 

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartQr.Application.Billing.Core.Commands;
 using SmartQr.Application.Billing.Core.Models;
 using SmartQr.Application.Billing.Core.Queries;
-using SmartQr.Api.Requests;
+using SmartQr.Api.Requests.Billing;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;

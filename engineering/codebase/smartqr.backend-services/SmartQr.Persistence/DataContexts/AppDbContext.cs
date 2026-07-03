@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartQr.Domain.Billing.Entities;
-using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Identity.Entities;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore;
 using WoW.Two.Sdk.Backend.Beta.Data.EntityFrameworkCore.Naming;

@@ -1,4 +1,4 @@
-using SmartQr.Domain.Codes.Entities;
+using SmartQr.Domain.Codes.Core.Entities;
 
 namespace SmartQr.Application.Codes.Core.Services;
 

@@ -74,7 +74,7 @@ describe("mobileApp (dynamic, device-routed)", () => {
   it("has iOS/Android/other fields (all optional) with a helper note; routing is derived server-side", () => {
     const def = CONTENT_TYPES.find((c) => c.id === "mobileApp")!;
     expect(def.mode).toBe("dynamic");
-    expect(def.fields.map((f) => f.key)).toEqual(["ios", "android", "other"]);
+    expect(def.fields.map((f) => f.key)).toEqual(["appStore", "playStore", "other"]);
     // The backend derives device rules + fallback from these fields, so none is client-required.
     expect(def.fields.every((f) => !f.required)).toBe(true);
     expect(def.note).toBeTruthy();

@@ -1,4 +1,4 @@
-using SmartQr.Domain.Codes.Enums;
+using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Application.Codes.Core.Models;
 

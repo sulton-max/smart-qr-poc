@@ -75,11 +75,11 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
     mode: "dynamic",
     note: "Add at least one. iPhone opens the App Store, Android opens Google Play; choose which link every other device opens.",
     fields: [
-      { key: "ios", label: "App Store (iOS) URL", kind: "url", placeholder: "https://apps.apple.com/app/…" },
-      { key: "android", label: "Google Play URL", kind: "url", placeholder: "https://play.google.com/store/apps/…" },
+      { key: "appStore", label: "App Store (iOS) URL", kind: "url", placeholder: "https://apps.apple.com/app/…" },
+      { key: "playStore", label: "Google Play URL", kind: "url", placeholder: "https://play.google.com/store/apps/…" },
       { key: "other", label: "Other devices URL (fallback)", kind: "url", placeholder: "https://yourapp.com or another store" },
     ],
-    encode: (v) => t(v.other) || t(v.ios) || t(v.android),
+    encode: (v) => t(v.other) || t(v.appStore) || t(v.playStore),
   },
   {
     id: "text",
