@@ -1,7 +1,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using SmartQr.Application.Codes.Content;
-using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Extensions;
 
 namespace SmartQr.Application.Codes.Core.Validation;
@@ -10,7 +10,7 @@ namespace SmartQr.Application.Codes.Core.Validation;
 internal static class ContentValidation
 {
     /// <summary>Rejects a content type the builder can't create yet, then runs the resolved spec's field validation; a no-op when no content is supplied.</summary>
-    public static void Apply<T>(ContentSpec? content, ValidationContext<T> ctx)
+    public static void Apply<T>(CodeContent? content, ValidationContext<T> ctx)
     {
         if (content is null)
             return;

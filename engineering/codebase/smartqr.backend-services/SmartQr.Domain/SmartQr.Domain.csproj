@@ -11,4 +11,9 @@
         <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.41-beta" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- SDK-generic domain primitives shared across the product (e.g. MobileAppStore) — a shared kernel; Common.Domain has no back-reference, so no cycle. -->
+        <ProjectReference Include="..\SmartQr.Common.Domain\SmartQr.Common.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

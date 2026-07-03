@@ -1,4 +1,5 @@
 using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Application.Codes.Content;
@@ -10,14 +11,14 @@ namespace SmartQr.Application.Codes.Content;
 /// </summary>
 public interface IContentTypeSpec
 {
-    /// <summary>The content type this spec handles (matches <see cref="ContentSpec.Type"/>).</summary>
+    /// <summary>The content type this spec handles (matches <see cref="CodeContent.Type"/>).</summary>
     CodeContentType Type { get; }
 
-    /// <summary>Validates the content's fields; an empty list means valid. Messages are content-aware (e.g. "App Store link…"), not the generic fallback-URL message.</summary>
-    IReadOnlyList<ContentError> Validate(ContentSpec content);
+    /// <summary>Validates the typed content; an empty list means valid. Messages are content-aware (e.g. "App Store link…"), not the generic fallback-URL message.</summary>
+    IReadOnlyList<ContentError> Validate(CodeContent content);
 
     /// <summary>Projects the content into the code's persisted routing — the derived fallback destination plus ordered device rules.</summary>
-    ContentProjection Project(ContentSpec content);
+    ContentProjection Project(CodeContent content);
 }
 
 /// <summary>A single content validation failure — lifted into the FluentValidation pipeline so it surfaces in the standard ProblemDetails <c>errors</c> array (property / message / code).</summary>

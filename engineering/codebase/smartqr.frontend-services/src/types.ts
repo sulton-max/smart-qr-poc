@@ -28,14 +28,31 @@ export interface RuleDraft {
   destination: string;
 }
 
-// Structured content descriptor mirroring the backend `ContentSpec`. `payload != null`
-// marks a static code (the payload is baked into the symbol); `type` + `fields` round-trip
-// the builder form on edit.
-export interface ContentSpec {
-  type: string;
-  fields: Record<string, string>;
-  payload: string | null;
-}
+// Typed content mirroring the backend polymorphic `CodeContent` — discriminated on `type`
+// (the camelCase content id). The backend owns encoding: static types bake a payload from these
+// fields, dynamic types (url / mobileApp) resolve the redirect short link. No `payload` on the wire.
+export type CodeContent =
+  | { type: "url"; url: string }
+  | { type: "mobileApp"; appStore?: string; playStore?: string; other?: string; fallback?: string }
+  | { type: "text"; text: string }
+  | { type: "email"; to: string; subject?: string; body?: string }
+  | { type: "sms"; phone: string; message?: string }
+  | { type: "phone"; phone: string }
+  | { type: "geo"; latitude: string; longitude: string }
+  | { type: "wifi"; ssid: string; password?: string; encryption?: string; hidden: boolean }
+  | {
+      type: "vcard";
+      firstName: string;
+      lastName?: string;
+      org?: string;
+      title?: string;
+      phone?: string;
+      email?: string;
+      url?: string;
+      address?: string;
+      note?: string;
+    }
+  | { type: "calendar"; title: string; start: string; end?: string; location?: string; description?: string };
 
 export interface CreateCodeRequest {
   name: string;
@@ -50,8 +67,8 @@ export interface CreateCodeRequest {
   }>;
   // The visual style to persist (server defaults it when omitted; the builder always sends it).
   style: PreviewStyle;
-  // The structured content (type + fields + baked static payload); the builder always sends it.
-  content: ContentSpec;
+  // The typed content (discriminated on `type`); the builder always sends it. Encoded server-side.
+  content: CodeContent;
 }
 
 // `PUT /api/codes/{id}` — full replace; slug, scan count, creation time are server-preserved.
@@ -149,10 +166,12 @@ export interface PreviewStyle {
 }
 
 export interface PreviewRequest {
-  // The data encoded into the code — the short link on edit, a sample URL on create.
+  // Fallback data when `content` is absent/dynamic — the short link on edit, a sample URL on create.
   value: string;
   codeType: CodeType;
   style: PreviewStyle;
+  // Typed content; when static, the server encodes its payload so the preview matches the saved asset.
+  content: CodeContent | null;
 }
 
 export interface CodeDto {
@@ -175,8 +194,8 @@ export interface CodeDto {
   }>;
   // Persisted visual style (enum values come back verbatim/PascalCase — normalize on read).
   style: PreviewStyle;
-  // Persisted structured content (content type + field values + baked static payload); null for a legacy/plain code.
-  content: ContentSpec | null;
+  // Persisted typed content (discriminated on `type`); null for a legacy/plain code.
+  content: CodeContent | null;
 }
 
 // Backend `ApiResponse<T>.Success` envelope (camelCased).

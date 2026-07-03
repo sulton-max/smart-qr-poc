@@ -1,5 +1,6 @@
 using SmartQr.Application.Codes.Core.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -31,6 +32,6 @@ public sealed record CodeCreateCommand
     /// <summary>Optional style to persist; null leaves the code on the default style.</summary>
     public StyleSpec? Style { get; init; }
 
-    /// <summary>Optional structured content (type + field values + baked payload); a non-null payload marks a static code.</summary>
-    public ContentSpec? Content { get; init; }
+    /// <summary>Optional typed content the code carries; static types bake a payload (<see cref="CodeContent.Encode"/>), dynamic types (url / mobileApp) resolve the redirect short link.</summary>
+    public CodeContent? Content { get; init; }
 }

@@ -1,0 +1,5 @@
+-- ============================================================
+-- 006-content-model — Rollback.
+-- A jsonb SHAPE change with no DDL to reverse; the forward wipe discarded the old-shape descriptors and they
+-- cannot be reconstructed. Nothing to undo — codes with a null content_json resolve as dynamic short links.
+-- ============================================================

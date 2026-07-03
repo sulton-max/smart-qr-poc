@@ -1,3 +1,4 @@
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 
@@ -44,9 +45,9 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <remarks>Raw <c>jsonb</c> string, not a CLR graph — style is applied only at render time, never queried server-side.</remarks>
     public string StyleJson { get; set; }
 
-    /// <summary>Gets or sets the JSON content descriptor of the code (<c>{ type, fields, payload? }</c>) — the builder's content type plus its raw field values.</summary>
-    /// <remarks>Raw <c>jsonb</c> string, not a CLR graph. A non-null baked <c>payload</c> marks a static code (encoded verbatim into the symbol); null (and legacy rows) resolve as a dynamic short link.</remarks>
-    public string? ContentJson { get; set; }
+    /// <summary>Gets or sets the typed content the code carries — a polymorphic <see cref="CodeContent"/> persisted as <c>content_json</c> jsonb via an EF value converter.</summary>
+    /// <remarks>Static content bakes its payload into the symbol (<see cref="CodeContent.Encode"/>); dynamic content (url / mobileApp) and legacy null rows resolve as the redirect short link.</remarks>
+    public CodeContent? Content { get; set; }
 
     /// <summary>Gets or sets the running total of scans of the code (denormalized for fast display).</summary>
     public long ScanCount { get; set; }

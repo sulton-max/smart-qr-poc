@@ -1,5 +1,6 @@
 using SmartQr.Application.Codes.Core.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -34,6 +35,6 @@ public sealed record CodeUpdateCommand
     /// <summary>Optional style to persist; null preserves the code's saved style.</summary>
     public StyleSpec? Style { get; init; }
 
-    /// <summary>Optional structured content (type + field values + baked payload); null preserves the code's saved content.</summary>
-    public ContentSpec? Content { get; init; }
+    /// <summary>Optional typed content to persist; null preserves the code's saved content. Static types bake a payload, dynamic types resolve the short link.</summary>
+    public CodeContent? Content { get; init; }
 }

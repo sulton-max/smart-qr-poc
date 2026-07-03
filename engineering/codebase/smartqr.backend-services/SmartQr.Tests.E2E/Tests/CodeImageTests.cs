@@ -46,7 +46,7 @@ public sealed class CodeImageTests(AppFixture fixture) : E2EBase(fixture)
         // A static code renders its baked payload rather than a short link — the full stack still returns a valid image.
         var owner = await CreateGuestClientAsync();
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.StaticCode("WiFi svg", "wifi", "WIFI:T:WPA;S:Net;P:pw;;", new { ssid = "Net" })))
+            CodeRequests.Content("WiFi svg", new { type = "wifi", ssid = "Net", password = "pw" })))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         var response = await owner.Client.GetAsync($"/api/codes/{code.Id}/image?format=svg");

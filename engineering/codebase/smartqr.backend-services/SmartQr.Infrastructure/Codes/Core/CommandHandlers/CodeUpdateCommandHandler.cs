@@ -48,7 +48,7 @@ public sealed class CodeUpdateCommandHandler(
 
             // Persist content only when the request carries it — an omitted block preserves saved content (mirrors style).
             if (request.Content is { } content)
-                code.ContentJson = ContentSpecJson.Serialize(content);
+                code.Content = content;
 
             // Full replace of the rule set — the spec's derived rules when it owns routing, else the request's.
             code.Rules = (projection?.Rules ?? request.Rules)

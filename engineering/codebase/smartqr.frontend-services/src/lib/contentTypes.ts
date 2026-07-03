@@ -1,6 +1,9 @@
-// Static content types (v0.7) — the builder collects structured fields, and `encodeContent`
-// turns them into the standard QR payload string that gets encoded into the code. `url` is the
-// dynamic forwarder's destination; every other type bakes its payload directly (a static QR).
+// Content types (v0.7) — the builder collects structured fields per type; `buildContent` maps them to the
+// typed `CodeContent` the wire carries. The BACKEND owns encoding: static types bake their payload from these
+// fields server-side, dynamic types (url / mobileApp) resolve the redirect short link. No local payload encoders
+// (that was the frontend↔backend drift risk this rewire removes).
+
+import type { CodeContent } from "../types";
 
 export type ContentTypeId =
   | "url"
@@ -17,7 +20,7 @@ export type ContentTypeId =
 export type FieldKind = "text" | "url" | "tel" | "email" | "number" | "textarea" | "datetime" | "select";
 
 export interface ContentField {
-  /** Key in the values record + the persisted field name. */
+  /** Key in the values record + the typed content property name. */
   key: string;
   label: string;
   kind?: FieldKind;
@@ -37,25 +40,6 @@ export interface ContentTypeDef {
   /** Optional helper text rendered above the fields (e.g. "add at least one"). */
   note?: string;
   fields: ContentField[];
-  /** Build the QR payload string from collected field values. */
-  encode: (v: FieldValues) => string;
-}
-
-const t = (v: string | undefined) => (v ?? "").trim();
-
-/** Escape the WIFI: payload reserved characters (`\ ; , : "`). */
-const escWifi = (v: string) => v.replace(/([\\;,:"])/g, "\\$1");
-
-/** Escape a vCard / iCal property value (`\ ; ,` + newlines). */
-const escIcal = (v: string) => v.replace(/([\\;,])/g, "\\$1").replace(/\r?\n/g, "\\n");
-
-/** `2026-07-01T18:30` (datetime-local) → `20260701T183000`; date-only → `20260701`. */
-export function toICalDate(s: string | undefined): string {
-  const v = t(s);
-  const dt = v.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
-  if (dt) return `${dt[1]}${dt[2]}${dt[3]}T${dt[4]}${dt[5]}${dt[6] ?? "00"}`;
-  const d = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  return d ? `${d[1]}${d[2]}${d[3]}` : v;
 }
 
 export const CONTENT_TYPES: ContentTypeDef[] = [
@@ -64,7 +48,6 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
     label: "URL",
     mode: "dynamic",
     fields: [{ key: "url", label: "Destination URL", kind: "url", placeholder: "https://example.com", required: true }],
-    encode: (v) => t(v.url),
   },
   {
     // Dynamic + device-routed: the QR carries the forwarder short link; the redirect resolves the
@@ -79,14 +62,12 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
       { key: "playStore", label: "Google Play URL", kind: "url", placeholder: "https://play.google.com/store/apps/…" },
       { key: "other", label: "Other devices URL (fallback)", kind: "url", placeholder: "https://yourapp.com or another store" },
     ],
-    encode: (v) => t(v.other) || t(v.appStore) || t(v.playStore),
   },
   {
     id: "text",
     label: "Text",
     mode: "static",
     fields: [{ key: "text", label: "Text", kind: "textarea", required: true }],
-    encode: (v) => v.text ?? "",
   },
   {
     id: "email",
@@ -97,13 +78,6 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
       { key: "subject", label: "Subject" },
       { key: "body", label: "Body", kind: "textarea" },
     ],
-    encode: (v) => {
-      const params = new URLSearchParams();
-      if (t(v.subject)) params.set("subject", t(v.subject));
-      if (t(v.body)) params.set("body", t(v.body));
-      const q = params.toString();
-      return `mailto:${t(v.to)}${q ? `?${q}` : ""}`;
-    },
   },
   {
     id: "sms",
@@ -113,24 +87,21 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
       { key: "phone", label: "Phone", kind: "tel", required: true },
       { key: "message", label: "Message", kind: "textarea" },
     ],
-    encode: (v) => (t(v.message) ? `SMSTO:${t(v.phone)}:${t(v.message)}` : `SMSTO:${t(v.phone)}`),
   },
   {
     id: "phone",
     label: "Phone",
     mode: "static",
     fields: [{ key: "phone", label: "Phone", kind: "tel", placeholder: "+1 555 0100", required: true }],
-    encode: (v) => `tel:${t(v.phone)}`,
   },
   {
     id: "geo",
     label: "Location",
     mode: "static",
     fields: [
-      { key: "lat", label: "Latitude", kind: "number", required: true },
-      { key: "lng", label: "Longitude", kind: "number", required: true },
+      { key: "latitude", label: "Latitude", kind: "number", required: true },
+      { key: "longitude", label: "Longitude", kind: "number", required: true },
     ],
-    encode: (v) => `geo:${t(v.lat)},${t(v.lng)}`,
   },
   {
     id: "wifi",
@@ -154,13 +125,6 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
         { value: "true", label: "Yes" },
       ] },
     ],
-    encode: (v) => {
-      const enc = t(v.encryption) || "WPA";
-      const ssid = escWifi(v.ssid ?? "");
-      const pass = enc === "nopass" ? "" : `P:${escWifi(v.password ?? "")};`;
-      const hidden = v.hidden === "true" ? "H:true;" : "";
-      return `WIFI:T:${enc};S:${ssid};${pass}${hidden};`;
-    },
   },
   {
     id: "vcard",
@@ -177,19 +141,6 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
       { key: "address", label: "Address" },
       { key: "note", label: "Note", kind: "textarea" },
     ],
-    encode: (v) => {
-      const fn = [t(v.firstName), t(v.lastName)].filter(Boolean).join(" ");
-      const lines = ["BEGIN:VCARD", "VERSION:3.0", `N:${escIcal(t(v.lastName))};${escIcal(t(v.firstName))};;;`, `FN:${escIcal(fn)}`];
-      if (t(v.org)) lines.push(`ORG:${escIcal(t(v.org))}`);
-      if (t(v.title)) lines.push(`TITLE:${escIcal(t(v.title))}`);
-      if (t(v.phone)) lines.push(`TEL;TYPE=CELL:${escIcal(t(v.phone))}`);
-      if (t(v.email)) lines.push(`EMAIL:${escIcal(t(v.email))}`);
-      if (t(v.url)) lines.push(`URL:${escIcal(t(v.url))}`);
-      if (t(v.address)) lines.push(`ADR:;;${escIcal(t(v.address))};;;;`);
-      if (t(v.note)) lines.push(`NOTE:${escIcal(t(v.note))}`);
-      lines.push("END:VCARD");
-      return lines.join("\n");
-    },
   },
   {
     id: "calendar",
@@ -202,16 +153,6 @@ export const CONTENT_TYPES: ContentTypeDef[] = [
       { key: "location", label: "Location" },
       { key: "description", label: "Description", kind: "textarea" },
     ],
-    encode: (v) => {
-      const lines = ["BEGIN:VEVENT"];
-      if (t(v.title)) lines.push(`SUMMARY:${escIcal(t(v.title))}`);
-      if (t(v.start)) lines.push(`DTSTART:${toICalDate(v.start)}`);
-      if (t(v.end)) lines.push(`DTEND:${toICalDate(v.end)}`);
-      if (t(v.location)) lines.push(`LOCATION:${escIcal(t(v.location))}`);
-      if (t(v.description)) lines.push(`DESCRIPTION:${escIcal(t(v.description))}`);
-      lines.push("END:VEVENT");
-      return lines.join("\n");
-    },
   },
 ];
 
@@ -222,6 +163,45 @@ const BY_ID: Record<ContentTypeId, ContentTypeDef> = Object.fromEntries(
 /** Look up a content-type definition by id. */
 export const contentType = (id: ContentTypeId): ContentTypeDef => BY_ID[id];
 
-/** Build the QR payload string for a content type from collected field values. */
-export const encodeContent = (id: ContentTypeId, values: FieldValues): string => BY_ID[id].encode(values);
+/**
+ * Builds the typed `CodeContent` the wire carries from the builder's collected field values. Required fields are
+ * always sent (may be empty); optional fields are omitted when blank so the backend sees them as absent (null) — this
+ * is what makes mobileApp's "at least one link" and its device-rule derivation correct. `wifi.hidden` maps to a bool.
+ */
+export function buildContent(id: ContentTypeId, values: FieldValues): CodeContent {
+  const out: Record<string, unknown> = { type: id };
 
+  for (const field of contentType(id).fields) {
+    if (id === "wifi" && field.key === "hidden") {
+      out.hidden = values.hidden === "true";
+      continue;
+    }
+
+    const value = values[field.key] ?? "";
+    if (field.required) out[field.key] = value;
+    else if (value.trim() !== "") out[field.key] = value;
+  }
+
+  // The mobile-app fallback picker isn't a registry field — carry the chosen store key through when set.
+  if (id === "mobileApp" && values.fallback) out.fallback = values.fallback;
+
+  return out as CodeContent;
+}
+
+/** Projects a persisted `CodeContent` back to the builder's flat field values (for the edit round-trip). Inverse of `buildContent`. */
+export function contentToValues(content: CodeContent): FieldValues {
+  const values: FieldValues = {};
+
+  for (const [key, value] of Object.entries(content)) {
+    if (key === "type") continue;
+    if (typeof value === "boolean") values[key] = value ? "true" : "false";
+    else if (value != null) values[key] = String(value);
+  }
+
+  return values;
+}
+
+/** A code resolves through its redirect short link (dynamic) rather than a baked payload — true for url / mobileApp / legacy-null content. */
+export function isDynamicContent(content: CodeContent | null): boolean {
+  return content == null || contentType(content.type).mode === "dynamic";
+}

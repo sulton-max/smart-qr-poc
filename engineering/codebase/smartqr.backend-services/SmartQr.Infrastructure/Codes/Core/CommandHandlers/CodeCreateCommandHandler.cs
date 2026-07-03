@@ -74,9 +74,7 @@ public sealed class CodeCreateCommandHandler(
                 StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
                     ? StyleSpecJson.Serialize(style)
                     : "{}",
-                ContentJson = request.Content is { } content  // a static payload here bakes into the symbol; null → dynamic short link
-                    ? ContentSpecJson.Serialize(content)
-                    : null,
+                Content = request.Content,             // typed content persisted via the EF value converter; null → a dynamic short-link code
                 Rules = (projection?.Rules ?? request.Rules)
                     .Select(r => new RoutingRuleEntity
                     {

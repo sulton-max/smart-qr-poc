@@ -1,5 +1,5 @@
 using SmartQr.Application.Codes.Core.Commands;
-using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Api.Requests.Codes;
@@ -25,8 +25,8 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the optional style to persist — omitted leaves the code on the default style.</summary>
     public StyleApiRequest? Style { get; init; }
 
-    /// <summary>Gets the optional structured content (type + field values + baked payload); a non-null payload marks a static code.</summary>
-    public ContentSpec? Content { get; init; }
+    /// <summary>Gets the optional typed content the code carries (polymorphic on <c>type</c>); static types bake a payload, dynamic types resolve the short link.</summary>
+    public CodeContent? Content { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>

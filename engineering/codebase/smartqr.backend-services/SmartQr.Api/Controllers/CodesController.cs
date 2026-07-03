@@ -36,9 +36,10 @@ public sealed class CodesController(
         if (request.CodeType == CodeType.Link)
             return Problem(detail: "Link codes have no rendered image.", statusCode: StatusCodes.Status400BadRequest);
 
+        // Static content encodes its payload server-side (same encoder as the saved asset → true preview parity); dynamic/absent content falls back to the supplied value (the short link).
         var rendered = renderer.Render(new CodeRenderRequest
         {
-            Payload = request.Value,
+            Payload = request.Content?.Encode() ?? request.Value,
             Symbology = request.ResolveSymbology().ToRender(),
             Format = ImageFormat.Svg,
             Style = request.ToStyleSpec(),

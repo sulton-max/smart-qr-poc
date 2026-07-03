@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Persistence.Constants;
 
@@ -24,10 +27,23 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
             .HasColumnType(PostgresColumnTypes.Jsonb)
             .IsRequired();
 
+        // Typed polymorphic content ⇄ content_json jsonb, via the one STJ options object shared with the wire (CodeContentJson).
         // Nullable — legacy codes predate content types; a null resolves as a dynamic short link.
+        var contentConverter = new ValueConverter<CodeContent?, string?>(
+            content => content == null ? null : CodeContentJson.Serialize(content),
+            json => CodeContentJson.Deserialize(json));
+
+        // Records give structural equality; the comparer lets EF change-track the reference-typed jsonb graph (content is immutable → the snapshot is the same instance).
+        var contentComparer = new ValueComparer<CodeContent?>(
+            (left, right) => left == right,
+            content => content == null ? 0 : content.GetHashCode(),
+            content => content);
+
         builder
-            .Property(e => e.ContentJson)
-            .HasColumnType(PostgresColumnTypes.Jsonb);
+            .Property(e => e.Content)
+            .HasColumnName("content_json")
+            .HasColumnType(PostgresColumnTypes.Jsonb)
+            .HasConversion(contentConverter, contentComparer);
 
         // ── Relationships ──
         builder

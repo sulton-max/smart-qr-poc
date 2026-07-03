@@ -1,6 +1,8 @@
 # Handoff — content-type model rewire (polymorphic `CodeContent`)
 
-*Last updated: 2026-07-02*
+*Last updated: 2026-07-03*
+
+> **STATUS: DONE (2026-07-03).** Executed end-to-end — backend (domain models + encoders, validation, persistence + EF converter, wire + `/preview` encode-from-content, migration `006`) and frontend (discriminated union, encoders dropped, `buildContent`/`contentToValues`, server preview). Green: **Unit 107 · Integration 18 · E2E 68 · Migrations 10 · FE typecheck + vitest 9**. Two STJ gotchas hit + fixed (both now locked by `CodeContentJsonTests`): `[JsonIgnore]` needed on each derived `Type` override (base attr not inherited); Postgres jsonb reorders keys → `Options.AllowOutOfOrderMetadataProperties = true`. Deferred: per-type validators for the 8 static types. Kept below as the execution record.
 
 > **Goal:** every content type becomes a first-class **polymorphic value object** that serves all three roles — domain VO, wire DTO, and persisted shape. **Backend owns encoding + validation**; the frontend sends typed content (no local encoders). Kills frontend↔backend encoder drift + delivers true server-preview parity.
 >

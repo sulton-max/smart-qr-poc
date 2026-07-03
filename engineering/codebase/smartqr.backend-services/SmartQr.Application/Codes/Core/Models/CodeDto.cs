@@ -1,4 +1,5 @@
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
+using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Application.Codes.Core.Models;
@@ -45,6 +46,6 @@ public sealed record CodeDto
     /// <summary>The persisted visual style (deserialized from <c>StyleJson</c>; the render default when none was saved) — lets the builder round-trip a saved style on edit.</summary>
     public required StyleSpec Style { get; init; }
 
-    /// <summary>The persisted structured content (content type + field values + baked static payload); null for a legacy/plain code. Lets the builder round-trip the content form on edit.</summary>
-    public ContentSpec? Content { get; init; }
+    /// <summary>The persisted typed content (polymorphic on <c>type</c>); null for a legacy/plain code. Lets the builder round-trip the content form on edit.</summary>
+    public CodeContent? Content { get; init; }
 }

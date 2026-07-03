@@ -13,7 +13,7 @@ import { TileColorPicker } from "../components/TileColorPicker";
 import { EmojiControls } from "../components/EmojiControls";
 import { ContrastHint } from "../components/ContrastHint";
 import { ContentTypeForm } from "../components/ContentTypeForm";
-import { CONTENT_TYPES, contentType, encodeContent, type ContentTypeId, type FieldValues } from "../lib/contentTypes";
+import { CONTENT_TYPES, contentType, buildContent, contentToValues, isDynamicContent, type ContentTypeId, type FieldValues } from "../lib/contentTypes";
 import { codeImageUrl, createCode, getCode, updateCode, REDIRECT_BASE } from "../api";
 import {
   BarcodeFormat,
@@ -126,13 +126,14 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         setGradient(gradientFromDto(code.style.gradient));
         setTransparentBackground(code.style.transparentBackground);
         setEmoji(code.style.emoji ?? null);
-        // Round-trip the content form: the wire type is PascalCase (e.g. "MobileApp") — normalize to the
-        // camelCase content-type id, then restore the saved field values (legacy codes carry none).
+        // Round-trip the content form: normalize the discriminator to a content-type id, then project the typed
+        // content back to the builder's flat field values (legacy codes carry no content).
         if (code.content) {
           const typeId = enumFromWire(CONTENT_TYPES.map((c) => c.id), code.content.type, "url");
           setContentTypeId(typeId);
-          if (typeId === "url") setFallbackUrl(code.content.fields.url ?? code.fallbackUrl);
-          else setContentValues(code.content.fields);
+          const values = contentToValues(code.content);
+          if (typeId === "url") setFallbackUrl(values.url ?? code.fallbackUrl);
+          else setContentValues(values);
         }
       })
       .catch((e: unknown) => {
@@ -146,13 +147,11 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     };
   }, [codeId]);
 
-  // Static content bakes its payload directly into the QR; dynamic (url/appstore) encodes the
-  // permanent short link (a sample URL before the code is saved).
+  // The preview endpoint encodes the typed content server-side (same encoder as the saved asset → true parity).
+  // Static content bakes its payload; dynamic (url / mobileApp) falls back to the short link.
   const contentDef = contentType(contentTypeId);
-  const previewValue =
-    contentDef.mode === "static"
-      ? encodeContent(contentTypeId, contentValues) || " "
-      : (saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`);
+  const previewContent = buildContent(contentTypeId, contentTypeId === "url" ? { url: fallbackUrl } : contentValues);
+  const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
 
   // The preview endpoint's coarse kind: QR symbology → "Qr", any other (1D/2D) → "Barcode".
   const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? "Qr" : "Barcode";
@@ -185,19 +184,11 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       return;
     }
     setSaving(true);
-    // Content shapes the request: static bakes its payload (no redirect, no rules); a self-routed type
-    // (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
+    // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed
+    // type (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
     const isStatic = contentDef.mode === "static";
     const selfRouted = contentTypeId === "mobileApp"; // backend derives fallback + device rules from the fields
-    const fields = contentTypeId === "url" ? { url: fallbackUrl } : contentValues;
-    const content = {
-      type: contentTypeId,
-      // Persist only non-empty field values so the saved form round-trips cleanly.
-      fields: Object.fromEntries(
-        Object.entries(fields).filter(([, v]) => v != null && v !== ""),
-      ) as Record<string, string>,
-      payload: isStatic ? encodeContent(contentTypeId, contentValues) : null,
-    };
+    const content = buildContent(contentTypeId, contentTypeId === "url" ? { url: fallbackUrl } : contentValues);
     const request = {
       name: name.trim() || "Untitled code",
       codeType: "Qr" as const,
@@ -445,7 +436,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
         {/* ── Preview ── */}
         <Card className="surface-soft flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
-          <QrPreview value={previewValue} codeType={previewCodeType} style={previewStyle} />
+          <QrPreview value={previewValue} content={previewContent} codeType={previewCodeType} style={previewStyle} />
           <Text size="xs" color="muted" align="center">
             Live preview — the final asset rendered server-side (vector-first), so what you see
             is what you download.
@@ -470,7 +461,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
               className="w-full"
             >
               <Text size="sm" weight="medium">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
-              {saved.content?.payload == null ? (
+              {isDynamicContent(saved.content) ? (
                 <Text size="sm" color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
                   {saved.shortUrl}
                 </Text>
@@ -480,7 +471,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                 </Text>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {saved.content?.payload == null && (
+                {isDynamicContent(saved.content) && (
                   <CopyButton size="sm" text={saved.shortUrl} aria-label="Copy short URL">
                     Copy link
                   </CopyButton>

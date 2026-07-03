@@ -290,6 +290,40 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         svg.Should().Contain("🎉");
     }
 
+    [Fact]
+    public async Task Preview_MatchesSavedImage_ForStaticContent()
+    {
+        // Server-preview parity for STATIC content: the preview encodes the typed content with the SAME encoder as
+        // the saved asset (backend owns encoding), so a default-style preview of the content equals the saved image.
+        var owner = await CreateGuestClientAsync();
+        var wifi = new { type = "wifi", ssid = "Cafe", password = "beans123" };
+
+        var createResponse = await owner.Client.PostAsync("/api/codes", JsonBody(new
+        {
+            name = "WiFi parity",
+            codeType = "Qr",
+            barcodeFormat = "QrCode",
+            fallbackUrl = "",
+            rules = Array.Empty<object>(),
+            content = wifi,
+        }));
+        createResponse.EnsureSuccessStatusCode();
+        using var created = System.Text.Json.JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
+        var id = created.RootElement.GetProperty("data").GetProperty("id").GetGuid();
+
+        var savedImage = await owner.Client.GetStringAsync($"/api/codes/{id}/image?format=svg");
+
+        // Preview the SAME typed content with the default style → the server bakes the identical payload.
+        var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+        {
+            value = " ",
+            codeType = "Qr",
+            style = DefaultStyle(),
+            content = wifi,
+        });
+        (await previewResponse.Content.ReadAsStringAsync()).Should().Be(savedImage);
+    }
+
     private static HttpContent JsonBody(object body) =>
         new StringContent(System.Text.Json.JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
 }

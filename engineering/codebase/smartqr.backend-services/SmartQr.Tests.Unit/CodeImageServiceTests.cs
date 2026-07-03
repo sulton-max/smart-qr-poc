@@ -1,7 +1,9 @@
 using SkiaSharp;
-using SmartQr.Application.Codes.Core.Models;
 using SmartQr.Infrastructure.Codes.Core.Services;
 using SmartQr.Application.Settings;
+using SmartQr.Domain.Codes.Content;
+using SmartQr.Domain.Codes.Content.Url.Models;
+using SmartQr.Domain.Codes.Content.Wifi.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering;
@@ -12,14 +14,13 @@ using ZXing;
 using ZXing.Common;
 using DomainBarcodeFormat = SmartQr.Domain.Codes.Core.Enums.BarcodeFormat;
 using DomainCodeType = SmartQr.Domain.Codes.Core.Enums.CodeType;
-using DomainContentType = SmartQr.Domain.Codes.Core.Enums.CodeContentType;
 
 namespace SmartQr.Tests.Unit;
 
 /// <summary>
-/// The v0.7 static/dynamic split proven where it matters — the encoded payload. A static code (a non-null baked
-/// <c>ContentSpec.Payload</c>) must render a symbol that decodes to that payload; a dynamic/legacy code must decode
-/// to the redirect short link. Each case goes through the real render pipeline, rasterizes to PNG, and decodes with ZXing.
+/// The v0.7 static/dynamic split proven where it matters — the encoded payload. A static code (typed content whose
+/// <see cref="CodeContent.Encode"/> returns a payload) must render a symbol that decodes to that payload; a dynamic/legacy
+/// code must decode to the redirect short link. Each case goes through the real render pipeline, rasterizes to PNG, and decodes with ZXing.
 /// </summary>
 public sealed class CodeImageServiceTests
 {
@@ -34,13 +35,9 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Static_code_bakes_its_content_payload_into_the_symbol()
     {
+        // The backend encodes the payload from the typed content (WifiContent.Encode()), not a client-baked string.
         const string payload = "WIFI:T:WPA;S:CoffeeShop;P:latte123;;";
-        var code = Code(contentJson: ContentSpecJson.Serialize(new ContentSpec
-        {
-            Type = DomainContentType.Wifi,
-            Fields = new Dictionary<string, string> { ["ssid"] = "CoffeeShop", ["password"] = "latte123" },
-            Payload = payload,
-        }));
+        var code = Code(content: new WifiContent { Ssid = "CoffeeShop", Password = "latte123" });
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -50,7 +47,7 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Dynamic_code_with_null_content_encodes_the_redirect_short_link()
     {
-        var code = Code(slug: "abc1234", contentJson: null);
+        var code = Code(slug: "abc1234", content: null);
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -60,18 +57,13 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Dynamic_content_without_a_baked_payload_still_encodes_the_short_link()
     {
-        // A url/appstore code persists its content descriptor but no baked payload → the symbol carries the short link, not the fields.
-        var code = Code(slug: "xyz9999", contentJson: ContentSpecJson.Serialize(new ContentSpec
-        {
-            Type = DomainContentType.Url,
-            Fields = new Dictionary<string, string> { ["url"] = "https://example.com" },
-            Payload = null,
-        }));
+        // A url code persists its typed content but Encode() is null (dynamic) → the symbol carries the short link, not the fields.
+        var code = Code(slug: "xyz9999", content: new UrlContent { Url = "https://example.com" });
 
         Assert.Equal($"{RedirectBase}/xyz9999", Decode(_service.Render(code, ImageFormat.Png).Content));
     }
 
-    private static CodeEntity Code(string slug = "slug0001", string? contentJson = null) => new()
+    private static CodeEntity Code(string slug = "slug0001", CodeContent? content = null) => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,
@@ -81,7 +73,7 @@ public sealed class CodeImageServiceTests
         BarcodeFormat = DomainBarcodeFormat.QrCode,
         FallbackUrl = "",
         StyleJson = "{}",
-        ContentJson = contentJson,
+        Content = content,
     };
 
     /// <summary>Decodes a PNG QR back to its text via ZXing over the SkiaSharp-decoded RGBA pixels. Returns null if undecodable.</summary>

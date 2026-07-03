@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@wow-two-beta/ui/feedback";
 import { previewCode } from "../api";
-import type { CodeType, PreviewStyle } from "../types";
+import type { CodeContent, CodeType, PreviewStyle } from "../types";
 
 export interface QrPreviewProps {
-  /** Data encoded into the code — the short link on edit, a sample URL on create. */
+  /** Fallback data when `content` is dynamic/absent — the short link on edit, a sample URL on create. */
   value: string;
+  /** Typed content; when static, the server encodes its payload so the preview matches the saved asset. */
+  content: CodeContent | null;
   /** Coarse code kind; derived from the chosen symbology in the builder. */
   codeType: CodeType;
   /** Visual style sent to the server renderer. */
@@ -23,6 +25,7 @@ export interface QrPreviewProps {
  */
 export function QrPreview({
   value,
+  content,
   codeType,
   style,
   size = 240,
@@ -35,8 +38,9 @@ export function QrPreview({
   // background never recolors before the matching server render arrives — no perceived lag.
   const [rendered, setRendered] = useState<PreviewStyle>(style);
 
-  // Serialize style so the effect re-runs on any individual field change.
+  // Serialize style + content so the effect re-runs on any individual field change.
   const styleKey = JSON.stringify(style);
+  const contentKey = JSON.stringify(content);
   // Track the latest in-flight controller so we can abort superseded requests.
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -49,7 +53,7 @@ export function QrPreview({
       setLoading(true);
       setError(false);
 
-      previewCode({ value: value || " ", codeType, style }, controller.signal)
+      previewCode({ value: value || " ", content, codeType, style }, controller.signal)
         .then((markup) => {
           if (controller.signal.aborted) return;
           setSvg(markup);
@@ -69,7 +73,7 @@ export function QrPreview({
     return () => clearTimeout(timer);
     // styleKey stands in for the deep `style` object.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, codeType, styleKey, debounceMs]);
+  }, [value, contentKey, codeType, styleKey, debounceMs]);
 
   // Cancel any in-flight request on unmount.
   useEffect(() => () => controllerRef.current?.abort(), []);

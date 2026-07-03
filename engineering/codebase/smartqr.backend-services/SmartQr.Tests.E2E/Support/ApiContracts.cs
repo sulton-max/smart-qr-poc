@@ -51,12 +51,15 @@ public sealed record CodeDtoModel
     public ContentDtoModel? Content { get; init; }
 }
 
-/// <summary>Wire shape of <c>ContentSpec</c> — <c>Payload</c> is non-null for a static code.</summary>
+/// <summary>Wire shape of the polymorphic <c>CodeContent</c> — the <c>type</c> discriminator plus the flattened typed fields (all optional; only those for that type are populated). No <c>payload</c>: it is derived server-side, never returned.</summary>
 public sealed record ContentDtoModel
 {
     public string Type { get; init; } = "";
-    public IReadOnlyDictionary<string, string> Fields { get; init; } = new Dictionary<string, string>();
-    public string? Payload { get; init; }
+    public string? Ssid { get; init; }
+    public string? Password { get; init; }
+    public string? FirstName { get; init; }
+    public string? AppStore { get; init; }
+    public string? PlayStore { get; init; }
 }
 
 /// <summary>Wire shape of <c>RuleDto</c>.</summary>

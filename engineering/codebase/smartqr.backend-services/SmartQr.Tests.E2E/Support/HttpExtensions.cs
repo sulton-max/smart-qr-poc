@@ -29,34 +29,25 @@ public static class CodeRequests
     public static object IosRule(string destination, int order = 1)
         => Rule(order, "Device", "Ios", destination);
 
-    /// <summary>A static create/update body — bakes <paramref name="payload"/> into the symbol (no redirect), with an empty fallback and no rules.</summary>
-    /// <param name="fields">The raw field values persisted to round-trip the builder form; pass <c>null</c> for none.</param>
-    public static object StaticCode(string name, string type, string payload, object? fields = null) => new
+    /// <summary>A create/update body carrying typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>) — empty fallback + no rules; the backend derives the payload from the content.</summary>
+    public static object Content(string name, object content) => new
     {
         name,
         codeType = "Qr",
         barcodeFormat = "QrCode",
         fallbackUrl = "",
         rules = Array.Empty<object>(),
-        content = new { type, fields = fields ?? new { }, payload },
+        content,
     };
 
-    /// <summary>A mobile-app-link create/update body — sends only the raw store links + fallback choice; the backend derives the device rules + fallback URL.</summary>
-    public static object MobileApp(string name, string? appStore = null, string? playStore = null, string? other = null, string? fallback = null)
+    /// <summary>A mobile-app-link create/update body — sends the typed store links + fallback choice; the backend derives the device rules + fallback URL.</summary>
+    public static object MobileApp(string name, string? appStore = null, string? playStore = null, string? other = null, string? fallback = null) => new
     {
-        var fields = new Dictionary<string, string>();
-        if (appStore is not null) fields["appStore"] = appStore;
-        if (playStore is not null) fields["playStore"] = playStore;
-        if (other is not null) fields["other"] = other;
-        if (fallback is not null) fields["fallback"] = fallback;
-        return new
-        {
-            name,
-            codeType = "Qr",
-            barcodeFormat = "QrCode",
-            fallbackUrl = "",
-            rules = Array.Empty<object>(),
-            content = new { type = "mobileApp", fields, payload = (string?)null },
-        };
-    }
+        name,
+        codeType = "Qr",
+        barcodeFormat = "QrCode",
+        fallbackUrl = "",
+        rules = Array.Empty<object>(),
+        content = new { type = "mobileApp", appStore, playStore, other, fallback },
+    };
 }

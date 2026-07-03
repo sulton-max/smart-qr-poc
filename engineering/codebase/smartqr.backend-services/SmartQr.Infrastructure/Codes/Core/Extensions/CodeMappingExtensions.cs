@@ -32,6 +32,6 @@ public static class CodeMappingExtensions
             })
             .ToList(),
         Style = StyleSpecJson.Deserialize(e.StyleJson),
-        Content = ContentSpecJson.Deserialize(e.ContentJson),
+        Content = e.Content,
     };
 }

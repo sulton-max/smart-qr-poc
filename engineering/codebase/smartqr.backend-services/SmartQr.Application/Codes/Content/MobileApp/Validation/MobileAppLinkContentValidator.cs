@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using FluentValidation;
-using SmartQr.Application.Codes.Content.MobileApp.Models;
 using SmartQr.Application.Codes.Core.Validation;
+using SmartQr.Domain.Codes.Content.MobileApp.Models;
 
 namespace SmartQr.Application.Codes.Content.MobileApp.Validation;
 

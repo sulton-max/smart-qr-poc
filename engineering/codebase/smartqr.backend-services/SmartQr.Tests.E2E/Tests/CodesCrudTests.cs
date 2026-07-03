@@ -208,16 +208,15 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.StaticCode("Cafe WiFi", "wifi", "WIFI:T:WPA;S:Cafe;P:beans123;;",
-                new { ssid = "Cafe", password = "beans123" }));
+            CodeRequests.Content("Cafe WiFi", new { type = "wifi", ssid = "Cafe", password = "beans123" }));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK, "static codes carry a non-URL payload, so the fallback URL rule is skipped");
         var code = await response.ReadEnvelopeAsync<CodeDtoModel>();
 
         code.Content.Should().NotBeNull();
-        code.Content!.Type.Should().Be("Wifi");
-        code.Content.Payload.Should().Be("WIFI:T:WPA;S:Cafe;P:beans123;;");
-        code.Content.Fields["ssid"].Should().Be("Cafe");
+        code.Content!.Type.Should().Be("wifi");
+        code.Content.Ssid.Should().Be("Cafe");
+        code.Content.Password.Should().Be("beans123");
     }
 
     [Fact]
@@ -226,15 +225,13 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.StaticCode("Contact", "vcard", "BEGIN:VCARD\nVERSION:3.0\nFN:Ada\nEND:VCARD",
-                new { firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.Content("Contact", new { type = "vcard", firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
 
         fetched.Content.Should().NotBeNull();
-        fetched.Content!.Type.Should().Be("VCard");
-        fetched.Content.Payload.Should().Be("BEGIN:VCARD\nVERSION:3.0\nFN:Ada\nEND:VCARD");
-        fetched.Content.Fields["firstName"].Should().Be("Ada");
+        fetched.Content!.Type.Should().Be("vcard");
+        fetched.Content.FirstName.Should().Be("Ada");
     }
 
     [Fact]
@@ -263,7 +260,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         // One store link is enough — the server derives the iOS device rule and the fallback destination.
         code.FallbackUrl.Should().Be("https://apps.apple.com/us/app/notion/id1232780281");
         code.Rules.Should().ContainSingle().Which.ConditionValue.Should().Be("Ios");
-        code.Content!.Type.Should().Be("MobileApp");
+        code.Content!.Type.Should().Be("mobileApp");
     }
 
     [Fact]
@@ -327,7 +324,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
     {
         var owner = await CreateGuestClientAsync();
 
-        // A known-but-not-yet-buildable content type (youtube) is rejected with a content-aware message.
+        // A content type with no typed model (youtube) isn't representable in the polymorphic wire contract → rejected at binding.
         var response = await owner.Client.PostJsonAsync("/api/codes", new
         {
             name = "Later",
@@ -335,11 +332,10 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
             barcodeFormat = "QrCode",
             fallbackUrl = "https://example.com",
             rules = Array.Empty<object>(),
-            content = new { type = "youtube", fields = new { }, payload = (string?)null },
+            content = new { type = "youtube" },
         });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync()).Should().Contain("isn't supported");
     }
 
     // ── Style persistence round-trip (create → edit → re-render reflects the new style) ──
