@@ -13,7 +13,7 @@ public static class CodeContentJson
     /// <summary>The shared serializer options — Web defaults (camelCase) plus string enums; the polymorphic discriminator comes from the <c>[JsonDerivedType]</c> attributes on <see cref="CodeContent"/>.</summary>
     public static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web)
     {
-        Converters = { new JsonStringEnumConverter() },
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
 
         // Postgres jsonb does not preserve object key order, so the "type" discriminator may not be first on read —
         // let the polymorphic reader find it anywhere (it buffers the object). Without this, reading a stored code throws.

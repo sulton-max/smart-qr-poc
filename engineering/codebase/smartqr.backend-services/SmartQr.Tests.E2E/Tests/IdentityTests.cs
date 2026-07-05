@@ -17,7 +17,7 @@ public sealed class IdentityTests(AppFixture fixture) : E2EBase(fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var me = await response.ReadEnvelopeAsync<MeResponseDto>();
-        me.Kind.Should().Be("Anonymous");
+        me.Kind.Should().Be("anonymous");
     }
 
     [Fact]
@@ -41,6 +41,6 @@ public sealed class IdentityTests(AppFixture fixture) : E2EBase(fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var me = await response.ReadEnvelopeAsync<MeResponseDto>();
-        me.Kind.Should().Be("Guest");
+        me.Kind.Should().Be("guest");
     }
 }

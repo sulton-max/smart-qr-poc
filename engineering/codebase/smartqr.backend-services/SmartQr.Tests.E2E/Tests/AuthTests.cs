@@ -20,7 +20,7 @@ public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var me = await response.ReadEnvelopeAsync<MeResponseDto>();
-        me.Kind.Should().Be("User");
+        me.Kind.Should().Be("user");
 
         response.Headers.TryGetValues("Set-Cookie", out var cookies).Should().BeTrue();
         cookies!.Should().Contain(c => c.StartsWith($"{AppFixture.AuthCookieName}=", StringComparison.Ordinal));
@@ -43,7 +43,7 @@ public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var me = await response.ReadEnvelopeAsync<MeWithUserDto>();
-        me.Kind.Should().Be("User");
+        me.Kind.Should().Be("user");
         me.User!.Email.Should().Be("bob@example.com");
         me.User.Name.Should().Be("Bob");
     }

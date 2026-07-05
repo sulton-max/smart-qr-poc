@@ -218,3 +218,10 @@ strike-through + ✅ when done (kept for traceability).
 
 (From spec §13) Name/domain · launch wedge feature · single vs custom-domain-first · UZ vs global ·
 abuse-moderation depth · edge redirect timing · self-host edition.
+
+### Frontend naming / architecture forks (unresolved — from the polish track)
+
+- **Hook file casing** — `useX.ts` vs `UseX.ts`.
+- **Enum labels** — `{Enum}Labels` (a `Record<Enum,string>`) vs `{ENUM}_LABEL`. Gates the `MODULE_LABEL` rename in `p0.1` Iter 2.
+- **API object** — `{domain}Api` vs a bare `api`.
+- **Static/dynamic content dispatch** — baseline: discriminated union + `Record` registry + a `mode` flag (refine when the content tree is re-audited).

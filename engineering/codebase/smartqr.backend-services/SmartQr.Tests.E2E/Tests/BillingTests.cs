@@ -89,7 +89,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var before = await GetMeAsync(owner);
-        before.Plan.Should().Be("Free");
+        before.Plan.Should().Be("free");
         before.Status.Should().Be("active");
         before.Limits.MaxCodes.Should().Be(3);   // Free cap
         before.Usage.CodeCount.Should().Be(0);
@@ -109,7 +109,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedCodesAsync(owner, 5);
 
         var me = await GetMeAsync(owner);
-        me.Plan.Should().Be("Pro");
+        me.Plan.Should().Be("pro");
         me.Status.Should().Be("active");
         me.Limits.MaxCodes.Should().Be(200);
         me.Usage.CodeCount.Should().Be(5);
@@ -122,7 +122,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Agency, "sub_agency", "cus_agency");
 
         var me = await GetMeAsync(owner);
-        me.Plan.Should().Be("Agency");
+        me.Plan.Should().Be("agency");
         me.Limits.MaxCodes.Should().Be(-1); // unlimited → -1 on the wire
     }
 
@@ -203,7 +203,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         webhook.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var me = await GetMeAsync(owner);
-        me.Plan.Should().Be("Pro");
+        me.Plan.Should().Be("pro");
         me.Status.Should().Be("active");
         me.Limits.MaxCodes.Should().Be(200);
     }
@@ -218,7 +218,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Solo, "sub_upgrade", "cus_1");
 
         var before = await GetMeAsync(owner);
-        before.Plan.Should().Be("Solo");
+        before.Plan.Should().Be("solo");
         before.Limits.MaxCodes.Should().Be(25);
 
         Fixture.Gateway.NextEvent = new BillingWebhookEvent
@@ -234,7 +234,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         webhook.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var after = await GetMeAsync(owner);
-        after.Plan.Should().Be("Pro");
+        after.Plan.Should().Be("pro");
         after.Status.Should().Be("active");
         after.Limits.MaxCodes.Should().Be(200);
     }
@@ -297,7 +297,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         };
         (await AppFixture.PostWebhookAsync(owner.Client)).StatusCode.Should().Be(HttpStatusCode.OK);
 
-        (await GetMeAsync(owner)).Plan.Should().Be("Pro");
+        (await GetMeAsync(owner)).Plan.Should().Be("pro");
 
         // The next create — which would have been over the Free cap — now succeeds.
         (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("after-upgrade", "https://x.example")))
