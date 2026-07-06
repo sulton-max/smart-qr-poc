@@ -1,65 +1,30 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 import { ArrowLeftRight, ArrowRight } from "lucide-react";
 
-import { Button, OptionTile, ToggleButton, ToggleButtonGroup } from "@wow-two-beta/ui/presentation/actions";
-import { RadiusGlyph, Separator } from "@wow-two-beta/ui/presentation/display";
+import { Button, OptionTile, OptionTileGroup, ToggleButton, ToggleButtonGroup } from "@wow-two-beta/ui/presentation/actions";
+import { Separator } from "@wow-two-beta/ui/presentation/display";
 import { ColorPicker } from "@wow-two-beta/ui/presentation/forms";
 import { ControlGroup, Stack } from "@wow-two-beta/ui/presentation/layout";
 
 import { FillType, Gradient, GradientType } from "@/domain/codes/core";
 
-import { ANGLES, DEFAULT_ANGLE, DEFAULT_GRADIENT_END, DEFAULT_RADIUS, PRESET_ICON_SIZE, RADII } from "./gradient";
+import { PRESET_ICON_SIZE, PRESET_ROWS } from "./GradientPresets";
 
-/** Defines one selectable preset within a gradient projection row. */
-interface GradientPreset {
-  /** The value the preset applies — angle in degrees, or radius extent. */
-  readonly value: number;
+const DEFAULT_ANGLE = 45;
+const DEFAULT_RADIUS = 0.8;
 
-  /** The accessible label for the preset tile. */
-  readonly label: string;
+/** Default gradient end stop — the brand violet (matches `--color-primary`). A stored data value, so a concrete hex, not a CSS token. */
+const DEFAULT_GRADIENT_END = "#7c3aed";
 
-  /** The preset's glyph. */
-  readonly glyph: ReactNode;
+/** The gradient's current projection value — its angle (linear) or radius (radial). */
+function projectionValue(gradient: Gradient): number {
+  return gradient.type === GradientType.Linear ? gradient.angle : gradient.radius;
 }
 
-/** Defines one projection row — a gradient type's presets plus how they bind to the gradient. */
-interface PresetRow {
-  /** The gradient type this row drives (also gates its enabled state). */
-  readonly type: GradientType;
-
-  /** The row's selectable presets. */
-  readonly presets: ReadonlyArray<GradientPreset>;
-
-  /** Whether `value` is the gradient's current selection. */
-  readonly isSelected: (gradient: Gradient, value: number) => boolean;
-
-  /** Applies `value` to the gradient. */
-  readonly apply: (gradient: Gradient, value: number) => Gradient;
+/** Applies a projection value to the gradient — its angle (linear) or radius (radial). */
+function applyProjection(gradient: Gradient, value: number): Gradient {
+  return gradient.type === GradientType.Linear ? Gradient.withAngle(gradient, value) : Gradient.withRadius(gradient, value);
 }
-
-/** The projection rows — one per `GradientType`, binding its angle / radius presets to the gradient. */
-const PRESET_ROWS: PresetRow[] = [
-  {
-    type: GradientType.Linear,
-    presets: ANGLES.map((angle) => ({
-      value: angle.value,
-      label: `${angle.label} (${angle.value}°)`,
-      glyph: <angle.Icon size={PRESET_ICON_SIZE} />,
-    })),
-    isSelected: (gradient, value) => gradient.type === GradientType.Linear && gradient.angle === value,
-    apply: (gradient, value) => Gradient.withAngle(gradient, value),
-  },
-  {
-    type: GradientType.Radial,
-    presets: RADII.map((radius) => ({
-      value: radius.value,
-      label: `${radius.label} radius`,
-      glyph: <RadiusGlyph extent={radius.value} />,
-    })),
-    isSelected: (gradient, value) => gradient.type === GradientType.Radial && gradient.radius === value,
-    apply: (gradient, value) => Gradient.withRadius(gradient, value),
-  },
-];
 
 /** Defines props for the fill controls. */
 export interface FillControlsProps {
@@ -168,21 +133,23 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
             {PRESET_ROWS.map((row, index) => (
               <Fragment key={row.type}>
                 {index > 0 && <Separator />}
-                <fieldset
+                <OptionTileGroup
+                  label={row.ariaLabel}
                   disabled={gradient.type !== row.type}
-                  className="flex min-w-0 items-center justify-end gap-2 py-2 first:pt-0 last:pb-0"
+                  align="end"
+                  className="py-2 first:pt-0 last:pb-0"
                 >
                   {row.presets.map((preset) => (
                     <OptionTile
                       key={preset.value}
-                      selected={row.isSelected(gradient, preset.value)}
+                      selected={gradient.type === row.type && projectionValue(gradient) === preset.value}
                       label={preset.label}
-                      onSelect={() => onGradientChange(row.apply(gradient, preset.value))}
+                      onSelect={() => onGradientChange(applyProjection(gradient, preset.value))}
                     >
                       {preset.glyph}
                     </OptionTile>
                   ))}
-                </fieldset>
+                </OptionTileGroup>
               </Fragment>
             ))}
           </div>

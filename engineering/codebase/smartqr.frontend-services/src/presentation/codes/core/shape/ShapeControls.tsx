@@ -1,95 +1,35 @@
-import type { ReactNode } from "react";
-import { cn } from "@wow-two-beta/ui/foundation/utils";
-import { Stack } from "@wow-two-beta/ui/presentation/layout";
+import { OptionTile, OptionTileGroup } from "@wow-two-beta/ui/presentation/actions";
+import { ControlGroup, Divider, Stack } from "@wow-two-beta/ui/presentation/layout";
+
 import { FinderShape, ModuleShape } from "@/domain/codes/core";
+
 import { FinderShapeDisplays, ModuleShapeDisplays } from "./ShapeDisplays";
 
+const MODULE_SHAPES = Object.keys(ModuleShapeDisplays) as ModuleShape[];
+const FINDER_SHAPES = Object.keys(FinderShapeDisplays) as FinderShape[];
+
+/** Defines props for the shape controls. */
 export interface ShapeControlsProps {
+  /** The body module shape. */
   readonly moduleShape: ModuleShape;
+
+  /** The external (frame) eye shape. */
   readonly finderShape: FinderShape;
+
+  /** The internal (pupil) eye shape. */
   readonly finderDotShape: FinderShape;
+
+  /** Emits the next body module shape. */
   readonly onModuleShapeChange: (shape: ModuleShape) => void;
+
+  /** Emits the next external eye shape. */
   readonly onFinderShapeChange: (shape: FinderShape) => void;
+
+  /** Emits the next internal eye shape. */
   readonly onFinderDotShapeChange: (shape: FinderShape) => void;
 }
 
-/** A 32px shape-preset cell — mirrors the colors panel's preset buttons (soft-primary when active). */
-function ShapeCell({
-  selected,
-  ariaLabel,
-  title,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  ariaLabel: string;
-  title: string;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      aria-label={ariaLabel}
-      title={title}
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-8 w-8 items-center justify-center rounded-md border transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        selected
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-background text-muted-foreground hover:border-border-strong hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-/** A muted sub-group label for one eye column. */
-function EyeColumn({
-  label,
-  value,
-  ariaPrefix,
-  dot,
-  onChange,
-}: {
-  label: string;
-  value: FinderShape;
-  ariaPrefix: string;
-  dot?: boolean;
-  onChange: (shape: FinderShape) => void;
-}) {
-  return (
-    <div className="min-w-0 flex-1">
-      <div className="mb-1.5 text-xs text-muted-foreground">{label}</div>
-      <div className="flex flex-wrap gap-2">
-        {(Object.keys(FinderShapeDisplays) as FinderShape[]).map((shape) => {
-          const display = FinderShapeDisplays[shape];
-          return (
-            <ShapeCell
-              key={shape}
-              selected={value === shape}
-              ariaLabel={`${ariaPrefix}: ${display.label}`}
-              title={display.label}
-              onClick={() => onChange(shape)}
-            >
-              {dot ? display.dotIcon : display.icon}
-            </ShapeCell>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Code-styling controls — Variant D layout: a full-width body-module grid above a
- * paired "Eyes" block (External + Internal side by side, hairline between). 32px
- * preset cells matching the colors panel. Drives the preview `style`:
- * `moduleShape` / `finderShape` (outer eye) / `finderDotShape` (inner eye).
- */
+/** Renders the code-styling shape controls — a body-module grid above the paired external / internal eyes. */
 export function ShapeControls({
   moduleShape,
   finderShape,
@@ -100,45 +40,58 @@ export function ShapeControls({
 }: ShapeControlsProps) {
   return (
     <Stack gap="2">
-      <div>
-        <div className="mb-2 text-sm text-muted-foreground">Body</div>
-        <div className="flex flex-wrap gap-2">
-          {(Object.keys(ModuleShapeDisplays) as ModuleShape[]).map((shape) => {
-            const display = ModuleShapeDisplays[shape];
-            return (
-              <ShapeCell
-                key={shape}
-                selected={moduleShape === shape}
-                ariaLabel={`Body shape: ${display.label}`}
-                title={display.label}
-                onClick={() => onModuleShapeChange(shape)}
-              >
-                {display.icon}
-              </ShapeCell>
-            );
-          })}
-        </div>
-      </div>
+      {/* Body — the module (data cell) shape. */}
+      <ControlGroup label="Body" orientation="vertical" divided={false}>
+        <OptionTileGroup label="Body shape" wrap>
+          {MODULE_SHAPES.map((shape) => (
+            <OptionTile
+              key={shape}
+              selected={moduleShape === shape}
+              label={`Body shape: ${ModuleShapeDisplays[shape].label}`}
+              onSelect={() => onModuleShapeChange(shape)}
+            >
+              {ModuleShapeDisplays[shape].icon}
+            </OptionTile>
+          ))}
+        </OptionTileGroup>
+      </ControlGroup>
 
-      <div>
-        <div className="mb-2 text-sm text-muted-foreground">Eyes</div>
+      {/* Eyes — the finder frame (external) + pupil (internal). */}
+      <ControlGroup label="Eyes" orientation="vertical" divided={false}>
         <div className="flex items-start gap-3">
-          <EyeColumn
-            label="External"
-            value={finderShape}
-            ariaPrefix="External eye"
-            onChange={onFinderShapeChange}
-          />
-          <div className="w-px self-stretch bg-border" />
-          <EyeColumn
-            label="Internal"
-            value={finderDotShape}
-            ariaPrefix="Internal eye"
-            dot
-            onChange={onFinderDotShapeChange}
-          />
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 text-xs text-muted-foreground">External</div>
+            <OptionTileGroup label="External eye" wrap>
+              {FINDER_SHAPES.map((shape) => (
+                <OptionTile
+                  key={shape}
+                  selected={finderShape === shape}
+                  label={`External eye: ${FinderShapeDisplays[shape].label}`}
+                  onSelect={() => onFinderShapeChange(shape)}
+                >
+                  {FinderShapeDisplays[shape].icon}
+                </OptionTile>
+              ))}
+            </OptionTileGroup>
+          </div>
+          <Divider orientation="vertical" />
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 text-xs text-muted-foreground">Internal</div>
+            <OptionTileGroup label="Internal eye" wrap>
+              {FINDER_SHAPES.map((shape) => (
+                <OptionTile
+                  key={shape}
+                  selected={finderDotShape === shape}
+                  label={`Internal eye: ${FinderShapeDisplays[shape].label}`}
+                  onSelect={() => onFinderDotShapeChange(shape)}
+                >
+                  {FinderShapeDisplays[shape].dotIcon}
+                </OptionTile>
+              ))}
+            </OptionTileGroup>
+          </div>
         </div>
-      </div>
+      </ControlGroup>
     </Stack>
   );
 }

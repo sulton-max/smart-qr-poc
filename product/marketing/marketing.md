@@ -24,12 +24,15 @@
 
 ---
 
-## Channels (ordered — rationale in the convention)
+## Channels (ordered — rationale + format library in the convention)
 
-1. **SEO (primary)** — free-generator keywords ("free qr code generator", "custom/styled qr", "qr code with logo") + comparison ("QR Tiger/Bitly alternative", "dynamic vs static") + content-type pSEO (`/vcard` · `/wifi` · `/dynamic-qr` · `/qr-that-never-expires`), ≥500w each.
-2. **Launch** — IndieHackers + r/smallbusiness / r/restaurateur (hostage-code pain) → Product Hunt (the free styled generator is the demo hook) → AlternativeTo · G2 · Capterra.
-3. **Integrations (post-API)** — Zapier / Make: generate + update codes from a workflow.
-4. **Lifecycle** — calm only: welcome · first-code · limit-approaching. No nags.
+1. **SEO (capture)** — free-generator keywords ("free qr code generator", "custom/styled qr", "qr with logo") + comparison ("QR Tiger/Bitly alternative", "dynamic vs static") + content-type pSEO (`/vcard` · `/wifi` · `/dynamic-qr`), ≥500w each.
+2. **Short-form video (create)** — Reels/TikTok/Shorts reach the ICP scrolling at lunch; formats → `conventions/marketing/channels/content-formats.md`. Lean on: hostage-code horror · ugly→styled before/after · the "Vanessa drops a PDF" workflow skit.
+3. **Launch (one-time bump)** — IndieHackers + r/smallbusiness / r/restaurateur → Product Hunt (free generator = demo hook) → AlternativeTo · G2 · Capterra. **Builders ≠ ICP** — credibility + backlinks, not user acquisition.
+4. **Integrations (post-API)** — Zapier · Make · **Canva** (native reach to SMB flyer-makers).
+5. **Lifecycle** — calm only: welcome · first-code · limit-approaching. No nags.
+
+- standouts: **Canva app** · **wedding/event niche** (Pinterest · Etsy · r/weddingplanning) — high-intent, design-driven.
 
 ---
 
