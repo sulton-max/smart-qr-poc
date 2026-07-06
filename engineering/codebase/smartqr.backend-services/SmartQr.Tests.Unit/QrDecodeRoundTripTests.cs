@@ -56,9 +56,8 @@ public sealed class QrDecodeRoundTripTests
         // A foreground gradient is a fill change only (geometry untouched) — proves Skia rasterizes the gradient AND it scans.
         var style = StyleSpec.Default with
         {
-            Gradient = new GradientSpec
+            Gradient = new LinearGradientSpec
             {
-                Type = GradientType.Linear,
                 Angle = 45,
                 Stops =
                 [

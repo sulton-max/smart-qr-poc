@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Card, Heading, Text } from "@wow-two-beta/ui/display";
-import { Alert, Banner, MeterBar, Spinner } from "@wow-two-beta/ui/feedback";
-import { Center, Grid, HStack, Stack } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Card, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Alert, Banner, MeterBar, Spinner } from "@wow-two-beta/ui/presentation/feedback";
+import { Center, Grid, HStack, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowUpRight, Check, CreditCard, Infinity as InfinityIcon } from "lucide-react";
 import { PAID_PLANS, Plan } from "@/domain/billing";
 import type { BillingStatus } from "@/domain/billing";

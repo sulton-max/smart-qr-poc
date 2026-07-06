@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Heading, Text } from "@wow-two-beta/ui/display";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Heading, Text } from "@wow-two-beta/ui/presentation/display";
 import { usePageMeta } from "@/presentation/common";
 import { Section } from "./components";
 

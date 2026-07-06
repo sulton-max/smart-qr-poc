@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { BrowserRouter } from "react-router-dom";
-import { ColorModeProvider } from "@wow-two-beta/ui/primitives";
+import { ColorModeProvider } from "@wow-two-beta/ui/foundation/primitives";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import { GOOGLE_CLIENT_ID } from "@/integration/common";

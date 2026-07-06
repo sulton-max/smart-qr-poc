@@ -1,5 +1,5 @@
-import { ApiError, parseJson } from "@wow-two-beta/ui/http";
-import type { ApiResponse, ProblemDetails } from "@wow-two-beta/ui/http";
+import { ApiError, parseJson } from "@wow-two-beta/ui/foundation/http";
+import type { ApiResponse, ProblemDetails } from "@wow-two-beta/ui/foundation/http";
 
 // Re-export the shared error type so consumers import it from the integration surface, not the SDK directly.
 export { ApiError };

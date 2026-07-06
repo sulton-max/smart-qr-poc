@@ -10,7 +10,7 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*" />
         <PackageReference Include="Stripe.net" Version="52.0.0" />
-        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.42-beta" />
+        <PackageReference Include="WoW2.Sdk.Backend.Beta" Version="10.0.43-beta" />
     </ItemGroup>
 
     <ItemGroup>

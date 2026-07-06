@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Button, CopyButton } from "@wow-two-beta/ui/actions";
-import { SearchInput } from "@wow-two-beta/ui/forms";
-import { Card, EmptyState, Heading, Text } from "@wow-two-beta/ui/display";
-import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
-import { Center, HStack, Stack } from "@wow-two-beta/ui/layout";
+import { Button, CopyButton } from "@wow-two-beta/ui/presentation/actions";
+import { SearchInput } from "@wow-two-beta/ui/presentation/forms";
+import { Card, EmptyState, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
+import { Center, HStack, Stack } from "@wow-two-beta/ui/presentation/layout";
 import {
   AlertModal,
   AlertModalCancel,
@@ -12,16 +12,16 @@ import {
   ModalFooter,
   ModalHeader,
   ModalTitle,
-} from "@wow-two-beta/ui/overlays";
+} from "@wow-two-beta/ui/presentation/overlays";
 import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
 import type { CodeDto } from "@/domain/codes/core";
 import { deleteCode, listCodes, setCodeActive } from "@/integration/codes";
 
 interface CodesListScreenProps {
   /** Open the empty builder. */
-  onCreate: () => void;
+  readonly onCreate: () => void;
   /** Open the builder in edit mode. */
-  onEdit: (id: string) => void;
+  readonly onEdit: (id: string) => void;
 }
 
 /** Codes dashboard — searchable list, per-row Edit / Enable-Disable / Delete. Fetches and mutations are owner-scoped via the credentials cookie. */

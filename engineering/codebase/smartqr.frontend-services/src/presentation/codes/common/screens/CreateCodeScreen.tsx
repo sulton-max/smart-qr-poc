@@ -1,27 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, CopyButton, SegmentedControl, ToggleButton } from "@wow-two-beta/ui/actions";
-import { ColorPicker, Field, Select, TextInput } from "@wow-two-beta/ui/forms";
-import { Accordion, Card, Heading, Text } from "@wow-two-beta/ui/display";
-import { Alert, Spinner } from "@wow-two-beta/ui/feedback";
-import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/layout";
+import { Button, CopyButton, ToggleButton, ToggleButtonGroup } from "@wow-two-beta/ui/presentation/actions";
+import { ColorPicker, Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { Accordion, Card, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
+import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
 import {
   BarcodeFormat,
-  BarcodeFormatLabels,
+  CodeType,
+  EccLevel,
   FinderShape,
+  GradientType,
   ModuleShape,
   type CodeDto,
-  type CodeType,
+  type Gradient,
   type PreviewEmoji,
-  type PreviewGradient,
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
 import { CONTENT_TYPES, contentType, buildContent, contentToValues, isDynamicContent, type ContentTypeId, type FieldValues } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
 import { codeImageUrl, createCode, getCode, updateCode } from "@/integration/codes";
-import { ContrastHint, EmojiControls, FillControls, QrPreview, RuleBuilder, ShapeControls } from "../core";
-import { ContentTypeForm } from "../content/components/ContentTypeForm";
+import { BarcodeFormatDisplays, ContrastHint, EmojiControls, FillControls, QrPreview, RuleBuilder, ShapeControls } from "../../core";
+import { ContentTypeForm } from "../../content/components/ContentTypeForm";
 
 /** Persisted rules → builder draft shape (adds client-side keys). */
 function toDrafts(code: CodeDto): RuleDraft[] {
@@ -35,23 +36,21 @@ function toDrafts(code: CodeDto): RuleDraft[] {
 }
 
 /** Maps a persisted gradient (wire shape) back to the builder's gradient, or null for a solid foreground. */
-function gradientFromDto(g: CodeDto["style"]["gradient"]): PreviewGradient | null {
+function gradientFromDto(g: CodeDto["style"]["gradient"]): Gradient | null {
   if (!g) return null;
-  return {
-    type: g.type,
-    angle: g.angle,
-    radius: g.radius,
-    stops: g.stops.map((s) => ({ color: s.color, offset: s.offset })),
-  };
+  const stops = g.stops.map((s) => ({ color: s.color, offset: s.offset }));
+  return g.type === GradientType.Linear
+    ? { type: GradientType.Linear, angle: g.angle, stops }
+    : { type: GradientType.Radial, radius: g.radius, stops };
 }
 
 export interface CreateCodeScreenProps {
   /** Set → edit this code (PUT); unset → create (POST). */
-  codeId?: string;
+  readonly codeId?: string;
   /** Return to the codes list. */
-  onBack?: () => void;
+  readonly onBack?: () => void;
   /** Save succeeded — parent refreshes the list. */
-  onSaved?: () => void;
+  readonly onSaved?: () => void;
 }
 
 /** Code builder — create, or edit when `codeId` set. Edit submits a full replace; slug is read-only (printed, immutable). */
@@ -69,7 +68,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [moduleShape, setModuleShape] = useState<ModuleShape>(ModuleShape.Square);
   const [finderShape, setFinderShape] = useState<FinderShape>(FinderShape.Square);
   const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
-  const [gradient, setGradient] = useState<PreviewGradient | null>(null);
+  const [gradient, setGradient] = useState<Gradient | null>(null);
   const [transparentBackground, setTransparentBackground] = useState(false);
   const [emoji, setEmoji] = useState<PreviewEmoji | null>(null);
   const [rules, setRules] = useState<RuleDraft[]>([]);
@@ -134,7 +133,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
 
   // The preview endpoint's coarse kind: QR symbology → "qr", any other (1D/2D) → "barcode".
-  const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? "qr" : "barcode";
+  const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? CodeType.Qr : CodeType.Barcode;
 
   // Defaults (ECC / quiet-zone / logo) aren't surfaced in the builder yet — send the renderer's
   // standard defaults. Surface them as inputs in a later iteration. Shapes default to `square`,
@@ -144,7 +143,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       foregroundColor: foreground,
       backgroundColor: background,
       transparentBackground,
-      eccLevel: "q",
+      eccLevel: EccLevel.Q,
       quietZoneModules: 2,
       logo: null,
       moduleShape,
@@ -171,7 +170,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     const content = buildContent(contentTypeId, contentTypeId === "url" ? { url: fallbackUrl } : contentValues);
     const request = {
       name: name.trim() || "Untitled code",
-      codeType: "qr" as const,
+      codeType: CodeType.Qr,
       barcodeFormat: symbology,
       // Static bakes a payload; mobileApp's fallback + rules are derived on the server — both send empty here.
       fallbackUrl: isStatic || selfRouted ? "" : fallbackUrl.trim(),
@@ -242,7 +241,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       <Grid columns={{ base: "1", lg: "2" }} gap="6">
         {/* ── Builder ── */}
         <Card className="surface-soft flex flex-col gap-5 p-6">
-          <SegmentedControl
+          <ToggleButtonGroup variant="segmented"
             type="single"
             value={tab}
             onValueChange={(v) => v && setTab(v as typeof tab)}
@@ -251,7 +250,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             <ToggleButton value="content" className="flex-1">Content</ToggleButton>
             <ToggleButton value="design" className="flex-1">Design</ToggleButton>
             <ToggleButton value="routing" className="flex-1">Routing</ToggleButton>
-          </SegmentedControl>
+          </ToggleButtonGroup>
 
           {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
           <div key={tab} className="flex flex-col gap-5 motion-safe:animate-fade-in">
@@ -308,7 +307,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   </Select.Trigger>
                   <Select.Content>
                     {Object.values(BarcodeFormat).map((f) => (
-                      <Select.Item key={f} itemKey={f} label={BarcodeFormatLabels[f]} />
+                      <Select.Item key={f} itemKey={f} label={BarcodeFormatDisplays[f].label} />
                     ))}
                   </Select.Content>
                 </Select>
@@ -340,7 +339,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                             under Transparent. */}
                         <div className="flex min-h-10 items-center justify-between gap-4 border-t border-border pt-2">
                           <span className="text-sm text-muted-foreground">Background</span>
-                          <SegmentedControl
+                          <ToggleButtonGroup variant="segmented"
                             type="single"
                             value={transparentBackground ? "transparent" : "color"}
                             onValueChange={(v) => {
@@ -364,7 +363,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                               Color
                             </ToggleButton>
                             <ToggleButton value="transparent" size="sm">Transparent</ToggleButton>
-                          </SegmentedControl>
+                          </ToggleButtonGroup>
                         </div>
                       </Stack>
                     </div>

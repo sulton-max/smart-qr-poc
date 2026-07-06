@@ -1,8 +1,8 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Accordion, Badge, Card, FeatureCard as UiFeatureCard, Heading, PricingCard as UiPricingCard, StepCard as UiStepCard, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/display";
-import { Container, Grid, HStack, Section as UiSection, Surface, VStack } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Accordion, Badge, Card, FeatureCard as UiFeatureCard, Heading, PricingCard as UiPricingCard, StepCard as UiStepCard, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/presentation/display";
+import { Container, Grid, HStack, Section as UiSection, Surface, VStack } from "@wow-two-beta/ui/presentation/layout";
 import {
   ArrowRight,
   Check,

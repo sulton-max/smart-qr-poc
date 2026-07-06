@@ -1,4 +1,4 @@
-import { Field, Select, TextInput } from "@wow-two-beta/ui/forms";
+import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import type { FieldValues } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 

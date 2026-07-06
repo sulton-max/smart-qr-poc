@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Heading, Text } from "@wow-two-beta/ui/display";
-import { Container, Grid, VStack } from "@wow-two-beta/ui/layout";
+import { Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Container, Grid, VStack } from "@wow-two-beta/ui/presentation/layout";
 import { Logo } from "./components";
 import { BRAND } from "./data";
 

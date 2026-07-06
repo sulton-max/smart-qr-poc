@@ -1,6 +1,6 @@
-import { Button } from "@wow-two-beta/ui/actions";
-import { Field } from "@wow-two-beta/ui/forms";
-import { Grid, Stack } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Field } from "@wow-two-beta/ui/presentation/forms";
+import { Grid, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { type PreviewEmoji } from "@/domain/codes/core";
 
 // Curated, high-contrast emoji that stay legible shrunk to a code's center.
@@ -9,9 +9,9 @@ const DEFAULT_SIZE = 0.25;
 
 export interface EmojiControlsProps {
   /** The current center emoji, or `null` for none. */
-  emoji: PreviewEmoji | null;
+  readonly emoji: PreviewEmoji | null;
   /** Emit the next emoji, or `null` to clear it. */
-  onChange: (emoji: PreviewEmoji | null) => void;
+  readonly onChange: (emoji: PreviewEmoji | null) => void;
 }
 
 /**

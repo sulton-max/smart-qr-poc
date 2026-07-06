@@ -3,9 +3,11 @@
 
 import type { Temporal } from "@js-temporal/polyfill";
 import type { CodeContent } from "../content/types";
+import type { Gradient } from "@wow-two-beta/ui/domain/color";
 import type { BarcodeFormat } from "./enums/BarcodeFormat";
+import type { CodeType } from "./enums/CodeType";
+import type { EccLevel } from "./enums/EccLevel";
 import type { FinderShape } from "./enums/FinderShape";
-import type { GradientType } from "./enums/GradientType";
 import type { ModuleShape } from "./enums/ModuleShape";
 import type { RuleConditionType } from "./enums/RuleConditionType";
 
@@ -46,13 +48,6 @@ export interface SetActiveRequest {
 // Server-authoritative render for the builder's live preview — same engine that
 // produces the downloadable asset, so the preview is byte-for-byte parity.
 
-// Coarse code kind for the preview endpoint. Derived from the chosen symbology:
-// QrCode → "qr"; every other (1D/2D) symbology → "barcode". camelCase wire (backend `CodeType`).
-export type CodeType = "qr" | "barcode" | "link";
-
-// QR error-correction level; mirrors backend `EccLevel` (camelCase wire: l/m/q/h).
-export type EccLevel = "l" | "m" | "q" | "h";
-
 // Optional center logo overlay for the preview render.
 export interface PreviewLogo {
   // Data URL (e.g. `data:image/png;base64,…`) of the logo image.
@@ -67,22 +62,6 @@ export interface PreviewEmoji {
   sizeRatio: number; // fraction of the code's width (0–1)
 }
 
-// One color stop of a foreground gradient.
-export interface PreviewGradientStop {
-  color: string; // #RRGGBB
-  offset: number; // 0..1
-}
-
-// Foreground gradient — replaces the solid foreground when set (needs ≥2 stops).
-export interface PreviewGradient {
-  type: GradientType;
-  stops: PreviewGradientStop[];
-  angle: number; // degrees; 0 = left→right, 90 = top→bottom (linear only)
-  // Radial extent (0..1) of the canvas half-size — smaller is tighter. Wired + persisted
-  // end-to-end (`GradientSpec.Radius` → `SvgRenderer` `r`); optional, defaults to full extent.
-  radius?: number; // radial only
-}
-
 // Visual style sent with a preview request. Field names match the pinned wire
 // contract (camelCase), not the internal C# `CodeRenderOptions` shape.
 export interface PreviewStyle {
@@ -95,7 +74,7 @@ export interface PreviewStyle {
   moduleShape: ModuleShape; // default "square"
   finderShape: FinderShape; // outer eye frame; default "square"
   finderDotShape: FinderShape; // inner eye pupil; default "square"
-  gradient: PreviewGradient | null; // foreground gradient; null = solid foregroundColor
+  gradient: Gradient | null; // foreground gradient; null = solid foregroundColor
   emoji: PreviewEmoji | null; // center emoji overlay; null = none
 }
 

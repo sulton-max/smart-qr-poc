@@ -3,15 +3,17 @@
 // required semantics, and the native-input styling) without duplicating it. The control groups still
 // drive the flat `FieldValues` form-state model (a separate pass restructures the data flow later).
 
-import { Field, Select as SdkSelect, TextInput } from "@wow-two-beta/ui/forms";
+import { Field, Select as SdkSelect, TextInput } from "@wow-two-beta/ui/presentation/forms";
+
 import type { FieldValues } from "@/domain/codes/content";
 
 /** Shared props for every per-type control group — keeps the flat `FieldValues` form-state model. */
 export interface ContentControlsProps {
-  /** Current field values, keyed by `ContentField.key`. */
-  values: FieldValues;
-  /** Emit the next values record. */
-  onChange: (next: FieldValues) => void;
+  /** The current field values, keyed by `ContentField.key`. */
+  readonly values: FieldValues;
+
+  /** Emits the next values record. */
+  readonly onChange: (next: FieldValues) => void;
 }
 
 // Native textarea / datetime inputs styled to match the SDK TextInput (which has no
@@ -19,18 +21,23 @@ export interface ContentControlsProps {
 export const nativeInput =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+/** Defines props for a single-line or multi-line text field. */
+interface TextFieldProps {
+  /** The field's label. */
+  readonly label: string;
+
+  /** The current text value. */
+  readonly value: string;
+
+  /** The placeholder shown while the field is empty. */
+  readonly placeholder?: string;
+
+  /** Emits the next text value. */
+  readonly onChange: (value: string) => void;
+}
+
 /** Single-line text-like input (text / url / tel / email / number all render the SDK TextInput). */
-export function TextField({
-  label,
-  value,
-  placeholder,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  placeholder?: string;
-  onChange: (v: string) => void;
-}) {
+export function TextField({ label, value, placeholder, onChange }: TextFieldProps) {
   return (
     <Field label={label}>
       <TextInput ring="sm" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
@@ -39,17 +46,7 @@ export function TextField({
 }
 
 /** Multi-line text input (native `<textarea>` styled to match the SDK TextInput). */
-export function TextAreaField({
-  label,
-  value,
-  placeholder,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  placeholder?: string;
-  onChange: (v: string) => void;
-}) {
+export function TextAreaField({ label, value, placeholder, onChange }: TextFieldProps) {
   return (
     <Field label={label}>
       <textarea
@@ -63,16 +60,20 @@ export function TextAreaField({
   );
 }
 
+/** Defines props for the datetime field. */
+interface DateTimeFieldProps {
+  /** The field's label. */
+  readonly label: string;
+
+  /** The current `datetime-local` value. */
+  readonly value: string;
+
+  /** Emits the next value. */
+  readonly onChange: (value: string) => void;
+}
+
 /** Native `datetime-local` input styled to match the SDK TextInput. */
-export function DateTimeField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+export function DateTimeField({ label, value, onChange }: DateTimeFieldProps) {
   return (
     <Field label={label}>
       <input type="datetime-local" className={nativeInput} value={value} onChange={(e) => onChange(e.target.value)} />
@@ -80,18 +81,32 @@ export function DateTimeField({
   );
 }
 
+/** Defines one selectable option. */
+interface SelectOption {
+  /** The option's stored value. */
+  readonly value: string;
+
+  /** The option's display label. */
+  readonly label: string;
+}
+
+/** Defines props for the select field. */
+interface SelectFieldProps {
+  /** The field's label. */
+  readonly label: string;
+
+  /** The current value, or undefined to fall back to the first option. */
+  readonly value: string | undefined;
+
+  /** The selectable options. */
+  readonly options: ReadonlyArray<SelectOption>;
+
+  /** Emits the next value. */
+  readonly onChange: (value: string) => void;
+}
+
 /** SDK Select over value/label options. `value` falls back to the first option when unset (matches the old form). */
-export function SelectField({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string | undefined;
-  options: { value: string; label: string }[];
-  onChange: (v: string) => void;
-}) {
+export function SelectField({ label, value, options, onChange }: SelectFieldProps) {
   return (
     <Field label={label}>
       <SdkSelect value={value ?? options[0]?.value} onValueChange={(o) => o && onChange(o.itemKey)}>

@@ -58,17 +58,24 @@ public static class StyleApiRequestExtensions
         ModuleShape = style.ModuleShape,
         FinderShape = style.FinderShape,
         FinderDotShape = style.FinderDotShape,
-        Gradient = style.Gradient is { } gradient
-            ? new GradientSpec
+        Gradient = style.Gradient switch
+        {
+            LinearGradientApiRequest linear => new LinearGradientSpec
             {
-                Type = gradient.Type,
-                Angle = gradient.Angle,
-                Radius = gradient.Radius,
-                Stops = gradient.Stops
+                Angle = linear.Angle,
+                Stops = linear.Stops
                     .Select(stop => new GradientStopSpec { Color = stop.Color, Offset = stop.Offset })
                     .ToList(),
-            }
-            : null,
+            },
+            RadialGradientApiRequest radial => new RadialGradientSpec
+            {
+                Radius = radial.Radius,
+                Stops = radial.Stops
+                    .Select(stop => new GradientStopSpec { Color = stop.Color, Offset = stop.Offset })
+                    .ToList(),
+            },
+            _ => null,
+        },
         Emoji = style.Emoji is { } emoji
             ? new EmojiSpec { Char = emoji.Char, SizeRatio = emoji.SizeRatio }
             : null,

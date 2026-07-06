@@ -1,4 +1,4 @@
-import { Grid } from "@wow-two-beta/ui/layout";
+import { Grid } from "@wow-two-beta/ui/presentation/layout";
 import { usePageMeta } from "@/presentation/common";
 import { POST_METAS } from "./blog";
 import { BlogCard, Section, SectionHeading } from "./components";

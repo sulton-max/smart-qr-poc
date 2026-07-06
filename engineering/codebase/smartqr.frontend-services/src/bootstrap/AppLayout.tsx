@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { Spinner } from "@wow-two-beta/ui/feedback";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Container, HStack, Navbar } from "@wow-two-beta/ui/layout";
-import { Text } from "@wow-two-beta/ui/display";
-import type { Me } from "@/domain/identity";
+import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Container, HStack, Navbar } from "@wow-two-beta/ui/presentation/layout";
+import { Text } from "@wow-two-beta/ui/presentation/display";
+import { UserKind, type Me } from "@/domain/identity";
 import { getMe, logout } from "@/integration/identity";
 import { ColorModeToggle } from "@/presentation/common";
 import { GoogleSignInButton, LoginScreen } from "@/presentation/identity";
@@ -23,7 +23,7 @@ export function AppLayout() {
       .then((result) => {
         if (!cancelled) {
           setMe(result);
-          setStatus(result.kind === "anonymous" ? "gate" : "ready");
+          setStatus(result.kind === UserKind.Anonymous ? "gate" : "ready");
         }
       })
       .catch(() => {
@@ -68,7 +68,7 @@ export function AppLayout() {
                 Billing
               </Link>
             )}
-            {me?.kind === "guest" && (
+            {me?.kind === UserKind.Guest && (
               <>
                 <Text as="span" size="sm" color="muted">
                   Guest
@@ -79,7 +79,7 @@ export function AppLayout() {
                 </Button>
               </>
             )}
-            {me?.kind === "user" && me.user && (
+            {me?.kind === UserKind.User && me.user && (
               <>
                 <Text as="span" size="sm" color="muted">
                   {me.user.name}

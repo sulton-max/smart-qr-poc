@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Spinner } from "@wow-two-beta/ui/feedback";
+import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import type { CodeContent, CodeType, PreviewStyle } from "@/domain/codes";
 import { previewCode } from "@/integration/codes";
 
 export interface QrPreviewProps {
   /** Fallback data when `content` is dynamic/absent — the short link on edit, a sample URL on create. */
-  value: string;
+  readonly value: string;
   /** Typed content; when static, the server encodes its payload so the preview matches the saved asset. */
-  content: CodeContent | null;
+  readonly content: CodeContent | null;
   /** Coarse code kind; derived from the chosen symbology in the builder. */
-  codeType: CodeType;
+  readonly codeType: CodeType;
   /** Visual style sent to the server renderer. */
-  style: PreviewStyle;
+  readonly style: PreviewStyle;
   /** Rendered box edge in px. */
-  size?: number;
+  readonly size?: number;
   /** Debounce window before firing the preview request (ms). */
-  debounceMs?: number;
+  readonly debounceMs?: number;
 }
 
 /**

@@ -13,11 +13,11 @@ import { CalendarControls } from "./CalendarControls";
 
 export interface ContentTypeFormProps {
   /** Which content type's fields to render. */
-  typeId: ContentTypeId;
+  readonly typeId: ContentTypeId;
   /** Current field values, keyed by `ContentField.key`. */
-  values: FieldValues;
+  readonly values: FieldValues;
   /** Emit the next values record. */
-  onChange: (next: FieldValues) => void;
+  readonly onChange: (next: FieldValues) => void;
 }
 
 // Each content type has a dedicated control group so its controls can diverge; this maps id → component.

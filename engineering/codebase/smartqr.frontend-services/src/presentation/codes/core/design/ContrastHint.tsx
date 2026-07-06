@@ -1,12 +1,12 @@
-import { Alert } from "@wow-two-beta/ui/feedback";
-import type { PreviewGradient } from "@/domain/codes/core";
+import { Alert } from "@wow-two-beta/ui/presentation/feedback";
+import type { Gradient } from "@/domain/codes/core";
 
 export interface ContrastHintProps {
-  foreground: string;
-  background: string;
-  transparent: boolean;
+  readonly foreground: string;
+  readonly background: string;
+  readonly transparent: boolean;
   /** When set, contrast is checked against the worst (lightest) gradient stop. */
-  gradient: PreviewGradient | null;
+  readonly gradient: Gradient | null;
 }
 
 /** WCAG relative luminance of a `#RRGGBB` color (0 = black, 1 = white). */

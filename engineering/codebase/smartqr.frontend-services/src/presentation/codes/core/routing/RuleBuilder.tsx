@@ -1,20 +1,14 @@
-import { Button } from "@wow-two-beta/ui/actions";
-import { Select, TextInput } from "@wow-two-beta/ui/forms";
-import { Sortable } from "@wow-two-beta/ui/display";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { Sortable } from "@wow-two-beta/ui/presentation/display";
 import { ArrowRight, GripVertical, Plus, Trash2 } from "lucide-react";
-import { RuleConditionType, RuleConditionTypeLabels, type RuleDraft } from "@/domain/codes/core";
+import { RuleConditionType, type RuleDraft } from "@/domain/codes/core";
+import { RuleConditionTypeDisplays } from "./RuleConditionTypeDisplays";
 
 export interface RuleBuilderProps {
-  rules: RuleDraft[];
-  onChange: (rules: RuleDraft[]) => void;
+  readonly rules: ReadonlyArray<RuleDraft>;
+  readonly onChange: (rules: RuleDraft[]) => void;
 }
-
-const VALUE_PLACEHOLDER: Record<RuleConditionType, string> = {
-  [RuleConditionType.Device]: "Ios · Android · Desktop",
-  [RuleConditionType.Country]: "US",
-  [RuleConditionType.Language]: "ru",
-  [RuleConditionType.TimeOfDay]: "09:00-16:00",
-};
 
 // Ordered conditional-rule editor — dense joined list, numbered by priority (first match wins, the
 // rest falls through to the fallback URL). Drag the handle to reorder (SDK `Sortable`). Visual only —
@@ -81,7 +75,7 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
                 </Select.Trigger>
                 <Select.Content>
                   {Object.values(RuleConditionType).map((ct) => (
-                    <Select.Item key={ct} itemKey={ct} label={RuleConditionTypeLabels[ct]} />
+                    <Select.Item key={ct} itemKey={ct} label={RuleConditionTypeDisplays[ct].label} />
                   ))}
                 </Select.Content>
               </Select>
@@ -89,7 +83,7 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
               <TextInput
                 ring="sm"
                 value={rule.conditionValue}
-                placeholder={VALUE_PLACEHOLDER[rule.conditionType]}
+                placeholder={RuleConditionTypeDisplays[rule.conditionType].placeholder}
                 onChange={(e) => update(rule.id, { conditionValue: e.target.value })}
               />
 

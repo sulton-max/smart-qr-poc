@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Card, Heading, Text } from "@wow-two-beta/ui/display";
-import { Alert } from "@wow-two-beta/ui/feedback";
-import { Center, Divider, Stack } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Card, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Alert } from "@wow-two-beta/ui/presentation/feedback";
+import { Center, Divider, Stack } from "@wow-two-beta/ui/presentation/layout";
 import type { Me } from "@/domain/identity";
 import { GOOGLE_CLIENT_ID } from "@/integration/common";
 import { createGuest } from "@/integration/identity";

@@ -389,7 +389,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         gradient = gradient
             ? (object)new
             {
-                type = "Linear",
+                type = "linear",
                 angle = 0.0,
                 stops = new[]
                 {

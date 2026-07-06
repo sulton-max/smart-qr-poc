@@ -230,7 +230,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             codeType = "Qr",
             style = StyleWith(("gradient", new
             {
-                type = "Linear",
+                type = "linear",
                 angle = 45.0,
                 stops = new[]
                 {
@@ -258,8 +258,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             codeType = "Qr",
             style = StyleWith(("gradient", new
             {
-                type = "Radial",
-                angle = 0.0,
+                // Radial carries no angle — proves the polymorphic union deserializes without it.
+                type = "radial",
                 stops = new[]
                 {
                     new { color = "#11FF00", offset = 0.0 },

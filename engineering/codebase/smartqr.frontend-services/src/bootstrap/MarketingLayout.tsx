@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Container, HStack } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Container, HStack } from "@wow-two-beta/ui/presentation/layout";
 import { ColorModeToggle } from "@/presentation/common";
 import { Logo, MarketingFooter } from "@/presentation/marketing";
 

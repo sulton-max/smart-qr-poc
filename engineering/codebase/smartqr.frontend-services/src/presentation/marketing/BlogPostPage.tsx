@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Badge, Heading, Text } from "@wow-two-beta/ui/display";
-import { Grid, Surface } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Badge, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Grid, Surface } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
 import { usePageMeta } from "@/presentation/common";
 import { getPost, POST_METAS } from "./blog";

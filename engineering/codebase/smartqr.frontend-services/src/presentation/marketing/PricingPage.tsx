@@ -1,4 +1,4 @@
-import { Text } from "@wow-two-beta/ui/display";
+import { Text } from "@wow-two-beta/ui/presentation/display";
 import { usePageMeta } from "@/presentation/common";
 import { PRICING_FAQS } from "./data";
 import {

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/actions";
-import { Heading, Text } from "@wow-two-beta/ui/display";
-import { Container, Grid } from "@wow-two-beta/ui/layout";
+import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Container, Grid } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowRight, Infinity as InfinityIcon } from "lucide-react";
 import { usePageMeta } from "@/presentation/common";
 import { FAQS, FEATURES, STEPS } from "./data";

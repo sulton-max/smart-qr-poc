@@ -1,7 +1,5 @@
 // Identity — mirrors the backend `SmartQr.Api` identity DTOs.
-
-// camelCase wire (backend `UserKind` enum).
-export type UserKind = "anonymous" | "guest" | "user";
+import type { UserKind } from "./enums/UserKind";
 
 export interface UserSummary {
   id: string;
