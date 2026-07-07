@@ -1,25 +1,21 @@
 // Shared input primitives for the per-type content control groups. Extracted verbatim from the old
-// generic `ContentTypeForm` so every control group renders identical markup (same labels, placeholders,
+// generic `ContentControls` so every control group renders identical markup (same labels, placeholders,
 // required semantics, and the native-input styling) without duplicating it. The control groups still
 // drive the flat `FieldValues` form-state model (a separate pass restructures the data flow later).
 
 import { Field, Select as SdkSelect, TextInput } from "@wow-two-beta/ui/presentation/forms";
 
-import type { FieldValues } from "@/domain/codes/content";
+import { FieldKind, type ContentField, type FieldValues } from "@/domain/codes/content";
+import { NativeInputStyles } from "./NativeInputStyles";
 
-/** Shared props for every per-type control group — keeps the flat `FieldValues` form-state model. */
+/** Defines the shared props for every per-type control group — keeps the flat `FieldValues` form-state model. */
 export interface ContentControlsProps {
   /** The current field values, keyed by `ContentField.key`. */
-  readonly values: FieldValues;
+  readonly fieldValues: FieldValues;
 
   /** Emits the next values record. */
   readonly onChange: (next: FieldValues) => void;
 }
-
-// Native textarea / datetime inputs styled to match the SDK TextInput (which has no
-// multiline / datetime variant yet). Plain text-likes use the SDK TextInput.
-export const nativeInput =
-  "w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /** Defines props for a single-line or multi-line text field. */
 interface TextFieldProps {
@@ -36,7 +32,7 @@ interface TextFieldProps {
   readonly onChange: (value: string) => void;
 }
 
-/** Single-line text-like input (text / url / tel / email / number all render the SDK TextInput). */
+/** Renders a single-line text-like input (text / url / tel / email / number all render the SDK TextInput). */
 export function TextField({ label, value, placeholder, onChange }: TextFieldProps) {
   return (
     <Field label={label}>
@@ -45,12 +41,12 @@ export function TextField({ label, value, placeholder, onChange }: TextFieldProp
   );
 }
 
-/** Multi-line text input (native `<textarea>` styled to match the SDK TextInput). */
+/** Renders a multi-line text input (native `<textarea>` styled to match the SDK TextInput). */
 export function TextAreaField({ label, value, placeholder, onChange }: TextFieldProps) {
   return (
     <Field label={label}>
       <textarea
-        className={nativeInput}
+        className={NativeInputStyles}
         rows={3}
         value={value}
         placeholder={placeholder}
@@ -72,11 +68,11 @@ interface DateTimeFieldProps {
   readonly onChange: (value: string) => void;
 }
 
-/** Native `datetime-local` input styled to match the SDK TextInput. */
+/** Renders a native `datetime-local` input styled to match the SDK TextInput. */
 export function DateTimeField({ label, value, onChange }: DateTimeFieldProps) {
   return (
     <Field label={label}>
-      <input type="datetime-local" className={nativeInput} value={value} onChange={(e) => onChange(e.target.value)} />
+      <input type="datetime-local" className={NativeInputStyles} value={value} onChange={(e) => onChange(e.target.value)} />
     </Field>
   );
 }
@@ -105,7 +101,7 @@ interface SelectFieldProps {
   readonly onChange: (value: string) => void;
 }
 
-/** SDK Select over value/label options. `value` falls back to the first option when unset (matches the old form). */
+/** Renders an SDK Select over value/label options. `value` falls back to the first option when unset (matches the old form). */
 export function SelectField({ label, value, options, onChange }: SelectFieldProps) {
   return (
     <Field label={label}>
@@ -121,4 +117,30 @@ export function SelectField({ label, value, options, onChange }: SelectFieldProp
       </SdkSelect>
     </Field>
   );
+}
+
+/** Defines props for the field renderer — one registry `ContentField` bound to its current value. */
+interface FieldRendererProps {
+  /** The field definition (label, kind, placeholder, options) driving which input renders. */
+  readonly field: ContentField;
+
+  /** The field's current string value. */
+  readonly value: string | undefined;
+
+  /** Emits the field's next string value. */
+  readonly onChange: (value: string) => void;
+}
+
+/** Renders the right input for a registry field, dispatching on its `FieldKind` (textarea / datetime / select / text-like). */
+export function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
+  switch (field.kind) {
+    case FieldKind.TextArea:
+      return <TextAreaField label={field.label} value={value ?? ""} placeholder={field.placeholder} onChange={onChange} />;
+    case FieldKind.DateTime:
+      return <DateTimeField label={field.label} value={value ?? ""} onChange={onChange} />;
+    case FieldKind.Select:
+      return <SelectField label={field.label} value={value} options={field.options ?? []} onChange={onChange} />;
+    default:
+      return <TextField label={field.label} value={value ?? ""} placeholder={field.placeholder} onChange={onChange} />;
+  }
 }

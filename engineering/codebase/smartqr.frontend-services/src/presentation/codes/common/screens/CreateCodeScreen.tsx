@@ -14,17 +14,17 @@ import {
   ModuleShape,
   type CodeDto,
   type Gradient,
-  type PreviewEmoji,
+  type DesignEmojiOverlay,
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
-import { CONTENT_TYPES, contentType, buildContent, contentToValues, isDynamicContent, type ContentTypeId, type FieldValues } from "@/domain/codes/content";
+import { ContentTypeId, ContentTypes, contentType, buildContent, contentToValues, isDynamicContent, type FieldValues } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
 import { codeImageUrl, createCode, getCode, updateCode } from "@/integration/codes";
-import { BarcodeFormatDisplays, ContrastHint, EmojiControls, FillControls, QrPreview, RuleBuilder, ShapeControls } from "../../core";
-import { ContentTypeForm } from "../../content/components/ContentTypeForm";
+import { BarcodeFormatDisplays, ContrastCallout, EmojiControls, FillControls, QrPreview, RuleControls, ShapeControls } from "../../core";
+import { ContentTypeControls } from "../../content/components/ContentTypeControls";
 
-/** Persisted rules → builder draft shape (adds client-side keys). */
+/** Maps a code's persisted rules to the builder's draft shape (adds client-side keys). */
 function toDrafts(code: CodeDto): RuleDraft[] {
   return code.rules.map((r) => ({
     id: crypto.randomUUID(),
@@ -44,16 +44,19 @@ function gradientFromDto(g: CodeDto["style"]["gradient"]): Gradient | null {
     : { type: GradientType.Radial, radius: g.radius, stops };
 }
 
+/** Defines props for the code builder screen. */
 export interface CreateCodeScreenProps {
-  /** Set → edit this code (PUT); unset → create (POST). */
+  /** The id of the code to edit (PUT); unset → create (POST). */
   readonly codeId?: string;
-  /** Return to the codes list. */
+
+  /** Fires when the user returns to the codes list. */
   readonly onBack?: () => void;
-  /** Save succeeded — parent refreshes the list. */
+
+  /** Fires when a save succeeds so the parent refreshes the list. */
   readonly onSaved?: () => void;
 }
 
-/** Code builder — create, or edit when `codeId` set. Edit submits a full replace; slug is read-only (printed, immutable). */
+/** Renders the code builder — create, or edit when `codeId` set. Edit submits a full replace; slug is read-only (printed, immutable). */
 export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenProps) {
   const isEdit = Boolean(codeId);
 
@@ -70,12 +73,12 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
   const [gradient, setGradient] = useState<Gradient | null>(null);
   const [transparentBackground, setTransparentBackground] = useState(false);
-  const [emoji, setEmoji] = useState<PreviewEmoji | null>(null);
+  const [emoji, setEmoji] = useState<DesignEmojiOverlay | null>(null);
   const [rules, setRules] = useState<RuleDraft[]>([]);
   const [existing, setExisting] = useState<CodeDto | null>(null);
   // v0.7 iter1: the chosen content type + its form values. `url` is the dynamic forwarder
   // (its single field binds to `fallbackUrl`); other types drive the preview from their payload.
-  const [contentTypeId, setContentTypeId] = useState<ContentTypeId>("url");
+  const [contentTypeId, setContentTypeId] = useState<ContentTypeId>(ContentTypeId.Url);
   const [contentValues, setContentValues] = useState<FieldValues>({});
 
   const [loading, setLoading] = useState(isEdit);
@@ -111,7 +114,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           const typeId = code.content.type;
           setContentTypeId(typeId);
           const values = contentToValues(code.content);
-          if (typeId === "url") setFallbackUrl(values.url ?? code.fallbackUrl);
+          if (typeId === ContentTypeId.Url) setFallbackUrl(values.url ?? code.fallbackUrl);
           else setContentValues(values);
         }
       })
@@ -129,7 +132,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   // The preview endpoint encodes the typed content server-side (same encoder as the saved asset → true parity).
   // Static content bakes its payload; dynamic (url / mobileApp) falls back to the short link.
   const contentDef = contentType(contentTypeId);
-  const previewContent = buildContent(contentTypeId, contentTypeId === "url" ? { url: fallbackUrl } : contentValues);
+  const previewContent = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
   const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
 
   // The preview endpoint's coarse kind: QR symbology → "qr", any other (1D/2D) → "barcode".
@@ -158,7 +161,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   async function handleSubmit() {
     setError(null);
     // Client-side guard (the backend still validates): a mobile app link needs at least one destination.
-    if (contentTypeId === "mobileApp" && !["appStore", "playStore", "other"].some((k) => (contentValues[k] ?? "").trim())) {
+    if (contentTypeId === ContentTypeId.MobileApp && !["appStore", "playStore", "other"].some((k) => (contentValues[k] ?? "").trim())) {
       setError("Add at least one link — App Store, Google Play, or a custom URL for other devices.");
       return;
     }
@@ -166,8 +169,8 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed
     // type (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
     const isStatic = contentDef.mode === "static";
-    const selfRouted = contentTypeId === "mobileApp"; // backend derives fallback + device rules from the fields
-    const content = buildContent(contentTypeId, contentTypeId === "url" ? { url: fallbackUrl } : contentValues);
+    const selfRouted = contentTypeId === ContentTypeId.MobileApp; // backend derives fallback + device rules from the fields
+    const content = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
     const request = {
       name: name.trim() || "Untitled code",
       codeType: CodeType.Qr,
@@ -278,17 +281,17 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                     <Select.Value />
                   </Select.Trigger>
                   <Select.Content>
-                    {CONTENT_TYPES.map((c) => (
+                    {ContentTypes.map((c) => (
                       <Select.Item key={c.id} itemKey={c.id} label={c.label} />
                     ))}
                   </Select.Content>
                 </Select>
               </Field>
-              <ContentTypeForm
+              <ContentTypeControls
                 typeId={contentTypeId}
-                values={contentTypeId === "url" ? { url: fallbackUrl } : contentValues}
+                values={contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues}
                 onChange={(next) =>
-                  contentTypeId === "url" ? setFallbackUrl(next.url ?? "") : setContentValues(next)
+                  contentTypeId === ContentTypeId.Url ? setFallbackUrl(next.url ?? "") : setContentValues(next)
                 }
               />
             </>
@@ -398,7 +401,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </>
           )}
 
-          {tab === "routing" && <RuleBuilder rules={rules} onChange={setRules} />}
+          {tab === "routing" && <RuleControls rules={rules} onChange={setRules} />}
           </div>
 
           <Button
@@ -424,7 +427,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
           {/* Scannability note — lives under the preview (not in the form) so it reads against the actual render. */}
           <div className="w-full">
-            <ContrastHint
+            <ContrastCallout
               foreground={foreground}
               background={background}
               transparent={transparentBackground}

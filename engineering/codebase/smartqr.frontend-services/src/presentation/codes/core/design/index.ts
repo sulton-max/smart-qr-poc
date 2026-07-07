@@ -1,3 +1,3 @@
 export * from "./FillControls";
 export * from "./EmojiControls";
-export * from "./ContrastHint";
+export * from "./ContrastCallout";

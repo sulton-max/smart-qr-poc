@@ -1,15 +1,18 @@
-import { contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, TextField } from "./fields";
+import { ContentTypeId, contentType } from "@/domain/codes/content";
+import { type ContentControlsProps, FieldRenderer } from "./fields";
 
-const [latitude, longitude] = contentType("geo").fields;
+// latitude / longitude are numeric coordinate fields (kinds come from the registry).
+const fields = contentType(ContentTypeId.Geo).fields;
 
-/** Location content — latitude / longitude coordinate pair. */
-export function GeoControls({ values, onChange }: ContentControlsProps) {
-  const set = (key: string, v: string) => onChange({ ...values, [key]: v });
+/** Renders location content — latitude / longitude coordinate pair. */
+export function GeoControls({ fieldValues, onChange }: ContentControlsProps) {
+  const setValue = (key: string, v: string) => onChange({ ...fieldValues, [key]: v });
+
   return (
     <>
-      <TextField label={latitude.label} value={values[latitude.key] ?? ""} placeholder={latitude.placeholder} onChange={(v) => set(latitude.key, v)} />
-      <TextField label={longitude.label} value={values[longitude.key] ?? ""} placeholder={longitude.placeholder} onChange={(v) => set(longitude.key, v)} />
+      {fields.map((f) => (
+        <FieldRenderer key={f.key} field={f} value={fieldValues[f.key]} onChange={(v) => setValue(f.key, v)} />
+      ))}
     </>
   );
 }

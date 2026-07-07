@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CONTENT_TYPES } from "./registry";
+import { ContentTypeId, ContentTypes } from "./registry";
 import { buildContent, contentToValues, isDynamicContent } from "./operations";
 
 // Payload ENCODING now lives on the backend (SmartQr.Tests.Unit/CodeContentEncodeTests); the frontend only maps
@@ -7,22 +7,22 @@ import { buildContent, contentToValues, isDynamicContent } from "./operations";
 
 describe("buildContent", () => {
   it("passes a type's required field through", () => {
-    expect(buildContent("url", { url: "https://x.io" })).toEqual({ type: "url", url: "https://x.io" });
-    expect(buildContent("text", { text: "hi there" })).toEqual({ type: "text", text: "hi there" });
-    expect(buildContent("phone", { phone: "+15550100" })).toEqual({ type: "phone", phone: "+15550100" });
+    expect(buildContent(ContentTypeId.Url, { url: "https://x.io" })).toEqual({ type: "url", url: "https://x.io" });
+    expect(buildContent(ContentTypeId.Text, { text: "hi there" })).toEqual({ type: "text", text: "hi there" });
+    expect(buildContent(ContentTypeId.Phone, { phone: "+15550100" })).toEqual({ type: "phone", phone: "+15550100" });
   });
 
   it("keeps required fields but omits empty optional ones", () => {
-    expect(buildContent("email", { to: "a@b.com", subject: "Hi", body: "" })).toEqual({
+    expect(buildContent(ContentTypeId.Email, { to: "a@b.com", subject: "Hi", body: "" })).toEqual({
       type: "email",
       to: "a@b.com",
       subject: "Hi",
     });
-    expect(buildContent("sms", { phone: "+15550100" })).toEqual({ type: "sms", phone: "+15550100" });
+    expect(buildContent(ContentTypeId.Sms, { phone: "+15550100" })).toEqual({ type: "sms", phone: "+15550100" });
   });
 
   it("geo carries latitude/longitude keys", () => {
-    expect(buildContent("geo", { latitude: "41.31", longitude: "69.24" })).toEqual({
+    expect(buildContent(ContentTypeId.Geo, { latitude: "41.31", longitude: "69.24" })).toEqual({
       type: "geo",
       latitude: "41.31",
       longitude: "69.24",
@@ -30,23 +30,23 @@ describe("buildContent", () => {
   });
 
   it("wifi maps hidden to a bool (defaulting false) and omits an empty password", () => {
-    expect(buildContent("wifi", { ssid: "Cafe", password: "pw", hidden: "true" })).toEqual({
+    expect(buildContent(ContentTypeId.Wifi, { ssid: "Cafe", password: "pw", hidden: "true" })).toEqual({
       type: "wifi",
       ssid: "Cafe",
       password: "pw",
       hidden: true,
     });
-    expect(buildContent("wifi", { ssid: "Open" })).toEqual({ type: "wifi", ssid: "Open", hidden: false });
+    expect(buildContent(ContentTypeId.Wifi, { ssid: "Open" })).toEqual({ type: "wifi", ssid: "Open", hidden: false });
   });
 
   it("mobileApp omits empty links and carries the fallback choice", () => {
-    expect(buildContent("mobileApp", { appStore: "https://a", fallback: "appStore" })).toEqual({
+    expect(buildContent(ContentTypeId.MobileApp, { appStore: "https://a", fallback: "appStore" })).toEqual({
       type: "mobileApp",
       appStore: "https://a",
       fallback: "appStore",
     });
     // No links → an empty object (backend rejects it) — no stray empty-string fields that would defeat the check.
-    expect(buildContent("mobileApp", {})).toEqual({ type: "mobileApp" });
+    expect(buildContent(ContentTypeId.MobileApp, {})).toEqual({ type: "mobileApp" });
   });
 });
 
@@ -74,11 +74,11 @@ describe("isDynamicContent", () => {
   });
 });
 
-describe("CONTENT_TYPES registry", () => {
+describe("ContentTypes registry", () => {
   it("has unique ids, each with at least one field", () => {
-    const ids = CONTENT_TYPES.map((c) => c.id);
+    const ids = ContentTypes.map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const c of CONTENT_TYPES) {
+    for (const c of ContentTypes) {
       expect(c.fields.length).toBeGreaterThan(0);
     }
   });

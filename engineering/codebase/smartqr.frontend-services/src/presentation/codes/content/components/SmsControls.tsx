@@ -1,15 +1,18 @@
-import { contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, TextAreaField, TextField } from "./fields";
+import { ContentTypeId, contentType } from "@/domain/codes/content";
+import { type ContentControlsProps, FieldRenderer } from "./fields";
 
-const [phone, message] = contentType("sms").fields;
+// phone is a tel; message is a textarea (kinds come from the registry).
+const fields = contentType(ContentTypeId.Sms).fields;
 
-/** SMS content — recipient phone plus an optional prefilled (multiline) message. */
-export function SmsControls({ values, onChange }: ContentControlsProps) {
-  const set = (key: string, v: string) => onChange({ ...values, [key]: v });
+/** Renders SMS content — recipient phone plus an optional prefilled (multiline) message. */
+export function SmsControls({ fieldValues, onChange }: ContentControlsProps) {
+  const setValue = (key: string, v: string) => onChange({ ...fieldValues, [key]: v });
+
   return (
     <>
-      <TextField label={phone.label} value={values[phone.key] ?? ""} placeholder={phone.placeholder} onChange={(v) => set(phone.key, v)} />
-      <TextAreaField label={message.label} value={values[message.key] ?? ""} placeholder={message.placeholder} onChange={(v) => set(message.key, v)} />
+      {fields.map((f) => (
+        <FieldRenderer key={f.key} field={f} value={fieldValues[f.key]} onChange={(v) => setValue(f.key, v)} />
+      ))}
     </>
   );
 }

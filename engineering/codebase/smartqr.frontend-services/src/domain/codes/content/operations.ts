@@ -4,7 +4,7 @@
 // risk this rewire removes). The per-type field registry lives in `registry.ts`.
 
 import type { CodeContent } from "./types";
-import { contentType, type ContentTypeId, type FieldValues } from "./registry";
+import { ContentTypeId, contentType, type FieldValues } from "./registry";
 
 /**
  * Builds the typed `CodeContent` the wire carries from the builder's collected field values. Required fields are
@@ -15,7 +15,7 @@ export function buildContent(id: ContentTypeId, values: FieldValues): CodeConten
   const out: Record<string, unknown> = { type: id };
 
   for (const field of contentType(id).fields) {
-    if (id === "wifi" && field.key === "hidden") {
+    if (id === ContentTypeId.Wifi && field.key === "hidden") {
       out.hidden = values.hidden === "true";
       continue;
     }
@@ -26,7 +26,7 @@ export function buildContent(id: ContentTypeId, values: FieldValues): CodeConten
   }
 
   // The mobile-app fallback picker isn't a registry field — carry the chosen store key through when set.
-  if (id === "mobileApp" && values.fallback) out.fallback = values.fallback;
+  if (id === ContentTypeId.MobileApp && values.fallback) out.fallback = values.fallback;
 
   // Structural cast via `unknown`: `out` is assembled dynamically, so it can't be narrowed to a single
   // union member statically — the per-type field loop guarantees the right shape at runtime.

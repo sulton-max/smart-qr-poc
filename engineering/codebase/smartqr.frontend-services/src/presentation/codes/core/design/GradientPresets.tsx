@@ -6,7 +6,7 @@ import { RadiusGlyph } from "@wow-two-beta/ui/presentation/display";
 import { GradientType } from "@/domain/codes/core";
 
 /** Preset-icon glyph size (px). */
-export const PRESET_ICON_SIZE = 16;
+export const PresetIconSize = 16;
 
 /** Defines one selectable preset within a gradient projection row. */
 export interface GradientPreset {
@@ -33,19 +33,19 @@ export interface PresetRow {
 }
 
 /** The linear (angle) projection presets. */
-export const LINEAR_PRESETS: PresetRow = {
+export const LinearPresets: PresetRow = {
   type: GradientType.Linear,
   ariaLabel: "Gradient angle",
   presets: [
-    { value: 0, label: "Left to right (0°)", glyph: <ArrowRight size={PRESET_ICON_SIZE} /> },
-    { value: 45, label: "Diagonal down-right (45°)", glyph: <ArrowDownRight size={PRESET_ICON_SIZE} /> },
-    { value: 90, label: "Top to bottom (90°)", glyph: <ArrowDown size={PRESET_ICON_SIZE} /> },
-    { value: 135, label: "Diagonal down-left (135°)", glyph: <ArrowDownLeft size={PRESET_ICON_SIZE} /> },
+    { value: 0, label: "Left to right (0°)", glyph: <ArrowRight size={PresetIconSize} /> },
+    { value: 45, label: "Diagonal down-right (45°)", glyph: <ArrowDownRight size={PresetIconSize} /> },
+    { value: 90, label: "Top to bottom (90°)", glyph: <ArrowDown size={PresetIconSize} /> },
+    { value: 135, label: "Diagonal down-left (135°)", glyph: <ArrowDownLeft size={PresetIconSize} /> },
   ],
 };
 
 /** The radial (radius) projection presets — extent `0..1`, frontend-only until the backend wires it. */
-export const RADIAL_PRESETS: PresetRow = {
+export const RadialPresets: PresetRow = {
   type: GradientType.Radial,
   ariaLabel: "Gradient radius",
   presets: [
@@ -57,4 +57,4 @@ export const RADIAL_PRESETS: PresetRow = {
 };
 
 /** The projection rows — one per `GradientType`, in render order. */
-export const PRESET_ROWS: PresetRow[] = [LINEAR_PRESETS, RADIAL_PRESETS];
+export const PresetRows: PresetRow[] = [LinearPresets, RadialPresets];

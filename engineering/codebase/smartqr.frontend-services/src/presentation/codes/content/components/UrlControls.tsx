@@ -1,17 +1,11 @@
-import { contentType, type FieldValues } from "@/domain/codes/content";
-import { type ContentControlsProps, TextField } from "./fields";
+import { ContentTypeId, contentType } from "@/domain/codes/content";
+import { type ContentControlsProps, FieldRenderer } from "./fields";
 
-const [url] = contentType("url").fields;
+const [url] = contentType(ContentTypeId.Url).fields;
 
-/** URL content — the dynamic forwarder's single destination field. */
-export function UrlControls({ values, onChange }: ContentControlsProps) {
-  const set = (key: string, v: string) => onChange({ ...values, [key]: v } as FieldValues);
+/** Renders URL content — the dynamic forwarder's single destination field. */
+export function UrlControls({ fieldValues, onChange }: ContentControlsProps) {
   return (
-    <TextField
-      label={url.label}
-      value={values[url.key] ?? ""}
-      placeholder={url.placeholder}
-      onChange={(v) => set(url.key, v)}
-    />
+    <FieldRenderer field={url} value={fieldValues[url.key]} onChange={(v) => onChange({ ...fieldValues, [url.key]: v })} />
   );
 }

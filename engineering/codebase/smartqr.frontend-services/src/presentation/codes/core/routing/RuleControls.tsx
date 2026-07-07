@@ -5,15 +5,24 @@ import { ArrowRight, GripVertical, Plus, Trash2 } from "lucide-react";
 import { RuleConditionType, type RuleDraft } from "@/domain/codes/core";
 import { RuleConditionTypeDisplays } from "./RuleConditionTypeDisplays";
 
-export interface RuleBuilderProps {
+/** Add-rule footer button label. */
+const AddRuleLabel = "Add rule";
+
+/** Defines props for the ordered routing-rule builder. */
+export interface RuleControlsProps {
+  /** The ordered routing rules to edit, first match wins. */
   readonly rules: ReadonlyArray<RuleDraft>;
+
+  /** Emits the next rule list on any add, edit, remove, or reorder. */
   readonly onChange: (rules: RuleDraft[]) => void;
 }
 
-// Ordered conditional-rule editor — dense joined list, numbered by priority (first match wins, the
-// rest falls through to the fallback URL). Drag the handle to reorder (SDK `Sortable`). Visual only —
-// the data shape is unchanged.
-export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
+/**
+ * Renders an ordered conditional-rule editor — a dense joined list numbered by priority (first
+ * match wins, the rest falls through to the fallback URL). Drag the handle to reorder (SDK
+ * `Sortable`). Visual only — the data shape is unchanged.
+ */
+export function RuleControls({ rules, onChange }: RuleControlsProps) {
   const renumber = (list: RuleDraft[]) => list.map((r, i) => ({ ...r, order: i + 1 }));
 
   const update = (id: string, patch: Partial<RuleDraft>) =>
@@ -112,14 +121,17 @@ export function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
         ))}
       </Sortable>
 
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        tone="neutral"
+        size="sm"
+        isFullWidth
+        leadingSlot={<Plus size={16} />}
         onClick={add}
-        className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="justify-start rounded-none px-4 py-3 text-muted-foreground"
       >
-        <Plus size={16} />
-        Add rule
-      </button>
+        {AddRuleLabel}
+      </Button>
     </div>
   );
 }

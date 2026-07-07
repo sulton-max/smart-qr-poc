@@ -8,15 +8,18 @@ import { ControlGroup, Stack } from "@wow-two-beta/ui/presentation/layout";
 
 import { FillType, Gradient, GradientType } from "@/domain/codes/core";
 
-import { PRESET_ICON_SIZE, PRESET_ROWS } from "./GradientPresets";
+import { PresetIconSize, PresetRows } from "./GradientPresets";
 
-const DEFAULT_ANGLE = 45;
-const DEFAULT_RADIUS = 0.8;
+/** @internal Default linear-gradient angle (deg). */
+const DefaultAngle = 45;
 
-/** Default gradient end stop — the brand violet (matches `--color-primary`). A stored data value, so a concrete hex, not a CSS token. */
-const DEFAULT_GRADIENT_END = "#7c3aed";
+/** @internal Default radial-gradient radius (0..1 extent). */
+const DefaultRadius = 0.8;
 
-/** The gradient's current projection value — its angle (linear) or radius (radial). */
+/** @internal Default gradient end stop — the brand violet (matches `--color-primary`). A stored data value, so a concrete hex, not a CSS token. */
+const DefaultGradientEnd = "#7c3aed";
+
+/** Resolves the gradient's current projection value — its angle (linear) or radius (radial). */
 function projectionValue(gradient: Gradient): number {
   return gradient.type === GradientType.Linear ? gradient.angle : gradient.radius;
 }
@@ -45,14 +48,14 @@ export interface FillControlsProps {
 export function FillControls({ foreground, onForegroundChange, gradient, onGradientChange }: FillControlsProps) {
   // Toggle between a solid foreground and a default two-stop gradient.
   function setFill(next: FillType | null) {
-    if (next === FillType.Gradient) onGradientChange(Gradient.twoStop(foreground, DEFAULT_GRADIENT_END, DEFAULT_ANGLE));
+    if (next === FillType.Gradient) onGradientChange(Gradient.twoStop(foreground, DefaultGradientEnd, DefaultAngle));
     else if (next === FillType.Solid) onGradientChange(null);
   }
 
   // Switch the gradient's projection (linear ↔ radial), seeding the target variant's field.
   function changeType(next: GradientType) {
     if (!gradient || gradient.type === next) return;
-    onGradientChange(Gradient.withType(gradient, next, { angle: DEFAULT_ANGLE, radius: DEFAULT_RADIUS }));
+    onGradientChange(Gradient.withType(gradient, next, { angle: DefaultAngle, radius: DefaultRadius }));
   }
 
   return (
@@ -77,7 +80,7 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
           <>
             <ColorPicker
               triggerVariant="swatch"
-              value={gradient.stops[0]?.color ?? DEFAULT_GRADIENT_END}
+              value={gradient.stops[0]?.color ?? DefaultGradientEnd}
               onValueChange={(hex) => onGradientChange(Gradient.withStop(gradient, 0, hex))}
               aria-label="Gradient start color"
             />
@@ -88,13 +91,13 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
               size="xs"
               aria-label="Reverse gradient colors"
               onClick={() => onGradientChange(Gradient.reverseStops(gradient))}
-              hoverSlot={<ArrowLeftRight size={PRESET_ICON_SIZE} />}
+              hoverSlot={<ArrowLeftRight size={PresetIconSize} />}
             >
-              <ArrowRight size={PRESET_ICON_SIZE} />
+              <ArrowRight size={PresetIconSize} />
             </Button>
             <ColorPicker
               triggerVariant="swatch"
-              value={gradient.stops[1]?.color ?? DEFAULT_GRADIENT_END}
+              value={gradient.stops[1]?.color ?? DefaultGradientEnd}
               onValueChange={(hex) => onGradientChange(Gradient.withStop(gradient, 1, hex))}
               aria-label="Gradient end color"
             />
@@ -130,7 +133,7 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
           </ToggleButtonGroup>
 
           <div className="flex flex-1 flex-col">
-            {PRESET_ROWS.map((row, index) => (
+            {PresetRows.map((row, index) => (
               <Fragment key={row.type}>
                 {index > 0 && <Separator />}
                 <OptionTileGroup

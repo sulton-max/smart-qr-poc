@@ -57,7 +57,7 @@ export interface PreviewLogo {
 }
 
 // Optional center emoji overlay for the preview render (no file upload).
-export interface PreviewEmoji {
+export interface DesignEmojiOverlay {
   char: string;
   sizeRatio: number; // fraction of the code's width (0–1)
 }
@@ -75,7 +75,7 @@ export interface PreviewStyle {
   finderShape: FinderShape; // outer eye frame; default "square"
   finderDotShape: FinderShape; // inner eye pupil; default "square"
   gradient: Gradient | null; // foreground gradient; null = solid foregroundColor
-  emoji: PreviewEmoji | null; // center emoji overlay; null = none
+  emoji: DesignEmojiOverlay | null; // center emoji overlay; null = none
 }
 
 export interface PreviewRequest {

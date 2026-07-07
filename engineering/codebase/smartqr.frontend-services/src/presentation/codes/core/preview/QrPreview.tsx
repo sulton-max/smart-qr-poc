@@ -3,23 +3,37 @@ import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import type { CodeContent, CodeType, PreviewStyle } from "@/domain/codes";
 import { previewCode } from "@/integration/codes";
 
+/** @internal CSS var (with hex fallback) for the muted "preview unavailable" caption color. */
+const ErrorTextColor = "var(--color-fg-muted,#71717a)";
+
+/** @internal Light-mode scrim tint behind the loading spinner. */
+const LoadingScrimLight = "bg-white/60";
+
+/** @internal Dark-mode scrim tint behind the loading spinner. */
+const LoadingScrimDark = "dark:bg-black/40";
+
 export interface QrPreviewProps {
-  /** Fallback data when `content` is dynamic/absent — the short link on edit, a sample URL on create. */
+  /** The fallback data when `content` is dynamic/absent — the short link on edit, a sample URL on create. */
   readonly value: string;
-  /** Typed content; when static, the server encodes its payload so the preview matches the saved asset. */
+
+  /** The typed content; when static, the server encodes its payload so the preview matches the saved asset. */
   readonly content: CodeContent | null;
-  /** Coarse code kind; derived from the chosen symbology in the builder. */
+
+  /** The coarse code kind, derived from the chosen symbology in the builder. */
   readonly codeType: CodeType;
-  /** Visual style sent to the server renderer. */
+
+  /** The visual style sent to the server renderer. */
   readonly style: PreviewStyle;
-  /** Rendered box edge in px. */
+
+  /** The rendered box edge in px. */
   readonly size?: number;
-  /** Debounce window before firing the preview request (ms). */
+
+  /** The debounce window before firing the preview request (ms). */
   readonly debounceMs?: number;
 }
 
 /**
- * Live builder preview — renders the **backend-emitted SVG** (server-authoritative
+ * Renders the live builder preview from the **backend-emitted SVG** (server-authoritative
  * parity with the downloadable asset) via `POST /api/codes/preview`. The request is
  * debounced so it isn't fired per-keystroke, and superseded requests are aborted.
  */
@@ -71,7 +85,8 @@ export function QrPreview({
     }, debounceMs);
 
     return () => clearTimeout(timer);
-    // styleKey stands in for the deep `style` object.
+    // Disabled because the effect depends on the deep `style`/`content` objects, which we track via their
+    // serialized `styleKey`/`contentKey` instead — listing the raw objects would re-fire on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, contentKey, codeType, styleKey, debounceMs]);
 
@@ -94,13 +109,18 @@ export function QrPreview({
       )}
 
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-[1px] dark:bg-black/40">
+        <div
+          className={`absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-[1px] ${LoadingScrimLight} ${LoadingScrimDark}`}
+        >
           <Spinner size="md" label="Rendering preview" />
         </div>
       )}
 
-      {error && !loading && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-xl p-4 text-center text-xs text-[var(--color-fg-muted,#71717a)]">
+      {error && (
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-xl p-4 text-center text-xs"
+          style={{ color: ErrorTextColor }}
+        >
           Preview unavailable
         </div>
       )}

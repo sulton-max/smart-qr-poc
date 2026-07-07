@@ -1,16 +1,11 @@
-import { contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, TextField } from "./fields";
+import { ContentTypeId, contentType } from "@/domain/codes/content";
+import { type ContentControlsProps, FieldRenderer } from "./fields";
 
-const [phone] = contentType("phone").fields;
+const [phone] = contentType(ContentTypeId.Phone).fields;
 
-/** Phone content — a single dial-number field. */
-export function PhoneControls({ values, onChange }: ContentControlsProps) {
+/** Renders phone content — a single dial-number field. */
+export function PhoneControls({ fieldValues, onChange }: ContentControlsProps) {
   return (
-    <TextField
-      label={phone.label}
-      value={values[phone.key] ?? ""}
-      placeholder={phone.placeholder}
-      onChange={(v) => onChange({ ...values, [phone.key]: v })}
-    />
+    <FieldRenderer field={phone} value={fieldValues[phone.key]} onChange={(v) => onChange({ ...fieldValues, [phone.key]: v })} />
   );
 }

@@ -17,14 +17,16 @@ import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
 import type { CodeDto } from "@/domain/codes/core";
 import { deleteCode, listCodes, setCodeActive } from "@/integration/codes";
 
+/** Defines props for the codes dashboard screen. */
 interface CodesListScreenProps {
-  /** Open the empty builder. */
+  /** Fires when the user opens the empty builder. */
   readonly onCreate: () => void;
-  /** Open the builder in edit mode. */
+
+  /** Fires when the user opens the builder in edit mode. */
   readonly onEdit: (id: string) => void;
 }
 
-/** Codes dashboard — searchable list, per-row Edit / Enable-Disable / Delete. Fetches and mutations are owner-scoped via the credentials cookie. */
+/** Renders the codes dashboard — searchable list, per-row Edit / Enable-Disable / Delete. Fetches and mutations are owner-scoped via the credentials cookie. */
 export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
   const [codes, setCodes] = useState<CodeDto[]>([]);
   const [query, setQuery] = useState("");

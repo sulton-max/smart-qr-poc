@@ -1,16 +1,18 @@
-import { contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, TextAreaField, TextField } from "./fields";
+import { ContentTypeId, contentType } from "@/domain/codes/content";
+import { type ContentControlsProps, FieldRenderer } from "./fields";
 
-const [to, subject, body] = contentType("email").fields;
+// to is an email; subject is single-line; body is a textarea (kinds come from the registry).
+const fields = contentType(ContentTypeId.Email).fields;
 
-/** Email content — recipient, optional subject, optional (multiline) body. */
-export function EmailControls({ values, onChange }: ContentControlsProps) {
-  const set = (key: string, v: string) => onChange({ ...values, [key]: v });
+/** Renders email content — recipient, optional subject, optional (multiline) body. */
+export function EmailControls({ fieldValues, onChange }: ContentControlsProps) {
+  const setValue = (key: string, v: string) => onChange({ ...fieldValues, [key]: v });
+
   return (
     <>
-      <TextField label={to.label} value={values[to.key] ?? ""} placeholder={to.placeholder} onChange={(v) => set(to.key, v)} />
-      <TextField label={subject.label} value={values[subject.key] ?? ""} placeholder={subject.placeholder} onChange={(v) => set(subject.key, v)} />
-      <TextAreaField label={body.label} value={values[body.key] ?? ""} placeholder={body.placeholder} onChange={(v) => set(body.key, v)} />
+      {fields.map((f) => (
+        <FieldRenderer key={f.key} field={f} value={fieldValues[f.key]} onChange={(v) => setValue(f.key, v)} />
+      ))}
     </>
   );
 }

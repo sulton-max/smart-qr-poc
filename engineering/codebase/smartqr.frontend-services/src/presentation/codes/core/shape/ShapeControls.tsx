@@ -5,8 +5,8 @@ import { FinderShape, ModuleShape } from "@/domain/codes/core";
 
 import { FinderShapeDisplays, ModuleShapeDisplays } from "./ShapeDisplays";
 
-const MODULE_SHAPES = Object.keys(ModuleShapeDisplays) as ModuleShape[];
-const FINDER_SHAPES = Object.keys(FinderShapeDisplays) as FinderShape[];
+const ModuleShapes = Object.keys(ModuleShapeDisplays) as ModuleShape[];
+const FinderShapes = Object.keys(FinderShapeDisplays) as FinderShape[];
 
 /** Defines props for the shape controls. */
 export interface ShapeControlsProps {
@@ -43,7 +43,7 @@ export function ShapeControls({
       {/* Body — the module (data cell) shape. */}
       <ControlGroup label="Body" orientation="vertical" divided={false}>
         <OptionTileGroup label="Body shape" wrap>
-          {MODULE_SHAPES.map((shape) => (
+          {ModuleShapes.map((shape) => (
             <OptionTile
               key={shape}
               selected={moduleShape === shape}
@@ -62,7 +62,7 @@ export function ShapeControls({
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 text-xs text-muted-foreground">External</div>
             <OptionTileGroup label="External eye" wrap>
-              {FINDER_SHAPES.map((shape) => (
+              {FinderShapes.map((shape) => (
                 <OptionTile
                   key={shape}
                   selected={finderShape === shape}
@@ -78,7 +78,7 @@ export function ShapeControls({
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 text-xs text-muted-foreground">Internal</div>
             <OptionTileGroup label="Internal eye" wrap>
-              {FINDER_SHAPES.map((shape) => (
+              {FinderShapes.map((shape) => (
                 <OptionTile
                   key={shape}
                   selected={finderDotShape === shape}

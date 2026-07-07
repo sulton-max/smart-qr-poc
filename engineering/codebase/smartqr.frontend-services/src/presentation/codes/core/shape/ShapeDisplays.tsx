@@ -6,10 +6,7 @@ import { FinderShape, ModuleShape } from "@/domain/codes/core";
 
 /** Defines the display for a module-shape option. */
 interface ModuleShapeDisplay {
-  /** The option's label. */
   readonly label: string;
-
-  /** The preview glyph. */
   readonly icon: ReactNode;
 }
 
@@ -47,13 +44,8 @@ export const ModuleShapeDisplays: Record<ModuleShape, ModuleShapeDisplay> = {
 
 /** Defines the display for a finder-eye shape option — label + outer-frame / inner-pupil glyphs. */
 interface FinderShapeDisplay {
-  /** The option's label. */
   readonly label: string;
-
-  /** The outer-frame preview glyph. */
   readonly icon: ReactNode;
-
-  /** The inner-pupil preview glyph. */
   readonly dotIcon: ReactNode;
 }
 
