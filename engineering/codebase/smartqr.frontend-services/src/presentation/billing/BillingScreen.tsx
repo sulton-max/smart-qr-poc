@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { ArrowUpRight, Check, CreditCard, Infinity as InfinityIcon } from "lucide-react";
+
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
 import { Card, Heading, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert, Banner, MeterBar, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Grid, HStack, Stack } from "@wow-two-beta/ui/presentation/layout";
-import { ArrowUpRight, Check, CreditCard, Infinity as InfinityIcon } from "lucide-react";
+
 import { PAID_PLANS, Plan } from "@/domain/billing";
 import type { BillingStatus } from "@/domain/billing";
 import { createCheckout, createPortal, getBilling } from "@/integration/billing";
@@ -128,7 +131,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
   return (
     <Stack gap="6">
       <div>
-        <Heading level={1} size="xl" weight="bold">
+        <Heading level={1} size={SizePreset.Xl} weight="bold">
           Billing
         </Heading>
         <Text color="muted">Manage your plan, usage, and payment method.</Text>
@@ -155,7 +158,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
 
       {loading ? (
         <Center className="min-h-[40vh]">
-          <Spinner size="lg" label="Loading billing" />
+          <Spinner size={SizePreset.Lg} label="Loading billing" />
         </Center>
       ) : (
         <>
@@ -170,11 +173,11 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                     {currentPlan === Plan.Free ? "Free plan" : "Active"}
                   </span>
                 </div>
-                <Text size="sm" color="muted" className="mt-1">{PLAN_META[currentPlan].tagline}</Text>
+                <Text size={SizePreset.Sm} color="muted" className="mt-1">{PLAN_META[currentPlan].tagline}</Text>
               </div>
               <Button
-                variant="outline"
-                tone="neutral"
+                variant={ButtonVariant.Outline}
+                tone={ColorTone.Neutral}
                 leadingSlot={<CreditCard size={16} />}
                 isLoading={openingPortal}
                 loadingText="Opening…"
@@ -209,7 +212,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                 />
               )}
               {!unlimited && codeCount >= maxCodes && (
-                <Text size="sm" color="warning" className="mt-2">
+                <Text size={SizePreset.Sm} color="warning" className="mt-2">
                   You've reached your plan's code limit. Upgrade to create more — your existing codes keep
                   working regardless.
                 </Text>
@@ -220,7 +223,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
           {/* ── Upgrade options ── */}
           {upgradePlans.length > 0 ? (
             <Stack gap="3">
-              <Heading level={2} size="md" weight="semibold">
+              <Heading level={2} size={SizePreset.Md} weight="semibold">
                 {currentPlan === Plan.Free ? "Choose a plan" : "Upgrade"}
               </Heading>
               <Grid columns={{ base: "1", sm: "2", lg: "3" }} gap="4">
@@ -236,7 +239,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                             {meta.cadence}
                           </span>
                         </HStack>
-                        <Text size="sm" color="muted" className="mt-1">{meta.tagline}</Text>
+                        <Text size={SizePreset.Sm} color="muted" className="mt-1">{meta.tagline}</Text>
                       </div>
                       <ul className="flex flex-1 flex-col gap-2 text-sm">
                         {meta.highlights.map((h) => (
@@ -247,7 +250,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
                         ))}
                       </ul>
                       <Button
-                        tone="primary"
+                        tone={ColorTone.Primary}
                         isFullWidth
                         trailingSlot={<ArrowUpRight size={16} />}
                         isLoading={upgradingTo === plan}
@@ -264,7 +267,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
             </Stack>
           ) : (
             <Card className="surface-soft p-6">
-              <Text size="sm" color="muted">
+              <Text size={SizePreset.Sm} color="muted">
                 You're on the top plan — nothing more to upgrade to. Use{" "}
                 <span className="font-medium text-foreground">Manage billing</span> to update your payment
                 method or cancel.

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, CopyButton, ToggleButton, ToggleButtonGroup } from "@wow-two-beta/ui/presentation/actions";
+import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant, CopyButton, ToggleButton, ToggleButtonGroup, ToggleButtonGroupVariant, ToggleMode } from "@wow-two-beta/ui/presentation/actions";
 import { ColorPicker, Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
-import { Accordion, Card, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Accordion, AccordionType, Card, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
@@ -209,7 +210,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   if (loading) {
     return (
       <Center className="min-h-[60vh]">
-        <Spinner size="lg" label="Loading code" />
+        <Spinner size={SizePreset.Lg} label="Loading code" />
       </Center>
     );
   }
@@ -219,9 +220,9 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       <Stack gap="2">
         {onBack && (
           <Button
-            variant="ghost"
-            tone="neutral"
-            size="sm"
+            variant={ButtonVariant.Ghost}
+            tone={ColorTone.Neutral}
+            size={SizePreset.Sm}
             leadingSlot={<ArrowLeft size={16} />}
             className="-ml-2 self-start"
             onClick={onBack}
@@ -230,7 +231,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           </Button>
         )}
         <div>
-          <Heading level={1} size="xl" weight="bold">
+          <Heading level={1} size={HeadingSize.Xl} weight="bold">
             {isEdit ? "Edit code" : "Create a code"}
           </Heading>
           <Text color="muted">
@@ -244,8 +245,8 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
       <Grid columns={{ base: "1", lg: "2" }} gap="6">
         {/* ── Builder ── */}
         <Card className="surface-soft flex flex-col gap-5 p-6">
-          <ToggleButtonGroup variant="segmented"
-            type="single"
+          <ToggleButtonGroup variant={ToggleButtonGroupVariant.Segmented}
+            type={ToggleMode.Single}
             value={tab}
             onValueChange={(v) => v && setTab(v as typeof tab)}
             aria-label="Builder section"
@@ -318,7 +319,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
               {/* Layout D: one styling section open at a time — caps height, scales to any number of sections. */}
               <Accordion
-                type="single"
+                type={AccordionType.Single}
                 defaultValue="colors"
                 isCollapsible
                 className="overflow-hidden rounded-lg border border-border"
@@ -342,8 +343,8 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                             under Transparent. */}
                         <div className="flex min-h-10 items-center justify-between gap-4 border-t border-border pt-2">
                           <span className="text-sm text-muted-foreground">Background</span>
-                          <ToggleButtonGroup variant="segmented"
-                            type="single"
+                          <ToggleButtonGroup variant={ToggleButtonGroupVariant.Segmented}
+                            type={ToggleMode.Single}
                             value={transparentBackground ? "transparent" : "color"}
                             onValueChange={(v) => {
                               if (v === "color") setTransparentBackground(false);
@@ -351,7 +352,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                             }}
                             aria-label="Background fill"
                           >
-                            <ToggleButton value="color" size="sm" as="div" className="gap-2">
+                            <ToggleButton value="color" size={SizePreset.Sm} as="div" className="gap-2">
                               <span
                                 className={`inline-flex items-center${transparentBackground ? " pointer-events-none opacity-40" : ""}`}
                               >
@@ -365,7 +366,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                               </span>
                               Color
                             </ToggleButton>
-                            <ToggleButton value="transparent" size="sm">Transparent</ToggleButton>
+                            <ToggleButton value="transparent" size={SizePreset.Sm}>Transparent</ToggleButton>
                           </ToggleButtonGroup>
                         </div>
                       </Stack>
@@ -405,7 +406,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           </div>
 
           <Button
-            tone="primary"
+            tone={ColorTone.Primary}
             isFullWidth
             isLoading={saving}
             loadingText={isEdit ? "Saving…" : "Creating…"}
@@ -420,7 +421,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         {/* ── Preview ── */}
         <Card className="surface-soft flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
           <QrPreview value={previewValue} content={previewContent} codeType={previewCodeType} style={previewStyle} />
-          <Text size="xs" color="muted" align="center">
+          <Text size={SizePreset.Xs} color="muted" align="center">
             Live preview — the final asset rendered server-side (vector-first), so what you see
             is what you download.
           </Text>
@@ -437,46 +438,46 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
           {saved && (
             <Surface
-              variant="subtle"
-              tone="neutral"
+              variant={SurfaceVariant.Subtle}
+              tone={ColorTone.Neutral}
               radius="lg"
               padding="md"
               className="w-full"
             >
-              <Text size="sm" weight="medium">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
+              <Text size={SizePreset.Sm} weight="medium" role="status">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
               {isDynamicContent(saved.content) ? (
-                <Text size="sm" color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
+                <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
                   {saved.shortUrl}
                 </Text>
               ) : (
-                <Text size="sm" color="muted" className="mt-1">
+                <Text size={SizePreset.Sm} color="muted" className="mt-1">
                   Payload baked into the code — it works offline, with no redirect.
                 </Text>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {isDynamicContent(saved.content) && (
-                  <CopyButton size="sm" text={saved.shortUrl} aria-label="Copy short URL">
+                  <CopyButton size={SizePreset.Sm} text={saved.shortUrl} aria-label="Copy short URL">
                     Copy link
                   </CopyButton>
                 )}
-                <Button asChild size="sm" variant="outline" tone="neutral">
+                <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
                   <a href={codeImageUrl(saved.id, "svg")} target="_blank" rel="noreferrer">
                     SVG
                   </a>
                 </Button>
-                <Button asChild size="sm" variant="outline" tone="neutral">
+                <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
                   <a href={codeImageUrl(saved.id, "png")} target="_blank" rel="noreferrer">
                     PNG
                   </a>
                 </Button>
                 {isEdit ? (
                   onBack && (
-                    <Button size="sm" variant="ghost" tone="neutral" onClick={onBack}>
+                    <Button size={SizePreset.Sm} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} onClick={onBack}>
                       Done
                     </Button>
                   )
                 ) : (
-                  <Button size="sm" variant="ghost" tone="neutral" onClick={reset}>
+                  <Button size={SizePreset.Sm} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} onClick={reset}>
                     Create another
                   </Button>
                 )}

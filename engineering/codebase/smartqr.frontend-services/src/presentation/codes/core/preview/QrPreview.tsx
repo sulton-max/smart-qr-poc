@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import type { CodeContent, CodeType, PreviewStyle } from "@/domain/codes";
 import { previewCode } from "@/integration/codes";
@@ -112,12 +113,13 @@ export function QrPreview({
         <div
           className={`absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-[1px] ${LoadingScrimLight} ${LoadingScrimDark}`}
         >
-          <Spinner size="md" label="Rendering preview" />
+          <Spinner size={SizePreset.Md} label="Rendering preview" />
         </div>
       )}
 
       {error && (
         <div
+          role="status"
           className="absolute inset-0 flex items-center justify-center rounded-xl p-4 text-center text-xs"
           style={{ color: ErrorTextColor }}
         >

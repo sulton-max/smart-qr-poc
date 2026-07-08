@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/presentation/actions";
-import { Heading, Text } from "@wow-two-beta/ui/presentation/display";
-import { Container, Grid } from "@wow-two-beta/ui/presentation/layout";
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
+import { Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
+import { Container, ContainerSize, Grid } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowRight, Infinity as InfinityIcon } from "lucide-react";
 import { usePageMeta } from "@/presentation/common";
 import { FAQS, FEATURES, STEPS } from "./data";
@@ -29,7 +30,7 @@ export function LandingPage() {
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
         <Container
-          size="full"
+          size={ContainerSize.Full}
           className="grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-2"
         >
           <div>
@@ -37,22 +38,22 @@ export function LandingPage() {
               <InfinityIcon size={14} className="text-primary" />
               Codes never expire — on every plan
             </span>
-            <Heading level={1} size="3xl" weight="bold" className="mt-5 leading-[1.1] sm:text-5xl">
+            <Heading level={1} size={HeadingSize.Xxxl} weight="bold" className="mt-5 leading-[1.1] sm:text-5xl">
               A QR code smart enough to route every scan — and that you'll never reprint.
             </Heading>
-            <Text size="lg" color="muted" className="mt-5">
+            <Text size={SizePreset.Lg} color="muted" className="mt-5">
               Programmable routing, every code type, one flat price. Print it once; reprogram it
               forever; it never expires on you.
             </Text>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild tone="primary">
+              <Button asChild tone={ColorTone.Primary}>
                 <Link to="/app/new">Get started free</Link>
               </Button>
-              <Button asChild tone="neutral" variant="outline">
+              <Button asChild tone={ColorTone.Neutral} variant={ButtonVariant.Outline}>
                 <Link to="/pricing">See pricing</Link>
               </Button>
             </div>
-            <Text size="xs" color="muted" className="mt-4">
+            <Text size={SizePreset.Xs} color="muted" className="mt-4">
               No account required · Unlimited scans · Free forever tier
             </Text>
           </div>
@@ -113,7 +114,7 @@ export function LandingPage() {
           <PricingCards />
         </div>
         <div className="mt-8 text-center">
-          <Button asChild variant="ghost" tone="primary">
+          <Button asChild variant={ButtonVariant.Ghost} tone={ColorTone.Primary}>
             <Link to="/pricing" className="inline-flex items-center gap-1">
               Compare plans in detail <ArrowRight size={15} />
             </Link>

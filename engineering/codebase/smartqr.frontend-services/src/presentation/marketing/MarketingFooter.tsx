@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Heading, Text } from "@wow-two-beta/ui/presentation/display";
-import { Container, Grid, VStack } from "@wow-two-beta/ui/presentation/layout";
+import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
+import { Container, ContainerSize, Grid, VStack } from "@wow-two-beta/ui/presentation/layout";
 import { Logo } from "./components";
 import { BRAND } from "./data";
 
@@ -20,14 +21,14 @@ export function MarketingFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-border bg-muted/30">
-      <Container size="full" className="max-w-6xl px-6 py-12">
+      <Container size={ContainerSize.Full} className="max-w-6xl px-6 py-12">
         <Grid columns="1" gap="10" className="sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <Logo />
-            <Text size="sm" color="muted" className="mt-3 max-w-xs">
+            <Text size={SizePreset.Sm} color="muted" className="mt-3 max-w-xs">
               {BRAND.pitch}
             </Text>
-            <Text size="xs" color="muted" className="mt-4">
+            <Text size={SizePreset.Xs} color="muted" className="mt-4">
               No hostage codes. No scan caps. No nags.
             </Text>
           </div>
@@ -48,7 +49,7 @@ export function MarketingFooter() {
 function FooterColumn({ title, links }: { title: string; links: { to: string; label: string }[] }) {
   return (
     <div>
-      <Heading level={3} size="xs" weight="semibold" className="tracking-normal">
+      <Heading level={3} size={HeadingSize.Xs} weight="semibold" className="tracking-normal">
         {title}
       </Heading>
       <VStack as="ul" gap="2" className="mt-3">

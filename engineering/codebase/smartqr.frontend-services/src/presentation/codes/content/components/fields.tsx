@@ -4,9 +4,28 @@
 // drive the flat `FieldValues` form-state model (a separate pass restructures the data flow later).
 
 import { Field, Select as SdkSelect, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { useFormControl } from "@wow-two-beta/ui/foundation/primitives";
 
 import { FieldKind, type ContentField, type FieldValues } from "@/domain/codes/content";
 import { NativeInputStyles } from "./NativeInputStyles";
+
+/**
+ * Provides access to the enclosing SDK `Field` context as spreadable native-element props (id + aria).
+ * SDK atoms (TextInput, Select) auto-wire via context; a raw `<textarea>` / `<input>` does not, so without
+ * this the `<label>`'s `htmlFor` points at an element with no matching `id` and the label goes unassociated.
+ */
+function useNativeFieldProps() {
+  const control = useFormControl();
+  if (!control) return {};
+  return {
+    id: control.id,
+    "aria-invalid": control.isInvalid || undefined,
+    "aria-describedby": control.isInvalid ? control.errorId : undefined,
+    required: control.isRequired || undefined,
+    disabled: control.isDisabled || undefined,
+    readOnly: control.isReadOnly || undefined,
+  };
+}
 
 /** Defines the shared props for every per-type control group — keeps the flat `FieldValues` form-state model. */
 export interface ContentControlsProps {
@@ -43,9 +62,11 @@ export function TextField({ label, value, placeholder, onChange }: TextFieldProp
 
 /** Renders a multi-line text input (native `<textarea>` styled to match the SDK TextInput). */
 export function TextAreaField({ label, value, placeholder, onChange }: TextFieldProps) {
+  const fieldProps = useNativeFieldProps();
   return (
     <Field label={label}>
       <textarea
+        {...fieldProps}
         className={NativeInputStyles}
         rows={3}
         value={value}
@@ -70,9 +91,16 @@ interface DateTimeFieldProps {
 
 /** Renders a native `datetime-local` input styled to match the SDK TextInput. */
 export function DateTimeField({ label, value, onChange }: DateTimeFieldProps) {
+  const fieldProps = useNativeFieldProps();
   return (
     <Field label={label}>
-      <input type="datetime-local" className={NativeInputStyles} value={value} onChange={(e) => onChange(e.target.value)} />
+      <input
+        type="datetime-local"
+        {...fieldProps}
+        className={NativeInputStyles}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </Field>
   );
 }

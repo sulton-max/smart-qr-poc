@@ -1,8 +1,11 @@
 import { useState } from "react";
+
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Button } from "@wow-two-beta/ui/presentation/actions";
 import { Card, Heading, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Divider, Stack } from "@wow-two-beta/ui/presentation/layout";
+
 import type { Me } from "@/domain/identity";
 import { GOOGLE_CLIENT_ID } from "@/integration/common";
 import { createGuest } from "@/integration/identity";
@@ -34,10 +37,10 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
       <Card className="surface-soft w-full max-w-sm p-8">
         <Stack gap="5">
           <div>
-            <Heading level={1} size="xl" weight="bold">
+            <Heading level={1} size={SizePreset.Xl} weight="bold">
               Welcome to Smart QR
             </Heading>
-            <Text size="sm" color="muted" className="mt-1">
+            <Text size={SizePreset.Sm} color="muted" className="mt-1">
               Programmable codes that never expire.
             </Text>
           </div>
@@ -47,7 +50,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
               <GoogleSignInButton onSignedIn={onAuthenticated} onError={setError} />
             </div>
           ) : (
-            <Text size="xs" color="muted" align="center">
+            <Text size={SizePreset.Xs} color="muted" align="center">
               Google sign-in isn't configured yet.
             </Text>
           )}
@@ -55,7 +58,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
           <Divider label="or" />
 
           <Button
-            tone="primary"
+            tone={ColorTone.Primary}
             isFullWidth
             isLoading={loading}
             loadingText="Setting up…"

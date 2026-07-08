@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Button, CopyButton } from "@wow-two-beta/ui/presentation/actions";
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant, CopyButton } from "@wow-two-beta/ui/presentation/actions";
 import { SearchInput } from "@wow-two-beta/ui/presentation/forms";
-import { Card, EmptyState, Heading, Text } from "@wow-two-beta/ui/presentation/display";
+import { Card, EmptyState, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, HStack, Stack } from "@wow-two-beta/ui/presentation/layout";
 import {
@@ -86,12 +87,12 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
     <Stack gap="6">
       <HStack wrap="wrap" align="end" justify="between" gap="4">
         <div>
-          <Heading level={1} size="xl" weight="bold">
+          <Heading level={1} size={HeadingSize.Xl} weight="bold">
             Your codes
           </Heading>
           <Text color="muted">Manage destinations and routing — nothing ever expires.</Text>
         </div>
-        <Button tone="primary" leadingSlot={<Plus size={16} />} onClick={onCreate}>
+        <Button tone={ColorTone.Primary} leadingSlot={<Plus size={16} />} onClick={onCreate}>
           Create new
         </Button>
       </HStack>
@@ -100,6 +101,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
         <SearchInput
           value={query}
           placeholder="Search by name or destination…"
+          aria-label="Search codes"
           onChange={(e) => setQuery(e.target.value)}
           onClear={() => setQuery("")}
         />
@@ -109,7 +111,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
 
       {loading ? (
         <Center className="min-h-[40vh]">
-          <Spinner size="lg" label="Loading codes" />
+          <Spinner size={SizePreset.Lg} label="Loading codes" />
         </Center>
       ) : codes.length === 0 ? (
         <Card className="surface-soft p-6">
@@ -123,7 +125,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
             }
             actions={
               !query && (
-                <Button tone="primary" leadingSlot={<Plus size={16} />} onClick={onCreate}>
+                <Button tone={ColorTone.Primary} leadingSlot={<Plus size={16} />} onClick={onCreate}>
                   Create new
                 </Button>
               )
@@ -154,9 +156,9 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                   >
                     {code.shortUrl}
                   </a>
-                  <CopyButton size="xs" variant="ghost" tone="neutral" text={code.shortUrl} aria-label="Copy short URL" />
+                  <CopyButton size={SizePreset.Xs} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} text={code.shortUrl} aria-label="Copy short URL" />
                 </div>
-                <Text size="sm" color="muted" isTruncated className="mt-1" title={code.fallbackUrl}>
+                <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={code.fallbackUrl}>
                   → {code.fallbackUrl}
                 </Text>
               </div>
@@ -164,14 +166,14 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
               <div className="flex shrink-0 items-center gap-4 sm:gap-6">
                 <div className="text-right">
                   <div className="text-lg font-semibold tabular-nums">{code.scanCount.toLocaleString()}</div>
-                  <Text size="xs" color="muted">scans</Text>
+                  <Text size={SizePreset.Xs} color="muted">scans</Text>
                 </div>
 
                 <div className="flex items-center gap-1">
                   <Button
-                    size="sm"
-                    variant="ghost"
-                    tone="neutral"
+                    size={SizePreset.Sm}
+                    variant={ButtonVariant.Ghost}
+                    tone={ColorTone.Neutral}
                     leadingSlot={<Pencil size={15} />}
                     isDisabled={busyId === code.id}
                     onClick={() => onEdit(code.id)}
@@ -179,18 +181,18 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                     Edit
                   </Button>
                   <Button
-                    size="sm"
-                    variant="soft"
-                    tone="neutral"
+                    size={SizePreset.Sm}
+                    variant={ButtonVariant.Soft}
+                    tone={ColorTone.Neutral}
                     isLoading={busyId === code.id}
                     onClick={() => toggleActive(code)}
                   >
                     {code.isActive ? "Disable" : "Enable"}
                   </Button>
                   <Button
-                    size="sm"
-                    variant="ghost"
-                    tone="danger"
+                    size={SizePreset.Sm}
+                    variant={ButtonVariant.Ghost}
+                    tone={ColorTone.Danger}
                     shape="square"
                     aria-label="Delete code"
                     isDisabled={busyId === code.id}
@@ -222,7 +224,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
           <ModalFooter>
             <AlertModalCancel>Cancel</AlertModalCancel>
             <Button
-              tone="danger"
+              tone={ColorTone.Danger}
               isLoading={busyId === pendingDelete?.id}
               loadingText="Deleting…"
               onClick={confirmDelete}

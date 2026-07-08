@@ -1,7 +1,8 @@
 import { Fragment } from "react";
 import { ArrowLeftRight, ArrowRight } from "lucide-react";
 
-import { Button, OptionTile, OptionTileGroup, ToggleButton, ToggleButtonGroup } from "@wow-two-beta/ui/presentation/actions";
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant, OptionTile, OptionTileGroup, ToggleButton, ToggleButtonGroup, ToggleButtonGroupVariant, ToggleMode } from "@wow-two-beta/ui/presentation/actions";
 import { Separator } from "@wow-two-beta/ui/presentation/display";
 import { ColorPicker } from "@wow-two-beta/ui/presentation/forms";
 import { ControlGroup, Stack } from "@wow-two-beta/ui/presentation/layout";
@@ -63,14 +64,14 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
       {/* Fill mode — solid vs two-stop gradient. */}
       <ControlGroup label="Fill">
         <ToggleButtonGroup<FillType>
-          variant="segmented"
-          type="single"
+          variant={ToggleButtonGroupVariant.Segmented}
+          type={ToggleMode.Single}
           value={gradient === null ? FillType.Solid : FillType.Gradient}
           onValueChange={setFill}
           aria-label="Foreground fill"
         >
-          <ToggleButton value={FillType.Solid} size="sm">Solid</ToggleButton>
-          <ToggleButton value={FillType.Gradient} size="sm">Gradient</ToggleButton>
+          <ToggleButton value={FillType.Solid} size={SizePreset.Sm}>Solid</ToggleButton>
+          <ToggleButton value={FillType.Gradient} size={SizePreset.Sm}>Gradient</ToggleButton>
         </ToggleButtonGroup>
       </ControlGroup>
 
@@ -85,10 +86,10 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
               aria-label="Gradient start color"
             />
             <Button
-              variant="reveal"
-              tone="neutral"
+              variant={ButtonVariant.Reveal}
+              tone={ColorTone.Neutral}
               shape="square"
-              size="xs"
+              size={SizePreset.Xs}
               aria-label="Reverse gradient colors"
               onClick={() => onGradientChange(Gradient.reverseStops(gradient))}
               hoverSlot={<ArrowLeftRight size={PresetIconSize} />}
@@ -116,18 +117,18 @@ export function FillControls({ foreground, onForegroundChange, gradient, onGradi
       {gradient && (
         <div className="flex items-stretch gap-3 py-2">
           <ToggleButtonGroup<GradientType>
-            variant="segmented"
-            type="single"
+            variant={ToggleButtonGroupVariant.Segmented}
+            type={ToggleMode.Single}
             orientation="vertical"
             value={gradient.type}
             onValueChange={(v) => v && changeType(v)}
             aria-label="Gradient type"
             className="shrink-0 self-stretch"
           >
-            <ToggleButton value={GradientType.Linear} size="sm" className="flex-1">
+            <ToggleButton value={GradientType.Linear} size={SizePreset.Sm} className="flex-1">
               Linear
             </ToggleButton>
-            <ToggleButton value={GradientType.Radial} size="sm" className="flex-1">
+            <ToggleButton value={GradientType.Radial} size={SizePreset.Sm} className="flex-1">
               Radial
             </ToggleButton>
           </ToggleButtonGroup>

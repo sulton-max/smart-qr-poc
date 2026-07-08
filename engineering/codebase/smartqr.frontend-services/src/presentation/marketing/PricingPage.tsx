@@ -1,3 +1,4 @@
+import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Text } from "@wow-two-beta/ui/presentation/display";
 import { usePageMeta } from "@/presentation/common";
 import { PRICING_FAQS } from "./data";
@@ -23,11 +24,12 @@ export function PricingPage() {
           eyebrow="Pricing"
           title="Flat pricing. Unlimited scans. Codes that never expire."
           description="Every plan includes unlimited scans and the never-expire promise. Pay for more codes and routing power — never for the scans themselves."
+          level={1}
         />
         <div className="mt-12">
           <PricingCards />
         </div>
-        <Text size="sm" color="muted" align="center" className="mt-6">
+        <Text size={SizePreset.Sm} color="muted" align="center" className="mt-6">
           All plans: unlimited scans · codes never deactivate on downgrade · export &amp; delete
           anytime.
         </Text>

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
-import { Button } from "@wow-two-beta/ui/presentation/actions";
-import { Container, HStack, Navbar } from "@wow-two-beta/ui/presentation/layout";
+
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
 import { Text } from "@wow-two-beta/ui/presentation/display";
+import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
+import { Container, ContainerSize, HStack, Navbar } from "@wow-two-beta/ui/presentation/layout";
+
 import { UserKind, type Me } from "@/domain/identity";
 import { getMe, logout } from "@/integration/identity";
 import { ColorModeToggle } from "@/presentation/common";
@@ -70,21 +73,21 @@ export function AppLayout() {
             )}
             {me?.kind === UserKind.Guest && (
               <>
-                <Text as="span" size="sm" color="muted">
+                <Text as="span" size={SizePreset.Sm} color="muted">
                   Guest
                 </Text>
                 <GoogleSignInButton onSignedIn={(m) => setMe(m)} />
-                <Button tone="neutral" variant="outline" onClick={handleSignOut}>
+                <Button tone={ColorTone.Neutral} variant={ButtonVariant.Outline} onClick={handleSignOut}>
                   Sign out
                 </Button>
               </>
             )}
             {me?.kind === UserKind.User && me.user && (
               <>
-                <Text as="span" size="sm" color="muted">
+                <Text as="span" size={SizePreset.Sm} color="muted">
                   {me.user.name}
                 </Text>
-                <Button tone="neutral" variant="outline" onClick={handleSignOut}>
+                <Button tone={ColorTone.Neutral} variant={ButtonVariant.Outline} onClick={handleSignOut}>
                   Log out
                 </Button>
               </>
@@ -96,10 +99,10 @@ export function AppLayout() {
         }
       />
 
-      <Container as="main" size="lg" className="flex-1 px-6 py-8">
+      <Container as="main" size={ContainerSize.Lg} className="flex-1 px-6 py-8">
         {status === "checking" && (
           <div className="flex min-h-[60vh] items-center justify-center">
-            <Spinner size="lg" label="Loading" />
+            <Spinner size={SizePreset.Lg} label="Loading" />
           </div>
         )}
         {status === "gate" && (

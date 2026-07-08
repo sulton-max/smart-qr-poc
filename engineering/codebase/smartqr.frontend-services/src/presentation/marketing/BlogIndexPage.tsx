@@ -15,6 +15,7 @@ export function BlogIndexPage() {
         eyebrow="Blog"
         title="Why and how to use QR codes"
         description="Practical guides to getting QR codes right — from the squares that have to scan to the routing rules behind them."
+        level={1}
       />
       <Grid columns="1" gap="6" className="mx-auto mt-12 max-w-4xl sm:grid-cols-2">
         {POST_METAS.map((post) => (

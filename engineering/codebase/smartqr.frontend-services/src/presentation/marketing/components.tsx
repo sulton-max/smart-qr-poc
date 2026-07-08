@@ -1,8 +1,9 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/presentation/actions";
-import { Accordion, Badge, Card, FeatureCard as UiFeatureCard, Heading, PricingCard as UiPricingCard, StepCard as UiStepCard, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/presentation/display";
-import { Container, Grid, HStack, Section as UiSection, Surface, VStack } from "@wow-two-beta/ui/presentation/layout";
+import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
+import { Accordion, AccordionType, Badge, BadgeVariant, Card, FeatureCard as UiFeatureCard, Heading, HeadingSize, PricingCard as UiPricingCard, StepCard as UiStepCard, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from "@wow-two-beta/ui/presentation/display";
+import { Container, ContainerSize, Grid, HStack, Section as UiSection, Surface, VStack } from "@wow-two-beta/ui/presentation/layout";
 import {
   ArrowRight,
   Check,
@@ -35,6 +36,7 @@ function StaticQrPreview({
 }) {
   return (
     <div
+      aria-hidden
       className="inline-flex items-center justify-center rounded-xl p-4"
       style={{ backgroundColor: background }}
     >
@@ -79,36 +81,38 @@ export function Section({
       id={id}
       bleed
       py="none"
-      tone={muted ? "neutral" : undefined}
+      tone={muted ? ColorTone.Neutral : undefined}
       className={muted ? "border-transparent bg-muted/40" : undefined}
     >
-      <Container size="full" className={`max-w-6xl px-6 py-16 sm:py-20 ${className}`}>
+      <Container size={ContainerSize.Full} className={`max-w-6xl px-6 py-16 sm:py-20 ${className}`}>
         {children}
       </Container>
     </UiSection>
   );
 }
 
-/** Eyebrow, title, description block. */
+/** Eyebrow, title, description block. `level` sets the title's semantic heading tag (visual size is fixed); use `1` when this is the page's top heading. */
 export function SectionHeading({
   eyebrow,
   title,
   description,
   align = "center",
+  level = 2,
 }: {
   eyebrow?: string;
   title: string;
   description?: string;
   align?: "center" | "left";
+  level?: 1 | 2;
 }) {
   return (
     <div className={`max-w-2xl ${align === "center" ? "mx-auto text-center" : ""}`}>
       {eyebrow && (
-        <Text as="span" size="sm" weight="semibold" color="brand">
+        <Text as="span" size={SizePreset.Sm} weight="semibold" color="brand">
           {eyebrow}
         </Text>
       )}
-      <Heading level={2} size="2xl" weight="bold" className="mt-2">
+      <Heading level={level} size={HeadingSize.Xxl} weight="bold" className="mt-2">
         {title}
       </Heading>
       {description && (
@@ -158,11 +162,11 @@ function PricingCard({ tier }: { tier: PricingTier }) {
       featured={tier.featured}
     >
       {tier.featured ? (
-        <Button asChild tone="primary" isFullWidth>
+        <Button asChild tone={ColorTone.Primary} isFullWidth>
           <Link to={href}>{tier.cta}</Link>
         </Button>
       ) : (
-        <Button asChild tone="neutral" variant="outline" isFullWidth>
+        <Button asChild tone={ColorTone.Neutral} variant={ButtonVariant.Outline} isFullWidth>
           <Link to={href}>{tier.cta}</Link>
         </Button>
       )}
@@ -208,7 +212,7 @@ export function ComparisonTable() {
 export function FaqList({ items }: { items: Faq[] }) {
   return (
     <Accordion
-      type="single"
+      type={AccordionType.Single}
       isCollapsible
       defaultValue="0"
       className="mx-auto max-w-2xl divide-y divide-border overflow-hidden rounded-2xl border border-border [&>*]:border-b-0"
@@ -230,13 +234,13 @@ export function FaqList({ items }: { items: Faq[] }) {
 /** Closing call-to-action band. */
 export function CtaBand() {
   return (
-    <Container size="full" className="max-w-6xl px-6 pb-20">
+    <Container size={ContainerSize.Full} className="max-w-6xl px-6 pb-20">
       <Surface
-        variant="subtle"
-        tone="primary"
+        variant={SurfaceVariant.Subtle}
+        tone={ColorTone.Primary}
         className="rounded-3xl px-6 py-12 text-center sm:py-16"
       >
-        <Heading level={2} size="xl" weight="bold" className="sm:text-3xl">
+        <Heading level={2} size={HeadingSize.Xl} weight="bold" className="sm:text-3xl">
           Your codes, forever.
         </Heading>
         <Text color="muted" className="mx-auto mt-3 max-w-xl">
@@ -244,10 +248,10 @@ export function CtaBand() {
           never expires on you.
         </Text>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Button asChild tone="primary">
+          <Button asChild tone={ColorTone.Primary}>
             <Link to="/app/new">Create your first code</Link>
           </Button>
-          <Button asChild tone="neutral" variant="outline">
+          <Button asChild tone={ColorTone.Neutral} variant={ButtonVariant.Outline}>
             <Link to="/pricing">See pricing</Link>
           </Button>
         </div>
@@ -266,7 +270,7 @@ export function RoutingDemo() {
   ];
   return (
     <Card
-      variant="outline"
+      variant={SurfaceVariant.Outline}
       elevation={0}
       className="grid items-center gap-8 rounded-3xl bg-card p-8 lg:grid-cols-2"
     >
@@ -274,7 +278,7 @@ export function RoutingDemo() {
         <StaticQrPreview value="https://smartqr.app/demo" foreground="#18181b" background="#ffffff" size={200} />
       </div>
       <VStack gap="3">
-        <Text size="sm" weight="medium" color="muted">
+        <Text size={SizePreset.Sm} weight="medium" color="muted">
           One printed code resolves by context:
         </Text>
         {rules.map((rule) => {
@@ -296,7 +300,7 @@ export function RoutingDemo() {
             </HStack>
           );
         })}
-        <Text size="xs" color="muted">
+        <Text size={SizePreset.Xs} color="muted">
           …otherwise → your fallback URL. Change any of this without reprinting the code.
         </Text>
       </VStack>
@@ -324,21 +328,21 @@ export function BlogCard({ post }: { post: PostMeta }) {
   return (
     <Surface
       asChild
-      variant="outline"
+      variant={SurfaceVariant.Outline}
       radius="2xl"
       className="group flex flex-col bg-card p-6 transition-colors hover:border-primary/40"
     >
       <Link to={`/blog/${post.slug}`}>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant="brand" size="md" className="px-2.5 py-1 text-primary">
+          <Badge variant={BadgeVariant.Brand} size={SizePreset.Md} className="px-2.5 py-1 text-primary">
             {post.tag}
           </Badge>
           <span>{post.readingMinutes} min read</span>
         </div>
-        <Heading level={3} size="md" className="mt-4 leading-snug tracking-normal group-hover:text-primary">
+        <Heading level={3} size={HeadingSize.Md} className="mt-4 leading-snug tracking-normal group-hover:text-primary">
           {post.title}
         </Heading>
-        <Text size="sm" color="muted" className="mt-2 flex-1 leading-relaxed">
+        <Text size={SizePreset.Sm} color="muted" className="mt-2 flex-1 leading-relaxed">
           {post.description}
         </Text>
         <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">

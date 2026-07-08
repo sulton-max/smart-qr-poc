@@ -1,6 +1,9 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Button } from "@wow-two-beta/ui/presentation/actions";
-import { Container, HStack } from "@wow-two-beta/ui/presentation/layout";
+
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
+import { Container, ContainerSize, HStack } from "@wow-two-beta/ui/presentation/layout";
+
 import { ColorModeToggle } from "@/presentation/common";
 import { Logo, MarketingFooter } from "@/presentation/marketing";
 
@@ -16,7 +19,7 @@ export function MarketingLayout() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
         <Container
-          size="full"
+          size={ContainerSize.Full}
           className="flex max-w-6xl items-center justify-between gap-4 px-6 py-3.5"
         >
           <Link to="/" aria-label="Smart QR home">
@@ -32,10 +35,10 @@ export function MarketingLayout() {
           </nav>
           <HStack align="center" gap="2">
             <ColorModeToggle />
-            <Button asChild variant="ghost" tone="neutral" size="sm" className="hidden sm:inline-flex">
+            <Button asChild variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} size={SizePreset.Sm} className="hidden sm:inline-flex">
               <Link to="/app">Open app</Link>
             </Button>
-            <Button asChild tone="primary" size="sm">
+            <Button asChild tone={ColorTone.Primary} size={SizePreset.Sm}>
               <Link to="/app/new">Get started</Link>
             </Button>
           </HStack>

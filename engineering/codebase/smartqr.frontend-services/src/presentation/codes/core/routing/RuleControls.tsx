@@ -1,4 +1,5 @@
-import { Button } from "@wow-two-beta/ui/presentation/actions";
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
 import { Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import { Sortable } from "@wow-two-beta/ui/presentation/display";
 import { ArrowRight, GripVertical, Plus, Trash2 } from "lucide-react";
@@ -109,8 +110,8 @@ export function RuleControls({ rules, onChange }: RuleControlsProps) {
             </div>
 
             <Button
-              tone="danger"
-              variant="ghost"
+              tone={ColorTone.Danger}
+              variant={ButtonVariant.Ghost}
               shape="square"
               aria-label="Remove rule"
               onClick={() => remove(rule.id)}
@@ -122,9 +123,9 @@ export function RuleControls({ rules, onChange }: RuleControlsProps) {
       </Sortable>
 
       <Button
-        variant="ghost"
-        tone="neutral"
-        size="sm"
+        variant={ButtonVariant.Ghost}
+        tone={ColorTone.Neutral}
+        size={SizePreset.Sm}
         isFullWidth
         leadingSlot={<Plus size={16} />}
         onClick={add}
