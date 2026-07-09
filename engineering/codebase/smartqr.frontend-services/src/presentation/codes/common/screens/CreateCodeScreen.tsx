@@ -394,7 +394,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   <Accordion.Trigger>Center</Accordion.Trigger>
                   <Accordion.Content>
                     <div className="px-3 py-2">
-                      <EmojiControls emoji={emoji} onChange={setEmoji} />
+                      <EmojiControls emoji={emoji} onChange={setEmoji} size={{ icon: 16 }} />
                     </div>
                   </Accordion.Content>
                 </Accordion.Item>

@@ -1,5 +1,6 @@
 import { OptionTile, OptionTileGroup } from "@wow-two-beta/ui/presentation/actions";
 import { ControlGroup, Divider, Stack } from "@wow-two-beta/ui/presentation/layout";
+import { Orientation } from "@wow-two-beta/ui/foundation/utils";
 
 import { FinderShape, ModuleShape } from "@/domain/codes/core";
 
@@ -41,7 +42,7 @@ export function ShapeControls({
   return (
     <Stack gap="2">
       {/* Body — the module (data cell) shape. */}
-      <ControlGroup label="Body" orientation="vertical" divided={false}>
+      <ControlGroup label="Body" orientation={Orientation.Vertical} divided={false}>
         <OptionTileGroup label="Body shape" wrap>
           {ModuleShapes.map((shape) => (
             <OptionTile
@@ -56,8 +57,10 @@ export function ShapeControls({
         </OptionTileGroup>
       </ControlGroup>
 
+      <Divider orientation={Orientation.Horizontal} />
+
       {/* Eyes — the finder frame (external) + pupil (internal). */}
-      <ControlGroup label="Eyes" orientation="vertical" divided={false}>
+      <ControlGroup label="Eyes" orientation={Orientation.Vertical} divided={false}>
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 text-xs text-muted-foreground">External</div>
@@ -74,7 +77,7 @@ export function ShapeControls({
               ))}
             </OptionTileGroup>
           </div>
-          <Divider orientation="vertical" />
+          <Divider orientation={Orientation.Vertical} />
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 text-xs text-muted-foreground">Internal</div>
             <OptionTileGroup label="Internal eye" wrap>

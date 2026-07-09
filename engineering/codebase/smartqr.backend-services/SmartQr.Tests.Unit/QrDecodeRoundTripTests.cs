@@ -83,7 +83,7 @@ public sealed class QrDecodeRoundTripTests
     public void Center_emoji_qr_still_decodes_to_its_payload()
     {
         // The emoji halo clears the center; the auto-bumped ECC=H reconstructs the occluded modules.
-        var style = StyleSpec.Default with { Emoji = new EmojiSpec { Char = "🎉", SizeRatio = 0.25 } };
+        var style = StyleSpec.Default with { Emoji = new EmojiSpec { Glyph = "🎉", SizeRatio = 0.25 } };
 
         Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
     }
@@ -92,7 +92,7 @@ public sealed class QrDecodeRoundTripTests
     public void Max_size_center_emoji_qr_still_decodes_to_its_payload()
     {
         // Worst case — the max-clamped emoji size (0.27). The halo + ECC=H must still leave the symbol readable.
-        var style = StyleSpec.Default with { Emoji = new EmojiSpec { Char = "🔥", SizeRatio = 0.27 } };
+        var style = StyleSpec.Default with { Emoji = new EmojiSpec { Glyph = "🔥", SizeRatio = 0.27 } };
 
         Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
     }

@@ -1,22 +1,18 @@
-import { Button } from "@wow-two-beta/ui/presentation/actions";
-import { SearchInput } from "@wow-two-beta/ui/presentation/forms";
+import { useCallback, useMemo } from "react";
+
+import { EmojiCatalog, type EmojiCatalogEntry } from "@wow-two-beta/ui/domain/emoji";
+import { localStorageStorageBroker, type StorageBroker } from "@wow-two-beta/ui/foundation/storage";
+import {
+  type CategoryNavVariant,
+  DefaultEmojiSize,
+  EmojiPicker,
+  type EmojiPickerSizeInput,
+  EmojiSizeControl,
+  type EmojiTileShape,
+} from "@wow-two-beta/ui/presentation/forms";
 import { Stack } from "@wow-two-beta/ui/presentation/layout";
 
 import { type DesignEmojiOverlay } from "@/domain/codes/core";
-
-import {
-  CategoryNav,
-  CategoryNavVariant,
-  DefaultPickerSize,
-  EmojiAccordion,
-  EmojiEmptyLabels,
-  EmojiGrid,
-  type EmojiPickerSize,
-  EmojiSizeControl,
-  EmojiTileShape,
-  RecentCategory,
-  useEmojiPicker,
-} from "./emoji";
 
 /** Defines props for the center-emoji picker. */
 export interface EmojiControlsProps {
@@ -30,114 +26,79 @@ export interface EmojiControlsProps {
   readonly categoryNavVariant?: CategoryNavVariant;
 
   /** The element scale — one value for every element, or a per-element `{ search, nav, tile }`. Default `md`. */
-  readonly size?: EmojiPickerSize | { search?: EmojiPickerSize; nav?: EmojiPickerSize; tile?: EmojiPickerSize };
+  readonly size?: EmojiPickerSizeInput;
 
-  /** The emoji-tile frame — rounded chip, circle, or borderless. Default `rounded`. */
+  /** The emoji-tile frame — rounded chip or circle. Default `rounded`. */
   readonly tileShape?: EmojiTileShape;
 
   /** The scrollable tile viewport's height, in tile rows. Default `6`. */
   readonly rowsCount?: number;
+
+  /** The heading rendered above the picker. Default `Center emoji`. */
+  readonly label?: string;
+
+  /** Open on the first category when there are no recents yet. Default `true`. */
+  readonly showFirstCategoryWhenRecentsEmpty?: boolean;
+
+  /** The persistence contract for recents — defaults to `localStorageStorageBroker`; swap for a Redux-backed broker, etc. */
+  readonly recentsStorageBroker?: StorageBroker;
 }
 
-/** Resolves the `size` prop to a per-element scale, falling back to `DefaultPickerSize`. */
-function resolveSizes(size: EmojiControlsProps["size"]): {
-  search: EmojiPickerSize;
-  nav: EmojiPickerSize;
-  tile: EmojiPickerSize;
-} {
-  if (typeof size === "string") return { search: size, nav: size, tile: size };
-  return {
-    search: size?.search ?? DefaultPickerSize,
-    nav: size?.nav ?? DefaultPickerSize,
-    tile: size?.tile ?? DefaultPickerSize,
-  };
-}
+/** @internal The largest preview glyph, in px, that still fits an `OptionTile` without clipping its frame. */
+const MaxPreviewGlyph = 24;
 
 /**
- * Center-emoji picker (v0.5) — search + recents + a swappable category nav over the full emoji set. `null` = none.
+ * Center-emoji picker — the app's thin adapter over the SDK `EmojiPicker` + `EmojiSizeControl`. Bridges the
+ * builder's `DesignEmojiOverlay { glyph, sizeRatio }` to the picker's `EmojiCatalogEntry` (resolved via the
+ * catalog) and adds the per-emoji size row (size is an app concern the picker deliberately leaves out).
  * Rides the live preview `style.emoji`; the backend bumps ECC to H so the code still scans.
  */
 export function EmojiControls({
   emoji,
   onChange,
-  categoryNavVariant = CategoryNavVariant.Strip,
+  categoryNavVariant,
   size,
-  tileShape = EmojiTileShape.Rounded,
-  rowsCount = 6,
+  tileShape,
+  rowsCount,
+  label = "Center emoji",
+  showFirstCategoryWhenRecentsEmpty = true,
+  recentsStorageBroker = localStorageStorageBroker,
 }: EmojiControlsProps) {
-  const picker = useEmojiPicker({ value: emoji, onChange });
+  const selectedEntry = useMemo<EmojiCatalogEntry | null>(
+    () => (emoji === null ? null : EmojiCatalog.all.find((entry) => entry.glyph === emoji.glyph) ?? null),
+    [emoji],
+  );
 
-  const { search, nav, tile } = resolveSizes(size);
-  const selectedChar = picker.selected?.char ?? null;
+  const pickEmoji = useCallback(
+    (entry: EmojiCatalogEntry | null) => {
+      if (entry === null) {
+        onChange(null);
+        return;
+      }
+      onChange({ glyph: entry.glyph, sizeRatio: emoji?.sizeRatio ?? DefaultEmojiSize });
+    },
+    [emoji?.sizeRatio, onChange],
+  );
 
   return (
     <Stack gap="3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">Center emoji</span>
-        {/* TODO(sdk): Button `variant`/`tone` string literals — enum-ify once the SDK ships the tokens. */}
-        <Button
-          variant={emoji === null ? undefined : "outline"}
-          tone={emoji === null ? "primary" : "neutral"}
-          size="sm"
-          aria-pressed={emoji === null}
-          onClick={picker.clearSelection}
-        >
-          None
-        </Button>
-      </div>
-
-      <SearchInput
-        size={search}
-        placeholder="Search emoji…"
-        value={picker.searchKeyword}
-        onChange={(event) => picker.setSearchKeyword(event.target.value)}
-        onClear={() => picker.setSearchKeyword("")}
+      <EmojiPicker
+        value={selectedEntry}
+        onChange={pickEmoji}
+        storage={recentsStorageBroker}
+        label={label}
+        showFirstCategoryWhenRecentsEmpty={showFirstCategoryWhenRecentsEmpty}
+        categoryNavVariant={categoryNavVariant}
+        size={size}
+        tileShape={tileShape}
+        rowsCount={rowsCount}
       />
-
-      {categoryNavVariant === CategoryNavVariant.Accordion ? (
-        <EmojiAccordion
-          active={picker.activeCategory}
-          onSelectCategory={picker.setActiveCategory}
-          visibleEmojis={picker.visibleEmojis}
-          showSearchResults={picker.showSearchResults}
-          selectedChar={selectedChar}
-          size={tile}
-          shape={tileShape}
-          viewportRows={rowsCount}
-          onSelect={picker.selectEmoji}
-        />
-      ) : (
-        <Stack gap="2">
-          {picker.showSearchResults ? null : (
-            <CategoryNav
-              variant={categoryNavVariant}
-              active={picker.activeCategory}
-              onSelect={picker.setActiveCategory}
-              size={nav}
-            />
-          )}
-          <EmojiGrid
-            emojis={picker.visibleEmojis}
-            selectedChar={selectedChar}
-            size={tile}
-            shape={tileShape}
-            onSelect={picker.selectEmoji}
-            viewportRows={rowsCount}
-            emptyLabel={
-              picker.showSearchResults
-                ? EmojiEmptyLabels.search
-                : picker.activeCategory === RecentCategory
-                  ? EmojiEmptyLabels.recents
-                  : EmojiEmptyLabels.category
-            }
-          />
-        </Stack>
-      )}
 
       {emoji === null ? null : (
         <EmojiSizeControl
-          char={emoji.char}
+          glyph={emoji.glyph}
           sizeRatio={emoji.sizeRatio}
+          maxPreviewGlyph={MaxPreviewGlyph}
           onChange={(ratio) => onChange({ ...emoji, sizeRatio: ratio })}
         />
       )}

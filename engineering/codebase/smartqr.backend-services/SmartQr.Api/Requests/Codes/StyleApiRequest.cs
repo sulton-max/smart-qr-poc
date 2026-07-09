@@ -77,7 +77,7 @@ public static class StyleApiRequestExtensions
             _ => null,
         },
         Emoji = style.Emoji is { } emoji
-            ? new EmojiSpec { Char = emoji.Char, SizeRatio = emoji.SizeRatio }
+            ? new EmojiSpec { Glyph = emoji.Glyph, SizeRatio = emoji.SizeRatio }
             : null,
     };
 }

@@ -18,6 +18,7 @@ import {
   StepCard,
   PricingCards,
 } from "./components";
+import { HeroSim } from "./hero/HeroSim";
 
 export function LandingPage() {
   usePageMeta(
@@ -29,9 +30,10 @@ export function LandingPage() {
     <>
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
+        <HeroSim />
         <Container
           size={ContainerSize.Full}
-          className="grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-2"
+          className="relative z-10 grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-2"
         >
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">

@@ -58,7 +58,7 @@ export interface PreviewLogo {
 
 // Optional center emoji overlay for the preview render (no file upload).
 export interface DesignEmojiOverlay {
-  char: string;
+  glyph: string;
   sizeRatio: number; // fraction of the code's width (0–1)
 }
 

@@ -281,7 +281,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         {
             value = "https://smartqr.app/abc1234",
             codeType = "Qr",
-            style = StyleWith(("emoji", new { @char = "🎉", sizeRatio = 0.25 })),
+            style = StyleWith(("emoji", new { glyph = "🎉", sizeRatio = 0.25 })),
         });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
