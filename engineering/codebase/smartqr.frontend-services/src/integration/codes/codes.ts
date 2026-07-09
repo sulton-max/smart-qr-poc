@@ -1,4 +1,4 @@
-import type { CodeDto, CreateCodeRequest, PreviewRequest, UpdateCodeRequest } from "@/domain/codes/core";
+import type { CodeDto, CreateCodeRequest, ImageFormat, PreviewRequest, UpdateCodeRequest } from "@/domain/codes/core";
 import { API_BASE, problemError, readData } from "../common/client";
 
 export async function createCode(request: CreateCodeRequest): Promise<CodeDto> {
@@ -69,7 +69,7 @@ export async function deleteCode(id: string): Promise<void> {
   if (!res.ok) throw await problemError(res, "Delete failed");
 }
 
-export function codeImageUrl(id: string, format: "svg" | "png"): string {
+export function codeImageUrl(id: string, format: ImageFormat): string {
   return `${API_BASE}/api/codes/${id}/image?format=${format}`;
 }
 

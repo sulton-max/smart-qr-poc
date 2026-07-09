@@ -6,6 +6,7 @@ export * from "./enums/FinderShape";
 export * from "./enums/FillType";
 export * from "./enums/CodeType";
 export * from "./enums/EccLevel";
+export * from "./enums/ImageFormat";
 export { Gradient, GradientType } from "@wow-two-beta/ui/domain/color";
 export type { GradientStop, LinearGradient, RadialGradient } from "@wow-two-beta/ui/domain/color";
 export * from "./types";

@@ -67,6 +67,17 @@ export const FieldKind = {
 
 export type FieldKind = (typeof FieldKind)[keyof typeof FieldKind];
 
+/** Defines how a code carries its payload — baked directly (static) vs via the forwarder short link (dynamic). */
+export const ContentMode = {
+  /** Refers to a code that bakes the payload directly into the symbol (no redirect). */
+  Static: "static",
+
+  /** Refers to a code that carries the forwarder short link, resolved at scan time. */
+  Dynamic: "dynamic",
+} as const;
+
+export type ContentMode = (typeof ContentMode)[keyof typeof ContentMode];
+
 export interface ContentField {
   /** Key in the values record + the typed content property name. */
   key: string;
@@ -91,7 +102,7 @@ export interface ContentTypeDef {
   label: string;
 
   /** Whether the QR carries the payload directly (static) or the forwarder short link (dynamic). */
-  mode: "static" | "dynamic";
+  mode: ContentMode;
 
   /** Optional helper text rendered above the fields (e.g. "add at least one"). */
   note?: string;
@@ -103,7 +114,7 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.Url,
     label: "URL",
-    mode: "dynamic",
+    mode: ContentMode.Dynamic,
     fields: [{ key: "url", label: "Destination URL", kind: FieldKind.Url, placeholder: "https://example.com", required: true }],
   },
   {
@@ -112,7 +123,7 @@ export const ContentTypes: ContentTypeDef[] = [
     // The backend derives the device rules + fallback from these fields at save (see MobileAppLinkContentSpec).
     id: ContentTypeId.MobileApp,
     label: "Mobile app link",
-    mode: "dynamic",
+    mode: ContentMode.Dynamic,
     note: "Add at least one. iPhone opens the App Store, Android opens Google Play; choose which link every other device opens.",
     fields: [
       { key: "appStore", label: "App Store (iOS) URL", kind: FieldKind.Url, placeholder: "https://apps.apple.com/app/…" },
@@ -123,13 +134,13 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.Text,
     label: "Text",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [{ key: "text", label: "Text", kind: FieldKind.TextArea, required: true }],
   },
   {
     id: ContentTypeId.Email,
     label: "Email",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [
       { key: "to", label: "To", kind: FieldKind.Email, placeholder: "name@example.com", required: true },
       { key: "subject", label: "Subject" },
@@ -139,7 +150,7 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.Sms,
     label: "SMS",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [
       { key: "phone", label: "Phone", kind: FieldKind.Tel, required: true },
       { key: "message", label: "Message", kind: FieldKind.TextArea },
@@ -148,13 +159,13 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.Phone,
     label: "Phone",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [{ key: "phone", label: "Phone", kind: FieldKind.Tel, placeholder: "+1 555 0100", required: true }],
   },
   {
     id: ContentTypeId.Geo,
     label: "Location",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [
       { key: "latitude", label: "Latitude", kind: FieldKind.Number, required: true },
       { key: "longitude", label: "Longitude", kind: FieldKind.Number, required: true },
@@ -163,7 +174,7 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.Wifi,
     label: "WiFi",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [
       { key: "ssid", label: "Network name (SSID)", required: true },
       { key: "password", label: "Password", kind: FieldKind.Text },
@@ -186,7 +197,7 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.VCard,
     label: "Contact card",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [
       { key: "firstName", label: "First name", required: true },
       { key: "lastName", label: "Last name" },
@@ -202,7 +213,7 @@ export const ContentTypes: ContentTypeDef[] = [
   {
     id: ContentTypeId.Calendar,
     label: "Event",
-    mode: "static",
+    mode: ContentMode.Static,
     fields: [
       { key: "title", label: "Title", required: true },
       { key: "start", label: "Starts", kind: FieldKind.DateTime, required: true },

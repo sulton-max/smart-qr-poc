@@ -13,11 +13,21 @@ import { ColorModeToggle } from "@/presentation/common";
 import { GoogleSignInButton, LoginScreen } from "@/presentation/identity";
 import { Logo } from "@/presentation/marketing";
 
-type Status = "checking" | "gate" | "ready";
+/** Defines the identity-resolution phase gating what the layout renders. */
+const Status = {
+  /** Refers to the in-flight identity check (spinner). */
+  Checking: "checking",
+  /** Refers to the anonymous guest gate (login screen). */
+  Gate: "gate",
+  /** Refers to a resolved identity — render the routed screen. */
+  Ready: "ready",
+} as const;
+
+type Status = (typeof Status)[keyof typeof Status];
 
 // Resolves identity once: anonymous → guest gate; guests and users pass through to the routed screen.
 export function AppLayout() {
-  const [status, setStatus] = useState<Status>("checking");
+  const [status, setStatus] = useState<Status>(Status.Checking);
   const [me, setMe] = useState<Me | null>(null);
 
   useEffect(() => {
@@ -26,14 +36,14 @@ export function AppLayout() {
       .then((result) => {
         if (!cancelled) {
           setMe(result);
-          setStatus(result.kind === UserKind.Anonymous ? "gate" : "ready");
+          setStatus(result.kind === UserKind.Anonymous ? Status.Gate : Status.Ready);
         }
       })
       .catch(() => {
         // Failed identity check → treat as anonymous.
         if (!cancelled) {
           setMe(null);
-          setStatus("gate");
+          setStatus(Status.Gate);
         }
       });
     return () => {
@@ -44,7 +54,7 @@ export function AppLayout() {
   async function handleSignOut() {
     await logout();
     setMe(null);
-    setStatus("gate");
+    setStatus(Status.Gate);
   }
 
   return (
@@ -63,7 +73,7 @@ export function AppLayout() {
         end={
           <HStack as="nav" align="center" gap="5" className="text-sm">
             <ColorModeToggle />
-            {status === "ready" && (
+            {status === Status.Ready && (
               <Link
                 to="/app/billing"
                 className="text-muted-foreground transition-colors hover:text-foreground"
@@ -100,12 +110,12 @@ export function AppLayout() {
       />
 
       <Container as="main" size={ContainerSize.Lg} className="flex-1 px-6 py-8">
-        {status === "checking" && (
+        {status === Status.Checking && (
           <div className="flex min-h-[60vh] items-center justify-center">
             <Spinner size={SizePreset.Lg} label="Loading" />
           </div>
         )}
-        {status === "gate" && (
+        {status === Status.Gate && (
           <LoginScreen
             onAuthenticated={(m) => {
               setMe(m);
@@ -113,7 +123,7 @@ export function AppLayout() {
             }}
           />
         )}
-        {status === "ready" && <Outlet />}
+        {status === Status.Ready && <Outlet />}
       </Container>
     </div>
   );

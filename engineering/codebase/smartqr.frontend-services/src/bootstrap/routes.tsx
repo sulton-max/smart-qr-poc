@@ -1,5 +1,5 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { BillingScreen } from "@/presentation/billing";
+import { BillingScreen, ReturnStatus } from "@/presentation/billing";
 import { CodesListScreen, CreateCodeScreen } from "@/presentation/codes";
 
 // Route adapters injecting router navigation; screens keep their callback-prop contract.
@@ -29,7 +29,7 @@ export function BillingRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   // Stripe returns to `/app/billing?status=success|cancelled` — surface it as a banner, then drop it.
   const raw = searchParams.get("status");
-  const returnStatus = raw === "success" || raw === "cancelled" ? raw : undefined;
+  const returnStatus = raw === ReturnStatus.Success || raw === ReturnStatus.Cancelled ? raw : undefined;
   return (
     <BillingScreen
       returnStatus={returnStatus}

@@ -12,6 +12,7 @@ import {
   EccLevel,
   FinderShape,
   GradientType,
+  ImageFormat,
   ModuleShape,
   type CodeDto,
   type Gradient,
@@ -19,11 +20,23 @@ import {
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
-import { ContentTypeId, ContentTypes, contentType, buildContent, contentToValues, isDynamicContent, type FieldValues } from "@/domain/codes/content";
+import { ContentMode, ContentTypeId, ContentTypes, contentType, buildContent, contentToValues, isDynamicContent, type FieldValues } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
 import { codeImageUrl, createCode, getCode, updateCode } from "@/integration/codes";
 import { BarcodeFormatDisplays, ContrastCallout, EmojiControls, FillControls, QrPreview, RuleControls, ShapeControls } from "../../core";
 import { ContentTypeControls } from "../../content/components/ContentTypeControls";
+
+/** Defines the code builder's grouped sections (Layout D — Content · Design · Routing). */
+const CodeTab = {
+  /** Refers to the content-type + payload section. */
+  Content: "content",
+  /** Refers to the styling section (colors / shape / center). */
+  Design: "design",
+  /** Refers to the routing-rules section. */
+  Routing: "routing",
+} as const;
+
+type CodeTab = (typeof CodeTab)[keyof typeof CodeTab];
 
 /** Maps a code's persisted rules to the builder's draft shape (adds client-side keys). */
 function toDrafts(code: CodeDto): RuleDraft[] {
@@ -68,7 +81,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [background, setBackground] = useState("#ffffff");
   // Code-styling shapes (v0.5) — default `square` so the render is unchanged until picked.
   // Layout D (v0.6): 3 grouped tabs — Content · Design (accordion) · Routing.
-  const [tab, setTab] = useState<"content" | "design" | "routing">("content");
+  const [tab, setTab] = useState<CodeTab>(CodeTab.Content);
   const [moduleShape, setModuleShape] = useState<ModuleShape>(ModuleShape.Square);
   const [finderShape, setFinderShape] = useState<FinderShape>(FinderShape.Square);
   const [finderDotShape, setFinderDotShape] = useState<FinderShape>(FinderShape.Square);
@@ -169,7 +182,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     setSaving(true);
     // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed
     // type (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
-    const isStatic = contentDef.mode === "static";
+    const isStatic = contentDef.mode === ContentMode.Static;
     const selfRouted = contentTypeId === ContentTypeId.MobileApp; // backend derives fallback + device rules from the fields
     const content = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
     const request = {
@@ -248,19 +261,19 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           <ToggleButtonGroup variant={ToggleButtonGroupVariant.Segmented}
             type={ToggleMode.Single}
             value={tab}
-            onValueChange={(v) => v && setTab(v as typeof tab)}
+            onValueChange={(v) => v && setTab(v as CodeTab)}
             aria-label="Builder section"
           >
-            <ToggleButton value="content" className="flex-1">Content</ToggleButton>
-            <ToggleButton value="design" className="flex-1">Design</ToggleButton>
-            <ToggleButton value="routing" className="flex-1">Routing</ToggleButton>
+            <ToggleButton value={CodeTab.Content} className="flex-1">Content</ToggleButton>
+            <ToggleButton value={CodeTab.Design} className="flex-1">Design</ToggleButton>
+            <ToggleButton value={CodeTab.Routing} className="flex-1">Routing</ToggleButton>
           </ToggleButtonGroup>
 
           {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
           <div key={tab} className="flex flex-col gap-5 motion-safe:animate-fade-in">
-          {tab === "content" && (
+          {tab === CodeTab.Content && (
             <>
-              {isEdit && existing && contentDef.mode !== "static" && (
+              {isEdit && existing && contentDef.mode !== ContentMode.Static && (
                 <Field label="Short link">
                   <TextInput value={existing.shortUrl} readOnly disabled />
                 </Field>
@@ -298,7 +311,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </>
           )}
 
-          {tab === "design" && (
+          {tab === CodeTab.Design && (
             <>
               {/* Code type stays outside the accordion — it gates which style options apply (QR vs 1D/2D). */}
               <Field label="Code type">
@@ -402,7 +415,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             </>
           )}
 
-          {tab === "routing" && <RuleControls rules={rules} onChange={setRules} />}
+          {tab === CodeTab.Routing && <RuleControls rules={rules} onChange={setRules} />}
           </div>
 
           <Button
@@ -461,12 +474,12 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                   </CopyButton>
                 )}
                 <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
-                  <a href={codeImageUrl(saved.id, "svg")} target="_blank" rel="noreferrer">
+                  <a href={codeImageUrl(saved.id, ImageFormat.Svg)} target="_blank" rel="noreferrer">
                     SVG
                   </a>
                 </Button>
                 <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
-                  <a href={codeImageUrl(saved.id, "png")} target="_blank" rel="noreferrer">
+                  <a href={codeImageUrl(saved.id, ImageFormat.Png)} target="_blank" rel="noreferrer">
                     PNG
                   </a>
                 </Button>

@@ -2,7 +2,17 @@ import { useEffect, useRef } from "react";
 import QRCode from "qrcode";
 import { HERO_CODE_URLS } from "./heroCodes";
 
-export type HeroMode = "drift" | "bump" | "chase";
+/** Defines the floating-code hero simulation behavior. */
+export const HeroMode = {
+  /** Refers to a calm cruise with DVD-style wall bounce (click shoves codes away). */
+  Drift: "drift",
+  /** Refers to angry weight-based ramming toward random waypoints. */
+  Bump: "bump",
+  /** Refers to codes gathering around the cursor. */
+  Chase: "chase",
+} as const;
+
+export type HeroMode = (typeof HeroMode)[keyof typeof HeroMode];
 
 /** Live-tunable simulation parameters (read per-frame, so slider changes take effect instantly). */
 export interface SimParams {
@@ -216,10 +226,10 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
       const m = modeRef.current;
       const p = paramsRef.current;
       const now = performance.now();
-      const calm = m === "bump" && now < calmUntil;
+      const calm = m === HeroMode.Bump && now < calmUntil;
 
       // Bump: randomly send up to ⅓ of the codes on a 2-3s "break" (they drop attacking + just drift).
-      if (m === "bump" && !calm) {
+      if (m === HeroMode.Bump && !calm) {
         let resting = 0;
         for (const s of sprites) if (now < s.restUntil) resting++;
         if (resting < Math.floor(sprites.length / 3) && Math.random() < 0.05) {
@@ -235,7 +245,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
       }
 
       for (const s of sprites) {
-        if (m === "chase" && pointer.active) {
+        if (m === HeroMode.Chase && pointer.active) {
           // Seek the cursor but stop at a dead-zone ring → they GATHER around it, not pile on the point.
           const dx = pointer.x - s.x;
           const dy = pointer.y - s.y;
@@ -249,7 +259,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
             s.vx += (-dx / d) * out * dt - s.vx * 0.14;
             s.vy += (-dy / d) * out * dt - s.vy * 0.14;
           }
-        } else if (m === "bump" && !calm && now >= s.restUntil) {
+        } else if (m === HeroMode.Bump && !calm && now >= s.restUntil) {
           // Attacking: roam toward a random waypoint (spreads them); ram whatever's in the way.
           const dx = s.tx - s.x;
           const dy = s.ty - s.y;
@@ -260,7 +270,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
           }
           s.vx += ((dx / d) * p.ramSpeed - s.vx) * Math.min(1, dt * 1.5);
           s.vy += ((dy / d) * p.ramSpeed - s.vy) * Math.min(1, dt * 1.5);
-        } else if (m === "bump" && calm) {
+        } else if (m === HeroMode.Bump && calm) {
           // Truce — coast to a near-stop, then bumping resumes when it lifts.
           s.vx *= 0.9;
           s.vy *= 0.9;
@@ -307,7 +317,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
           const ny = dy / dist;
           const push = min - dist;
 
-          if (m === "bump") {
+          if (m === HeroMode.Bump) {
             const invA = 1 / a.size;
             const invB = 1 / b.size;
             const invSum = invA + invB;
@@ -347,7 +357,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
       }
 
       // Speed caps (scale with the tuned speed so sliders can push it).
-      const cap = m === "bump" ? p.ramSpeed * 1.5 : m === "chase" ? p.seekSpeed * 1.3 : p.driftSpeed * 2.2;
+      const cap = m === HeroMode.Bump ? p.ramSpeed * 1.5 : m === HeroMode.Chase ? p.seekSpeed * 1.3 : p.driftSpeed * 2.2;
       for (const s of sprites) {
         const sp = Math.hypot(s.vx, s.vy);
         if (sp > cap) {
@@ -405,7 +415,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
       const y = e.clientY - rect.top;
       if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
       const m = modeRef.current;
-      if (m === "drift") {
+      if (m === HeroMode.Drift) {
         // Medium radial shove outward from the click, falling off with distance.
         const R = 260;
         const F = 360;
@@ -419,7 +429,7 @@ export function HeroCanvas({ mode, params }: HeroCanvasProps) {
             s.vy += (dy / d) * f;
           }
         }
-      } else if (m === "bump") {
+      } else if (m === HeroMode.Bump) {
         calmUntil = performance.now() + 1100; // ~1s truce, then they resume
       }
     }

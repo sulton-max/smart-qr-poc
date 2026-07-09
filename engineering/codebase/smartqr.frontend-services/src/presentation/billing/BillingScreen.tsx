@@ -11,8 +11,15 @@ import { PAID_PLANS, Plan } from "@/domain/billing";
 import type { BillingStatus } from "@/domain/billing";
 import { createCheckout, createPortal, getBilling } from "@/integration/billing";
 
-/** Stripe return outcome (`/app/billing?status=success|cancelled`). */
-type ReturnStatus = "success" | "cancelled";
+/** Defines the Stripe return outcome (`/app/billing?status=success|cancelled`). */
+export const ReturnStatus = {
+  /** Refers to a completed checkout. */
+  Success: "success",
+  /** Refers to an abandoned checkout. */
+  Cancelled: "cancelled",
+} as const;
+
+export type ReturnStatus = (typeof ReturnStatus)[keyof typeof ReturnStatus];
 
 /** Plan-keyed display metadata. Caps mirror backend `PlanLimits` (Free=3, Solo=25, Pro=200, Agency=∞). */
 interface PlanMeta {
@@ -137,7 +144,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
         <Text color="muted">Manage your plan, usage, and payment method.</Text>
       </div>
 
-      {returnStatus === "success" && (
+      {returnStatus === ReturnStatus.Success && (
         <Banner
           severity="success"
           title="You're all set."
@@ -145,7 +152,7 @@ export function BillingScreen({ returnStatus, onClearReturnStatus }: BillingScre
           onClose={onClearReturnStatus}
         />
       )}
-      {returnStatus === "cancelled" && (
+      {returnStatus === ReturnStatus.Cancelled && (
         <Banner
           severity="warning"
           title="Checkout cancelled."

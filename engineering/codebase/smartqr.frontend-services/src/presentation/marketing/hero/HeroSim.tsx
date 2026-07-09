@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { DEFAULT_PARAMS, HeroCanvas, type HeroMode, type SimParams } from "./HeroCanvas";
+import { DEFAULT_PARAMS, HeroCanvas, HeroMode, type SimParams } from "./HeroCanvas";
 
 const MODES: ReadonlyArray<{ value: HeroMode; label: string }> = [
-  { value: "drift", label: "Drift" },
-  { value: "bump", label: "Bump" },
-  { value: "chase", label: "Mouse chase" },
+  { value: HeroMode.Drift, label: "Drift" },
+  { value: HeroMode.Bump, label: "Bump" },
+  { value: HeroMode.Chase, label: "Mouse chase" },
 ];
 
 interface Ctrl {
@@ -19,9 +19,9 @@ const COUNT: Ctrl = { key: "count", label: "count", min: 8, max: 60, step: 1 };
 const OPACITY: Ctrl = { key: "opacity", label: "opacity", min: 0.3, max: 1, step: 0.02 };
 
 const PER_MODE: Record<HeroMode, ReadonlyArray<Ctrl>> = {
-  drift: [COUNT, { key: "driftSpeed", label: "speed", min: 10, max: 160, step: 2 }, OPACITY],
-  bump: [COUNT, { key: "ramSpeed", label: "speed", min: 80, max: 440, step: 5 }, OPACITY],
-  chase: [
+  [HeroMode.Drift]: [COUNT, { key: "driftSpeed", label: "speed", min: 10, max: 160, step: 2 }, OPACITY],
+  [HeroMode.Bump]: [COUNT, { key: "ramSpeed", label: "speed", min: 80, max: 440, step: 5 }, OPACITY],
+  [HeroMode.Chase]: [
     COUNT,
     { key: "seekSpeed", label: "speed", min: 80, max: 380, step: 5 },
     { key: "mouseGap", label: "gap radius", min: 6, max: 160, step: 2 },
@@ -35,7 +35,7 @@ const PER_MODE: Record<HeroMode, ReadonlyArray<Ctrl>> = {
  * replaces it.
  */
 export function HeroSim() {
-  const [mode, setMode] = useState<HeroMode>("drift");
+  const [mode, setMode] = useState<HeroMode>(HeroMode.Drift);
   const [params, setParams] = useState<SimParams>(DEFAULT_PARAMS);
   const controls = PER_MODE[mode];
 

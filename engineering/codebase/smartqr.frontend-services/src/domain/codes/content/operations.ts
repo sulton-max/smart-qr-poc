@@ -4,7 +4,7 @@
 // risk this rewire removes). The per-type field registry lives in `registry.ts`.
 
 import type { CodeContent } from "./types";
-import { ContentTypeId, contentType, type FieldValues } from "./registry";
+import { ContentMode, ContentTypeId, contentType, type FieldValues } from "./registry";
 
 /**
  * Builds the typed `CodeContent` the wire carries from the builder's collected field values. Required fields are
@@ -48,5 +48,5 @@ export function contentToValues(content: CodeContent): FieldValues {
 
 /** A code resolves through its redirect short link (dynamic) rather than a baked payload — true for url / mobileApp / legacy-null content. */
 export function isDynamicContent(content: CodeContent | null): boolean {
-  return content == null || contentType(content.type).mode === "dynamic";
+  return content == null || contentType(content.type).mode === ContentMode.Dynamic;
 }
