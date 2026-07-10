@@ -94,8 +94,6 @@ export interface ContentField {
   options?: { value: string; label: string }[];
 }
 
-export type FieldValues = Record<string, string | undefined>;
-
 export interface ContentTypeDef {
   id: ContentTypeId;
 

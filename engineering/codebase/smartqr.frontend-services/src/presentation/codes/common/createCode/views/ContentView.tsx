@@ -1,15 +1,17 @@
 import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
-import { ContentTypeId, ContentTypes, isDynamicType, type FieldValues } from "@/domain/codes/content";
+import { Orientation } from "@wow-two-beta/ui/foundation/utils";
+import { Divider } from "@wow-two-beta/ui/presentation/layout";
+import { ContentTypeId, ContentTypes, contentType, emptyContent, isDynamicType, type CodeContent } from "@/domain/codes/content";
 import type { CodeDto } from "@/domain/codes";
 import { ContentTypeControls } from "@/presentation/codes/content/components/ContentTypeControls";
 
-/** Defines props for the Content tab — the code's name, content type, and the per-type payload fields. */
+/** Defines props for the Content tab — the code's name and its typed content. */
 export interface ContentViewProps {
   /** True in edit mode (surfaces the read-only short link for dynamic codes). */
   readonly isEdit: boolean;
 
   /** The loaded code in edit mode (its `shortUrl` backs the short-link field); null on create. */
-  readonly existing: CodeDto | null;
+  readonly existingCode: CodeDto | null;
 
   /** The code's display name. */
   readonly name: string;
@@ -17,45 +19,19 @@ export interface ContentViewProps {
   /** Fires when the name changes. */
   readonly onNameChange: (value: string) => void;
 
-  /** The chosen content type (url / wifi / vCard / …). */
-  readonly contentTypeId: ContentTypeId;
+  /** The typed content the code carries (discriminated on `type`). */
+  readonly content: CodeContent;
 
-  /** Fires when the content type changes. */
-  readonly onContentTypeIdChange: (value: ContentTypeId) => void;
-
-  /** The dynamic forwarder's URL — the `url` type binds its single field here. */
-  readonly fallbackUrl: string;
-
-  /** Fires when the URL type's value changes. */
-  readonly onFallbackUrlChange: (value: string) => void;
-
-  /** The active content type's flat field values (every type except `url`). */
-  readonly contentValues: FieldValues;
-
-  /** Fires when a non-URL content type's field values change. */
-  readonly onContentValuesChange: (values: FieldValues) => void;
+  /** Fires when the content (type or fields) changes. */
+  readonly onContentChange: (content: CodeContent) => void;
 }
 
-/** Renders the Content tab: short link (edit + dynamic), name, content-type picker, and the per-type fields. */
-export function ContentView({
-  isEdit,
-  existing,
-  name,
-  onNameChange,
-  contentTypeId,
-  onContentTypeIdChange,
-  fallbackUrl,
-  onFallbackUrlChange,
-  contentValues,
-  onContentValuesChange,
-}: ContentViewProps) {
+/** Renders the Content tab — static code identity (name + type) up top, then a rule, then the dynamic chosen content (short link + the type's typed fields). */
+export function ContentView({ isEdit, existingCode, name, onNameChange, content, onContentChange }: ContentViewProps) {
+  const typeId = content.type;
   return (
     <>
-      {isEdit && existing && isDynamicType(contentTypeId) && (
-        <Field label="Short link">
-          <TextInput value={existing.shortUrl} readOnly disabled />
-        </Field>
-      )}
+      {/* Static — the code's identity: its name and the content type it carries. */}
       <Field label="Name">
         <TextInput
           ring="sm"
@@ -66,8 +42,9 @@ export function ContentView({
       </Field>
       <Field label="Content type">
         <Select<ContentTypeId>
-          value={contentTypeId}
-          onValueChange={(o) => o && onContentTypeIdChange(o.itemKey)}
+          value={typeId}
+          onValueChange={(o) => o && onContentChange(emptyContent(o.itemKey))}
+          getOptionLabel={(id) => contentType(id).label}
         >
           <Select.Trigger>
             <Select.Value />
@@ -79,13 +56,16 @@ export function ContentView({
           </Select.Content>
         </Select>
       </Field>
-      <ContentTypeControls
-        typeId={contentTypeId}
-        values={contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues}
-        onChange={(next) =>
-          contentTypeId === ContentTypeId.Url ? onFallbackUrlChange(next.url ?? "") : onContentValuesChange(next)
-        }
-      />
+
+      <Divider orientation={Orientation.Horizontal} />
+
+      {/* Dynamic — the chosen content: the short link (edit + dynamic types) then the type's own fields. */}
+      {isEdit && existingCode && isDynamicType(typeId) && (
+        <Field label="Short link">
+          <TextInput value={existingCode.shortUrl} readOnly disabled />
+        </Field>
+      )}
+      <ContentTypeControls content={content} onChange={onContentChange} />
     </>
   );
 }

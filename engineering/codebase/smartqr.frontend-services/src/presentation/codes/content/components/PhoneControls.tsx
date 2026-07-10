@@ -1,11 +1,17 @@
-import { ContentTypeId, contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, FieldRenderer } from "./fields";
+import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import type { PhoneContent } from "@/domain/codes/content";
+import type { ContentControlsProps } from "./fields";
 
-const [phone] = contentType(ContentTypeId.Phone).fields;
-
-/** Renders phone content — a single dial-number field. */
-export function PhoneControls({ fieldValues, onChange }: ContentControlsProps) {
+/** Renders phone content — a single dial number. */
+export function PhoneControls({ value, onChange }: ContentControlsProps<PhoneContent>) {
   return (
-    <FieldRenderer field={phone} value={fieldValues[phone.key]} onChange={(v) => onChange({ ...fieldValues, [phone.key]: v })} />
+    <Field label="Phone">
+      <TextInput
+        ring="sm"
+        value={value.phone}
+        placeholder="+1 555 0100"
+        onChange={(e) => onChange({ ...value, phone: e.target.value })}
+      />
+    </Field>
   );
 }

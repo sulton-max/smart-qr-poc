@@ -1,19 +1,40 @@
-import { ContentTypeId, contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, FieldRenderer } from "./fields";
+import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import type { WifiContent } from "@/domain/codes/content";
+import { type ContentControlsProps, type SelectOption, SelectField } from "./fields";
 
-// ssid / password are text; `encryption` and `hidden` are selects (options come from the registry). `hidden`
-// stays a "true"/"false" string in the form state — `buildContent` maps it to a real bool on the wire.
-const fields = contentType(ContentTypeId.Wifi).fields;
+const ENCRYPTION_OPTIONS: readonly SelectOption[] = [
+  { value: "WPA", label: "WPA/WPA2" },
+  { value: "WEP", label: "WEP" },
+  { value: "nopass", label: "None" },
+];
 
-/** Renders WiFi content — SSID, password, security type, and a hidden-network toggle. */
-export function WifiControls({ fieldValues, onChange }: ContentControlsProps) {
-  const setValue = (key: string, v: string) => onChange({ ...fieldValues, [key]: v });
+const HIDDEN_OPTIONS: readonly SelectOption[] = [
+  { value: "false", label: "No" },
+  { value: "true", label: "Yes" },
+];
 
+/** Renders WiFi content — SSID, optional password, security type, and a hidden-network toggle (`hidden` is a real bool). */
+export function WifiControls({ value, onChange }: ContentControlsProps<WifiContent>) {
   return (
     <>
-      {fields.map((f) => (
-        <FieldRenderer key={f.key} field={f} value={fieldValues[f.key]} onChange={(v) => setValue(f.key, v)} />
-      ))}
+      <Field label="Network name (SSID)">
+        <TextInput ring="sm" value={value.ssid} onChange={(e) => onChange({ ...value, ssid: e.target.value })} />
+      </Field>
+      <Field label="Password">
+        <TextInput ring="sm" value={value.password ?? ""} onChange={(e) => onChange({ ...value, password: e.target.value || undefined })} />
+      </Field>
+      <SelectField
+        label="Security"
+        value={value.encryption}
+        options={ENCRYPTION_OPTIONS}
+        onChange={(encryption) => onChange({ ...value, encryption })}
+      />
+      <SelectField
+        label="Hidden network"
+        value={String(value.hidden)}
+        options={HIDDEN_OPTIONS}
+        onChange={(v) => onChange({ ...value, hidden: v === "true" })}
+      />
     </>
   );
 }

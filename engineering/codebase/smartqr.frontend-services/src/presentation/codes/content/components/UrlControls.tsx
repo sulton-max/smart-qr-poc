@@ -1,11 +1,17 @@
-import { ContentTypeId, contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, FieldRenderer } from "./fields";
-
-const [url] = contentType(ContentTypeId.Url).fields;
+import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import type { UrlContent } from "@/domain/codes/content";
+import type { ContentControlsProps } from "./fields";
 
 /** Renders URL content — the dynamic forwarder's single destination field. */
-export function UrlControls({ fieldValues, onChange }: ContentControlsProps) {
+export function UrlControls({ value, onChange }: ContentControlsProps<UrlContent>) {
   return (
-    <FieldRenderer field={url} value={fieldValues[url.key]} onChange={(v) => onChange({ ...fieldValues, [url.key]: v })} />
+    <Field label="Destination URL">
+      <TextInput
+        ring="sm"
+        value={value.url}
+        placeholder="https://example.com"
+        onChange={(e) => onChange({ ...value, url: e.target.value })}
+      />
+    </Field>
   );
 }

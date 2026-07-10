@@ -94,6 +94,7 @@ export function DesignView({
         <Select<BarcodeFormat>
           value={symbology}
           onValueChange={(opt) => opt && onSymbologyChange(opt.itemKey)}
+          getOptionLabel={(f) => BarcodeFormatDisplays[f].label}
         >
           <Select.Trigger>
             <Select.Value />

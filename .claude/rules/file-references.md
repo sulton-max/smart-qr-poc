@@ -13,7 +13,10 @@
 | `context.md` | Current state, brand (name/tagline/domain), active business-side tasks, decisions log |
 | `product.md` | Model, pricing tiers, positioning, GWDNBM, target users, kill gates |
 | `analysis/feature-research.md` | QR/codes feature universe mapped against the ForeverPin wedge → v0.5 hand-pick shortlist |
+| `analysis/content-type-use-cases.md` | Use cases per content type (phone/email/vCard/WiFi/…) framed as dynamic+routable+never-expire; resolve mechanics; SEO spears |
 | `marketing/marketing.md` | App GTM — positioning v2 (free generator + forwarder), $1 pricing experiment, channels |
+| `marketing/landing-hero-concept.md` | Interactive QR-simulation hero concept + v2 mode ideas |
+| `marketing/handoff.md` | Marketing thread handoff — decisions · conventions · assets · ordered next steps |
 
 ## Engineering — Planning (`engineering/planning/`)
 

@@ -1,5 +1,4 @@
-import { ContentTypeId, contentType, type FieldValues } from "@/domain/codes/content";
-import type { ContentControlsProps } from "./fields";
+import { ContentTypeId, contentType, type CodeContent } from "@/domain/codes/content";
 import { UrlControls } from "./UrlControls";
 import { MobileAppControls } from "./MobileAppControls";
 import { TextControls } from "./TextControls";
@@ -11,41 +10,55 @@ import { WifiControls } from "./WifiControls";
 import { VCardControls } from "./VCardControls";
 import { CalendarControls } from "./CalendarControls";
 
-/** Defines props for the content-type dispatcher. */
+/** Defines props for the content dispatcher — the typed content model + a change handler. */
 export interface ContentTypeControlsProps {
-  /** The content type whose fields to render. */
-  readonly typeId: ContentTypeId;
+  /** The current typed content (discriminated on `type`). */
+  readonly content: CodeContent;
 
-  /** The current field values, keyed by `ContentField.key`. */
-  readonly values: FieldValues;
-
-  /** Emits the next values record. */
-  readonly onChange: (next: FieldValues) => void;
+  /** Emits the next typed content. */
+  readonly onChange: (next: CodeContent) => void;
 }
 
-// Each content type has a dedicated control group so its controls can diverge; this maps id → component.
-const Controls: Record<ContentTypeId, (props: ContentControlsProps) => React.JSX.Element> = {
-  [ContentTypeId.Url]: UrlControls,
-  [ContentTypeId.MobileApp]: MobileAppControls,
-  [ContentTypeId.Text]: TextControls,
-  [ContentTypeId.Email]: EmailControls,
-  [ContentTypeId.Sms]: SmsControls,
-  [ContentTypeId.Phone]: PhoneControls,
-  [ContentTypeId.Geo]: GeoControls,
-  [ContentTypeId.Wifi]: WifiControls,
-  [ContentTypeId.VCard]: VCardControls,
-  [ContentTypeId.Calendar]: CalendarControls,
-};
-
-/** Renders the chosen content type's dedicated control group, plus its optional note. */
-export function ContentTypeControls({ typeId, values, onChange }: ContentTypeControlsProps) {
-  const def = contentType(typeId);
-  const TypeControls = Controls[typeId];
+/** Renders the chosen content type's dedicated typed control group, plus its optional note. */
+export function ContentTypeControls({ content, onChange }: ContentTypeControlsProps) {
+  const def = contentType(content.type);
 
   return (
     <>
       {def.note && <p className="text-sm text-muted-foreground">{def.note}</p>}
-      <TypeControls fieldValues={values} onChange={onChange} />
+      {renderControls(content, onChange)}
     </>
   );
+}
+
+// Each content type has a dedicated typed control so its controls can diverge; the switch narrows the union to
+// the matching model. `onChange` (over the full union) is passed as-is — a wider handler satisfies a narrower one.
+function renderControls(content: CodeContent, onChange: (next: CodeContent) => void) {
+  switch (content.type) {
+    case ContentTypeId.Url:
+      return <UrlControls value={content} onChange={onChange} />;
+    case ContentTypeId.MobileApp:
+      return <MobileAppControls value={content} onChange={onChange} />;
+    case ContentTypeId.Text:
+      return <TextControls value={content} onChange={onChange} />;
+    case ContentTypeId.Email:
+      return <EmailControls value={content} onChange={onChange} />;
+    case ContentTypeId.Sms:
+      return <SmsControls value={content} onChange={onChange} />;
+    case ContentTypeId.Phone:
+      return <PhoneControls value={content} onChange={onChange} />;
+    case ContentTypeId.Geo:
+      return <GeoControls value={content} onChange={onChange} />;
+    case ContentTypeId.Wifi:
+      return <WifiControls value={content} onChange={onChange} />;
+    case ContentTypeId.VCard:
+      return <VCardControls value={content} onChange={onChange} />;
+    case ContentTypeId.Calendar:
+      return <CalendarControls value={content} onChange={onChange} />;
+    default: {
+      // Exhaustiveness guard — a new content type must add a control above.
+      const _exhaustive: never = content;
+      return _exhaustive;
+    }
+  }
 }

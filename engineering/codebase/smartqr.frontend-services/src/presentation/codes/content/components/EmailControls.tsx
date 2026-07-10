@@ -1,18 +1,23 @@
-import { ContentTypeId, contentType } from "@/domain/codes/content";
-import { type ContentControlsProps, FieldRenderer } from "./fields";
-
-// to is an email; subject is single-line; body is a textarea (kinds come from the registry).
-const fields = contentType(ContentTypeId.Email).fields;
+import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import type { EmailContent } from "@/domain/codes/content";
+import { type ContentControlsProps, TextAreaField } from "./fields";
 
 /** Renders email content — recipient, optional subject, optional (multiline) body. */
-export function EmailControls({ fieldValues, onChange }: ContentControlsProps) {
-  const setValue = (key: string, v: string) => onChange({ ...fieldValues, [key]: v });
-
+export function EmailControls({ value, onChange }: ContentControlsProps<EmailContent>) {
   return (
     <>
-      {fields.map((f) => (
-        <FieldRenderer key={f.key} field={f} value={fieldValues[f.key]} onChange={(v) => setValue(f.key, v)} />
-      ))}
+      <Field label="To">
+        <TextInput
+          ring="sm"
+          value={value.to}
+          placeholder="name@example.com"
+          onChange={(e) => onChange({ ...value, to: e.target.value })}
+        />
+      </Field>
+      <Field label="Subject">
+        <TextInput ring="sm" value={value.subject ?? ""} onChange={(e) => onChange({ ...value, subject: e.target.value || undefined })} />
+      </Field>
+      <TextAreaField label="Body" value={value.body ?? ""} onChange={(v) => onChange({ ...value, body: v || undefined })} />
     </>
   );
 }

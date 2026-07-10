@@ -1,49 +1,35 @@
-// Content operations — map the builder's flat form values to/from the typed `CodeContent` the wire carries.
-// Payload ENCODING lives on the backend: static types bake their payload from these fields server-side, dynamic
-// types (url / mobileApp) resolve the redirect short link. No local payload encoders (the frontend↔backend drift
-// risk this rewire removes). The per-type field registry lives in `registry.ts`.
+// Content operations — factories + predicates over the typed `CodeContent` union the builder holds directly.
+// Payload ENCODING lives on the backend (static types bake their payload; dynamic types resolve the redirect
+// short link). Each content type's fields are edited via its typed control (`UrlControls`, `WifiControls`, …);
+// there's no flat form-values bag — the builder's content state *is* the wire shape.
 
 import type { CodeContent } from "./types";
-import { ContentMode, ContentTypeId, contentType, type FieldValues } from "./registry";
+import { ContentMode, ContentTypeId, contentType } from "./registry";
 
-/**
- * Builds the typed `CodeContent` the wire carries from the builder's collected field values. Required fields are
- * always sent (may be empty); optional fields are omitted when blank so the backend sees them as absent (null) — this
- * is what makes mobileApp's "at least one link" and its device-rule derivation correct. `wifi.hidden` maps to a bool.
- */
-export function buildContent(id: ContentTypeId, values: FieldValues): CodeContent {
-  const out: Record<string, unknown> = { type: id };
-
-  for (const field of contentType(id).fields) {
-    if (id === ContentTypeId.Wifi && field.key === "hidden") {
-      out.hidden = values.hidden === "true";
-      continue;
-    }
-
-    const value = values[field.key] ?? "";
-    if (field.required) out[field.key] = value;
-    else if (value.trim() !== "") out[field.key] = value;
+/** Builds the minimal typed content for a type — the discriminator plus its required fields blank. Used to seed a fresh content type. */
+export function emptyContent(id: ContentTypeId): CodeContent {
+  switch (id) {
+    case ContentTypeId.Url:
+      return { type: "url", url: "" };
+    case ContentTypeId.MobileApp:
+      return { type: "mobileApp" };
+    case ContentTypeId.Text:
+      return { type: "text", text: "" };
+    case ContentTypeId.Email:
+      return { type: "email", to: "" };
+    case ContentTypeId.Sms:
+      return { type: "sms", phone: "" };
+    case ContentTypeId.Phone:
+      return { type: "phone", phone: "" };
+    case ContentTypeId.Geo:
+      return { type: "geo", latitude: "", longitude: "" };
+    case ContentTypeId.Wifi:
+      return { type: "wifi", ssid: "", hidden: false };
+    case ContentTypeId.VCard:
+      return { type: "vcard", firstName: "" };
+    case ContentTypeId.Calendar:
+      return { type: "calendar", title: "", start: "" };
   }
-
-  // The mobile-app fallback picker isn't a registry field — carry the chosen store key through when set.
-  if (id === ContentTypeId.MobileApp && values.fallback) out.fallback = values.fallback;
-
-  // Structural cast via `unknown`: `out` is assembled dynamically, so it can't be narrowed to a single
-  // union member statically — the per-type field loop guarantees the right shape at runtime.
-  return out as unknown as CodeContent;
-}
-
-/** Projects a persisted `CodeContent` back to the builder's flat field values (for the edit round-trip). Inverse of `buildContent`. */
-export function contentToValues(content: CodeContent): FieldValues {
-  const values: FieldValues = {};
-
-  for (const [key, value] of Object.entries(content)) {
-    if (key === "type") continue;
-    if (typeof value === "boolean") values[key] = value ? "true" : "false";
-    else if (value != null) values[key] = String(value);
-  }
-
-  return values;
 }
 
 /** A code resolves through its redirect short link (dynamic) rather than a baked payload — true for url / mobileApp / legacy-null content. */

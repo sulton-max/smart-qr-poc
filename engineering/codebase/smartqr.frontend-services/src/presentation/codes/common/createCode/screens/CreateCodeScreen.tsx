@@ -18,7 +18,7 @@ import {
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
-import { ContentTypeId, buildContent, contentToValues, isDynamicType, type FieldValues } from "@/domain/codes/content";
+import { ContentTypeId, isDynamicType, type CodeContent } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
 import { createCode, getCode, updateCode } from "@/integration/codes";
 import { ContentView, DesignView, RoutingView, PreviewView } from "../views";
@@ -72,7 +72,6 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const isEdit = Boolean(codeId);
 
   const [name, setName] = useState("");
-  const [fallbackUrl, setFallbackUrl] = useState("https://example.com");
   const [symbology, setSymbology] = useState<BarcodeFormat>(BarcodeFormat.QrCode);
   const [foreground, setForeground] = useState("#18181b");
   const [background, setBackground] = useState("#ffffff");
@@ -86,11 +85,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [transparentBackground, setTransparentBackground] = useState(false);
   const [emoji, setEmoji] = useState<DesignEmojiOverlay | null>(null);
   const [rules, setRules] = useState<RuleDraft[]>([]);
-  const [existing, setExisting] = useState<CodeDto | null>(null);
-  // v0.7 iter1: the chosen content type + its form values. `url` is the dynamic forwarder
-  // (its single field binds to `fallbackUrl`); other types drive the preview from their payload.
-  const [contentTypeId, setContentTypeId] = useState<ContentTypeId>(ContentTypeId.Url);
-  const [contentValues, setContentValues] = useState<FieldValues>({});
+  const [existingCode, setExistingCode] = useState<CodeDto | null>(null);
+  // The typed content the code carries — the builder holds it directly (it *is* the wire shape). Defaults to a
+  // `url` forwarder seeded with a sample so the preview renders on first load.
+  const [content, setContent] = useState<CodeContent>({ type: "url", url: "https://example.com" });
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -106,9 +104,8 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     getCode(codeId)
       .then((code) => {
         if (cancelled) return;
-        setExisting(code);
+        setExistingCode(code);
         setName(code.name);
-        setFallbackUrl(code.fallbackUrl);
         setSymbology(code.barcodeFormat);
         setRules(toDrafts(code));
         setForeground(code.style.foregroundColor);
@@ -119,15 +116,9 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         setGradient(gradientFromDto(code.style.gradient));
         setTransparentBackground(code.style.transparentBackground);
         setEmoji(code.style.emoji ?? null);
-        // Round-trip the content form: normalize the discriminator to a content-type id, then project the typed
-        // content back to the builder's flat field values (legacy codes carry no content).
-        if (code.content) {
-          const typeId = code.content.type;
-          setContentTypeId(typeId);
-          const values = contentToValues(code.content);
-          if (typeId === ContentTypeId.Url) setFallbackUrl(values.url ?? code.fallbackUrl);
-          else setContentValues(values);
-        }
+        // Load the typed content directly. A legacy code (no typed content) opens as an editable `url` forwarder
+        // seeded from its stored fallback.
+        setContent(code.content ?? { type: "url", url: code.fallbackUrl });
       })
       .catch((e: unknown) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load the code");
@@ -141,9 +132,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   }, [codeId]);
 
   // The preview endpoint encodes the typed content server-side (same encoder as the saved asset → true parity).
-  // Static content bakes its payload; dynamic (url / mobileApp) falls back to the short link.
-  const previewContent = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
-  const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
+  // Static content bakes its payload; dynamic (url / mobileApp) falls back to the short link / sample URL.
+  const previewContent = content;
+  const urlDestination = content.type === ContentTypeId.Url ? content.url : "";
+  const previewValue = saved?.shortUrl ?? existingCode?.shortUrl ?? (urlDestination || `${REDIRECT_BASE}/preview`);
 
   // The preview endpoint's coarse kind: QR symbology → "qr", any other (1D/2D) → "barcode".
   const previewCodeType: CodeType = symbology === BarcodeFormat.QrCode ? CodeType.Qr : CodeType.Barcode;
@@ -171,22 +163,22 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   async function handleSubmit() {
     setError(null);
     // Client-side guard (the backend still validates): a mobile app link needs at least one destination.
-    if (contentTypeId === ContentTypeId.MobileApp && !["appStore", "playStore", "other"].some((k) => (contentValues[k] ?? "").trim())) {
+    if (content.type === ContentTypeId.MobileApp && !(content.appStore || content.playStore || content.other)) {
       setError("Add at least one link — App Store, Google Play, or a custom URL for other devices.");
       return;
     }
     setSaving(true);
     // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed
     // type (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
-    const isStatic = !isDynamicType(contentTypeId);
-    const selfRouted = contentTypeId === ContentTypeId.MobileApp; // backend derives fallback + device rules from the fields
-    const content = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
+    const isStatic = !isDynamicType(content.type);
+    const selfRouted = content.type === ContentTypeId.MobileApp; // backend derives fallback + device rules from the fields
     const request = {
       name: name.trim() || "Untitled code",
       codeType: CodeType.Qr,
       barcodeFormat: symbology,
       // Static bakes a payload; mobileApp's fallback + rules are derived on the server — both send empty here.
-      fallbackUrl: isStatic || selfRouted ? "" : fallbackUrl.trim(),
+      // A plain URL forwards to its own destination.
+      fallbackUrl: isStatic || selfRouted ? "" : content.type === ContentTypeId.Url ? content.url.trim() : "",
       rules:
         isStatic || selfRouted
           ? []
@@ -202,7 +194,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     try {
       const dto = codeId ? await updateCode(codeId, request) : await createCode(request);
       setSaved(dto);
-      setExisting(dto);
+      setExistingCode(dto);
       onSaved?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -270,15 +262,11 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             {tab === CodeTab.Content && (
               <ContentView
                 isEdit={isEdit}
-                existing={existing}
+                existingCode={existingCode}
                 name={name}
                 onNameChange={setName}
-                contentTypeId={contentTypeId}
-                onContentTypeIdChange={setContentTypeId}
-                fallbackUrl={fallbackUrl}
-                onFallbackUrlChange={setFallbackUrl}
-                contentValues={contentValues}
-                onContentValuesChange={setContentValues}
+                content={content}
+                onContentChange={setContent}
               />
             )}
 

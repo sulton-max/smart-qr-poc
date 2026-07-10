@@ -1,11 +1,11 @@
 import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
-import type { FieldValues } from "@/domain/codes/content";
+import type { MobileAppLinkContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
 /** Defines one mobile-app destination — a store link plus the "default for other devices" option label. */
 interface MobileAppInput {
-  /** The values-record key the input binds to. */
-  readonly key: string;
+  /** The content property this input binds to. */
+  readonly key: "appStore" | "playStore" | "other";
 
   /** The input's field label. */
   readonly label: string;
@@ -26,24 +26,23 @@ const MobileAppInputs: readonly MobileAppInput[] = [
 ];
 
 /** Resolves the active fallback key: the saved choice if it's still a filled link, else the first filled link. */
-function getActiveFallback(options: readonly MobileAppInput[], values: FieldValues): string | undefined {
-  const filled = options.filter((o) => (values[o.key] ?? "").trim());
-  return filled.some((o) => o.key === values.fallback) ? values.fallback : filled[0]?.key;
+function getActiveFallback(value: MobileAppLinkContent): string | undefined {
+  const filled = MobileAppInputs.filter((o) => (value[o.key] ?? "").trim());
+  return filled.some((o) => o.key === value.fallback) ? value.fallback : filled[0]?.key;
 }
 
 /**
  * Renders mobile-app-link controls — store links plus a "default for other devices" picker chosen among the
  * filled links (the separate "other" URL is optional). The backend derives the device rules + fallback.
  */
-export function MobileAppControls({ fieldValues, onChange }: ContentControlsProps) {
-  const filled = MobileAppInputs.filter((o) => (fieldValues[o.key] ?? "").trim());
-  const activeFallback = getActiveFallback(MobileAppInputs, fieldValues);
+export function MobileAppControls({ value, onChange }: ContentControlsProps<MobileAppLinkContent>) {
+  const filled = MobileAppInputs.filter((o) => (value[o.key] ?? "").trim());
+  const activeFallback = getActiveFallback(value);
 
-  // Merge a link change, keeping `fallback` pointing at a link that's still filled.
-  const setLink = (key: string, v: string) => {
-    const next: FieldValues = { ...fieldValues, [key]: v };
-    next.fallback = getActiveFallback(MobileAppInputs, next);
-    onChange(next);
+  // Merge a link change (blank → absent), keeping `fallback` pointing at a link that's still filled.
+  const setLink = (key: MobileAppInput["key"], v: string) => {
+    const next: MobileAppLinkContent = { ...value, [key]: v || undefined };
+    onChange({ ...next, fallback: getActiveFallback(next) });
   };
 
   return (
@@ -52,7 +51,7 @@ export function MobileAppControls({ fieldValues, onChange }: ContentControlsProp
         <Field key={input.key} label={input.label}>
           <TextInput
             ring="sm"
-            value={fieldValues[input.key] ?? ""}
+            value={value[input.key] ?? ""}
             placeholder={input.placeholder}
             onChange={(e) => setLink(input.key, e.target.value)}
           />
@@ -62,7 +61,11 @@ export function MobileAppControls({ fieldValues, onChange }: ContentControlsProp
       {/* Only a real choice (≥2 filled links) needs a picker; one link is the fallback by default. */}
       {filled.length > 1 && (
         <Field label="Other devices open">
-          <Select value={activeFallback} onValueChange={(o) => o && onChange({ ...fieldValues, fallback: o.itemKey })}>
+          <Select
+            value={activeFallback}
+            onValueChange={(o) => o && onChange({ ...value, fallback: o.itemKey })}
+            getOptionLabel={(k) => MobileAppInputs.find((i) => i.key === k)?.fallbackLabel}
+          >
             <Select.Trigger>
               <Select.Value />
             </Select.Trigger>
