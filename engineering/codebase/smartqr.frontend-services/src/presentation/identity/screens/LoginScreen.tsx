@@ -9,7 +9,7 @@ import { Center, Divider, Stack } from "@wow-two-beta/ui/presentation/layout";
 import type { Me } from "@/domain/identity";
 import { GOOGLE_CLIENT_ID } from "@/integration/common";
 import { createGuest } from "@/integration/identity";
-import { GoogleSignInButton } from "./components/GoogleSignInButton";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
 
 interface LoginScreenProps {
   onAuthenticated: (me: Me) => void;

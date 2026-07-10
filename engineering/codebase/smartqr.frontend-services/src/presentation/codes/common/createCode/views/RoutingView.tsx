@@ -1,5 +1,5 @@
 import type { RuleDraft } from "@/domain/codes";
-import { RuleControls } from "@/presentation/codes/routing";
+import { RuleControls } from "@/presentation/codes/routing/components/RuleControls";
 
 /** Defines props for the Routing tab — the ordered redirect rules. */
 export interface RoutingViewProps {

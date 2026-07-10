@@ -15,8 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { COMPARISON, type Faq, type Feature, PRICING, type PricingTier, type Step } from "./data";
-import { type PostMeta } from "./blog/types";
+import { COMPARISON, type Faq, type Feature, PRICING, type PricingTier, type Step } from "../data";
+import { type PostMeta } from "../blog/types";
 
 /**
  * Static decorative QR for marketing pages — pure client-side render (no backend

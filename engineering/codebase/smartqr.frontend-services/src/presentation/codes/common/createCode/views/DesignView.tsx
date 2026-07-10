@@ -4,7 +4,10 @@ import { ColorPicker, Field, Select } from "@wow-two-beta/ui/presentation/forms"
 import { Accordion, AccordionType } from "@wow-two-beta/ui/presentation/display";
 import { Stack } from "@wow-two-beta/ui/presentation/layout";
 import { BarcodeFormat, FinderShape, ModuleShape, type DesignEmojiOverlay, type Gradient } from "@/domain/codes";
-import { BarcodeFormatDisplays, EmojiControls, FillControls, ShapeControls } from "@/presentation/codes/design";
+import { BarcodeFormatDisplays } from "@/presentation/codes/design/components/BarcodeFormatDisplays";
+import { EmojiControls } from "@/presentation/codes/design/components/EmojiControls";
+import { FillControls } from "@/presentation/codes/design/components/FillControls";
+import { ShapeControls } from "@/presentation/codes/design/components/ShapeControls";
 
 /** Defines props for the Design tab — the code symbology plus the colors / shape / center accordion. */
 export interface DesignViewProps {

@@ -1,2 +1,2 @@
 // presentation/billing — the billing dashboard screen.
-export * from "./BillingScreen";
+export * from "./screens/BillingScreen";

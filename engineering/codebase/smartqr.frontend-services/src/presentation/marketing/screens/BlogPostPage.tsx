@@ -5,8 +5,8 @@ import { Badge, BadgeVariant, Heading, HeadingSize, Text } from "@wow-two-beta/u
 import { Grid, Surface } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
 import { usePageMeta } from "@/presentation/common";
-import { getPost, POST_METAS } from "./blog";
-import { BlogCard } from "./components";
+import { getPost, POST_METAS } from "../blog";
+import { BlogCard } from "../components";
 import { NotFoundPage } from "./NotFoundPage";
 
 function formatDate(iso: string): string {

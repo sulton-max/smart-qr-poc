@@ -5,7 +5,7 @@ import { Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/displa
 import { Container, ContainerSize, Grid } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowRight, Infinity as InfinityIcon } from "lucide-react";
 import { usePageMeta } from "@/presentation/common";
-import { FAQS, FEATURES, STEPS } from "./data";
+import { FAQS, FEATURES, STEPS } from "../data";
 import {
   ComparisonTable,
   CtaBand,
@@ -17,8 +17,8 @@ import {
   SectionHeading,
   StepCard,
   PricingCards,
-} from "./components";
-import { HeroSim } from "./hero/HeroSim";
+} from "../components";
+import { HeroSim } from "../components/hero/HeroSim";
 
 export function LandingPage() {
   usePageMeta(

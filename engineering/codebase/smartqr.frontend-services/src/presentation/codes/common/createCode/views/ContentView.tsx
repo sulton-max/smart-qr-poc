@@ -1,5 +1,5 @@
 import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
-import { ContentMode, ContentTypeId, ContentTypes, contentType, type FieldValues } from "@/domain/codes/content";
+import { ContentTypeId, ContentTypes, isDynamicType, type FieldValues } from "@/domain/codes/content";
 import type { CodeDto } from "@/domain/codes";
 import { ContentTypeControls } from "@/presentation/codes/content/components/ContentTypeControls";
 
@@ -49,10 +49,9 @@ export function ContentView({
   contentValues,
   onContentValuesChange,
 }: ContentViewProps) {
-  const contentDef = contentType(contentTypeId);
   return (
     <>
-      {isEdit && existing && contentDef.mode !== ContentMode.Static && (
+      {isEdit && existing && isDynamicType(contentTypeId) && (
         <Field label="Short link">
           <TextInput value={existing.shortUrl} readOnly disabled />
         </Field>
@@ -66,9 +65,9 @@ export function ContentView({
         />
       </Field>
       <Field label="Content type">
-        <Select
+        <Select<ContentTypeId>
           value={contentTypeId}
-          onValueChange={(o) => o && onContentTypeIdChange(o.itemKey as ContentTypeId)}
+          onValueChange={(o) => o && onContentTypeIdChange(o.itemKey)}
         >
           <Select.Trigger>
             <Select.Value />

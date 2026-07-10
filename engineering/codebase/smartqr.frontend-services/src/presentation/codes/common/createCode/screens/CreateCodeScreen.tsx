@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundation/utils";
-import { Button, ButtonVariant, CopyButton, ToggleButton, ToggleButtonGroup, ToggleButtonGroupVariant, ToggleMode } from "@wow-two-beta/ui/presentation/actions";
+import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Button, ButtonVariant, ToggleButton, ToggleButtonGroup, ToggleButtonGroupVariant, ToggleMode } from "@wow-two-beta/ui/presentation/actions";
 import { Card, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
-import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/presentation/layout";
+import { Center, Grid, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
 import {
   BarcodeFormat,
@@ -11,7 +11,6 @@ import {
   EccLevel,
   FinderShape,
   GradientType,
-  ImageFormat,
   ModuleShape,
   type CodeDto,
   type Gradient,
@@ -19,12 +18,10 @@ import {
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
-import { ContentMode, ContentTypeId, contentType, buildContent, contentToValues, isDynamicContent, type FieldValues } from "@/domain/codes/content";
+import { ContentTypeId, buildContent, contentToValues, isDynamicType, type FieldValues } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
-import { codeImageUrl, createCode, getCode, updateCode } from "@/integration/codes";
-import { ContrastCallout } from "@/presentation/codes/design";
-import { QrPreview } from "./QrPreview";
-import { ContentView, DesignView, RoutingView } from "./views";
+import { createCode, getCode, updateCode } from "@/integration/codes";
+import { ContentView, DesignView, RoutingView, PreviewView } from "../views";
 
 /** Defines the code builder's grouped sections (Layout D — Content · Design · Routing). */
 const CodeTab = {
@@ -145,7 +142,6 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
   // The preview endpoint encodes the typed content server-side (same encoder as the saved asset → true parity).
   // Static content bakes its payload; dynamic (url / mobileApp) falls back to the short link.
-  const contentDef = contentType(contentTypeId);
   const previewContent = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
   const previewValue = saved?.shortUrl ?? existing?.shortUrl ?? fallbackUrl ?? `${REDIRECT_BASE}/preview`;
 
@@ -182,7 +178,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     setSaving(true);
     // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed
     // type (mobileApp) is derived server-side from its fields; a plain URL keeps its own routing rules.
-    const isStatic = contentDef.mode === ContentMode.Static;
+    const isStatic = !isDynamicType(contentTypeId);
     const selfRouted = contentTypeId === ContentTypeId.MobileApp; // backend derives fallback + device rules from the fields
     const content = buildContent(contentTypeId, contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues);
     const request = {
@@ -326,72 +322,20 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         </Card>
 
         {/* ── Preview ── */}
-        <Card className="surface-soft flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
-          <QrPreview value={previewValue} content={previewContent} codeType={previewCodeType} style={previewStyle} />
-          <Text size={SizePreset.Xs} color="muted" align="center">
-            Live preview — the final asset rendered server-side (vector-first), so what you see
-            is what you download.
-          </Text>
-
-          {/* Scannability note — lives under the preview (not in the form) so it reads against the actual render. */}
-          <div className="w-full">
-            <ContrastCallout
-              foreground={foreground}
-              background={background}
-              transparent={transparentBackground}
-              gradient={gradient}
-            />
-          </div>
-
-          {saved && (
-            <Surface
-              variant={SurfaceVariant.Subtle}
-              tone={ColorTone.Neutral}
-              radius="lg"
-              padding="md"
-              className="w-full"
-            >
-              <Text size={SizePreset.Sm} weight="medium" role="status">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
-              {isDynamicContent(saved.content) ? (
-                <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
-                  {saved.shortUrl}
-                </Text>
-              ) : (
-                <Text size={SizePreset.Sm} color="muted" className="mt-1">
-                  Payload baked into the code — it works offline, with no redirect.
-                </Text>
-              )}
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                {isDynamicContent(saved.content) && (
-                  <CopyButton size={SizePreset.Sm} text={saved.shortUrl} aria-label="Copy short URL">
-                    Copy link
-                  </CopyButton>
-                )}
-                <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
-                  <a href={codeImageUrl(saved.id, ImageFormat.Svg)} target="_blank" rel="noreferrer">
-                    SVG
-                  </a>
-                </Button>
-                <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
-                  <a href={codeImageUrl(saved.id, ImageFormat.Png)} target="_blank" rel="noreferrer">
-                    PNG
-                  </a>
-                </Button>
-                {isEdit ? (
-                  onBack && (
-                    <Button size={SizePreset.Sm} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} onClick={onBack}>
-                      Done
-                    </Button>
-                  )
-                ) : (
-                  <Button size={SizePreset.Sm} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} onClick={reset}>
-                    Create another
-                  </Button>
-                )}
-              </div>
-            </Surface>
-          )}
-        </Card>
+        <PreviewView
+          previewValue={previewValue}
+          previewContent={previewContent}
+          previewCodeType={previewCodeType}
+          previewStyle={previewStyle}
+          foreground={foreground}
+          background={background}
+          transparentBackground={transparentBackground}
+          gradient={gradient}
+          saved={saved}
+          isEdit={isEdit}
+          onBack={onBack}
+          onCreateAnother={reset}
+        />
       </Grid>
     </Stack>
   );

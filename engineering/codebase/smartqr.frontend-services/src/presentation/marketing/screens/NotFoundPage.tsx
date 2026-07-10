@@ -3,7 +3,7 @@ import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
 import { Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { usePageMeta } from "@/presentation/common";
-import { Section } from "./components";
+import { Section } from "../components";
 
 export function NotFoundPage() {
   usePageMeta("Page not found · Smart QR");

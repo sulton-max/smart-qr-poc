@@ -1,7 +1,7 @@
 import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Text } from "@wow-two-beta/ui/presentation/display";
 import { usePageMeta } from "@/presentation/common";
-import { PRICING_FAQS } from "./data";
+import { PRICING_FAQS } from "../data";
 import {
   ComparisonTable,
   CtaBand,
@@ -9,7 +9,7 @@ import {
   PricingCards,
   Section,
   SectionHeading,
-} from "./components";
+} from "../components";
 
 export function PricingPage() {
   usePageMeta(

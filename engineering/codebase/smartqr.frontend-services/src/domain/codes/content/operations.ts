@@ -50,3 +50,8 @@ export function contentToValues(content: CodeContent): FieldValues {
 export function isDynamicContent(content: CodeContent | null): boolean {
   return content == null || contentType(content.type).mode === ContentMode.Dynamic;
 }
+
+/** Whether a content type resolves through the forwarder short link (dynamic) rather than baking its payload (static). */
+export function isDynamicType(id: ContentTypeId): boolean {
+  return contentType(id).mode === ContentMode.Dynamic;
+}

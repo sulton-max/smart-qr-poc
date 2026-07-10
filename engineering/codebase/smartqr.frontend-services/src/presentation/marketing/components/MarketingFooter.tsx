@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { Container, ContainerSize, Grid, VStack } from "@wow-two-beta/ui/presentation/layout";
-import { Logo } from "./components";
-import { BRAND } from "./data";
+import { Logo } from "./kit";
+import { BRAND } from "../data";
 
 const PRODUCT_LINKS = [
   { to: "/pricing", label: "Pricing" },

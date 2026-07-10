@@ -1,4 +1,4 @@
-// presentation/codes/common — cross-sub-domain role-groups: the routed screens + the create-code builder
-// (each composes the design / routing / content sub-domains).
-export * from "./screens";
+// presentation/codes/common — the composed feature areas (each pulls the content / design / routing
+// sub-domains into a screen): the create-code builder and the codes list.
 export * from "./createCode";
+export * from "./listCodes";
