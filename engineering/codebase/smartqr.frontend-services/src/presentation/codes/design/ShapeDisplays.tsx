@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { CellsGlyph, DotsGlyph, FrameGlyph, HorizontalBarsGlyph, VerticalBarsGlyph } from "@wow-two-beta/ui/presentation/display";
 
-import { FinderShape, ModuleShape } from "@/domain/codes/core";
+import { FinderShape, ModuleShape } from "@/domain/codes/style";
 
 /** Defines the display for a module-shape option. */
 interface ModuleShapeDisplay {

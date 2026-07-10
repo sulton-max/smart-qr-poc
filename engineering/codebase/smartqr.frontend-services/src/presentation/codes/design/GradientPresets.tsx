@@ -3,7 +3,7 @@ import { ArrowDown, ArrowDownLeft, ArrowDownRight, ArrowRight } from "lucide-rea
 
 import { RadiusGlyph } from "@wow-two-beta/ui/presentation/display";
 
-import { GradientType } from "@/domain/codes/core";
+import { GradientType } from "@/domain/codes/style";
 
 /** Preset-icon glyph size (px). */
 export const PresetIconSize = 16;

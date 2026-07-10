@@ -1,4 +1,4 @@
-import type { CodeDto, CreateCodeRequest, ImageFormat, PreviewRequest, UpdateCodeRequest } from "@/domain/codes/core";
+import type { CodeDto, CreateCodeRequest, ImageFormat, PreviewRequest, UpdateCodeRequest } from "@/domain/codes/common";
 import { API_BASE, problemError, readData } from "../common/client";
 
 export async function createCode(request: CreateCodeRequest): Promise<CodeDto> {

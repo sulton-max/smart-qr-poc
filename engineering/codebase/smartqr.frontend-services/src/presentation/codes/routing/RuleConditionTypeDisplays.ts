@@ -1,4 +1,4 @@
-import { RuleConditionType } from "@/domain/codes/core";
+import { RuleConditionType } from "@/domain/codes/rules";
 
 /** Defines the display for a routing-condition option. */
 interface RuleConditionTypeDisplay {

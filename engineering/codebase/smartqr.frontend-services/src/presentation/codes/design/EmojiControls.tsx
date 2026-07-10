@@ -12,7 +12,7 @@ import {
 } from "@wow-two-beta/ui/presentation/forms";
 import { Stack } from "@wow-two-beta/ui/presentation/layout";
 
-import { type DesignEmojiOverlay } from "@/domain/codes/core";
+import { type DesignEmojiOverlay } from "@/domain/codes/style";
 
 /** Defines props for the center-emoji picker. */
 export interface EmojiControlsProps {

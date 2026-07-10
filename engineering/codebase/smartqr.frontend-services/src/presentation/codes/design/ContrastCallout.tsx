@@ -1,5 +1,5 @@
 import { Alert } from "@wow-two-beta/ui/presentation/feedback";
-import type { Gradient } from "@/domain/codes/core";
+import type { Gradient } from "@/domain/codes/style";
 
 /** @internal sRGB channel value at/below which the WCAG luminance curve stays linear. */
 const LinearChannelThreshold = 0.03928;

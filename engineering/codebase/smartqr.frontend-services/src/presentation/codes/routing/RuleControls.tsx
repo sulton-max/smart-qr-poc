@@ -3,7 +3,7 @@ import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
 import { Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import { Sortable } from "@wow-two-beta/ui/presentation/display";
 import { ArrowRight, GripVertical, Plus, Trash2 } from "lucide-react";
-import { RuleConditionType, type RuleDraft } from "@/domain/codes/core";
+import { RuleConditionType, type RuleDraft } from "@/domain/codes/rules";
 import { RuleConditionTypeDisplays } from "./RuleConditionTypeDisplays";
 
 /** Add-rule footer button label. */

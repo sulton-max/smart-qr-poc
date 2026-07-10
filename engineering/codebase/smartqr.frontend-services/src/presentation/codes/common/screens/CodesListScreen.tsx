@@ -15,7 +15,7 @@ import {
   ModalTitle,
 } from "@wow-two-beta/ui/presentation/overlays";
 import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
-import type { CodeDto } from "@/domain/codes/core";
+import type { CodeDto } from "@/domain/codes/common";
 import { deleteCode, listCodes, setCodeActive } from "@/integration/codes";
 
 /** Defines props for the codes dashboard screen. */

@@ -1,4 +1,4 @@
-import { BarcodeFormat } from "@/domain/codes/core";
+import { BarcodeFormat } from "@/domain/codes/content";
 
 /** Defines the display for a barcode-format option. */
 interface BarcodeFormatDisplay {

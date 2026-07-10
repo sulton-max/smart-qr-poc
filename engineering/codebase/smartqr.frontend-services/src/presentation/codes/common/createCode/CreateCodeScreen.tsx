@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundation/utils";
 import { Button, ButtonVariant, CopyButton, ToggleButton, ToggleButtonGroup, ToggleButtonGroupVariant, ToggleMode } from "@wow-two-beta/ui/presentation/actions";
-import { ColorPicker, Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
-import { Accordion, AccordionType, Card, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
+import { Card, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Grid, Stack, Surface } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
@@ -20,11 +19,12 @@ import {
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
-import { ContentMode, ContentTypeId, ContentTypes, contentType, buildContent, contentToValues, isDynamicContent, type FieldValues } from "@/domain/codes/content";
+import { ContentMode, ContentTypeId, contentType, buildContent, contentToValues, isDynamicContent, type FieldValues } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
 import { codeImageUrl, createCode, getCode, updateCode } from "@/integration/codes";
-import { BarcodeFormatDisplays, ContrastCallout, EmojiControls, FillControls, QrPreview, RuleControls, ShapeControls } from "../../core";
-import { ContentTypeControls } from "../../content/components/ContentTypeControls";
+import { ContrastCallout } from "@/presentation/codes/design";
+import { QrPreview } from "./QrPreview";
+import { ContentView, DesignView, RoutingView } from "./views";
 
 /** Defines the code builder's grouped sections (Layout D — Content · Design · Routing). */
 const CodeTab = {
@@ -271,151 +271,45 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
 
           {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
           <div key={tab} className="flex flex-col gap-5 motion-safe:animate-fade-in">
-          {tab === CodeTab.Content && (
-            <>
-              {isEdit && existing && contentDef.mode !== ContentMode.Static && (
-                <Field label="Short link">
-                  <TextInput value={existing.shortUrl} readOnly disabled />
-                </Field>
-              )}
-              <Field label="Name">
-                <TextInput
-                  ring="sm"
-                  value={name}
-                  placeholder="Spring menu table tent"
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </Field>
-              <Field label="Content type">
-                <Select
-                  value={contentTypeId}
-                  onValueChange={(o) => o && setContentTypeId(o.itemKey as ContentTypeId)}
-                >
-                  <Select.Trigger>
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {ContentTypes.map((c) => (
-                      <Select.Item key={c.id} itemKey={c.id} label={c.label} />
-                    ))}
-                  </Select.Content>
-                </Select>
-              </Field>
-              <ContentTypeControls
-                typeId={contentTypeId}
-                values={contentTypeId === ContentTypeId.Url ? { url: fallbackUrl } : contentValues}
-                onChange={(next) =>
-                  contentTypeId === ContentTypeId.Url ? setFallbackUrl(next.url ?? "") : setContentValues(next)
-                }
+            {tab === CodeTab.Content && (
+              <ContentView
+                isEdit={isEdit}
+                existing={existing}
+                name={name}
+                onNameChange={setName}
+                contentTypeId={contentTypeId}
+                onContentTypeIdChange={setContentTypeId}
+                fallbackUrl={fallbackUrl}
+                onFallbackUrlChange={setFallbackUrl}
+                contentValues={contentValues}
+                onContentValuesChange={setContentValues}
               />
-            </>
-          )}
+            )}
 
-          {tab === CodeTab.Design && (
-            <>
-              {/* Code type stays outside the accordion — it gates which style options apply (QR vs 1D/2D). */}
-              <Field label="Code type">
-                <Select<BarcodeFormat>
-                  value={symbology}
-                  onValueChange={(opt) => opt && setSymbology(opt.itemKey)}
-                >
-                  <Select.Trigger>
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {Object.values(BarcodeFormat).map((f) => (
-                      <Select.Item key={f} itemKey={f} label={BarcodeFormatDisplays[f].label} />
-                    ))}
-                  </Select.Content>
-                </Select>
-              </Field>
+            {tab === CodeTab.Design && (
+              <DesignView
+                symbology={symbology}
+                onSymbologyChange={setSymbology}
+                foreground={foreground}
+                onForegroundChange={setForeground}
+                gradient={gradient}
+                onGradientChange={setGradient}
+                background={background}
+                onBackgroundChange={setBackground}
+                transparentBackground={transparentBackground}
+                onTransparentBackgroundChange={setTransparentBackground}
+                moduleShape={moduleShape}
+                onModuleShapeChange={setModuleShape}
+                finderShape={finderShape}
+                onFinderShapeChange={setFinderShape}
+                finderDotShape={finderDotShape}
+                onFinderDotShapeChange={setFinderDotShape}
+                emoji={emoji}
+                onEmojiChange={setEmoji}
+              />
+            )}
 
-              {/* Layout D: one styling section open at a time — caps height, scales to any number of sections. */}
-              <Accordion
-                type={AccordionType.Single}
-                defaultValue="colors"
-                isCollapsible
-                className="overflow-hidden rounded-lg border border-border"
-              >
-                <Accordion.Item value="colors">
-                  <Accordion.Trigger>Colors &amp; fill</Accordion.Trigger>
-                  <Accordion.Content>
-                    <div className="px-3 py-2">
-                      <Stack gap="0">
-                        <FillControls
-                          foreground={foreground}
-                          onForegroundChange={setForeground}
-                          gradient={gradient}
-                          onGradientChange={setGradient}
-                        />
-
-                        {/* Background row — [Color (swatch + label) | Transparent]. The swatch lives
-                            INSIDE the Color segment, now valid markup: ToggleButton `as="div"` renders a
-                            role=button div, so nesting the ColorPicker's <button> isn't button-in-button.
-                            Clicking the swatch opens the picker (and selects Color via bubble); it greys
-                            under Transparent. */}
-                        <div className="flex min-h-10 items-center justify-between gap-4 border-t border-border pt-2">
-                          <span className="text-sm text-muted-foreground">Background</span>
-                          <ToggleButtonGroup variant={ToggleButtonGroupVariant.Segmented}
-                            type={ToggleMode.Single}
-                            value={transparentBackground ? "transparent" : "color"}
-                            onValueChange={(v) => {
-                              if (v === "color") setTransparentBackground(false);
-                              else if (v === "transparent") setTransparentBackground(true);
-                            }}
-                            aria-label="Background fill"
-                          >
-                            <ToggleButton value="color" size={SizePreset.Sm} as="div" className="gap-2">
-                              <span
-                                className={`inline-flex items-center${transparentBackground ? " pointer-events-none opacity-40" : ""}`}
-                              >
-                                <ColorPicker
-                                  triggerVariant="swatch"
-                                  value={background}
-                                  onValueChange={setBackground}
-                                  aria-label="Background color"
-                                  triggerSize="sm"
-                                />
-                              </span>
-                              Color
-                            </ToggleButton>
-                            <ToggleButton value="transparent" size={SizePreset.Sm}>Transparent</ToggleButton>
-                          </ToggleButtonGroup>
-                        </div>
-                      </Stack>
-                    </div>
-                  </Accordion.Content>
-                </Accordion.Item>
-
-                <Accordion.Item value="shape">
-                  <Accordion.Trigger>Shape &amp; eyes</Accordion.Trigger>
-                  <Accordion.Content>
-                    <div className="px-3 py-2">
-                      <ShapeControls
-                        moduleShape={moduleShape}
-                        finderShape={finderShape}
-                        finderDotShape={finderDotShape}
-                        onModuleShapeChange={setModuleShape}
-                        onFinderShapeChange={setFinderShape}
-                        onFinderDotShapeChange={setFinderDotShape}
-                      />
-                    </div>
-                  </Accordion.Content>
-                </Accordion.Item>
-
-                <Accordion.Item value="center">
-                  <Accordion.Trigger>Center</Accordion.Trigger>
-                  <Accordion.Content>
-                    <div className="px-3 py-2">
-                      <EmojiControls emoji={emoji} onChange={setEmoji} size={{ icon: 16 }} />
-                    </div>
-                  </Accordion.Content>
-                </Accordion.Item>
-              </Accordion>
-            </>
-          )}
-
-          {tab === CodeTab.Routing && <RuleControls rules={rules} onChange={setRules} />}
+            {tab === CodeTab.Routing && <RoutingView rules={rules} onRulesChange={setRules} />}
           </div>
 
           <Button

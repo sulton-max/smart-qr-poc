@@ -2,7 +2,7 @@ import { OptionTile, OptionTileGroup } from "@wow-two-beta/ui/presentation/actio
 import { ControlGroup, Divider, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { Orientation } from "@wow-two-beta/ui/foundation/utils";
 
-import { FinderShape, ModuleShape } from "@/domain/codes/core";
+import { FinderShape, ModuleShape } from "@/domain/codes/style";
 
 import { FinderShapeDisplays, ModuleShapeDisplays } from "./ShapeDisplays";
 

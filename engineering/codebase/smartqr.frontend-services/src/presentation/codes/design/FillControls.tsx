@@ -7,7 +7,7 @@ import { Separator } from "@wow-two-beta/ui/presentation/display";
 import { ColorPicker } from "@wow-two-beta/ui/presentation/forms";
 import { ControlGroup, Stack } from "@wow-two-beta/ui/presentation/layout";
 
-import { FillType, Gradient, GradientType } from "@/domain/codes/core";
+import { FillType, Gradient, GradientType } from "@/domain/codes/style";
 
 import { PresetIconSize, PresetRows } from "./GradientPresets";
 
