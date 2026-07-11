@@ -1,4 +1,4 @@
-import { Field, TelInput, TextareaInput } from "@wow-two-beta/ui/presentation/forms";
+import { Field, TelInput, TextAreaInput } from "@wow-two-beta/ui/presentation/forms";
 import type { SmsContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
@@ -10,7 +10,7 @@ export function SmsControls({ value, onChange }: ContentControlsProps<SmsContent
         <TelInput ring="sm" value={value.phone} onChange={(e) => onChange({ ...value, phone: e.target.value })} />
       </Field>
       <Field label="Message">
-        <TextareaInput ring="sm" rows={3} value={value.message ?? ""} onChange={(e) => onChange({ ...value, message: e.target.value || undefined })} />
+        <TextAreaInput ring="sm" rows={3} value={value.message ?? ""} onChange={(e) => onChange({ ...value, message: e.target.value || undefined })} />
       </Field>
     </>
   );

@@ -1,7 +1,7 @@
 // Frontend mirror of the backend code contract (SmartQr.Api Codes DTOs) — the shared aggregate that
 // pulls the content / style / rules concerns together: the create/update/preview requests and the CodeDto.
 
-import type { Temporal } from "@js-temporal/polyfill";
+import type { Temporal } from "temporal-polyfill";
 import type { CodeContent } from "../content/types";
 import type { BarcodeFormat } from "../content/BarcodeFormat";
 import type { CodeType } from "../content/CodeType";

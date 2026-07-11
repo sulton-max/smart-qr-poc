@@ -13,10 +13,10 @@
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/geist-mono": "^5.2.8",
-    "@js-temporal/polyfill": "^0.5.0",
+    "temporal-polyfill": "^1.0.1",
     "@react-oauth/google": "^0.12.2",
     "@tanstack/react-form": "^1.33.1",
-    "@wow-two-beta/ui": "0.0.95",
+    "@wow-two-beta/ui": "0.0.97",
     "lucide-react": "^0.460.0",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",

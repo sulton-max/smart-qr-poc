@@ -1,4 +1,4 @@
-import { EmailInput, Field, TelInput, TextInput, TextareaInput, UrlInput } from "@wow-two-beta/ui/presentation/forms";
+import { EmailInput, Field, TelInput, TextInput, TextAreaInput, UrlInput } from "@wow-two-beta/ui/presentation/forms";
 import type { VCardContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
@@ -31,7 +31,7 @@ export function VCardControls({ value, onChange }: ContentControlsProps<VCardCon
         <TextInput ring="sm" value={value.address ?? ""} onChange={(e) => onChange({ ...value, address: e.target.value || undefined })} />
       </Field>
       <Field label="Note">
-        <TextareaInput ring="sm" rows={3} value={value.note ?? ""} onChange={(e) => onChange({ ...value, note: e.target.value || undefined })} />
+        <TextAreaInput ring="sm" rows={3} value={value.note ?? ""} onChange={(e) => onChange({ ...value, note: e.target.value || undefined })} />
       </Field>
     </>
   );

@@ -1,18 +1,19 @@
 # Handoff — create-code builder polish (p0.1 Iter 9 → p0.2)
 
-*Last updated: 2026-07-10*
+*Last updated: 2026-07-11*
 
-> Plans of record: **[p0.1](p0.1.md)** (active, Iters 1–9) · **[p0.2](../p0.2/p0.2.md)** (deep polish). Polish-track convention: `conventions/planning/polish-track/polish-track.md` (Status = one word). Read those first.
+> Plans of record: **[p0.1](p0.1.md)** (active — Iters 1–10 done; **Iter 11 code models** + **Iter 12 select field + calendar datetime** open) · **[p0.2](../p0.2/p0.2.md)** (queued — Iter 1 = dynamic-by-default model; do NOT start until the user says go). Polish-track convention: `conventions/planning/polish-track/polish-track.md` (Status = one word). Read those first.
 
 ## State
 
-- App `smartqr.frontend-services` on `@wow-two-beta/ui@0.0.95` (auto-bumped mid-session by a sibling chat). Baseline **green** (`pnpm typecheck · test · build` from that dir). Tests = 4 (`content/operations.test.ts`).
-- **Two other chats are live in the same tree** (see § Coordination) — one migrated the builder to the SDK **forms-engine**, one is editing the **SDK** repo. Stay in your lane; never revert their work.
+- App `smartqr.frontend-services` on `@wow-two-beta/ui@0.0.97`. Tree **green** (`pnpm typecheck · test 4/4 · build`). Tests = 4 (`content/operations.test.ts`).
+- **p0.1 active** — Iters 1–10 done (SDK `DateTimeField` published `0.0.97` + adopted; `NativeInputStyles` + bespoke atom gone; polyfill unified → `temporal-polyfill`). Open: **Iter 11 code models** (domain+UI merge · naming · view-models → `domain/codes` · `symbology`→`barcodeFormat` · tests → `tests/`) · **Iter 12 select field + calendar datetime** (`SelectField` resolution · `CalendarContent.start/end` → `Temporal`).
+- p0.2 is **queued** (Iter 1 = dynamic-by-default content model) — do NOT begin until p0.1 closes and the user says go.
+- Sibling chats may still touch this tree (forms-engine, SDK). Stay in your lane; never revert their work.
 
 ## ⚡ Do first
 
-1. **DateTimeField — done + green.** Rebuilt SDK-style in `fields.tsx` (inner `DateTimeInput` calls `useFormControl` *inside* `<Field>` → fixes the dangling-`id` a11y bug; `Temporal.PlainDateTime` via `@js-temporal/polyfill`; `formatISODateTime`/`parseISODateTime` helpers). `CalendarControls` bridges (`start`/`end` stay `string`); `useNativeFieldProps` retired.
-2. p0.1 Iter 9 tail: adopt SDK `options` (marginal) + the `TextareaInput`→`TextAreaInput` import rename (once the SDK's rename actually publishes — `@0.0.95` still exports `TextareaInput`). Then **close p0.1**, start **p0.2 Iter 1 = content-type components polish** (Calendar scan-bug is the first concrete target).
+**Open p0.1 iterations: 11 (code models) + 12 (select field + calendar datetime).** Iter 11 — merge the domain + UI code models (align names, share nested sub-models, UI-only props stay app-side), move `CreateCodeValues`/`BuilderStyle` → `domain/codes`, `symbology`→`barcodeFormat` (drop derivable `codeType`), tests → `tests/`. Iter 12 — resolve app-local `SelectField` (extract to SDK, or delete + use SDK `Select` if it renders from `options`), and migrate `CalendarContent.start/end` `string`→`Temporal.PlainDateTime` (wire stays ISO). Task lists → [p0.1](p0.1.md).
 
 ## Architecture shifts this stretch (know these)
 
@@ -28,10 +29,9 @@
 
 ## Follow-ups / open
 
-- **App import** `TextareaInput`→`TextAreaInput` once the SDK republishes the rename (+ bump the pin).
-- **SDK bug** — `ring` is inert on `UrlInput`/`EmailInput`/`TelInput`/`TextareaInput` (typechecks via `InputBaseVariants` but their impl drops it; only `TextInput` wires it). `ring="sm"` kept app-side to auto-correct; SDK should wire `border`/`ring` on these atoms.
-- **SDK — export `inputBaseVariants` + `InputBaseVariants`** from `presentation/forms` (`@0.0.95` doesn't). `DateTimeField` fell back to `NativeInputStyles`; swap to `inputBaseVariants({size,state})` + drop `NativeInputStyles` once exported.
-- **SDK gaps (p0.2)** — `Select.options` should render items (then `SelectField` inlines) · a combined `dateTimePicker` atom (extract the app's now-proven `DateTimeField`) · adopt `options` (getOptionLabel→options, marginal).
+- **Resolved on `0.0.96`** — `TextareaInput`→`TextAreaInput` rename adopted (6 files) · `ring` inert bug fixed (SDK now wires `inputBaseVariants`; app's `ring="sm"` now actually applies + is consistent across all inputs) · `Select.options` adopted in `SelectField` (dropped `getOptionLabel`).
+- **SDK — `inputBaseVariants` stays internal by design** (`0.0.96` barrel exposes only the `InputSize/State/Border/Ring` axis enums). `DateTimeField` keeps `NativeInputStyles` as the sanctioned local mirror — not a version lag; don't chase re-exporting it.
+- **SDK — combined `dateTimePicker` atom** — SDK ships separate `dateField`/`timeField`/`datePicker` but no single-input datetime; extract the app's now-proven `DateTimeField` (p0.2 § gaps).
 - **Content-model datetime** — `CalendarContent.start`/`end` still `string`; migrating to `Temporal.PlainDateTime` needs the wire serializer verified (deferred).
 - **Validation** — the SDK is building plug-and-play validation (form context); adopt for the content controls (same `Field` context) when it lands — don't roll our own. Single entry: per-`*Content` schema composed into the discriminated union.
 - **p0.2 per-content** — Calendar QR doesn't scan on phone (content/backend iCalendar encoding) · MobileApp needs rule-builder add/remove inputs (UX redesign) · per-model design mocks + `other` gloss.
