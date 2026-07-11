@@ -1,4 +1,4 @@
-import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { Field, UrlInput } from "@wow-two-beta/ui/presentation/forms";
 import type { UrlContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
@@ -6,7 +6,7 @@ import type { ContentControlsProps } from "./fields";
 export function UrlControls({ value, onChange }: ContentControlsProps<UrlContent>) {
   return (
     <Field label="Destination URL">
-      <TextInput
+      <UrlInput
         ring="sm"
         value={value.url}
         placeholder="https://example.com"

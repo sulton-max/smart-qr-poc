@@ -15,13 +15,15 @@
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@js-temporal/polyfill": "^0.5.0",
     "@react-oauth/google": "^0.12.2",
-    "@wow-two-beta/ui": "0.0.89",
+    "@tanstack/react-form": "^1.33.1",
+    "@wow-two-beta/ui": "0.0.95",
     "lucide-react": "^0.460.0",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.17.0"
+    "react-router-dom": "^7.17.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",

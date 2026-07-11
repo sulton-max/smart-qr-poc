@@ -1,6 +1,6 @@
-import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { EmailInput, Field, TelInput, TextInput, TextareaInput, UrlInput } from "@wow-two-beta/ui/presentation/forms";
 import type { VCardContent } from "@/domain/codes/content";
-import { type ContentControlsProps, TextAreaField } from "./fields";
+import type { ContentControlsProps } from "./fields";
 
 /** Renders contact-card (vCard) content — only the first name is required. */
 export function VCardControls({ value, onChange }: ContentControlsProps<VCardContent>) {
@@ -19,18 +19,20 @@ export function VCardControls({ value, onChange }: ContentControlsProps<VCardCon
         <TextInput ring="sm" value={value.title ?? ""} onChange={(e) => onChange({ ...value, title: e.target.value || undefined })} />
       </Field>
       <Field label="Phone">
-        <TextInput ring="sm" value={value.phone ?? ""} onChange={(e) => onChange({ ...value, phone: e.target.value || undefined })} />
+        <TelInput ring="sm" value={value.phone ?? ""} onChange={(e) => onChange({ ...value, phone: e.target.value || undefined })} />
       </Field>
       <Field label="Email">
-        <TextInput ring="sm" value={value.email ?? ""} onChange={(e) => onChange({ ...value, email: e.target.value || undefined })} />
+        <EmailInput ring="sm" value={value.email ?? ""} onChange={(e) => onChange({ ...value, email: e.target.value || undefined })} />
       </Field>
       <Field label="Website">
-        <TextInput ring="sm" value={value.url ?? ""} onChange={(e) => onChange({ ...value, url: e.target.value || undefined })} />
+        <UrlInput ring="sm" value={value.url ?? ""} onChange={(e) => onChange({ ...value, url: e.target.value || undefined })} />
       </Field>
       <Field label="Address">
         <TextInput ring="sm" value={value.address ?? ""} onChange={(e) => onChange({ ...value, address: e.target.value || undefined })} />
       </Field>
-      <TextAreaField label="Note" value={value.note ?? ""} onChange={(v) => onChange({ ...value, note: v || undefined })} />
+      <Field label="Note">
+        <TextareaInput ring="sm" rows={3} value={value.note ?? ""} onChange={(e) => onChange({ ...value, note: e.target.value || undefined })} />
+      </Field>
     </>
   );
 }

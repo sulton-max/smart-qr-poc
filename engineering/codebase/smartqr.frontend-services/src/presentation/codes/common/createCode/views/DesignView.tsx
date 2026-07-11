@@ -3,109 +3,49 @@ import { ToggleButton, ToggleButtonGroup, ToggleButtonGroupVariant, ToggleMode }
 import { ColorPicker, Field, Select } from "@wow-two-beta/ui/presentation/forms";
 import { Accordion, AccordionType } from "@wow-two-beta/ui/presentation/display";
 import { Stack } from "@wow-two-beta/ui/presentation/layout";
-import { BarcodeFormat, FinderShape, ModuleShape, type DesignEmojiOverlay, type Gradient } from "@/domain/codes";
+import type { AppForm } from "@wow-two-beta/ui/forms-engine";
+import { BarcodeFormat } from "@/domain/codes";
 import { BarcodeFormatDisplays } from "@/presentation/codes/design/components/BarcodeFormatDisplays";
 import { EmojiControls } from "@/presentation/codes/design/components/EmojiControls";
 import { FillControls } from "@/presentation/codes/design/components/FillControls";
 import { ShapeControls } from "@/presentation/codes/design/components/ShapeControls";
+import type { CreateCodeValues } from "../CreateCodeForm";
 
 /** Defines props for the Design tab — the code symbology plus the colors / shape / center accordion. */
 export interface DesignViewProps {
-  /** The barcode symbology (QR / 1D / 2D) — gates which style options apply. */
-  readonly symbology: BarcodeFormat;
-
-  /** Fires when the symbology changes. */
-  readonly onSymbologyChange: (value: BarcodeFormat) => void;
-
-  /** The solid foreground color (#RRGGBB). */
-  readonly foreground: string;
-
-  /** Fires when the foreground color changes. */
-  readonly onForegroundChange: (value: string) => void;
-
-  /** The foreground gradient, or null for a solid fill. */
-  readonly gradient: Gradient | null;
-
-  /** Fires when the gradient changes. */
-  readonly onGradientChange: (value: Gradient | null) => void;
-
-  /** The background color (#RRGGBB). */
-  readonly background: string;
-
-  /** Fires when the background color changes. */
-  readonly onBackgroundChange: (value: string) => void;
-
-  /** Whether the background is transparent (overrides the background color). */
-  readonly transparentBackground: boolean;
-
-  /** Fires when the transparent-background toggle changes. */
-  readonly onTransparentBackgroundChange: (value: boolean) => void;
-
-  /** The data-module shape. */
-  readonly moduleShape: ModuleShape;
-
-  /** Fires when the module shape changes. */
-  readonly onModuleShapeChange: (value: ModuleShape) => void;
-
-  /** The finder (eye) frame shape. */
-  readonly finderShape: FinderShape;
-
-  /** Fires when the finder frame shape changes. */
-  readonly onFinderShapeChange: (value: FinderShape) => void;
-
-  /** The finder (eye) pupil shape. */
-  readonly finderDotShape: FinderShape;
-
-  /** Fires when the finder pupil shape changes. */
-  readonly onFinderDotShapeChange: (value: FinderShape) => void;
-
-  /** The center emoji overlay, or null for none. */
-  readonly emoji: DesignEmojiOverlay | null;
-
-  /** Fires when the center emoji changes. */
-  readonly onEmojiChange: (value: DesignEmojiOverlay | null) => void;
+  /** The code-builder form. */
+  readonly form: AppForm<CreateCodeValues>;
 }
 
-/** Renders the Design tab: the code-type select plus a single-open accordion (colors & fill · shape & eyes · center). */
-export function DesignView({
-  symbology,
-  onSymbologyChange,
-  foreground,
-  onForegroundChange,
-  gradient,
-  onGradientChange,
-  background,
-  onBackgroundChange,
-  transparentBackground,
-  onTransparentBackgroundChange,
-  moduleShape,
-  onModuleShapeChange,
-  finderShape,
-  onFinderShapeChange,
-  finderDotShape,
-  onFinderDotShapeChange,
-  emoji,
-  onEmojiChange,
-}: DesignViewProps) {
+/**
+ * Renders the Design tab: the code-type select plus a single-open accordion (colors & fill · shape & eyes ·
+ * center). The design settings are one `style` field — each accordion pane binds through `form.Field name="style"`
+ * and merges its slice back with a spread (the same whole-object idiom the content controls use).
+ */
+export function DesignView({ form }: DesignViewProps) {
   return (
     <>
       {/* Code type stays outside the accordion — it gates which style options apply (QR vs 1D/2D). */}
-      <Field label="Code type">
-        <Select<BarcodeFormat>
-          value={symbology}
-          onValueChange={(opt) => opt && onSymbologyChange(opt.itemKey)}
-          getOptionLabel={(f) => BarcodeFormatDisplays[f].label}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            {Object.values(BarcodeFormat).map((f) => (
-              <Select.Item key={f} itemKey={f} label={BarcodeFormatDisplays[f].label} />
-            ))}
-          </Select.Content>
-        </Select>
-      </Field>
+      <form.Field name="symbology">
+        {(f) => (
+          <Field label="Code type">
+            <Select<BarcodeFormat>
+              value={f.value}
+              onValueChange={(opt) => opt && f.setValue(opt.itemKey)}
+              getOptionLabel={(format) => BarcodeFormatDisplays[format].label}
+            >
+              <Select.Trigger>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                {Object.values(BarcodeFormat).map((format) => (
+                  <Select.Item key={format} itemKey={format} label={BarcodeFormatDisplays[format].label} />
+                ))}
+              </Select.Content>
+            </Select>
+          </Field>
+        )}
+      </form.Field>
 
       {/* Layout D: one styling section open at a time — caps height, scales to any number of sections. */}
       <Accordion
@@ -118,48 +58,50 @@ export function DesignView({
           <Accordion.Trigger>Colors &amp; fill</Accordion.Trigger>
           <Accordion.Content>
             <div className="px-3 py-2">
-              <Stack gap="0">
-                <FillControls
-                  foreground={foreground}
-                  onForegroundChange={onForegroundChange}
-                  gradient={gradient}
-                  onGradientChange={onGradientChange}
-                />
+              <form.Field name="style">
+                {(f) => (
+                  <Stack gap="0">
+                    <FillControls
+                      foreground={f.value.foreground}
+                      onForegroundChange={(v) => f.setValue({ ...f.value, foreground: v })}
+                      gradient={f.value.gradient}
+                      onGradientChange={(v) => f.setValue({ ...f.value, gradient: v })}
+                    />
 
-                {/* Background row — [Color (swatch + label) | Transparent]. The swatch lives
-                    INSIDE the Color segment, now valid markup: ToggleButton `as="div"` renders a
-                    role=button div, so nesting the ColorPicker's <button> isn't button-in-button.
-                    Clicking the swatch opens the picker (and selects Color via bubble); it greys
-                    under Transparent. */}
-                <div className="flex min-h-10 items-center justify-between gap-4 border-t border-border pt-2">
-                  <span className="text-sm text-muted-foreground">Background</span>
-                  <ToggleButtonGroup variant={ToggleButtonGroupVariant.Segmented}
-                    type={ToggleMode.Single}
-                    value={transparentBackground ? "transparent" : "color"}
-                    onValueChange={(v) => {
-                      if (v === "color") onTransparentBackgroundChange(false);
-                      else if (v === "transparent") onTransparentBackgroundChange(true);
-                    }}
-                    aria-label="Background fill"
-                  >
-                    <ToggleButton value="color" size={SizePreset.Sm} as="div" className="gap-2">
-                      <span
-                        className={`inline-flex items-center${transparentBackground ? " pointer-events-none opacity-40" : ""}`}
+                    {/* Background row — [Color (swatch + label) | Transparent]. The swatch lives INSIDE the
+                        Color segment (ToggleButton `as="div"` → valid nesting); it greys under Transparent. */}
+                    <div className="flex min-h-10 items-center justify-between gap-4 border-t border-border pt-2">
+                      <span className="text-sm text-muted-foreground">Background</span>
+                      <ToggleButtonGroup
+                        variant={ToggleButtonGroupVariant.Segmented}
+                        type={ToggleMode.Single}
+                        value={f.value.transparentBackground ? "transparent" : "color"}
+                        onValueChange={(v) => {
+                          if (v === "color") f.setValue({ ...f.value, transparentBackground: false });
+                          else if (v === "transparent") f.setValue({ ...f.value, transparentBackground: true });
+                        }}
+                        aria-label="Background fill"
                       >
-                        <ColorPicker
-                          triggerVariant="swatch"
-                          value={background}
-                          onValueChange={onBackgroundChange}
-                          aria-label="Background color"
-                          triggerSize="sm"
-                        />
-                      </span>
-                      Color
-                    </ToggleButton>
-                    <ToggleButton value="transparent" size={SizePreset.Sm}>Transparent</ToggleButton>
-                  </ToggleButtonGroup>
-                </div>
-              </Stack>
+                        <ToggleButton value="color" size={SizePreset.Sm} as="div" className="gap-2">
+                          <span
+                            className={`inline-flex items-center${f.value.transparentBackground ? " pointer-events-none opacity-40" : ""}`}
+                          >
+                            <ColorPicker
+                              triggerVariant="swatch"
+                              value={f.value.background}
+                              onValueChange={(v) => f.setValue({ ...f.value, background: v })}
+                              aria-label="Background color"
+                              triggerSize="sm"
+                            />
+                          </span>
+                          Color
+                        </ToggleButton>
+                        <ToggleButton value="transparent" size={SizePreset.Sm}>Transparent</ToggleButton>
+                      </ToggleButtonGroup>
+                    </div>
+                  </Stack>
+                )}
+              </form.Field>
             </div>
           </Accordion.Content>
         </Accordion.Item>
@@ -168,14 +110,18 @@ export function DesignView({
           <Accordion.Trigger>Shape &amp; eyes</Accordion.Trigger>
           <Accordion.Content>
             <div className="px-3 py-2">
-              <ShapeControls
-                moduleShape={moduleShape}
-                finderShape={finderShape}
-                finderDotShape={finderDotShape}
-                onModuleShapeChange={onModuleShapeChange}
-                onFinderShapeChange={onFinderShapeChange}
-                onFinderDotShapeChange={onFinderDotShapeChange}
-              />
+              <form.Field name="style">
+                {(f) => (
+                  <ShapeControls
+                    moduleShape={f.value.moduleShape}
+                    finderShape={f.value.finderShape}
+                    finderDotShape={f.value.finderDotShape}
+                    onModuleShapeChange={(v) => f.setValue({ ...f.value, moduleShape: v })}
+                    onFinderShapeChange={(v) => f.setValue({ ...f.value, finderShape: v })}
+                    onFinderDotShapeChange={(v) => f.setValue({ ...f.value, finderDotShape: v })}
+                  />
+                )}
+              </form.Field>
             </div>
           </Accordion.Content>
         </Accordion.Item>
@@ -184,7 +130,15 @@ export function DesignView({
           <Accordion.Trigger>Center</Accordion.Trigger>
           <Accordion.Content>
             <div className="px-3 py-2">
-              <EmojiControls emoji={emoji} onChange={onEmojiChange} size={{ icon: 16 }} />
+              <form.Field name="style">
+                {(f) => (
+                  <EmojiControls
+                    emoji={f.value.emoji}
+                    onChange={(v) => f.setValue({ ...f.value, emoji: v })}
+                    size={{ icon: 16 }}
+                  />
+                )}
+              </form.Field>
             </div>
           </Accordion.Content>
         </Accordion.Item>

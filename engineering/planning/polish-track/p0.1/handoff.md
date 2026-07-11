@@ -1,43 +1,52 @@
-# Handoff — p0.1 create-code polish → Iteration 7 (tab views + Content view)
+# Handoff — create-code builder polish (p0.1 Iter 9 → p0.2)
 
-*Last updated: 2026-07-09*
+*Last updated: 2026-07-10*
 
-> Previous chat's context is full. **Plan of record = [`p0.1.md`](p0.1.md)** — read it first. Iter 1–6 done; next = Iter 7. Start at **§ Do first**.
+> Plans of record: **[p0.1](p0.1.md)** (active, Iters 1–9) · **[p0.2](../p0.2/p0.2.md)** (deep polish). Polish-track convention: `conventions/planning/polish-track/polish-track.md` (Status = one word). Read those first.
 
 ## State
 
-- **App** `smartqr.frontend-services` on `@wow-two-beta/ui@0.0.89` + backend `WoW2.Sdk.Backend.Beta@10.0.45-beta`. Green (`pnpm typecheck · test 9/9 · build`).
-- **Iter 6 (emoji picker) done end-to-end** — extracted to SDK + adopted; `char`→`glyph` complete (SDK `EmojiSpec.Glyph`; DB reset done); icon size folded into `size={{ icon }}` + `shrink-0` fix; `Divider` orientation-required + height fix; `ShapeControls` body↔eyes separator.
-- **String-union → const-enum sweep done** (app + SDK): `CodeTab` · `ContentMode` · `ImageFormat` · `Status` · `HeroMode` · `ReturnStatus` · SDK `ToggleButtonElement`.
-- Latest edits may be **uncommitted** — `git status` first. Agents never commit/push; the developer does.
+- App `smartqr.frontend-services` on `@wow-two-beta/ui@0.0.95` (auto-bumped mid-session by a sibling chat). Baseline **green** (`pnpm typecheck · test · build` from that dir). Tests = 4 (`content/operations.test.ts`).
+- **Two other chats are live in the same tree** (see § Coordination) — one migrated the builder to the SDK **forms-engine**, one is editing the **SDK** repo. Stay in your lane; never revert their work.
 
-## ⚡ Do first — Iteration 7, task 1
+## ⚡ Do first
 
-Extract the 3 tab bodies out of `CreateCodeScreen` (`presentation/codes/common/screens/CreateCodeScreen.tsx`, ~491 lines) — the `{tab === CodeTab.Content/Design/Routing}` blocks → `ContentView` · `DesignView` · `RoutingView`. The `Card` + tab-strip stay in the screen.
+1. **DateTimeField — done + green.** Rebuilt SDK-style in `fields.tsx` (inner `DateTimeInput` calls `useFormControl` *inside* `<Field>` → fixes the dangling-`id` a11y bug; `Temporal.PlainDateTime` via `@js-temporal/polyfill`; `formatISODateTime`/`parseISODateTime` helpers). `CalendarControls` bridges (`start`/`end` stay `string`); `useNativeFieldProps` retired.
+2. p0.1 Iter 9 tail: adopt SDK `options` (marginal) + the `TextareaInput`→`TextAreaInput` import rename (once the SDK's rename actually publishes — `@0.0.95` still exports `TextareaInput`). Then **close p0.1**, start **p0.2 Iter 1 = content-type components polish** (Calendar scan-bug is the first concrete target).
 
-- Naming = **View** (per `conventions/development/frontend/presentation/components.md` §1 — "content area inside a page, swaps on nav"), **not** `*Controls`.
-- Then work the flat Content-view tasks in `p0.1.md` Iter 7: unify URL (drop the `typeId === Url` value/`onChange` branch) · typed `Select<ContentTypeId>` (drop the cast) · short-link predicate (`ContentMode.Static` enum already done) · group content state into one prop.
+## Architecture shifts this stretch (know these)
 
-## Structure target (agreed — Iter 7)
+- **Typed content model** — each content type has a typed model (`domain/codes/content/types/*` = the `CodeContent` union); each `*Controls` is bound to its `XContent` (no flat `FieldValues` bag; `build/parse` gone). `type` discriminant = `typeof ContentTypeId.X` (no raw string). Interfaces follow `Defines`/`Gets or sets`/blank-line.
+- **SDK typed atoms adopted** — controls now use `TextareaInput` (multi-line), `UrlInput`/`EmailInput`/`TelInput` per field kind (imported from `@wow-two-beta/ui/presentation/forms`). **Geo kept `TextInput`** (`NumberInput` is numeric — drops partial coord strings). `fields.tsx` now holds only `DateTimeField` (rebuilding) + `SelectField` (wifi); `TextField`/`TextAreaField` were inlined away (pure-wrap philosophy — extract only when the wrapper adds logic).
+- **Forms-engine migration (other chat)** — the builder is now `useAppForm` (`@/form`) + **`createCode/CreateCodeForm.ts`**: `CreateCodeValues` (`name`·`symbology`·`content`·`style: BuilderStyle`·`rules`), a zod `CreateCodeSchema` (discriminated content union + rules array), `emptyCreateCodeValues`/`toCreateCodeValues`/`toCreateCodeRequest`/`toPreviewStyle`. Views take `form: AppForm<CreateCodeValues>`. `RoutingView` is migrated; content controls stay props-based but the form binds `content` as one `form.Field`.
 
-- **Domain** `domain/codes/` — dissolve `core/` → `common` + `content` · `style` · `rules`. `content` **absorbs code identity** (name · `CodeType` · `BarcodeFormat`); `common` = shared aggregate (`CodeDto` · preview · `ImageFormat`); `style` = shapes/fill/ecc/gradient/emoji/`PreviewStyle`; `rules` = `RuleConditionType`/`RuleDraft`.
-- **Presentation** `presentation/codes/` — `common/createCode/` holds the builder + its 3 views + `QrPreview`; per-type content controls stay in `content/components/`.
-- **Deferred convention** — "presentation mirrors the page's views": a view can host a *foreign* domain (e.g. an Analytics tab on the codes screen), so analyze cross-domain before codifying.
+## This session's changes (mine)
 
-## Conventions set this stretch
+- **Design defaults** → `domain/codes/style/defaultCodeStyle.ts` (a `PreviewStyle` domain constant): rounded body + both eyes · black→`#7c3aed` **radial** gradient (radius 1) · no emoji. Wired into `CreateCodeForm.ts` `emptyCreateCodeValues().style` (mapped to `BuilderStyle`). ⚠️ **that edit is in the forms-engine owner's file** — coordinate.
+- DateTimeField rebuild (agent, ↑ Do-first). Atom adoption, enum-`type`, interface docs, `TextField` inline, dead `FieldValues` — all done + green (see p0.1 Iter 8–9).
+- SDK (via agents, **uncommitted** in `wow-two-sdk-beta.ui`): `TextareaInput`→`TextAreaInput` rename (deprecated `Textarea` alias kept 1 release); **230-component catalog** added to `conventions/development/frontend/presentation/component-catalog.md` (check-list-first before building).
 
-- **Props = destructure with inline defaults** (the standard; `components.md` §4). Evaluated + reverted the no-`props.x` style (`withDefaults`/`splitProps`) — nullable props re-widen inside closures (needs `!`/captures); revisit if TS ships control-flow narrowing for member access.
-- **`component-catalog.md`** added to the frontend conventions — components by kind (screens · views · controls · fields · displays); indexed in `frontend-conventions.md`.
+## Follow-ups / open
 
-## Verify + gotchas
+- **App import** `TextareaInput`→`TextAreaInput` once the SDK republishes the rename (+ bump the pin).
+- **SDK bug** — `ring` is inert on `UrlInput`/`EmailInput`/`TelInput`/`TextareaInput` (typechecks via `InputBaseVariants` but their impl drops it; only `TextInput` wires it). `ring="sm"` kept app-side to auto-correct; SDK should wire `border`/`ring` on these atoms.
+- **SDK — export `inputBaseVariants` + `InputBaseVariants`** from `presentation/forms` (`@0.0.95` doesn't). `DateTimeField` fell back to `NativeInputStyles`; swap to `inputBaseVariants({size,state})` + drop `NativeInputStyles` once exported.
+- **SDK gaps (p0.2)** — `Select.options` should render items (then `SelectField` inlines) · a combined `dateTimePicker` atom (extract the app's now-proven `DateTimeField`) · adopt `options` (getOptionLabel→options, marginal).
+- **Content-model datetime** — `CalendarContent.start`/`end` still `string`; migrating to `Temporal.PlainDateTime` needs the wire serializer verified (deferred).
+- **Validation** — the SDK is building plug-and-play validation (form context); adopt for the content controls (same `Field` context) when it lands — don't roll our own. Single entry: per-`*Content` schema composed into the discriminated union.
+- **p0.2 per-content** — Calendar QR doesn't scan on phone (content/backend iCalendar encoding) · MobileApp needs rule-builder add/remove inputs (UX redesign) · per-model design mocks + `other` gloss.
+- **Later** — upgrade router + queries from the SDK.
 
-- App verify: `pnpm typecheck · test · build` from `smartqr.frontend-services`. https dev on `:7024` (mkcert).
-- **SDK version bumps** don't show until `rm -rf node_modules/.vite` + restart `:7024`. Another lane runs a dev server there — don't commandeer it; the developer restarts.
-- **SDK edits** → developer pushes → CI republishes (`@wow-two-beta/ui` `0.0.y`; backend `10.0.z-beta`) → then bump the app pin + `pnpm install`.
+## Coordination (multiple chats, one tree)
+
+- **App forms-engine chat** — owns `CreateCodeForm.ts`, `@/form`, `RoutingView`, the screen's form wiring. My design-defaults touched `CreateCodeForm.ts` (flagged above).
+- **SDK chat** — editing `wow-two-sdk-beta.ui` `src/forms-engine/*`, `.storybook`, `docs/planning.md` (disjoint from the rename/catalog agents did). SDK changes are **uncommitted** — dev commits + CI publishes `0.0.y`.
+- Rule: assume existing changes are intentional; edit only your files; a break rooted outside your lane = stop + report.
 
 ## Paths
 
-- Plan: `engineering/planning/polish-track/p0.1/p0.1.md` · this handoff alongside.
-- App: `engineering/codebase/smartqr.frontend-services/` (codes surface: `presentation/codes/**`, `domain/codes/**`).
-- Conventions: `wow-two-ws/conventions/development/frontend/` (`components.md` · `component-catalog.md` · `enums.md`).
-- SDK ui: `workbench/wow-two-sdk-beta/wow-two-sdk-beta.ui/`.
+- Plans: `engineering/planning/polish-track/{p0.1/p0.1.md, p0.2/p0.2.md}`.
+- Builder: `presentation/codes/common/createCode/` (`CreateCodeForm.ts` · `screens/` · `views/` · `components/`).
+- Content controls: `presentation/codes/content/components/` (`fields.tsx` · per-type `*Controls`).
+- Domain: `domain/codes/{content,style,common,rules}/` (`style/defaultCodeStyle.ts`).
+- SDK exemplar for datetime: `wow-two-sdk-beta.ui/src/presentation/forms/dateField/DateField.tsx` + `DateExtensions.ts`.

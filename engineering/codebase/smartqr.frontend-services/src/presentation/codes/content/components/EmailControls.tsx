@@ -1,13 +1,13 @@
-import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { EmailInput, Field, TextInput, TextareaInput } from "@wow-two-beta/ui/presentation/forms";
 import type { EmailContent } from "@/domain/codes/content";
-import { type ContentControlsProps, TextAreaField } from "./fields";
+import type { ContentControlsProps } from "./fields";
 
 /** Renders email content — recipient, optional subject, optional (multiline) body. */
 export function EmailControls({ value, onChange }: ContentControlsProps<EmailContent>) {
   return (
     <>
       <Field label="To">
-        <TextInput
+        <EmailInput
           ring="sm"
           value={value.to}
           placeholder="name@example.com"
@@ -17,7 +17,9 @@ export function EmailControls({ value, onChange }: ContentControlsProps<EmailCon
       <Field label="Subject">
         <TextInput ring="sm" value={value.subject ?? ""} onChange={(e) => onChange({ ...value, subject: e.target.value || undefined })} />
       </Field>
-      <TextAreaField label="Body" value={value.body ?? ""} onChange={(v) => onChange({ ...value, body: v || undefined })} />
+      <Field label="Body">
+        <TextareaInput ring="sm" rows={3} value={value.body ?? ""} onChange={(e) => onChange({ ...value, body: e.target.value || undefined })} />
+      </Field>
     </>
   );
 }

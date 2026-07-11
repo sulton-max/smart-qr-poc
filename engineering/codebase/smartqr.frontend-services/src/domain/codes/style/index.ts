@@ -5,5 +5,6 @@ export * from "./FinderShape";
 export * from "./FillType";
 export * from "./EccLevel";
 export * from "./PreviewStyle";
+export * from "./defaultCodeStyle";
 export { Gradient, GradientType } from "@wow-two-beta/ui/domain/color";
 export type { GradientStop, LinearGradient, RadialGradient } from "@wow-two-beta/ui/domain/color";

@@ -1,4 +1,4 @@
-import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { Field, TelInput } from "@wow-two-beta/ui/presentation/forms";
 import type { PhoneContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
@@ -6,7 +6,7 @@ import type { ContentControlsProps } from "./fields";
 export function PhoneControls({ value, onChange }: ContentControlsProps<PhoneContent>) {
   return (
     <Field label="Phone">
-      <TextInput
+      <TelInput
         ring="sm"
         value={value.phone}
         placeholder="+1 555 0100"

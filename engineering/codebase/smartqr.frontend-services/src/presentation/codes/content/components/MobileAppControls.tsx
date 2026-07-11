@@ -1,4 +1,4 @@
-import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
+import { Field, Select, UrlInput } from "@wow-two-beta/ui/presentation/forms";
 import type { MobileAppLinkContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
@@ -49,7 +49,7 @@ export function MobileAppControls({ value, onChange }: ContentControlsProps<Mobi
     <>
       {MobileAppInputs.map((input) => (
         <Field key={input.key} label={input.label}>
-          <TextInput
+          <UrlInput
             ring="sm"
             value={value[input.key] ?? ""}
             placeholder={input.placeholder}
