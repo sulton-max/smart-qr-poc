@@ -4,30 +4,30 @@
 // there's no flat form-values bag — the builder's content state *is* the wire shape.
 
 import type { CodeContent } from "./types";
-import { ContentMode, ContentTypeId, contentType } from "./registry";
+import { ContentMode, ContentType, contentType } from "./registry";
 
 /** Builds the minimal typed content for a type — the discriminator plus its required fields blank. Used to seed a fresh content type. */
-export function emptyContent(id: ContentTypeId): CodeContent {
+export function emptyContent(id: ContentType): CodeContent {
   switch (id) {
-    case ContentTypeId.Url:
+    case ContentType.Url:
       return { type: "url", url: "" };
-    case ContentTypeId.MobileApp:
+    case ContentType.MobileApp:
       return { type: "mobileApp" };
-    case ContentTypeId.Text:
+    case ContentType.Text:
       return { type: "text", text: "" };
-    case ContentTypeId.Email:
+    case ContentType.Email:
       return { type: "email", to: "" };
-    case ContentTypeId.Sms:
+    case ContentType.Sms:
       return { type: "sms", phone: "" };
-    case ContentTypeId.Phone:
+    case ContentType.Phone:
       return { type: "phone", phone: "" };
-    case ContentTypeId.Geo:
+    case ContentType.Geo:
       return { type: "geo", latitude: "", longitude: "" };
-    case ContentTypeId.Wifi:
+    case ContentType.Wifi:
       return { type: "wifi", ssid: "", hidden: false };
-    case ContentTypeId.VCard:
-      return { type: "vcard", firstName: "" };
-    case ContentTypeId.Calendar:
+    case ContentType.VCard:
+      return { type: "vCard", firstName: "" };
+    case ContentType.Calendar:
       return { type: "calendar", title: "", start: "" };
   }
 }
@@ -38,6 +38,6 @@ export function isDynamicContent(content: CodeContent | null): boolean {
 }
 
 /** Whether a content type resolves through the forwarder short link (dynamic) rather than baking its payload (static). */
-export function isDynamicType(id: ContentTypeId): boolean {
+export function isDynamicType(id: ContentType): boolean {
   return contentType(id).mode === ContentMode.Dynamic;
 }

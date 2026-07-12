@@ -24,7 +24,7 @@ import {
   type PreviewStyle,
   type RuleDraft,
 } from "@/domain/codes";
-import { ContentTypeId, isDynamicType, type CodeContent } from "@/domain/codes/content";
+import { ContentType, isDynamicType, type CodeContent } from "@/domain/codes/content";
 import { RuleConditionType } from "@/domain/codes/rules";
 
 /** A zod schema over a const-object enum's values, typed as the exact string-literal union it produces. */
@@ -76,33 +76,33 @@ export interface CreateCodeValues {
 // row cell is its own `form.Field` deep path.
 
 const contentSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal(ContentTypeId.Url), url: z.string() }),
+  z.object({ type: z.literal(ContentType.Url), url: z.string() }),
   z.object({
-    type: z.literal(ContentTypeId.MobileApp),
+    type: z.literal(ContentType.MobileApp),
     appStore: z.string().optional(),
     playStore: z.string().optional(),
     other: z.string().optional(),
     fallback: z.string().optional(),
   }),
-  z.object({ type: z.literal(ContentTypeId.Text), text: z.string() }),
+  z.object({ type: z.literal(ContentType.Text), text: z.string() }),
   z.object({
-    type: z.literal(ContentTypeId.Email),
+    type: z.literal(ContentType.Email),
     to: z.string(),
     subject: z.string().optional(),
     body: z.string().optional(),
   }),
-  z.object({ type: z.literal(ContentTypeId.Sms), phone: z.string(), message: z.string().optional() }),
-  z.object({ type: z.literal(ContentTypeId.Phone), phone: z.string() }),
-  z.object({ type: z.literal(ContentTypeId.Geo), latitude: z.string(), longitude: z.string() }),
+  z.object({ type: z.literal(ContentType.Sms), phone: z.string(), message: z.string().optional() }),
+  z.object({ type: z.literal(ContentType.Phone), phone: z.string() }),
+  z.object({ type: z.literal(ContentType.Geo), latitude: z.string(), longitude: z.string() }),
   z.object({
-    type: z.literal(ContentTypeId.Wifi),
+    type: z.literal(ContentType.Wifi),
     ssid: z.string(),
     password: z.string().optional(),
     encryption: z.string().optional(),
     hidden: z.boolean(),
   }),
   z.object({
-    type: z.literal(ContentTypeId.VCard),
+    type: z.literal(ContentType.VCard),
     firstName: z.string(),
     lastName: z.string().optional(),
     org: z.string().optional(),
@@ -114,7 +114,7 @@ const contentSchema = z.discriminatedUnion("type", [
     note: z.string().optional(),
   }),
   z.object({
-    type: z.literal(ContentTypeId.Calendar),
+    type: z.literal(ContentType.Calendar),
     title: z.string(),
     start: z.string(),
     end: z.string().optional(),
@@ -155,7 +155,7 @@ export const CreateCodeSchema = z
   .superRefine((values, ctx) => {
     // Rules only route a plain URL forwarder — static + mobileApp derive routing server-side and the submit
     // drops the array. Validate row destinations only when they'll actually be sent (cross-section refine).
-    if (values.content.type !== ContentTypeId.Url) return;
+    if (values.content.type !== ContentType.Url) return;
     values.rules.forEach((rule, index) => {
       if (!rule.destination.trim()) {
         ctx.addIssue({
@@ -174,7 +174,7 @@ export function emptyCreateCodeValues(): CreateCodeValues {
   return {
     name: "",
     symbology: BarcodeFormat.QrCode,
-    content: { type: ContentTypeId.Url, url: "https://example.com" },
+    content: { type: ContentType.Url, url: "https://example.com" },
     // Seed the house look (rounded + black→violet radial) so a new code is polished on first render.
     style: {
       foreground: defaultCodeStyle.foregroundColor,
@@ -227,7 +227,7 @@ export function toCreateCodeValues(code: CodeDto): CreateCodeValues {
     name: code.name,
     symbology: code.barcodeFormat,
     // A legacy code (no typed content) opens as an editable `url` forwarder seeded from its stored fallback.
-    content: code.content ?? { type: ContentTypeId.Url, url: code.fallbackUrl },
+    content: code.content ?? { type: ContentType.Url, url: code.fallbackUrl },
     style: {
       foreground: code.style.foregroundColor,
       background: code.style.backgroundColor,
@@ -266,13 +266,13 @@ export function toCreateCodeRequest(values: CreateCodeValues): CreateCodeRequest
   // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed
   // type (mobileApp) derives its fallback + device rules server-side; a plain URL keeps its own routing rules.
   const isStatic = !isDynamicType(content.type);
-  const selfRouted = content.type === ContentTypeId.MobileApp;
+  const selfRouted = content.type === ContentType.MobileApp;
   return {
     name: name.trim() || "Untitled code",
     codeType: CodeType.Qr,
     barcodeFormat: symbology,
     fallbackUrl:
-      isStatic || selfRouted ? "" : content.type === ContentTypeId.Url ? content.url.trim() : "",
+      isStatic || selfRouted ? "" : content.type === ContentType.Url ? content.url.trim() : "",
     rules:
       isStatic || selfRouted
         ? []

@@ -9,7 +9,7 @@ Dynamic QR / barcode / link platform — programmable routing ("one code, many d
 
 ## Structure
 
-Two top-level layers (per `conventions/development/repo/repo-structure.md`):
+Two top-level layers (per `conventions/development/repo/structure/repo-structure.md`):
 
 - **`product/`** — venture layer: model, pricing, positioning, GTM.
 - **`engineering/`** — technical layer: `codebase/` (the .NET + React services) · `architecture/` · `planning/` (incl. `version-track/`) · `development/` · `deployment/` · `operations/` · `research/`.
@@ -30,4 +30,4 @@ Frontend (`engineering/codebase/smartqr.frontend-services/`) — React 19 + Vite
 ## Conventions
 
 - All code / architecture / ports / docs conventions live in **`wow-two-ws/conventions/`** (index: `conventions.md`) — follow them, never restate here.
-- Repo specifics only: single `https` profile per service binding two ports — HTTPS even + HTTP odd (Api `7020`/`7021` · Redirect `7022`/`7023`); TLS upstream in prod. Allocations → `conventions/development/repo/ports.md`.
+- Repo specifics only: single `https` profile per service binding two ports — HTTPS even + HTTP odd (Api `7020`/`7021` · Redirect `7022`/`7023`); TLS upstream in prod. Allocations → `conventions/deployment/hosting/ports.md`.

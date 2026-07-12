@@ -1,9 +1,9 @@
-import { ContentTypeId } from "../registry";
+import { ContentType } from "../registry";
 
 /** Defines the dynamic device-routed app-link content — the server derives the App Store / Google Play / fallback rules from these links. */
 export interface MobileAppLinkContent {
   /** Gets or sets the content-type discriminator. */
-  type: typeof ContentTypeId.MobileApp;
+  type: typeof ContentType.MobileApp;
 
   /** Gets or sets the App Store URL for iOS devices. */
   appStore?: string;

@@ -4,7 +4,7 @@
 // The value ↔ typed-`CodeContent` mapping ops live in `operations.ts`.
 
 /** Defines the content type a code carries — the discriminator on the wire's `CodeContent`. */
-export const ContentTypeId = {
+export const ContentType = {
   /** Refers to a dynamic forwarder to a single destination URL. */
   Url: "url",
 
@@ -30,13 +30,13 @@ export const ContentTypeId = {
   Wifi: "wifi",
 
   /** Refers to a static contact-card (vCard) payload. */
-  VCard: "vcard",
+  VCard: "vCard",
 
   /** Refers to a static calendar-event payload. */
   Calendar: "calendar",
 } as const;
 
-export type ContentTypeId = (typeof ContentTypeId)[keyof typeof ContentTypeId];
+export type ContentType = (typeof ContentType)[keyof typeof ContentType];
 
 /** Defines the input primitive a content field binds to. */
 export const FieldKind = {
@@ -95,7 +95,7 @@ export interface ContentField {
 }
 
 export interface ContentTypeDef {
-  id: ContentTypeId;
+  id: ContentType;
 
   label: string;
 
@@ -110,7 +110,7 @@ export interface ContentTypeDef {
 
 export const ContentTypes: ContentTypeDef[] = [
   {
-    id: ContentTypeId.Url,
+    id: ContentType.Url,
     label: "URL",
     mode: ContentMode.Dynamic,
     fields: [{ key: "url", label: "Destination URL", kind: FieldKind.Url, placeholder: "https://example.com", required: true }],
@@ -119,7 +119,7 @@ export const ContentTypes: ContentTypeDef[] = [
     // Dynamic + device-routed: the QR carries the forwarder short link; the redirect resolves the
     // scanner's OS (User-Agent) and sends iOS → App Store, Android → Google Play, else → the fallback.
     // The backend derives the device rules + fallback from these fields at save (see MobileAppLinkContentSpec).
-    id: ContentTypeId.MobileApp,
+    id: ContentType.MobileApp,
     label: "Mobile app link",
     mode: ContentMode.Dynamic,
     note: "Add at least one. iPhone opens the App Store, Android opens Google Play; choose which link every other device opens.",
@@ -130,13 +130,13 @@ export const ContentTypes: ContentTypeDef[] = [
     ],
   },
   {
-    id: ContentTypeId.Text,
+    id: ContentType.Text,
     label: "Text",
     mode: ContentMode.Static,
     fields: [{ key: "text", label: "Text", kind: FieldKind.TextArea, required: true }],
   },
   {
-    id: ContentTypeId.Email,
+    id: ContentType.Email,
     label: "Email",
     mode: ContentMode.Static,
     fields: [
@@ -146,7 +146,7 @@ export const ContentTypes: ContentTypeDef[] = [
     ],
   },
   {
-    id: ContentTypeId.Sms,
+    id: ContentType.Sms,
     label: "SMS",
     mode: ContentMode.Static,
     fields: [
@@ -155,13 +155,13 @@ export const ContentTypes: ContentTypeDef[] = [
     ],
   },
   {
-    id: ContentTypeId.Phone,
+    id: ContentType.Phone,
     label: "Phone",
     mode: ContentMode.Static,
     fields: [{ key: "phone", label: "Phone", kind: FieldKind.Tel, placeholder: "+1 555 0100", required: true }],
   },
   {
-    id: ContentTypeId.Geo,
+    id: ContentType.Geo,
     label: "Location",
     mode: ContentMode.Static,
     fields: [
@@ -170,7 +170,7 @@ export const ContentTypes: ContentTypeDef[] = [
     ],
   },
   {
-    id: ContentTypeId.Wifi,
+    id: ContentType.Wifi,
     label: "WiFi",
     mode: ContentMode.Static,
     fields: [
@@ -193,7 +193,7 @@ export const ContentTypes: ContentTypeDef[] = [
     ],
   },
   {
-    id: ContentTypeId.VCard,
+    id: ContentType.VCard,
     label: "Contact card",
     mode: ContentMode.Static,
     fields: [
@@ -209,7 +209,7 @@ export const ContentTypes: ContentTypeDef[] = [
     ],
   },
   {
-    id: ContentTypeId.Calendar,
+    id: ContentType.Calendar,
     label: "Event",
     mode: ContentMode.Static,
     fields: [
@@ -222,9 +222,9 @@ export const ContentTypes: ContentTypeDef[] = [
   },
 ];
 
-const ById: Record<ContentTypeId, ContentTypeDef> = Object.fromEntries(
+const ById: Record<ContentType, ContentTypeDef> = Object.fromEntries(
   ContentTypes.map((c) => [c.id, c]),
-) as Record<ContentTypeId, ContentTypeDef>;
+) as Record<ContentType, ContentTypeDef>;
 
 /** Look up a content-type definition by id. */
-export const contentType = (id: ContentTypeId): ContentTypeDef => ById[id];
+export const contentType = (id: ContentType): ContentTypeDef => ById[id];

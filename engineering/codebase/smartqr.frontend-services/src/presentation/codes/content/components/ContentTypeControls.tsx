@@ -1,4 +1,4 @@
-import { ContentTypeId, contentType, type CodeContent } from "@/domain/codes/content";
+import { ContentType, contentType, type CodeContent } from "@/domain/codes/content";
 import { UrlControls } from "./UrlControls";
 import { MobileAppControls } from "./MobileAppControls";
 import { TextControls } from "./TextControls";
@@ -35,25 +35,25 @@ export function ContentTypeControls({ content, onChange }: ContentTypeControlsPr
 // the matching model. `onChange` (over the full union) is passed as-is — a wider handler satisfies a narrower one.
 function renderControls(content: CodeContent, onChange: (next: CodeContent) => void) {
   switch (content.type) {
-    case ContentTypeId.Url:
+    case ContentType.Url:
       return <UrlControls value={content} onChange={onChange} />;
-    case ContentTypeId.MobileApp:
+    case ContentType.MobileApp:
       return <MobileAppControls value={content} onChange={onChange} />;
-    case ContentTypeId.Text:
+    case ContentType.Text:
       return <TextControls value={content} onChange={onChange} />;
-    case ContentTypeId.Email:
+    case ContentType.Email:
       return <EmailControls value={content} onChange={onChange} />;
-    case ContentTypeId.Sms:
+    case ContentType.Sms:
       return <SmsControls value={content} onChange={onChange} />;
-    case ContentTypeId.Phone:
+    case ContentType.Phone:
       return <PhoneControls value={content} onChange={onChange} />;
-    case ContentTypeId.Geo:
+    case ContentType.Geo:
       return <GeoControls value={content} onChange={onChange} />;
-    case ContentTypeId.Wifi:
+    case ContentType.Wifi:
       return <WifiControls value={content} onChange={onChange} />;
-    case ContentTypeId.VCard:
+    case ContentType.VCard:
       return <VCardControls value={content} onChange={onChange} />;
-    case ContentTypeId.Calendar:
+    case ContentType.Calendar:
       return <CalendarControls value={content} onChange={onChange} />;
     default: {
       // Exhaustiveness guard — a new content type must add a control above.

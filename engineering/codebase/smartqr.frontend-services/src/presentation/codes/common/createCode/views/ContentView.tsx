@@ -2,7 +2,7 @@ import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import { Orientation } from "@wow-two-beta/ui/foundation/utils";
 import { Divider } from "@wow-two-beta/ui/presentation/layout";
 import type { AppForm } from "@wow-two-beta/ui/forms-engine";
-import { ContentTypeId, ContentTypes, contentType, emptyContent, isDynamicType } from "@/domain/codes/content";
+import { ContentType, ContentTypes, contentType, emptyContent, isDynamicType } from "@/domain/codes/content";
 import type { CodeDto } from "@/domain/codes";
 import { ContentTypeControls } from "@/presentation/codes/content/components/ContentTypeControls";
 import type { CreateCodeValues } from "../CreateCodeForm";
@@ -45,7 +45,7 @@ export function ContentView({ form, isEdit, existingCode }: ContentViewProps) {
         {(f) => (
           <>
             <Field label="Content type">
-              <Select<ContentTypeId>
+              <Select<ContentType>
                 value={f.value.type}
                 onValueChange={(o) => o && f.setValue(emptyContent(o.itemKey))}
                 getOptionLabel={(id) => contentType(id).label}

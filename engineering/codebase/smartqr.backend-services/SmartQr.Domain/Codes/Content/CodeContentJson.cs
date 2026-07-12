@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace SmartQr.Domain.Codes.Content;
 
@@ -10,7 +11,7 @@ namespace SmartQr.Domain.Codes.Content;
 /// </summary>
 public static class CodeContentJson
 {
-    /// <summary>The shared serializer options — Web defaults (camelCase) plus string enums; the polymorphic discriminator comes from the <c>[JsonDerivedType]</c> attributes on <see cref="CodeContent"/>.</summary>
+    /// <summary>The shared serializer options — Web defaults (camelCase) plus string enums; the polymorphic discriminator is wired from the <see cref="Core.Enums.CodeContentType"/> enum by <see cref="CodeContentPolymorphism"/> (single source of truth).</summary>
     public static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web)
     {
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
@@ -18,6 +19,9 @@ public static class CodeContentJson
         // Postgres jsonb does not preserve object key order, so the "type" discriminator may not be first on read —
         // let the polymorphic reader find it anywhere (it buffers the object). Without this, reading a stored code throws.
         AllowOutOfOrderMetadataProperties = true,
+
+        // Polymorphism from the CodeContentType enum — no per-type discriminator attributes to drift.
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { CodeContentPolymorphism.Configure } },
     };
 
     /// <summary>Serializes content to its jsonb string form, emitting the <c>type</c> discriminator.</summary>

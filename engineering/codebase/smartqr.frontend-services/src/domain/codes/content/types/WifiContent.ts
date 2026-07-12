@@ -1,9 +1,9 @@
-import { ContentTypeId } from "../registry";
+import { ContentType } from "../registry";
 
 /** Defines the static Wi-Fi join content — network credentials plus a hidden-SSID flag. */
 export interface WifiContent {
   /** Gets or sets the content-type discriminator. */
-  type: typeof ContentTypeId.Wifi;
+  type: typeof ContentType.Wifi;
 
   /** Gets or sets the network SSID. */
   ssid: string;

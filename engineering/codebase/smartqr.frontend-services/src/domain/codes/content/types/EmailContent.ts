@@ -1,9 +1,9 @@
-import { ContentTypeId } from "../registry";
+import { ContentType } from "../registry";
 
 /** Defines the static mailto content — a recipient plus optional subject and body. */
 export interface EmailContent {
   /** Gets or sets the content-type discriminator. */
-  type: typeof ContentTypeId.Email;
+  type: typeof ContentType.Email;
 
   /** Gets or sets the recipient email address. */
   to: string;

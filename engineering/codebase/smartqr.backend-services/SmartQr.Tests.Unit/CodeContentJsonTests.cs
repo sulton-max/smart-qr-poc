@@ -30,7 +30,7 @@ public sealed class CodeContentJsonTests
         { new PhoneContent { Phone = "+15550100" }, "phone" },
         { new GeoContent { Latitude = "41.31", Longitude = "69.24" }, "geo" },
         { new WifiContent { Ssid = "Cafe", Password = "pw", Hidden = true }, "wifi" },
-        { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vcard" },
+        { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
         { new CalendarContent { Title = "Launch", Start = "2026-07-01T18:30" }, "calendar" },
     };
 

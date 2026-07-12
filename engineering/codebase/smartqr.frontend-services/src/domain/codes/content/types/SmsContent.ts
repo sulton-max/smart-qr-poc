@@ -1,9 +1,9 @@
-import { ContentTypeId } from "../registry";
+import { ContentType } from "../registry";
 
 /** Defines the static sms content — a recipient phone plus optional prefilled message. */
 export interface SmsContent {
   /** Gets or sets the content-type discriminator. */
-  type: typeof ContentTypeId.Sms;
+  type: typeof ContentType.Sms;
 
   /** Gets or sets the recipient phone number. */
   phone: string;

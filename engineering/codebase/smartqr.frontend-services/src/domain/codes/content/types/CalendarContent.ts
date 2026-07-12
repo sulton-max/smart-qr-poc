@@ -1,9 +1,9 @@
-import { ContentTypeId } from "../registry";
+import { ContentType } from "../registry";
 
 /** Defines the static iCalendar event content — title and start are required, the rest optional. */
 export interface CalendarContent {
   /** Gets or sets the content-type discriminator. */
-  type: typeof ContentTypeId.Calendar;
+  type: typeof ContentType.Calendar;
 
   /** Gets or sets the event title. */
   title: string;

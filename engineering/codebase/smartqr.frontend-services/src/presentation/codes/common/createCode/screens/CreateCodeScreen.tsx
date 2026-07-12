@@ -13,7 +13,7 @@ import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Grid, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
 import { BarcodeFormat, CodeType, type CodeDto } from "@/domain/codes";
-import { ContentTypeId } from "@/domain/codes/content";
+import { ContentType } from "@/domain/codes/content";
 import { REDIRECT_BASE } from "@/integration/common";
 import { createCode, getCode, updateCode } from "@/integration/codes";
 import { useAppForm } from "@/form";
@@ -200,7 +200,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                 <form.Subscribe selector={(s) => s.values.symbology}>
                   {(symbology) => {
                     const previewStyle = toPreviewStyle(style);
-                    const urlDestination = content.type === ContentTypeId.Url ? content.url : "";
+                    const urlDestination = content.type === ContentType.Url ? content.url : "";
                     const previewValue =
                       saved?.shortUrl ?? existingCode?.shortUrl ?? (urlDestination || `${REDIRECT_BASE}/preview`);
                     // The preview endpoint's coarse kind: QR symbology → "qr", any other (1D/2D) → "barcode".

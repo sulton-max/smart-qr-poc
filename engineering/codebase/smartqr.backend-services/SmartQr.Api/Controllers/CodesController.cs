@@ -10,7 +10,6 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
-using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 using WoW.Two.Sdk.Backend.Beta.Web.Contracts;
 
 namespace SmartQr.Api.Controllers;

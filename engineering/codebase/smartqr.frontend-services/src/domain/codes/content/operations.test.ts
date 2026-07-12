@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ContentTypeId, ContentTypes } from "./registry";
+import { ContentType, ContentTypes } from "./registry";
 import { emptyContent, isDynamicContent, isDynamicType } from "./operations";
 
 // Payload ENCODING lives on the backend (SmartQr.Tests.Unit/CodeContentEncodeTests); each type's fields are
@@ -7,10 +7,10 @@ import { emptyContent, isDynamicContent, isDynamicType } from "./operations";
 
 describe("emptyContent", () => {
   it("creates a minimal typed content — discriminator set, required fields blank", () => {
-    expect(emptyContent(ContentTypeId.Url)).toEqual({ type: "url", url: "" });
-    expect(emptyContent(ContentTypeId.Wifi)).toEqual({ type: "wifi", ssid: "", hidden: false });
-    expect(emptyContent(ContentTypeId.MobileApp)).toEqual({ type: "mobileApp" });
-    expect(emptyContent(ContentTypeId.Geo)).toEqual({ type: "geo", latitude: "", longitude: "" });
+    expect(emptyContent(ContentType.Url)).toEqual({ type: "url", url: "" });
+    expect(emptyContent(ContentType.Wifi)).toEqual({ type: "wifi", ssid: "", hidden: false });
+    expect(emptyContent(ContentType.MobileApp)).toEqual({ type: "mobileApp" });
+    expect(emptyContent(ContentType.Geo)).toEqual({ type: "geo", latitude: "", longitude: "" });
   });
 
   it("covers every registered content type (id ≡ discriminator)", () => {
@@ -22,13 +22,13 @@ describe("emptyContent", () => {
 
 describe("isDynamicType / isDynamicContent", () => {
   it("url / mobileApp are dynamic; static types + null are classified correctly", () => {
-    expect(isDynamicType(ContentTypeId.Url)).toBe(true);
-    expect(isDynamicType(ContentTypeId.MobileApp)).toBe(true);
-    expect(isDynamicType(ContentTypeId.Wifi)).toBe(false);
+    expect(isDynamicType(ContentType.Url)).toBe(true);
+    expect(isDynamicType(ContentType.MobileApp)).toBe(true);
+    expect(isDynamicType(ContentType.Wifi)).toBe(false);
 
     expect(isDynamicContent(null)).toBe(true);
     expect(isDynamicContent({ type: "url", url: "https://x" })).toBe(true);
-    expect(isDynamicContent({ type: "vcard", firstName: "Ada" })).toBe(false);
+    expect(isDynamicContent({ type: "vCard", firstName: "Ada" })).toBe(false);
   });
 });
 

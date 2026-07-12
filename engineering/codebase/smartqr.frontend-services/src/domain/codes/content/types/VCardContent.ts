@@ -1,9 +1,9 @@
-import { ContentTypeId } from "../registry";
+import { ContentType } from "../registry";
 
 /** Defines the static vCard contact content — only the first name is required. */
 export interface VCardContent {
   /** Gets or sets the content-type discriminator. */
-  type: typeof ContentTypeId.VCard;
+  type: typeof ContentType.VCard;
 
   /** Gets or sets the contact's first name. */
   firstName: string;
