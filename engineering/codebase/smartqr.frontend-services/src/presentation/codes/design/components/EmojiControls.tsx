@@ -12,15 +12,15 @@ import {
 } from "@wow-two-beta/ui/presentation/forms";
 import { Stack } from "@wow-two-beta/ui/presentation/layout";
 
-import { type DesignEmojiOverlay } from "@/domain/codes/style";
+import { type CodeEmojiDto } from "@/domain/codes/style";
 
 /** Defines props for the center-emoji picker. */
 export interface EmojiControlsProps {
   /** The current center emoji, or `null` for none. */
-  readonly emoji: DesignEmojiOverlay | null;
+  readonly emoji: CodeEmojiDto | null;
 
   /** Emits the next center emoji, or `null` to clear it. */
-  readonly onChange: (emoji: DesignEmojiOverlay | null) => void;
+  readonly onChange: (emoji: CodeEmojiDto | null) => void;
 
   /** The category-navigation affordance. Default `strip`. */
   readonly categoryNavVariant?: CategoryNavVariant;
@@ -49,7 +49,7 @@ const MaxPreviewGlyph = 24;
 
 /**
  * Center-emoji picker — the app's thin adapter over the SDK `EmojiPicker` + `EmojiSizeControl`. Bridges the
- * builder's `DesignEmojiOverlay { glyph, sizeRatio }` to the picker's `EmojiCatalogEntry` (resolved via the
+ * builder's `CodeEmojiDto { glyph, sizeRatio }` to the picker's `EmojiCatalogEntry` (resolved via the
  * catalog) and adds the per-emoji size row (size is an app concern the picker deliberately leaves out).
  * Rides the live preview `style.emoji`; the backend bumps ECC to H so the code still scans.
  */

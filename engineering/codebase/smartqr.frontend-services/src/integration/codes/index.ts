@@ -1,2 +1,3 @@
-// integration/codes — code CRUD + image + server-rendered preview endpoint fns.
+// integration/codes — the codes API client (CRUD + image + server-rendered preview) + its request bodies.
+export * from "./models";
 export * from "./codes";

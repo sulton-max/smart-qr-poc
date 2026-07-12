@@ -64,7 +64,7 @@ function extractForegroundColors(foreground: string, gradient: Gradient | null):
 }
 
 /**
- * Renders a calm, passive scannability guardrail (v0.5) — warns when the foreground↔background contrast is
+ * Renders a calm, passive scannability guardrail — warns when the foreground↔background contrast is
  * too low to scan reliably, or when the code is inverted (light-on-dark). Never blocks; stays silent unless
  * there's a real risk.
  */

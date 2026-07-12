@@ -1,4 +1,3 @@
-// codes/common domain — the shared aggregate wire contract (CodeDto · create/update/preview requests)
-// plus the output ImageFormat. Depends on the content / style / rules concerns.
-export * from "./aggregate";
+// codes/common domain — the CodeDto read entity plus the output ImageFormat.
+export * from "./models";
 export * from "./ImageFormat";

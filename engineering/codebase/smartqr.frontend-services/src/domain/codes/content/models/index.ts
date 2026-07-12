@@ -1,9 +1,4 @@
-// Typed content mirroring the backend polymorphic `CodeContent` — discriminated on `type`
-// (the camelCase content id). The backend owns encoding: static types bake a payload from these
-// fields, dynamic types (url / mobileApp) resolve the redirect short link. No `payload` on the wire.
-// One named interface per member (mirrors the backend record names + field names exactly), then a
-// union alias — so each content type has a nameable, referenceable shape.
-
+// codes/content models — one interface per content variant + the discriminated `CodeContent` union.
 export * from "./UrlContent";
 export * from "./MobileAppLinkContent";
 export * from "./TextContent";
@@ -26,7 +21,9 @@ import type { WifiContent } from "./WifiContent";
 import type { VCardContent } from "./VCardContent";
 import type { CalendarContent } from "./CalendarContent";
 
-/** The wire's polymorphic content — a discriminated union over `type` of every content shape. */
+export * from "./ContentTypeDescriptor";
+
+/** Represents the wire's polymorphic content — a discriminated union over `type` of every content shape. */
 export type CodeContent =
   | UrlContent
   | MobileAppLinkContent

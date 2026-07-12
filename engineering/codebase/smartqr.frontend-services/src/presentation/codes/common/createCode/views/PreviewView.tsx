@@ -2,8 +2,8 @@ import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundati
 import { Button, ButtonVariant, CopyButton } from "@wow-two-beta/ui/presentation/actions";
 import { Card, Text } from "@wow-two-beta/ui/presentation/display";
 import { Surface } from "@wow-two-beta/ui/presentation/layout";
-import { ImageFormat, isDynamicContent, type CodeContent, type CodeDto, type CodeType, type Gradient, type PreviewStyle } from "@/domain/codes";
-import { codeImageUrl } from "@/integration/codes";
+import { ImageFormat, isDynamicContent, type CodeContent, type CodeDto, type CodeStyleDto, type CodeType, type Gradient } from "@/domain/codes";
+import { codesApiClient } from "@/integration/codes";
 import { ContrastCallout } from "@/presentation/codes/design/components/ContrastCallout";
 import { QrPreview } from "../components/QrPreview";
 
@@ -19,7 +19,7 @@ export interface PreviewViewProps {
   readonly previewCodeType: CodeType;
 
   /** The visual style driving the render. */
-  readonly previewStyle: PreviewStyle;
+  readonly previewStyle: CodeStyleDto;
 
   /** The solid foreground color — feeds the contrast check. */
   readonly foreground: string;
@@ -104,12 +104,12 @@ export function PreviewView({
               </CopyButton>
             )}
             <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
-              <a href={codeImageUrl(saved.id, ImageFormat.Svg)} target="_blank" rel="noreferrer">
+              <a href={codesApiClient.imageUrl(saved.id, ImageFormat.Svg)} target="_blank" rel="noreferrer">
                 SVG
               </a>
             </Button>
             <Button asChild size={SizePreset.Sm} variant={ButtonVariant.Outline} tone={ColorTone.Neutral}>
-              <a href={codeImageUrl(saved.id, ImageFormat.Png)} target="_blank" rel="noreferrer">
+              <a href={codesApiClient.imageUrl(saved.id, ImageFormat.Png)} target="_blank" rel="noreferrer">
                 PNG
               </a>
             </Button>

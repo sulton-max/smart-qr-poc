@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import mkcert from "vite-plugin-mkcert";
@@ -29,5 +29,9 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "./src"),
     },
+  },
+  // Unit tests mirror src/ under tests/ (frontend/architecture.md § Tests).
+  test: {
+    include: ["tests/**/*.test.{ts,tsx}"],
   },
 });

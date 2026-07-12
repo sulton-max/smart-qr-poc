@@ -5,16 +5,16 @@ import { Accordion, AccordionType } from "@wow-two-beta/ui/presentation/display"
 import { Stack } from "@wow-two-beta/ui/presentation/layout";
 import type { AppForm } from "@wow-two-beta/ui/forms-engine";
 import { BarcodeFormat } from "@/domain/codes";
+import type { CodeCreateUpdateApiRequest } from "@/integration/codes";
 import { BarcodeFormatDisplays } from "@/presentation/codes/design/components/BarcodeFormatDisplays";
 import { EmojiControls } from "@/presentation/codes/design/components/EmojiControls";
 import { FillControls } from "@/presentation/codes/design/components/FillControls";
 import { ShapeControls } from "@/presentation/codes/design/components/ShapeControls";
-import type { CreateCodeValues } from "../CreateCodeForm";
 
 /** Defines props for the Design tab — the code symbology plus the colors / shape / center accordion. */
 export interface DesignViewProps {
   /** The code-builder form. */
-  readonly form: AppForm<CreateCodeValues>;
+  readonly form: AppForm<CodeCreateUpdateApiRequest>;
 }
 
 /**
@@ -26,7 +26,7 @@ export function DesignView({ form }: DesignViewProps) {
   return (
     <>
       {/* Code type stays outside the accordion — it gates which style options apply (QR vs 1D/2D). */}
-      <form.Field name="symbology">
+      <form.Field name="barcodeFormat">
         {(f) => (
           <Field label="Code type">
             <Select<BarcodeFormat>
@@ -47,7 +47,7 @@ export function DesignView({ form }: DesignViewProps) {
         )}
       </form.Field>
 
-      {/* Layout D: one styling section open at a time — caps height, scales to any number of sections. */}
+      {/* one styling section open at a time */}
       <Accordion
         type={AccordionType.Single}
         defaultValue="colors"
@@ -62,10 +62,10 @@ export function DesignView({ form }: DesignViewProps) {
                 {(f) => (
                   <Stack gap="0">
                     <FillControls
-                      foreground={f.value.foreground}
-                      onForegroundChange={(v) => f.setValue({ ...f.value, foreground: v })}
-                      gradient={f.value.gradient}
-                      onGradientChange={(v) => f.setValue({ ...f.value, gradient: v })}
+                      foreground={f.value.foregroundColor}
+                      onForegroundChange={(v) => f.setValue({ ...f.value, foregroundColor: v })}
+                      gradient={f.value.gradient ?? null}
+                      onGradientChange={(v) => f.setValue({ ...f.value, gradient: v ?? undefined })}
                     />
 
                     {/* Background row — [Color (swatch + label) | Transparent]. The swatch lives INSIDE the
@@ -88,8 +88,8 @@ export function DesignView({ form }: DesignViewProps) {
                           >
                             <ColorPicker
                               triggerVariant="swatch"
-                              value={f.value.background}
-                              onValueChange={(v) => f.setValue({ ...f.value, background: v })}
+                              value={f.value.backgroundColor}
+                              onValueChange={(v) => f.setValue({ ...f.value, backgroundColor: v })}
                               aria-label="Background color"
                               triggerSize="sm"
                             />
@@ -133,8 +133,8 @@ export function DesignView({ form }: DesignViewProps) {
               <form.Field name="style">
                 {(f) => (
                   <EmojiControls
-                    emoji={f.value.emoji}
-                    onChange={(v) => f.setValue({ ...f.value, emoji: v })}
+                    emoji={f.value.emoji ?? null}
+                    onChange={(v) => f.setValue({ ...f.value, emoji: v ?? undefined })}
                     size={{ icon: 16 }}
                   />
                 )}

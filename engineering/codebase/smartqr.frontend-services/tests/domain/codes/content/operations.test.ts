@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ContentType, ContentTypes } from "./registry";
-import { emptyContent, isDynamicContent, isDynamicType } from "./operations";
+
+import { ContentType, contentTypeCatalog, emptyContent, isDynamicContent, isDynamicType } from "@/domain/codes/content";
 
 // Payload ENCODING lives on the backend (SmartQr.Tests.Unit/CodeContentEncodeTests); each type's fields are
 // edited via its typed control, so the builder's `CodeContent` is already the wire shape (no flat-values mapping).
@@ -14,7 +14,7 @@ describe("emptyContent", () => {
   });
 
   it("covers every registered content type (id ≡ discriminator)", () => {
-    for (const c of ContentTypes) {
+    for (const c of contentTypeCatalog) {
       expect(emptyContent(c.id).type).toBe(c.id);
     }
   });
@@ -32,12 +32,9 @@ describe("isDynamicType / isDynamicContent", () => {
   });
 });
 
-describe("ContentTypes registry", () => {
-  it("has unique ids, each with at least one field", () => {
-    const ids = ContentTypes.map((c) => c.id);
+describe("contentTypeCatalog registry", () => {
+  it("has unique ids", () => {
+    const ids = contentTypeCatalog.map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const c of ContentTypes) {
-      expect(c.fields.length).toBeGreaterThan(0);
-    }
   });
 });

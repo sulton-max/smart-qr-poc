@@ -16,7 +16,7 @@ import {
 } from "@wow-two-beta/ui/presentation/overlays";
 import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
 import type { CodeDto } from "@/domain/codes/common";
-import { deleteCode, listCodes, setCodeActive } from "@/integration/codes";
+import { codesApiClient } from "@/integration/codes";
 
 /** Defines props for the codes dashboard screen. */
 interface CodesListScreenProps {
@@ -40,7 +40,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
     setLoading(true);
     setError(null);
     try {
-      setCodes(await listCodes(q));
+      setCodes(await codesApiClient.list(q));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -58,7 +58,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
     setBusyId(code.id);
     setError(null);
     try {
-      const updated = await setCodeActive(code.id, !code.isActive);
+      const updated = await codesApiClient.setActive(code.id, !code.isActive);
       setCodes((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -73,7 +73,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
     setBusyId(target.id);
     setError(null);
     try {
-      await deleteCode(target.id);
+      await codesApiClient.delete(target.id);
       setCodes((prev) => prev.filter((c) => c.id !== target.id));
       setPendingDelete(null);
     } catch (e) {

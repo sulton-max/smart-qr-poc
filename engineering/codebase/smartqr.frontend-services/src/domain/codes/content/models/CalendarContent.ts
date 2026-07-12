@@ -1,0 +1,22 @@
+import { ContentType } from "../ContentType";
+
+/** Defines the static iCalendar event content — title and start are required, the rest optional. */
+export interface CalendarContent {
+  /** The content-type discriminator. */
+  type: typeof ContentType.Calendar;
+
+  /** The event title. */
+  title: string;
+
+  /** The event start date-time. */
+  start: string;
+
+  /** The optional event end date-time. */
+  end?: string;
+
+  /** The optional event location. */
+  location?: string;
+
+  /** The optional event description. */
+  description?: string;
+}

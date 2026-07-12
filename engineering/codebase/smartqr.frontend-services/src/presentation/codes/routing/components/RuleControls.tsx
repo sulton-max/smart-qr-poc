@@ -2,36 +2,33 @@ import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Button, ButtonVariant } from "@wow-two-beta/ui/presentation/actions";
 import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import { Sortable } from "@wow-two-beta/ui/presentation/display";
-import type { AppForm } from "@wow-two-beta/ui/forms-engine";
+import { useFieldArray, type AppForm } from "@wow-two-beta/ui/forms-engine";
 import { ArrowRight, GripVertical, Plus, Trash2 } from "lucide-react";
-import { RuleConditionType, type RuleDraft } from "@/domain/codes/rules";
-import { emptyRuleDraft, type CreateCodeValues } from "@/presentation/codes/common/createCode/CreateCodeForm";
+import { RuleConditionType, type CodeRuleDto } from "@/domain/codes/rules";
+import type { CodeCreateUpdateApiRequest } from "@/integration/codes";
+import { emptyCodeRule } from "@/application/codes";
 import { RuleConditionTypeDisplays } from "./RuleConditionTypeDisplays";
 
 /** Add-rule footer button label. */
 const AddRuleLabel = "Add rule";
 
-/** Defines props for the ordered routing-rule builder — reads the row snapshot, drives edits through `form.array`. */
+/** Defines props for the ordered routing-rule builder — drives rule edits through `useFieldArray`. */
 export interface RuleControlsProps {
   /** The code-builder form (owns the `rules` array + the per-row field paths). */
-  readonly form: AppForm<CreateCodeValues>;
-
-  /** The current rule rows (first match wins) — the reactive snapshot from `form.Subscribe`. */
-  readonly rules: ReadonlyArray<RuleDraft>;
+  readonly form: AppForm<CodeCreateUpdateApiRequest>;
 }
 
 /**
- * Renders an ordered conditional-rule editor — a dense joined list numbered by priority (first match wins,
- * the rest falls through to the fallback URL). Rows are driven by `form.array('rules')` (add / remove / reorder)
- * and each cell binds a `rules[i].*` field path; drag the handle to reorder (SDK `Sortable`). Row destinations
- * validate (and render errors) via the whole-form schema. Visual layout is unchanged.
+ * Renders the ordered routing-rule editor — priority-numbered rows (first match wins, the rest fall through
+ * to the fallback URL), driven by `useFieldArray('rules')` for add / remove / drag-reorder. Each cell binds a
+ * typed row field; row destinations validate (and render errors) via the whole-form schema.
  */
-export function RuleControls({ form, rules }: RuleControlsProps) {
-  const rulesArray = form.array("rules");
+export function RuleControls({ form }: RuleControlsProps) {
+  const rules = useFieldArray<CodeRuleDto>(form, "rules");
 
   const reorder = (from: number, to: number) => {
     const clamped = Math.max(0, Math.min(rules.length - 1, to));
-    if (clamped !== from) rulesArray.move(from, clamped);
+    if (clamped !== from) rules.move(from, clamped);
   };
 
   return (
@@ -43,10 +40,10 @@ export function RuleControls({ form, rules }: RuleControlsProps) {
       )}
 
       <Sortable onReorder={reorder}>
-        {rules.map((rule, index) => (
+        {rules.rows.map((row) => (
           <Sortable.Item
-            key={rule.id}
-            index={index}
+            key={row.key}
+            index={row.index}
             className="flex items-start gap-2.5 border-b border-border p-3"
           >
             <div className="flex items-center gap-1.5 pt-1.5">
@@ -54,16 +51,15 @@ export function RuleControls({ form, rules }: RuleControlsProps) {
                 <GripVertical size={15} />
               </Sortable.Handle>
               <span className="grid size-5 shrink-0 place-items-center rounded-md bg-muted text-xs font-medium text-muted-foreground">
-                {index + 1}
+                {row.index + 1}
               </span>
             </div>
 
             <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]">
-              {/* Deep array-row paths resolve to `unknown` in the contract (typed values, loose deep paths) — cast per row. */}
-              <form.Field name={`rules[${index}].conditionType`}>
+              <rules.Field index={row.index} name="conditionType">
                 {(f) => (
                   <Select<RuleConditionType>
-                    value={f.value as RuleConditionType}
+                    value={f.value}
                     onValueChange={(opt) => opt && f.setValue(opt.itemKey)}
                   >
                     <Select.Trigger>
@@ -76,37 +72,44 @@ export function RuleControls({ form, rules }: RuleControlsProps) {
                     </Select.Content>
                   </Select>
                 )}
-              </form.Field>
+              </rules.Field>
 
-              <form.Field name={`rules[${index}].conditionValue`}>
-                {(f) => (
-                  <TextInput
-                    ring="sm"
-                    value={f.value as string}
-                    placeholder={RuleConditionTypeDisplays[rule.conditionType].placeholder}
-                    onChange={(e) => f.setValue(e.target.value)}
-                    onBlur={f.onBlur}
-                  />
+              {/* Placeholder tracks this row's condition type. */}
+              <form.Subscribe
+                selector={(s) => s.values.rules[row.index]?.conditionType ?? RuleConditionType.Device}
+              >
+                {(conditionType) => (
+                  <rules.Field index={row.index} name="conditionValue">
+                    {(f) => (
+                      <TextInput
+                        ring="sm"
+                        value={f.value ?? ""}
+                        placeholder={RuleConditionTypeDisplays[conditionType].placeholder}
+                        onChange={(e) => f.setValue(e.target.value)}
+                        onBlur={f.onBlur}
+                      />
+                    )}
+                  </rules.Field>
                 )}
-              </form.Field>
+              </form.Subscribe>
 
               <div className="flex items-center gap-2 sm:col-span-2">
                 <ArrowRight size={14} className="shrink-0 text-subtle-foreground" />
-                {/* Field chrome renders the row's schema error (e.g. required destination) on the right row. */}
-                <form.Field name={`rules[${index}].destination`}>
+                {/* Field chrome renders the row's schema error on the right row. */}
+                <rules.Field index={row.index} name="destination">
                   {(f) => (
                     <Field className="flex-1">
                       <TextInput
                         ring="sm"
                         className="w-full"
-                        value={f.value as string}
+                        value={f.value}
                         placeholder="https://destination-for-this-rule.com"
                         onChange={(e) => f.setValue(e.target.value)}
                         onBlur={f.onBlur}
                       />
                     </Field>
                   )}
-                </form.Field>
+                </rules.Field>
               </div>
             </div>
 
@@ -115,7 +118,7 @@ export function RuleControls({ form, rules }: RuleControlsProps) {
               variant={ButtonVariant.Ghost}
               shape="square"
               aria-label="Remove rule"
-              onClick={() => rulesArray.remove(index)}
+              onClick={() => rules.remove(row.index)}
             >
               <Trash2 size={16} />
             </Button>
@@ -129,7 +132,7 @@ export function RuleControls({ form, rules }: RuleControlsProps) {
         size={SizePreset.Sm}
         isFullWidth
         leadingSlot={<Plus size={16} />}
-        onClick={() => rulesArray.push(emptyRuleDraft())}
+        onClick={() => rules.push(emptyCodeRule())}
         className="justify-start rounded-none px-4 py-3 text-muted-foreground"
       >
         {AddRuleLabel}

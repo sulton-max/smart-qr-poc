@@ -1,94 +1,96 @@
-import type { CodeDto, CreateCodeRequest, ImageFormat, PreviewRequest, UpdateCodeRequest } from "@/domain/codes/common";
+import type { CodeDto, ImageFormat } from "@/domain/codes/common";
 import { API_BASE, problemError, readData } from "../common/client";
+import type { CodeCreateUpdateApiRequest, CodePreviewApiRequest, CodeSetActiveApiRequest } from "./models";
 
-export async function createCode(request: CreateCodeRequest): Promise<CodeDto> {
-  const res = await fetch(`${API_BASE}/api/codes`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
-    credentials: "include", // guest owner cookie ties the code to this visitor
-  });
+/** The codes API client — code CRUD, image URLs, and the server-rendered live preview. */
+export const codesApiClient = {
+  /** Creates a code; the guest owner cookie ties it to this visitor. */
+  async create(request: CodeCreateUpdateApiRequest): Promise<CodeDto> {
+    const res = await fetch(`${API_BASE}/api/codes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+      credentials: "include",
+    });
 
-  if (!res.ok) throw await problemError(res, "Create failed");
-  return readData<CodeDto>(res);
-}
+    if (!res.ok) throw await problemError(res, "Create failed");
+    return readData<CodeDto>(res);
+  },
 
-// `q` case-insensitively filters on name or fallback URL (server-side `contains`).
-export async function listCodes(q?: string): Promise<CodeDto[]> {
-  const query = q && q.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
-  const res = await fetch(`${API_BASE}/api/codes${query}`, {
-    credentials: "include", // owner-scoped via cookie
-  });
+  /** Lists the owner's codes; `q` case-insensitively filters name or fallback URL (server-side `contains`). */
+  async list(q?: string): Promise<CodeDto[]> {
+    const query = q && q.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
+    const res = await fetch(`${API_BASE}/api/codes${query}`, {
+      credentials: "include",
+    });
 
-  if (!res.ok) throw await problemError(res, "List failed");
-  return readData<CodeDto[]>(res);
-}
+    if (!res.ok) throw await problemError(res, "List failed");
+    return readData<CodeDto[]>(res);
+  },
 
-// 404 when the code is missing or owned by someone else.
-export async function getCode(id: string): Promise<CodeDto> {
-  const res = await fetch(`${API_BASE}/api/codes/${id}`, {
-    credentials: "include",
-  });
+  /** Gets one code by id — 404 when missing or owned by someone else. */
+  async get(id: string): Promise<CodeDto> {
+    const res = await fetch(`${API_BASE}/api/codes/${id}`, {
+      credentials: "include",
+    });
 
-  if (!res.ok) throw await problemError(res, "Load failed");
-  return readData<CodeDto>(res);
-}
+    if (!res.ok) throw await problemError(res, "Load failed");
+    return readData<CodeDto>(res);
+  },
 
-// Full replace; slug, scan count, and creation time are server-preserved.
-export async function updateCode(id: string, request: UpdateCodeRequest): Promise<CodeDto> {
-  const res = await fetch(`${API_BASE}/api/codes/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
-    credentials: "include",
-  });
+  /** Replaces a code in full; slug, scan count, and creation time are server-preserved. */
+  async update(id: string, request: CodeCreateUpdateApiRequest): Promise<CodeDto> {
+    const res = await fetch(`${API_BASE}/api/codes/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+      credentials: "include",
+    });
 
-  if (!res.ok) throw await problemError(res, "Update failed");
-  return readData<CodeDto>(res);
-}
+    if (!res.ok) throw await problemError(res, "Update failed");
+    return readData<CodeDto>(res);
+  },
 
-export async function setCodeActive(id: string, isActive: boolean): Promise<CodeDto> {
-  const res = await fetch(`${API_BASE}/api/codes/${id}/active`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ isActive }),
-    credentials: "include",
-  });
+  /** Toggles a code's active state. */
+  async setActive(id: string, isActive: boolean): Promise<CodeDto> {
+    const request: CodeSetActiveApiRequest = { isActive };
+    const res = await fetch(`${API_BASE}/api/codes/${id}/active`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+      credentials: "include",
+    });
 
-  if (!res.ok) throw await problemError(res, "Status change failed");
-  return readData<CodeDto>(res);
-}
+    if (!res.ok) throw await problemError(res, "Status change failed");
+    return readData<CodeDto>(res);
+  },
 
-// Hard-delete; cascades rules.
-export async function deleteCode(id: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/codes/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+  /** Hard-deletes a code; cascades its rules. */
+  async delete(id: string): Promise<void> {
+    const res = await fetch(`${API_BASE}/api/codes/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
-  if (!res.ok) throw await problemError(res, "Delete failed");
-}
+    if (!res.ok) throw await problemError(res, "Delete failed");
+  },
 
-export function codeImageUrl(id: string, format: ImageFormat): string {
-  return `${API_BASE}/api/codes/${id}/image?format=${format}`;
-}
+  /** Builds the download URL for a code's rendered image in `format`. */
+  imageUrl(id: string, format: ImageFormat): string {
+    return `${API_BASE}/api/codes/${id}/image?format=${format}`;
+  },
 
-// Server-authoritative live preview: renders the code with the builder's current
-// value + style and returns raw SVG markup (Content-Type: image/svg+xml — NOT the
-// JSON envelope). Used by the builder so the preview matches the downloadable asset.
-// Pass an AbortSignal so superseded (debounced) requests can be cancelled.
-export async function previewCode(
-  request: PreviewRequest,
-  signal?: AbortSignal,
-): Promise<string> {
-  const res = await fetch(`${API_BASE}/api/codes/preview`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "image/svg+xml" },
-    body: JSON.stringify(request),
-    credentials: "include",
-    signal,
-  });
+  /** Renders a live preview as server-emitted SVG markup; pass an `AbortSignal` to cancel superseded requests. */
+  async preview(request: CodePreviewApiRequest, signal?: AbortSignal): Promise<string> {
+    const res = await fetch(`${API_BASE}/api/codes/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "image/svg+xml" },
+      body: JSON.stringify(request),
+      credentials: "include",
+      signal,
+    });
 
-  if (!res.ok) throw await problemError(res, "Preview failed");
-  return res.text();
-}
+    if (!res.ok) throw await problemError(res, "Preview failed");
+    return res.text();
+  },
+};

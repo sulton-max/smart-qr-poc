@@ -2,15 +2,15 @@ import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import { Orientation } from "@wow-two-beta/ui/foundation/utils";
 import { Divider } from "@wow-two-beta/ui/presentation/layout";
 import type { AppForm } from "@wow-two-beta/ui/forms-engine";
-import { ContentType, ContentTypes, contentType, emptyContent, isDynamicType } from "@/domain/codes/content";
+import { ContentType, contentTypeCatalog, contentType, emptyContent, isDynamicType } from "@/domain/codes/content";
 import type { CodeDto } from "@/domain/codes";
+import type { CodeCreateUpdateApiRequest } from "@/integration/codes";
 import { ContentTypeControls } from "@/presentation/codes/content/components/ContentTypeControls";
-import type { CreateCodeValues } from "../CreateCodeForm";
 
 /** Defines props for the Content tab — the code's name and its typed content, bound to the builder form. */
 export interface ContentViewProps {
   /** The code-builder form. */
-  readonly form: AppForm<CreateCodeValues>;
+  readonly form: AppForm<CodeCreateUpdateApiRequest>;
 
   /** True in edit mode (surfaces the read-only short link for dynamic codes). */
   readonly isEdit: boolean;
@@ -54,7 +54,7 @@ export function ContentView({ form, isEdit, existingCode }: ContentViewProps) {
                   <Select.Value />
                 </Select.Trigger>
                 <Select.Content>
-                  {ContentTypes.map((c) => (
+                  {contentTypeCatalog.map((c) => (
                     <Select.Item key={c.id} itemKey={c.id} label={c.label} />
                   ))}
                 </Select.Content>

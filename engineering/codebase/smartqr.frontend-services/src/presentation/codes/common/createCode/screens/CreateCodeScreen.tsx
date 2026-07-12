@@ -14,20 +14,18 @@ import { Center, Grid, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
 import { BarcodeFormat, CodeType, type CodeDto } from "@/domain/codes";
 import { ContentType } from "@/domain/codes/content";
-import { REDIRECT_BASE } from "@/integration/common";
-import { createCode, getCode, updateCode } from "@/integration/codes";
-import { useAppForm } from "@/form";
 import {
   CreateCodeSchema,
-  emptyCreateCodeValues,
+  emptyCodeCreateUpdateApiRequest,
+  toCodeCreateUpdateApiRequest,
   toCreateCodeRequest,
-  toCreateCodeValues,
-  toPreviewStyle,
-  type CreateCodeValues,
-} from "../CreateCodeForm";
+} from "@/application/codes";
+import { REDIRECT_BASE } from "@/integration/common";
+import { codesApiClient, type CodeCreateUpdateApiRequest } from "@/integration/codes";
+import { useAppForm } from "@/form";
 import { ContentView, DesignView, RoutingView, PreviewView } from "../views";
 
-/** Defines the code builder's grouped sections (Layout D — Content · Design · Routing). */
+/** Defines the code builder's grouped sections — Content · Design · Routing. */
 const CodeTab = {
   /** Refers to the content-type + payload section. */
   Content: "content",
@@ -55,42 +53,41 @@ export interface CreateCodeScreenProps {
 export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenProps) {
   const isEdit = Boolean(codeId);
 
-  // Layout D (v0.6): 3 grouped tabs — Content · Design (accordion) · Routing.
+  // The active builder section.
   const [tab, setTab] = useState<CodeTab>(CodeTab.Content);
   // The loaded / just-saved server record — backs the read-only short link + the preview value. Not form data.
   const [existingCode, setExistingCode] = useState<CodeDto | null>(null);
   // The saved code after a successful create/update — drives the post-save panel. Not form data.
   const [saved, setSaved] = useState<CodeDto | null>(null);
-  // Edit-mode fetch state (the hand-rolled data layer owns these — no /query migration this pass).
+  // Edit-mode fetch state.
   const [loading, setLoading] = useState(isEdit);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const form = useAppForm<CreateCodeValues>({
-    defaultValues: emptyCreateCodeValues(),
+  const form = useAppForm<CodeCreateUpdateApiRequest>({
+    defaultValues: emptyCodeCreateUpdateApiRequest(),
     schema: CreateCodeSchema,
-    // onSubmit is the only failure path: a thrown SDK `ApiError` is mapped to fields (ProblemDetails) with the
-    // unmatched remainder left in `submitError`. The submit call re-trims (the schema validates only).
+    // onSubmit is the only failure path — a thrown SDK ApiError maps to fields, the remainder to submitError.
     onSubmit: async (values) => {
       const request = toCreateCodeRequest(values);
-      const dto = codeId ? await updateCode(codeId, request) : await createCode(request);
+      const dto = codeId ? await codesApiClient.update(codeId, request) : await codesApiClient.create(request);
       setSaved(dto);
       setExistingCode(dto);
       onSaved?.();
     },
   });
 
-  // Edit mode: load once, then reseed the form values AND the dirty baseline via reset(data). This single call
-  // replaces the former 13-setter prefill effect (the migration's proof).
+  // Edit mode: load once, then reseed the form values + dirty baseline via reset(data).
   useEffect(() => {
     if (!codeId) return;
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    getCode(codeId)
+    codesApiClient
+      .get(codeId)
       .then((code) => {
         if (cancelled) return;
         setExistingCode(code);
-        form.reset(toCreateCodeValues(code));
+        form.reset(toCodeCreateUpdateApiRequest(code));
       })
       .catch((e: unknown) => {
         if (!cancelled) setLoadError(e instanceof Error ? e.message : "Failed to load the code");
@@ -191,31 +188,30 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
           </Card>
         </form>
 
-        {/* ── Preview ── driven by stable value slices (style / content / symbology); re-renders only when
-            a design/content/symbology change lands, never on name or rule-row keystrokes. */}
+        {/* ── Preview ── driven by stable value slices (style / content / barcodeFormat); re-renders only when
+            a design/content/format change lands, never on name or rule-row keystrokes. */}
         <form.Subscribe selector={(s) => s.values.style}>
           {(style) => (
             <form.Subscribe selector={(s) => s.values.content}>
               {(content) => (
-                <form.Subscribe selector={(s) => s.values.symbology}>
-                  {(symbology) => {
-                    const previewStyle = toPreviewStyle(style);
+                <form.Subscribe selector={(s) => s.values.barcodeFormat}>
+                  {(barcodeFormat) => {
                     const urlDestination = content.type === ContentType.Url ? content.url : "";
                     const previewValue =
                       saved?.shortUrl ?? existingCode?.shortUrl ?? (urlDestination || `${REDIRECT_BASE}/preview`);
                     // The preview endpoint's coarse kind: QR symbology → "qr", any other (1D/2D) → "barcode".
                     const previewCodeType: CodeType =
-                      symbology === BarcodeFormat.QrCode ? CodeType.Qr : CodeType.Barcode;
+                      barcodeFormat === BarcodeFormat.QrCode ? CodeType.Qr : CodeType.Barcode;
                     return (
                       <PreviewView
                         previewValue={previewValue}
                         previewContent={content}
                         previewCodeType={previewCodeType}
-                        previewStyle={previewStyle}
-                        foreground={style.foreground}
-                        background={style.background}
+                        previewStyle={style}
+                        foreground={style.foregroundColor}
+                        background={style.backgroundColor}
                         transparentBackground={style.transparentBackground}
-                        gradient={style.gradient}
+                        gradient={style.gradient ?? null}
                         saved={saved}
                         isEdit={isEdit}
                         onBack={onBack}

@@ -1,3 +1,3 @@
-// codes/rules domain — the routing model: the condition-type enum + the builder's draft-rule row.
+// codes/rules domain — the routing model: the condition-type enum + the CodeRuleDto wire rule.
 export * from "./RuleConditionType";
-export * from "./RuleDraft";
+export * from "./models";

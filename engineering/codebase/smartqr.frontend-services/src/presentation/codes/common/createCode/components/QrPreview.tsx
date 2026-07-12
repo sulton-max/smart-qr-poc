@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
-import type { CodeContent, CodeType, PreviewStyle } from "@/domain/codes";
-import { previewCode } from "@/integration/codes";
+import type { CodeContent, CodeStyleDto, CodeType } from "@/domain/codes";
+import { codesApiClient } from "@/integration/codes";
 
 /** @internal CSS var (with hex fallback) for the muted "preview unavailable" caption color. */
 const ErrorTextColor = "var(--color-fg-muted,#71717a)";
@@ -24,7 +24,7 @@ export interface QrPreviewProps {
   readonly codeType: CodeType;
 
   /** The visual style sent to the server renderer. */
-  readonly style: PreviewStyle;
+  readonly style: CodeStyleDto;
 
   /** The rendered box edge in px. */
   readonly size?: number;
@@ -49,9 +49,8 @@ export function QrPreview({
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  // Style of the currently-shown svg. The frame bg follows THIS (not the in-flight `style`), so the
-  // background never recolors before the matching server render arrives — no perceived lag.
-  const [rendered, setRendered] = useState<PreviewStyle>(style);
+  // Style of the currently-shown svg — the frame bg follows this, not the in-flight `style`.
+  const [rendered, setRendered] = useState<CodeStyleDto>(style);
 
   // Serialize style + content so the effect re-runs on any individual field change.
   const styleKey = JSON.stringify(style);
@@ -68,7 +67,8 @@ export function QrPreview({
       setLoading(true);
       setError(false);
 
-      previewCode({ value: value || " ", content, codeType, style }, controller.signal)
+      codesApiClient
+        .preview({ value: value || " ", content: content ?? undefined, codeType, style }, controller.signal)
         .then((markup) => {
           if (controller.signal.aborted) return;
           setSvg(markup);
@@ -86,8 +86,7 @@ export function QrPreview({
     }, debounceMs);
 
     return () => clearTimeout(timer);
-    // Disabled because the effect depends on the deep `style`/`content` objects, which we track via their
-    // serialized `styleKey`/`contentKey` instead — listing the raw objects would re-fire on every render.
+    // Deps tracked via serialized `styleKey`/`contentKey` (above), not the raw deep objects.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, contentKey, codeType, styleKey, debounceMs]);
 
