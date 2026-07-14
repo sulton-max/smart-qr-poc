@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the static mailto content — a recipient plus optional subject and body. */
+/** Represents the static mailto content — a recipient plus optional subject and body. */
 export interface EmailContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Email;

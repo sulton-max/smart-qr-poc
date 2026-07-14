@@ -1,4 +1,4 @@
-/** Defines the QR data-module body shape (mirrors backend `style.moduleShape`; default `square`). */
+/** Defines the QR data-module body shape (mirrors backend `style.moduleShape`). */
 export const ModuleShape = {
   /** Refers to a plain square module. */
   Square: "square",

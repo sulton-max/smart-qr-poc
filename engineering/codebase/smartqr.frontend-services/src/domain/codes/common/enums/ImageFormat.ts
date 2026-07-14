@@ -1,4 +1,4 @@
-/** Defines the downloadable code-image format for the `/image` endpoint (query `?format=`). */
+/** Defines the downloadable code image format. */
 export const ImageFormat = {
   /** Refers to a vector SVG render. */
   Svg: "svg",

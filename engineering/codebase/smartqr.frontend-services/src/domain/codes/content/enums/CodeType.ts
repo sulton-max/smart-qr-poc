@@ -1,7 +1,4 @@
-/**
- * Defines the coarse code kind for the preview endpoint — derived from the chosen symbology
- * (QR → `Qr`; any other 1D/2D → `Barcode`). camelCase wire (mirrors backend `CodeType`).
- */
+/** Defines the coarse code kind — QR, barcode, or a plain forwarder link (mirrors backend `CodeType`). */
 export const CodeType = {
   /** Refers to a QR-symbology render. */
   Qr: "qr",

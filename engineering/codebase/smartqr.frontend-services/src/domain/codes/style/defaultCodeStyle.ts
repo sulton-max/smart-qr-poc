@@ -1,8 +1,8 @@
 import { Gradient } from "@wow-two-beta/ui/domain/color";
 
-import { EccLevel } from "./EccLevel";
-import { FinderShape } from "./FinderShape";
-import { ModuleShape } from "./ModuleShape";
+import { EccLevel } from "./enums/EccLevel";
+import { FinderShape } from "./enums/FinderShape";
+import { ModuleShape } from "./enums/ModuleShape";
 import type { CodeStyleDto } from "./models";
 
 /** Defines the default style seeding every new code — rounded body + eyes, a black→violet radial gradient, no overlay. */

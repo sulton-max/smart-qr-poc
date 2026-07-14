@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the dynamic URL-forwarder content — the QR carries the redirect short link to this destination. */
+/** Represents the dynamic URL-forwarder content — the QR carries the redirect short link to this destination. */
 export interface UrlContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Url;

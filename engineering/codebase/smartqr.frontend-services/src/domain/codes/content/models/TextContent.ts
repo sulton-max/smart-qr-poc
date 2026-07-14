@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the static free-text content encoded directly in the QR. */
+/** Represents the static free-text content encoded directly in the QR. */
 export interface TextContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Text;

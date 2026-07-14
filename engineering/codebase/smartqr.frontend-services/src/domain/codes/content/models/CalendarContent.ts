@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the static iCalendar event content — title and start are required, the rest optional. */
+/** Represents the static iCalendar event content — title and start are required, the rest optional. */
 export interface CalendarContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Calendar;

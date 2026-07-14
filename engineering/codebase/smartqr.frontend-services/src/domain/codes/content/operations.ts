@@ -1,8 +1,8 @@
 // Content operations — factories + predicates over the typed `CodeContent` union the builder holds directly.
 
 import { contentType, type CodeContent } from "./models";
-import { ContentType } from "./ContentType";
-import { ContentMode } from "./ContentMode";
+import { ContentType } from "./enums/ContentType";
+import { ContentMode } from "./enums/ContentMode";
 
 /** Builds the minimal typed content for a type — the discriminator plus its required fields blank. Used to seed a fresh content type. */
 export function emptyContent(id: ContentType): CodeContent {

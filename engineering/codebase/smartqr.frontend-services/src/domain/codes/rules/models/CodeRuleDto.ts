@@ -1,4 +1,4 @@
-import type { RuleConditionType } from "../RuleConditionType";
+import type { RuleConditionType } from "../enums/RuleConditionType";
 
 /** Represents a single routing rule — a condition mapped to a destination, matched in order. */
 export interface CodeRuleDto {

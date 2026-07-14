@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the static sms content — a recipient phone plus optional prefilled message. */
+/** Represents the static sms content — a recipient phone plus optional prefilled message. */
 export interface SmsContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Sms;

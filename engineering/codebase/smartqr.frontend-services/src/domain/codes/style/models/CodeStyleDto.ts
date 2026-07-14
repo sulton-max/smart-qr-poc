@@ -1,8 +1,8 @@
 import type { Gradient } from "@wow-two-beta/ui/domain/color";
 
-import type { EccLevel } from "../EccLevel";
-import type { FinderShape } from "../FinderShape";
-import type { ModuleShape } from "../ModuleShape";
+import type { EccLevel } from "../enums/EccLevel";
+import type { FinderShape } from "../enums/FinderShape";
+import type { ModuleShape } from "../enums/ModuleShape";
 
 /** Represents an optional center logo overlay baked into the code render. */
 export interface CodeLogoDto {

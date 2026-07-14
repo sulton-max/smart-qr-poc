@@ -1,7 +1,4 @@
-/**
- * Defines the foreground fill mode — a solid color vs a two-stop gradient.
- * UI-only: the persisted model carries `gradient | null`, so this never crosses the wire.
- */
+/** Defines the foreground fill mode — a solid color or a two-stop gradient. */
 export const FillType = {
   /** Refers to a single solid foreground color. */
   Solid: "solid",

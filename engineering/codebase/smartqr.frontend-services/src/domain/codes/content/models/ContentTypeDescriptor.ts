@@ -1,5 +1,5 @@
-import { ContentType } from "../ContentType";
-import { ContentMode } from "../ContentMode";
+import { ContentType } from "../enums/ContentType";
+import { ContentMode } from "../enums/ContentMode";
 
 /** Represents a selectable content type — its id, display label, and static/dynamic mode. */
 export interface ContentTypeDescriptor {

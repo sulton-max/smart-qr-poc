@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the static vCard contact content — only the first name is required. */
+/** Represents the static vCard contact content — only the first name is required. */
 export interface VCardContent {
   /** The content-type discriminator. */
   type: typeof ContentType.VCard;

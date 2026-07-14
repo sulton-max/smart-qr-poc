@@ -1,6 +1,6 @@
-import { ContentType } from "../ContentType";
+import { ContentType } from "../enums/ContentType";
 
-/** Defines the static Wi-Fi join content — network credentials plus a hidden-SSID flag. */
+/** Represents the static Wi-Fi join content — network credentials plus a hidden-SSID flag. */
 export interface WifiContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Wifi;
