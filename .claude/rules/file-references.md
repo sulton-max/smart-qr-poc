@@ -23,6 +23,8 @@
 | File | Content |
 |---|---|
 | `planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions |
+| `vector-sweep.md` | Full-stack capability-vector map — app vs SDK vs neither, per-vector verdict (adopt/migrate/polish/add/defer), FE-infra adopt bundle, trim list, sequenced plan |
+| `content-model-rewire.md` | Polymorphic `CodeContent` rewire handoff (DONE 2026-07-03) — one model, three roles; backend-owned encoding |
 
 ## Engineering — Architecture (`engineering/architecture/`)
 
