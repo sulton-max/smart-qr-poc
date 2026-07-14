@@ -225,12 +225,12 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Content("Contact", new { type = "vcard", firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.Content("Contact", new { type = "vCard", firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
 
         fetched.Content.Should().NotBeNull();
-        fetched.Content!.Type.Should().Be("vcard");
+        fetched.Content!.Type.Should().Be("vCard");
         fetched.Content.FirstName.Should().Be("Ada");
     }
 
