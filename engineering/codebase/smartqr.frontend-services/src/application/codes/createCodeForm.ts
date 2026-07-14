@@ -1,5 +1,5 @@
-// The code builder's form module — the whole-form `CreateCodeSchema` (a zod discriminated content union + a
-// routing-rules array), blank/prefill factories, and the submit mapper to the wire request.
+// The code builder's form module — the whole-form `CreateCodeSchema`, the blank/prefill request factories,
+// and the submit normalizer. The form binds `CodeCreateUpdateApiRequest` directly (no separate `*Values` type).
 
 import { z } from "zod";
 
@@ -13,13 +13,12 @@ import {
   type CodeDto,
   type CodeEmojiDto,
   type CodeLogoDto,
+  type CodeRuleDto,
   type Gradient,
 } from "@/domain/codes";
 import { ContentType, isDynamicType } from "@/domain/codes/content";
 import { RuleConditionType } from "@/domain/codes/rules";
 import type { CodeCreateUpdateApiRequest } from "@/integration/codes";
-
-import type { CodeCreateUpdateFormValues, CodeRuleFormValue } from "./models";
 
 /** A zod schema over a const-object enum's values, typed as the exact string-literal union it produces. */
 function enumOf<T extends Record<string, string>>(source: T) {
@@ -28,9 +27,8 @@ function enumOf<T extends Record<string, string>>(source: T) {
 }
 
 // ── Schema ──────────────────────────────────────────────────────────────────────
-// `content` is a discriminated union over `type`; each member mirrors its domain interface. Per-content-field
-// messages are omitted — the content sub-controls bind the whole `content` object, so there's no field subscriber
-// to render them; content-payload validation is left to the backend. Rule-row destinations DO render (own paths).
+// `content` is a discriminated union over `type`, each member mirroring its domain interface — payload
+// validation is the backend's; only rule-row destinations validate here (they render their own errors).
 
 const contentSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal(ContentType.Url), url: z.string() }),
@@ -80,8 +78,7 @@ const contentSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
-const ruleFormValueSchema = z.object({
-  id: z.string(),
+const codeRuleSchema = z.object({
   order: z.number(),
   conditionType: enumOf(RuleConditionType),
   conditionValue: z.string(),
@@ -112,11 +109,10 @@ export const CreateCodeSchema = z
     fallbackUrl: z.string(),
     content: contentSchema,
     style: codeStyleSchema,
-    rules: z.array(ruleFormValueSchema),
+    rules: z.array(codeRuleSchema),
   })
   .superRefine((values, ctx) => {
-    // Rules only route a plain URL forwarder — static + mobileApp derive routing server-side and the submit drops
-    // the array. Validate row destinations only when they'll actually be sent (cross-section refine).
+    // Row destinations are sent only for a plain URL forwarder — validate them only then.
     if (values.content.type !== ContentType.Url) return;
     values.rules.forEach((rule, index) => {
       if (!rule.destination.trim()) {
@@ -131,24 +127,22 @@ export const CreateCodeSchema = z
 
 // ── Factories + mappers ─────────────────────────────────────────────────────────
 
-/** The blank builder values for create mode — a `url` forwarder seeded with a sample so the preview renders. */
-export function emptyCreateCodeFormValues(): CodeCreateUpdateFormValues {
+/** The blank builder request for create mode — a `url` forwarder seeded with a sample so the preview renders. */
+export function emptyCodeCreateUpdateApiRequest(): CodeCreateUpdateApiRequest {
   return {
     name: "",
     codeType: CodeType.Qr,
     barcodeFormat: BarcodeFormat.QrCode,
     fallbackUrl: "",
     content: { type: ContentType.Url, url: "https://example.com" },
-    // Seed the house look (rounded + black→violet radial) so a new code is polished on first render.
     style: { ...defaultCodeStyle },
     rules: [],
   };
 }
 
-/** A fresh empty routing rule for `form.array('rules').push` — `order` is assigned by row index at submit. */
-export function emptyRuleFormValue(): CodeRuleFormValue {
+/** A fresh empty routing rule for `useFieldArray('rules').push` — `order` is reassigned by row index at submit. */
+export function emptyCodeRule(): CodeRuleDto {
   return {
-    id: crypto.randomUUID(),
     order: 0,
     conditionType: RuleConditionType.Device,
     conditionValue: "",
@@ -156,8 +150,8 @@ export function emptyRuleFormValue(): CodeRuleFormValue {
   };
 }
 
-/** Maps a loaded code to builder values for edit-mode prefill — feed to `form.reset(...)` (no per-field setters). */
-export function toCreateCodeFormValues(code: CodeDto): CodeCreateUpdateFormValues {
+/** Maps a loaded code to the builder request for edit-mode prefill — feed to `form.reset(...)`. */
+export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApiRequest {
   return {
     name: code.name,
     codeType: CodeType.Qr,
@@ -167,7 +161,6 @@ export function toCreateCodeFormValues(code: CodeDto): CodeCreateUpdateFormValue
     content: code.content ?? { type: ContentType.Url, url: code.fallbackUrl },
     style: { ...code.style },
     rules: code.rules.map((rule) => ({
-      id: crypto.randomUUID(),
       order: rule.order,
       conditionType: rule.conditionType,
       conditionValue: rule.conditionValue ?? "",
@@ -176,11 +169,11 @@ export function toCreateCodeFormValues(code: CodeDto): CodeCreateUpdateFormValue
   };
 }
 
-/** Resolves builder values to the wire request — re-trims (the schema validates only) + gates the content routing rules, dropping the row keys. */
-export function toCreateCodeRequest(values: CodeCreateUpdateFormValues): CodeCreateUpdateApiRequest {
+/** Normalizes the builder request for submit — trims fields and content-gates the routing rules. */
+export function toCreateCodeRequest(values: CodeCreateUpdateApiRequest): CodeCreateUpdateApiRequest {
   const { name, barcodeFormat, content, style, rules } = values;
-  // Content shapes the request: static bakes its payload server-side (no redirect, no rules); a self-routed type
-  // (mobileApp) derives its fallback + device rules server-side; a plain URL keeps its own routing rules.
+  // Content shapes the request: a static type bakes its payload server-side (no redirect, no rules); a
+  // self-routed type (mobileApp) derives its fallback + device rules server-side; a plain URL keeps its rules.
   const isStatic = !isDynamicType(content.type);
   const selfRouted = content.type === ContentType.MobileApp;
   return {
@@ -195,7 +188,7 @@ export function toCreateCodeRequest(values: CodeCreateUpdateFormValues): CodeCre
         : rules.map((rule, index) => ({
             order: index + 1,
             conditionType: rule.conditionType,
-            conditionValue: rule.conditionValue.trim(),
+            conditionValue: (rule.conditionValue ?? "").trim(),
             destination: rule.destination.trim(),
           })),
     style,
