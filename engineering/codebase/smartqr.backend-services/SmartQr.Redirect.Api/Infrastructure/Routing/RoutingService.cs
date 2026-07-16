@@ -5,7 +5,8 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>Pure, allocation-light routing service. No I/O — runs in microseconds on the hot path.</summary>
+/// <summary>Provides rule evaluation for a scan — first match wins, and no match means the code does not resolve.</summary>
+/// <remarks>Pure and allocation-light: no I/O, so it runs in microseconds on the hot path. Context (device, geo, language) is resolved by the endpoint before evaluation.</remarks>
 public sealed class RoutingService : IRoutingService
 {
     /// <inheritdoc />

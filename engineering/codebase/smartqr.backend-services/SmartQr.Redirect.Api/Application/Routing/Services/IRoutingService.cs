@@ -3,9 +3,11 @@ using SmartQr.Redirect.Api.Application.Routing.Models;
 
 namespace SmartQr.Redirect.Api.Application.Routing.Services;
 
-/// <summary>Business-rule orchestration — given a code and a scan context, decide where to send the scanner.</summary>
+/// <summary>Defines the contract for deciding where a scan resolves, given a code and its scan context.</summary>
 public interface IRoutingService
 {
-    /// <summary>Evaluates the code's rules top-to-bottom (first match wins); no match means the code does not resolve. Also enforces active/expiry.</summary>
+    /// <summary>Evaluates the code's rules top-to-bottom (first match wins), enforcing active and expiry first; no match means the code does not resolve.</summary>
+    /// <param name="code">The scanned code with its routing rules loaded.</param>
+    /// <param name="context">The resolved scan context (device, geo, language, time).</param>
     RouteDecision Evaluate(CodeEntity code, ScanContext context);
 }
