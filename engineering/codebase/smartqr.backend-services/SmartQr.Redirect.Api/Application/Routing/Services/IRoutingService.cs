@@ -1,10 +1,11 @@
+using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Redirect.Api.Application.Routing.Models;
 
 namespace SmartQr.Redirect.Api.Application.Routing.Services;
 
-/// <summary>Business-rule orchestration — given a config and a scan context, decide where to send the scanner.</summary>
+/// <summary>Business-rule orchestration — given a code and a scan context, decide where to send the scanner.</summary>
 public interface IRoutingService
 {
-    /// <summary>Evaluates rules top-to-bottom (first match wins), else falls back. Also enforces active/expiry/password.</summary>
-    RouteDecision Evaluate(CodeRouteConfig config, ScanContext context);
+    /// <summary>Evaluates the code's rules top-to-bottom (first match wins); no match means the code does not resolve. Also enforces active/expiry.</summary>
+    RouteDecision Evaluate(CodeEntity code, ScanContext context);
 }

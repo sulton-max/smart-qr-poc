@@ -1,3 +1,4 @@
+using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Redirect.Api.Application.Routing.Models;
 using SmartQr.Redirect.Api.Application.Routing.Services;
@@ -8,17 +9,17 @@ namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 public sealed class RoutingService : IRoutingService
 {
     /// <inheritdoc />
-    public RouteDecision Evaluate(CodeRouteConfig config, ScanContext context)
+    public RouteDecision Evaluate(CodeEntity code, ScanContext context)
     {
-        if (!config.IsActive)
+        if (!code.IsActive)
             return new RouteDecision { Outcome = RouteOutcome.NotFound };
 
-        if (!config.NeverExpires
-            && config.ExpiresAt is { } expiry
+        if (!code.NeverExpires
+            && code.ExpiresAt is { } expiry
             && context.NowUtc >= expiry)
             return new RouteDecision { Outcome = RouteOutcome.Gone };
 
-        foreach (var rule in config.Rules.OrderBy(r => r.Order))
+        foreach (var rule in code.Rules.OrderBy(r => r.Order))
         {
             if (Matches(rule, context))
                 return new RouteDecision
@@ -33,7 +34,7 @@ public sealed class RoutingService : IRoutingService
         return new RouteDecision { Outcome = RouteOutcome.NotFound };
     }
 
-    private static bool Matches(RouteRule rule, ScanContext ctx) => rule.ConditionType switch
+    private static bool Matches(RoutingRuleEntity rule, ScanContext ctx) => rule.ConditionType switch
     {
         RuleConditionType.Default => true,
         RuleConditionType.Device => string.Equals(rule.ConditionValue, ctx.Device.ToString(), StringComparison.OrdinalIgnoreCase),

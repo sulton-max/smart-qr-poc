@@ -1,3 +1,5 @@
+using SmartQr.Domain.Codes.Content.Url.Models;
+using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Redirect.Api.Application.Routing.Models;
 using SmartQr.Redirect.Api.Infrastructure.Routing;
@@ -9,13 +11,19 @@ public class RoutingServiceTests
 {
     private readonly RoutingService _routingService = new();
 
-    private static CodeRouteConfig Config(params RouteRule[] rules) => new()
+    private static CodeEntity Code(params RoutingRuleEntity[] rules) => new()
     {
-        CodeId = Guid.NewGuid(),
+        Id = Guid.NewGuid(),
         Slug = "abc1234",
+        UserId = Guid.NewGuid(),
+        Name = "Test",
+        CodeType = CodeType.Qr,
+        BarcodeFormat = BarcodeFormat.QrCode,
+        StyleJson = "{}",
+        Content = new UrlContent { Url = "https://example.com" },
         IsActive = true,
         NeverExpires = true,
-        Rules = rules,
+        Rules = [.. rules],
     };
 
     private static ScanContext Context(DeviceType device) => new()
@@ -25,18 +33,20 @@ public class RoutingServiceTests
         NowUtc = DateTimeOffset.UnixEpoch,
     };
 
-    private static RouteRule DeviceRule(int order, string value, string destination) => new()
+    private static RoutingRuleEntity DeviceRule(int order, string value, string destination) => new()
     {
         Id = Guid.NewGuid(),
+        CodeId = Guid.NewGuid(),
         Order = order,
         ConditionType = RuleConditionType.Device,
         ConditionValue = value,
         Destination = destination,
     };
 
-    private static RouteRule DefaultRule(int order, string destination) => new()
+    private static RoutingRuleEntity DefaultRule(int order, string destination) => new()
     {
         Id = Guid.NewGuid(),
+        CodeId = Guid.NewGuid(),
         Order = order,
         ConditionType = RuleConditionType.Default,
         ConditionValue = null,
@@ -46,11 +56,11 @@ public class RoutingServiceTests
     [Fact]
     public void First_matching_device_rule_wins()
     {
-        var config = Config(
+        var code = Code(
             DeviceRule(1, "Ios", "https://apple.example"),
             DeviceRule(2, "Android", "https://play.example"));
 
-        var decision = _routingService.Evaluate(config, Context(DeviceType.Ios));
+        var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://apple.example", decision.DestinationUrl);
@@ -60,9 +70,9 @@ public class RoutingServiceTests
     [Fact]
     public void No_matching_rule_and_no_default_is_not_found()
     {
-        var config = Config(DeviceRule(1, "Ios", "https://apple.example"));
+        var code = Code(DeviceRule(1, "Ios", "https://apple.example"));
 
-        var decision = _routingService.Evaluate(config, Context(DeviceType.Desktop));
+        var decision = _routingService.Evaluate(code, Context(DeviceType.Desktop));
 
         Assert.Equal(RouteOutcome.NotFound, decision.Outcome);
     }
@@ -70,11 +80,11 @@ public class RoutingServiceTests
     [Fact]
     public void Default_rule_catches_all_when_no_specific_rule_matches()
     {
-        var config = Config(
+        var code = Code(
             DeviceRule(1, "Ios", "https://apple.example"),
             DefaultRule(2, "https://catch-all.example"));
 
-        var decision = _routingService.Evaluate(config, Context(DeviceType.Desktop));
+        var decision = _routingService.Evaluate(code, Context(DeviceType.Desktop));
 
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://catch-all.example", decision.DestinationUrl);
@@ -83,9 +93,9 @@ public class RoutingServiceTests
     [Fact]
     public void Inactive_code_is_not_found()
     {
-        var config = Config() with { IsActive = false };
+        var code = Code() with { IsActive = false };
 
-        var decision = _routingService.Evaluate(config, Context(DeviceType.Ios));
+        var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.NotFound, decision.Outcome);
     }
@@ -93,9 +103,9 @@ public class RoutingServiceTests
     [Fact]
     public void Expired_code_is_gone()
     {
-        var config = Config() with { NeverExpires = false, ExpiresAt = DateTimeOffset.UnixEpoch.AddDays(-1) };
+        var code = Code() with { NeverExpires = false, ExpiresAt = DateTimeOffset.UnixEpoch.AddDays(-1) };
 
-        var decision = _routingService.Evaluate(config, Context(DeviceType.Ios));
+        var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.Gone, decision.Outcome);
     }
@@ -103,10 +113,10 @@ public class RoutingServiceTests
     [Fact]
     public void Never_expires_ignores_past_expiry()
     {
-        var config = Config(DeviceRule(1, "Ios", "https://apple.example"))
+        var code = Code(DeviceRule(1, "Ios", "https://apple.example"))
             with { NeverExpires = true, ExpiresAt = DateTimeOffset.UnixEpoch.AddDays(-1) };
 
-        var decision = _routingService.Evaluate(config, Context(DeviceType.Ios));
+        var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://apple.example", decision.DestinationUrl);

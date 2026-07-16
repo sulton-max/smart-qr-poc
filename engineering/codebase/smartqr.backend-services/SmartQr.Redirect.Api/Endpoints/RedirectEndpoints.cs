@@ -7,7 +7,7 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Endpoints;
 
-/// <summary>The hot path: <c>GET /{slug}</c> → resolve config → evaluate rules → log async → 302.</summary>
+/// <summary>The hot path: <c>GET /{slug}</c> → resolve the code → evaluate rules → log async → 302.</summary>
 public static class RedirectEndpoints
 {
     /// <summary>Maps the slug redirect endpoint.</summary>
@@ -16,15 +16,15 @@ public static class RedirectEndpoints
     private static async Task<IResult> HandleAsync(
         string slug,
         HttpContext http,
-        IRedirectConfigRepository store,
+        IRedirectCodeRepository store,
         IRoutingService routingService,
         IDeviceResolver deviceResolver,
         IGeoResolver geoResolver,
         IScanRecorder recorder,
         CancellationToken ct)
     {
-        var config = await store.GetAsync(slug, ct);
-        if (config is null)
+        var code = await store.GetAsync(slug, ct);
+        if (code is null)
             return Results.NotFound();
 
         var userAgent = http.Request.Headers.UserAgent.ToString();
@@ -42,7 +42,7 @@ public static class RedirectEndpoints
             IpAddress = ip,
         };
 
-        var decision = routingService.Evaluate(config, context);
+        var decision = routingService.Evaluate(code, context);
 
         switch (decision.Outcome)
         {
@@ -55,7 +55,7 @@ public static class RedirectEndpoints
         // Fire-and-forget — the redirect never waits on analytics.
         recorder.Enqueue(new ScanRecord
         {
-            CodeId = config.CodeId,
+            CodeId = code.Id,
             ScannedAt = context.NowUtc,
             Device = context.Device,
             CountryCode = context.CountryCode,

@@ -11,10 +11,10 @@ using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
 
-/// <summary>End-to-end redirect data path against the provider-switchable test database — seed a code, the cached config store reads it, the evaluator resolves the destination.</summary>
+/// <summary>End-to-end redirect data path against the provider-switchable test database — seed a code, the cached code store reads it, the evaluator resolves the destination.</summary>
 public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
-    /// <summary>Builds the redirect routing services over the shared test database — the config store resolves <see cref="AppDbContext"/> per scope from the fixture, so it reads the same data the seeder writes (both providers).</summary>
+    /// <summary>Builds the redirect routing services over the shared test database — the code store resolves <see cref="AppDbContext"/> per scope from the fixture, so it reads the same data the seeder writes (both providers).</summary>
     private ServiceProvider BuildProvider()
     {
         var services = new ServiceCollection();
@@ -22,7 +22,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         services.AddMemoryCache();
         services.AddSingleton(new RedirectSettings { ConfigCacheSeconds = 30 });
         services.AddSingleton<IRoutingService, RoutingService>();
-        services.AddSingleton<IRedirectConfigRepository, CachedRedirectConfigRepository>();
+        services.AddSingleton<IRedirectCodeRepository, CachedRedirectCodeRepository>();
         return services.BuildServiceProvider();
     }
 
@@ -65,10 +65,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await SeedCodeAsync("route123");
         await using var sp = BuildProvider();
 
-        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("route123", default);
-        Assert.NotNull(config);
+        var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("route123", default);
+        Assert.NotNull(code);
 
-        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("route123", DeviceType.Ios));
+        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("route123", DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://apple.example", decision.DestinationUrl);
@@ -80,8 +80,8 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await SeedCodeAsync("route123");
         await using var sp = BuildProvider();
 
-        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("route123", default);
-        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("route123", DeviceType.Desktop));
+        var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("route123", default);
+        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("route123", DeviceType.Desktop));
 
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://fallback.example", decision.DestinationUrl);
@@ -93,9 +93,9 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
     {
         await using var sp = BuildProvider();
 
-        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("missing", default);
+        var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("missing", default);
 
-        Assert.Null(config); // endpoint maps this to 404
+        Assert.Null(code); // endpoint maps this to 404
     }
 
     /// <summary>Never-deactivate-on-downgrade — a code whose owner is far over their plan cap still resolves, since the redirect path is plan-agnostic.</summary>
@@ -136,10 +136,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await using var sp = BuildProvider();
 
         // The 1st code (way past the cap, no subscription row ⇒ Free) resolves like any other.
-        var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("overcap1", default);
-        Assert.NotNull(config);
+        var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("overcap1", default);
+        Assert.NotNull(code);
 
-        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("overcap1", DeviceType.Desktop));
+        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("overcap1", DeviceType.Desktop));
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://still-works.example", decision.DestinationUrl);
     }

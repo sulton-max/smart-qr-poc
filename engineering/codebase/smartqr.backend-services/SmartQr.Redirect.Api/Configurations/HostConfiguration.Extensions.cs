@@ -5,7 +5,6 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 using SmartQr.Redirect.Api.Infrastructure.Analytics;
 using SmartQr.Redirect.Api.Infrastructure.Routing;
 using SmartQr.Redirect.Api.Settings;
-using StackExchange.Redis;
 using WoW.Two.Sdk.Backend.Beta.Data;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 
@@ -27,7 +26,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the routing pipeline: config store, evaluator, detectors, and the async scan recorder.</summary>
+    /// <summary>Registers the routing pipeline: code store, evaluator, detectors, and the async scan recorder.</summary>
     private static WebApplicationBuilder AddRoutingServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMemoryCache();
@@ -35,18 +34,9 @@ public static partial class HostConfiguration
         builder.Services.AddSingleton<IDeviceResolver, UserAgentDeviceResolver>();
         builder.Services.AddSingleton<IGeoResolver, NoopGeoResolver>();
 
-        // Hot config store: Redis when configured, else read route config directly from the DB per scan.
-        var settings = ConfigurationLoader.Load<RedirectSettings>(builder.Configuration);
-        if (!string.IsNullOrWhiteSpace(settings.RedisConnectionString))
-        {
-            builder.Services.AddSingleton<IConnectionMultiplexer>(
-                _ => ConnectionMultiplexer.Connect(settings.RedisConnectionString));
-            builder.Services.AddSingleton<IRedirectConfigRepository, RedisRedirectConfigRepository>();
-        }
-        else
-        {
-            builder.Services.AddSingleton<IRedirectConfigRepository, DbRedirectConfigRepository>();
-        }
+        // Hot code store: read the code (with its rules) from the DB per scan — an edit takes effect on the next
+        // scan with no invalidation. Front it with a cache (CachedRedirectCodeRepository) when the caching item lands.
+        builder.Services.AddSingleton<IRedirectCodeRepository, DbRedirectCodeRepository>();
 
         // Async analytics: one recorder (producer) and one hosted flusher (consumer).
         builder.Services.AddSingleton<ChannelScanRecorder>();
