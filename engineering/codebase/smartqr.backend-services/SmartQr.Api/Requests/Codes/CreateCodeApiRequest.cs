@@ -16,17 +16,14 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Gets the default destination when no rule matches.</summary>
-    public required string FallbackUrl { get; init; }
-
     /// <summary>Gets the optional ordered routing rules.</summary>
     public IReadOnlyList<RuleApiRequest> Rules { get; init; } = [];
 
     /// <summary>Gets the optional style to persist — omitted leaves the code on the default style.</summary>
     public StyleApiRequest? Style { get; init; }
 
-    /// <summary>Gets the optional typed content the code carries (polymorphic on <c>type</c>); static types bake a payload, dynamic types resolve the short link.</summary>
-    public CodeContent? Content { get; init; }
+    /// <summary>Gets the typed content the code carries (polymorphic on <c>type</c>); static types bake a payload, dynamic types resolve the redirect short link. A plain <c>url</c> carries a trailing Default rule to its destination.</summary>
+    public required CodeContent Content { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>
@@ -41,7 +38,6 @@ public static class CreateCodeApiRequestExtensions
             Name = request.Name,
             CodeType = request.CodeType,
             BarcodeFormat = request.BarcodeFormat,
-            FallbackUrl = request.FallbackUrl,
             Rules = request.Rules.ToRuleDtos(),
             Style = request.Style?.ToStyleSpec(),
             Content = request.Content,

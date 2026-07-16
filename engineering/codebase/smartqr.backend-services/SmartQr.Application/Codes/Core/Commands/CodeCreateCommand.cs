@@ -23,15 +23,12 @@ public sealed record CodeCreateCommand
     /// <summary>Rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Default destination when no rule matches (the safety net).</summary>
-    public required string FallbackUrl { get; init; }
-
     /// <summary>Optional ordered routing rules.</summary>
     public IReadOnlyList<RuleDto> Rules { get; init; } = [];
 
     /// <summary>Optional style to persist; null leaves the code on the default style.</summary>
     public StyleSpec? Style { get; init; }
 
-    /// <summary>Optional typed content the code carries; static types bake a payload (<see cref="CodeContent.Encode"/>), dynamic types (url / mobileApp) resolve the redirect short link.</summary>
-    public CodeContent? Content { get; init; }
+    /// <summary>The typed content the code carries; static types bake a payload (<see cref="CodeContent.Encode"/>), dynamic types (url / mobileApp) resolve the redirect short link.</summary>
+    public required CodeContent Content { get; init; }
 }

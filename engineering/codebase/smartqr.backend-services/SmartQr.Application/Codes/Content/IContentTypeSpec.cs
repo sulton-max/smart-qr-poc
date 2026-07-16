@@ -17,12 +17,12 @@ public interface IContentTypeSpec
     /// <summary>Validates the typed content; an empty list means valid. Messages are content-aware (e.g. "App Store link…"), not the generic fallback-URL message.</summary>
     IReadOnlyList<ContentError> Validate(CodeContent content);
 
-    /// <summary>Projects the content into the code's persisted routing — the derived fallback destination plus ordered device rules.</summary>
+    /// <summary>Projects the content into the code's persisted routing — the ordered rules, including an optional trailing <see cref="RuleConditionType.Default"/> catch-all.</summary>
     ContentProjection Project(CodeContent content);
 }
 
 /// <summary>A single content validation failure — lifted into the FluentValidation pipeline so it surfaces in the standard ProblemDetails <c>errors</c> array (property / message / code).</summary>
 public sealed record ContentError(string Property, string Message, string Code);
 
-/// <summary>The routing a content type derives — the fallback destination plus ordered rules (empty for a single-destination code).</summary>
-public sealed record ContentProjection(string FallbackUrl, IReadOnlyList<RuleDto> Rules);
+/// <summary>The routing a content type derives — ordered rules, optionally ending in a <see cref="RuleConditionType.Default"/> catch-all (absent → a scan that matches no rule is <c>NotFound</c>).</summary>
+public sealed record ContentProjection(IReadOnlyList<RuleDto> Rules);

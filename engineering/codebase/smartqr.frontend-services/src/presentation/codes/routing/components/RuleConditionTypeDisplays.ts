@@ -8,6 +8,7 @@ interface RuleConditionTypeDisplay {
 
 /** Maps each routing condition to its label + value-input placeholder. */
 export const RuleConditionTypeDisplays: Record<RuleConditionType, RuleConditionTypeDisplay> = {
+  [RuleConditionType.Default]: { label: "Everyone else", placeholder: "" },
   [RuleConditionType.Device]: { label: "Device", placeholder: "Ios · Android · Desktop" },
   [RuleConditionType.Country]: { label: "Country", placeholder: "US" },
   [RuleConditionType.Language]: { label: "Language", placeholder: "ru" },

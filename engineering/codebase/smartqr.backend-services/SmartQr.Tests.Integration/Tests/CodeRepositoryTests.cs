@@ -18,7 +18,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Name = "Test",
         CodeType = CodeType.Qr,
         BarcodeFormat = BarcodeFormat.QrCode,
-        FallbackUrl = "https://fallback.example",
         StyleJson = "{}",
         IsActive = true,
         NeverExpires = true,
@@ -38,7 +37,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "App download",
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
-            FallbackUrl = "https://site.example",
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
@@ -126,7 +124,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "Old",
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
-            FallbackUrl = "https://old.example",
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
@@ -150,7 +147,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         var loaded = await repo.GetByIdForUserAsync(codeId, user, default);
         Assert.NotNull(loaded);
         loaded!.Name = "New";
-        loaded.FallbackUrl = "https://new.example";
         loaded.Rules =
         [
             new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Country, ConditionValue = "US", Destination = "https://new.example/us" },
@@ -201,7 +197,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "ToDelete",
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
-            FallbackUrl = "https://site.example",
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
@@ -226,7 +221,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
     }
 
     [Fact]
-    public async Task ListByUser_q_filters_on_name_or_fallback_case_insensitively()
+    public async Task ListByUser_q_filters_on_name_case_insensitively()
     {
         var user = Guid.NewGuid();
 
@@ -234,15 +229,17 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await new CodeRepository(NewContext()).AddAsync(NamedCode(user, "nm22222", "Promo Flyer", "https://menu-deals.example"), default);
         await new CodeRepository(NewContext()).AddAsync(NamedCode(user, "nm33333", "Business Card", "https://card.example"), default);
 
+        // Name-only match: the fallback_url column is retired, so "Promo Flyer" (whose destination contains
+        // "menu") no longer matches — the destination now lives in the typed content / rules.
         var filtered = await new CodeRepository(NewContext()).ListByUserAsync(user, "MENU", default);
-        Assert.Equal(2, filtered.Count);
-        Assert.DoesNotContain(filtered, c => c.Name == "Business Card");
+        Assert.Single(filtered);
+        Assert.Equal("Spring Menu", filtered[0].Name);
 
         var all = await new CodeRepository(NewContext()).ListByUserAsync(user, null, default);
         Assert.Equal(3, all.Count);
     }
 
-    private static CodeEntity NamedCode(Guid user, string slug, string name, string fallback) => new()
+    private static CodeEntity NamedCode(Guid user, string slug, string name, string destination) => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,
@@ -250,11 +247,10 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Name = name,
         CodeType = CodeType.Qr,
         BarcodeFormat = BarcodeFormat.QrCode,
-        FallbackUrl = fallback,
         StyleJson = "{}",
         IsActive = true,
         NeverExpires = true,
-        Content = new UrlContent { Url = fallback },
+        Content = new UrlContent { Url = destination },
         Rules = [],
     };
 }

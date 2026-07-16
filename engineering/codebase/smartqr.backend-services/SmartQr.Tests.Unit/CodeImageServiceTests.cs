@@ -72,7 +72,6 @@ public sealed class CodeImageServiceTests
         Name = "Test code",
         CodeType = DomainCodeType.Qr,
         BarcodeFormat = DomainBarcodeFormat.QrCode,
-        FallbackUrl = "",
         StyleJson = "{}",
         Content = content,
     };

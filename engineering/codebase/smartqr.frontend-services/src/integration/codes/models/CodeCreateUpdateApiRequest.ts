@@ -11,10 +11,7 @@ export interface CodeCreateUpdateApiRequest {
   /** The symbology the code renders as. */
   barcodeFormat: BarcodeFormat;
 
-  /** The fallback destination URL. */
-  fallbackUrl: string;
-
-  /** The ordered routing rules (first match wins). */
+  /** The ordered routing rules (first match wins; a trailing `Default` rule is the catch-all). */
   rules: CodeRuleDto[];
 
   /** The visual style to persist. */

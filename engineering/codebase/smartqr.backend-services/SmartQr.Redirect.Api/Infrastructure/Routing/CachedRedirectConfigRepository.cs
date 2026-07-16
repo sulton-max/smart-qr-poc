@@ -44,7 +44,6 @@ public sealed class CachedRedirectConfigRepository(
     {
         CodeId = c.Id,
         Slug = c.Slug,
-        FallbackUrl = c.FallbackUrl,
         IsActive = c.IsActive,
         NeverExpires = c.NeverExpires,
         ExpiresAt = c.ExpiresAt,

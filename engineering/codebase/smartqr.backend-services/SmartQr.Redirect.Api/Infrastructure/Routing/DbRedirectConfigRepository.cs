@@ -28,7 +28,6 @@ public sealed class DbRedirectConfigRepository(IServiceScopeFactory scopeFactory
     {
         CodeId = c.Id,
         Slug = c.Slug,
-        FallbackUrl = c.FallbackUrl,
         IsActive = c.IsActive,
         NeverExpires = c.NeverExpires,
         ExpiresAt = c.ExpiresAt,

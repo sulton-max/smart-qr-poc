@@ -35,9 +35,7 @@ public sealed class CodeRepository(AppDbContext db) : ICodeRepository
         {
             // Lower-case both sides → SQL lower() — reliably case-insensitive on PG and SQLite (raw LIKE is case-sensitive on PG).
             var term = q.Trim().ToLowerInvariant();
-            query = query.Where(c =>
-                c.Name.ToLower().Contains(term) ||
-                c.FallbackUrl.ToLower().Contains(term));
+            query = query.Where(c => c.Name.ToLower().Contains(term));
         }
 
         return await query

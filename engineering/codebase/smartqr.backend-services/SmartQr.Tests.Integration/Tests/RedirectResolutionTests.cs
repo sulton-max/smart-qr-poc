@@ -38,7 +38,6 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "App",
             CodeType = CodeType.Qr,
             BarcodeFormat = BarcodeFormat.QrCode,
-            FallbackUrl = "https://fallback.example",
             StyleJson = "{}",
             IsActive = true,
             NeverExpires = true,
@@ -46,6 +45,8 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Rules =
             [
                 new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://apple.example" },
+                // The catch-all is a trailing Default rule — it replaces the retired fallback_url column.
+                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 2, ConditionType = RuleConditionType.Default, Destination = "https://fallback.example" },
             ],
         });
         await ctx.SaveChangesAsync();
@@ -74,7 +75,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
     }
 
     [Fact]
-    public async Task Desktop_scan_falls_back()
+    public async Task Desktop_scan_hits_the_default_rule()
     {
         await SeedCodeAsync("route123");
         await using var sp = BuildProvider();
@@ -82,8 +83,9 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         var config = await sp.GetRequiredService<IRedirectConfigRepository>().GetAsync("route123", default);
         var decision = sp.GetRequiredService<IRoutingService>().Evaluate(config!, Scan("route123", DeviceType.Desktop));
 
+        Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
         Assert.Equal("https://fallback.example", decision.DestinationUrl);
-        Assert.Null(decision.MatchedRuleId);
+        Assert.NotNull(decision.MatchedRuleId); // the Default rule matched — it is a rule like any other
     }
 
     [Fact]
@@ -106,20 +108,28 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await using (var ctx = NewContext())
         {
             for (var i = 0; i < 10; i++)
+            {
+                var id = Guid.NewGuid();
                 ctx.Codes.Add(new CodeEntity
                 {
-                    Id = Guid.NewGuid(),
+                    Id = id,
                     Slug = i == 0 ? "overcap1" : $"oc{i:D5}",
                     UserId = owner,
                     Name = $"code-{i}",
                     CodeType = CodeType.Qr,
                     BarcodeFormat = BarcodeFormat.QrCode,
-                    FallbackUrl = "https://still-works.example",
                     StyleJson = "{}",
                     IsActive = true,
                     NeverExpires = true,
                     Content = new UrlContent { Url = "https://still-works.example" },
+                    // A plain url code carries its destination as a Default catch-all rule.
+                    Rules =
+                    [
+                        new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 1, ConditionType = RuleConditionType.Default, Destination = "https://still-works.example" },
+                    ],
                 });
+            }
+
             await ctx.SaveChangesAsync();
         }
 

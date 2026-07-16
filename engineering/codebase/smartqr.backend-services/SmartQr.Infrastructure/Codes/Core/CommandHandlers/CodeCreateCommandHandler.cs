@@ -9,7 +9,6 @@ using SmartQr.Infrastructure.Codes.Core.Extensions;
 using SmartQr.Application.Settings;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Domain.Billing.Enums;
-using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
@@ -53,10 +52,10 @@ public sealed class CodeCreateCommandHandler(
             }
             while (await repository.SlugExistsAsync(slug, ct));
 
-            // A backend content spec (e.g. mobileApp) owns its routing — derive the fallback + device rules from the
-            // content and override the client. Types without a spec keep the request's fallback + rules.
-            var projection = request.Content is { } routed && ContentTypes.Resolve(routed.Type) is { } spec
-                ? spec.Project(routed)
+            // A backend content spec (e.g. mobileApp) owns its routing — derives device rules + an optional Default
+            // catch-all from the content and overrides the client. Types without a spec keep the request's rules.
+            var projection = ContentTypes.Resolve(request.Content.Type) is { } spec
+                ? spec.Project(request.Content)
                 : null;
 
             var codeId = Guid.NewGuid();
@@ -69,15 +68,13 @@ public sealed class CodeCreateCommandHandler(
                 CodeType = request.CodeType,
                 // Defaults that used to live on the entity now originate here, at creation.
                 BarcodeFormat = request.BarcodeFormat, // command defaults this to QrCode
-                FallbackUrl = projection?.FallbackUrl ?? request.FallbackUrl,
                 IsActive = true,                       // new codes resolve immediately
                 NeverExpires = true,                   // the create request carries no expiry → the never-expire promise holds
                 StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
                     ? StyleSpecJson.Serialize(style)
                     : "{}",
-                // Typed content persisted via the EF value converter. A create with no explicit content defaults to a
-                // plain url content pointing at the code's fallback — every code carries a content (the column is NOT NULL).
-                Content = request.Content ?? new UrlContent { Url = request.FallbackUrl },
+                // Typed content persisted via the EF value converter — always present (the create request requires it).
+                Content = request.Content,
                 Rules = (projection?.Rules ?? request.Rules)
                     .Select(r => new RoutingRuleEntity
                     {

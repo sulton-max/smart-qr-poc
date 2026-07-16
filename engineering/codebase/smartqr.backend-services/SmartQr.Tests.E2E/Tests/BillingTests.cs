@@ -311,12 +311,13 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
 
         // Owner subscribes (Pro) then prints a code while subscribed.
         await SeedSubscriptionAsync(owner, Plan.Pro, "sub_cancel", "cus_c");
+        const string destination = "https://still-works.example";
         var code = await (await owner.Client.PostJsonAsync(
-                "/api/codes", CodeRequests.Code("keeper", "https://still-works.example")))
+                "/api/codes", CodeRequests.Code("keeper", destination)))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         // Sanity: it resolves on the Redirect host while subscribed. Compare as Uri — a bare host canonicalises to a trailing slash.
-        var expected = new Uri(code.FallbackUrl);
+        var expected = new Uri(destination);
         var before = await RedirectClient.GetAsync($"/{code.Slug}");
         before.StatusCode.Should().Be(HttpStatusCode.Found); // 302
         before.Headers.Location.Should().Be(expected);
@@ -371,7 +372,6 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
                 Name = $"seed-{i}",
                 CodeType = CodeType.Qr,
                 BarcodeFormat = BarcodeFormat.QrCode,
-                FallbackUrl = "https://seed.example",
                 StyleJson = "{}",
                 IsActive = true,
                 NeverExpires = true,

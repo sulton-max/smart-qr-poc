@@ -16,9 +16,6 @@ public sealed record UpdateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Gets the default destination when no rule matches.</summary>
-    public required string FallbackUrl { get; init; }
-
     /// <summary>Gets the replacement ordered routing rules (the whole set).</summary>
     public IReadOnlyList<RuleApiRequest> Rules { get; init; } = [];
 
@@ -42,7 +39,6 @@ public static class UpdateCodeApiRequestExtensions
             Name = request.Name,
             CodeType = request.CodeType,
             BarcodeFormat = request.BarcodeFormat,
-            FallbackUrl = request.FallbackUrl,
             Rules = request.Rules.ToRuleDtos(),
             Style = request.Style?.ToStyleSpec(),
             Content = request.Content,

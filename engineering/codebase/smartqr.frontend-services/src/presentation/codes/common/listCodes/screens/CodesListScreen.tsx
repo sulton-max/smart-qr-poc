@@ -16,6 +16,7 @@ import {
 } from "@wow-two-beta/ui/presentation/overlays";
 import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
 import type { CodeDto } from "@/domain/codes/common";
+import { ContentType } from "@/domain/codes/content";
 import { codesApiClient } from "@/integration/codes";
 
 /** Defines props for the codes dashboard screen. */
@@ -158,9 +159,11 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                   </a>
                   <CopyButton size={SizePreset.Xs} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} text={code.shortUrl} aria-label="Copy short URL" />
                 </div>
-                <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={code.fallbackUrl}>
-                  → {code.fallbackUrl}
-                </Text>
+                {code.content.type === ContentType.Url && (
+                  <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={code.content.url}>
+                    → {code.content.url}
+                  </Text>
+                )}
               </div>
 
               <div className="flex shrink-0 items-center gap-4 sm:gap-6">

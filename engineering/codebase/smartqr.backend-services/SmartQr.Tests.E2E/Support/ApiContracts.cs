@@ -40,7 +40,6 @@ public sealed record CodeDtoModel
     public string Name { get; init; } = "";
     public string CodeType { get; init; } = "";
     public string BarcodeFormat { get; init; } = "";
-    public string FallbackUrl { get; init; } = "";
     public bool IsActive { get; init; }
     public bool NeverExpires { get; init; }
     public long ScanCount { get; init; }

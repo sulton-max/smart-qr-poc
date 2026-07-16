@@ -24,9 +24,6 @@ export interface CodeDto {
   /** The symbology the code renders as. */
   barcodeFormat: BarcodeFormat;
 
-  /** The fallback destination URL. */
-  fallbackUrl: string;
-
   /** Whether the code is active. */
   isActive: boolean;
 
@@ -45,6 +42,6 @@ export interface CodeDto {
   /** The persisted visual style. */
   style: CodeStyleDto;
 
-  /** The persisted typed content, when present. */
-  content?: CodeContent;
+  /** The persisted typed content — always present. */
+  content: CodeContent;
 }

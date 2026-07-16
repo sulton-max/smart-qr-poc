@@ -40,7 +40,6 @@ public sealed class CodeUpdateCommandHandler(
             code.Name = request.Name;
             code.CodeType = request.CodeType;
             code.BarcodeFormat = request.BarcodeFormat;
-            code.FallbackUrl = projection?.FallbackUrl ?? request.FallbackUrl;
 
             // Persist style only when the request carries one — an omitted block preserves the saved style.
             if (request.Style is { } style)

@@ -25,9 +25,6 @@ public sealed record CodeDto
     /// <summary>Rendering symbology.</summary>
     public required BarcodeFormat BarcodeFormat { get; init; }
 
-    /// <summary>Default destination when no rule matches.</summary>
-    public required string FallbackUrl { get; init; }
-
     /// <summary>Whether the code currently resolves.</summary>
     public bool IsActive { get; init; }
 

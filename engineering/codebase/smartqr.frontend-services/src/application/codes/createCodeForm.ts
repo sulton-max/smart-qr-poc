@@ -106,7 +106,6 @@ export const CreateCodeSchema = z
     name: z.string(),
     codeType: enumOf(CodeType),
     barcodeFormat: enumOf(BarcodeFormat),
-    fallbackUrl: z.string(),
     content: contentSchema,
     style: codeStyleSchema,
     rules: z.array(codeRuleSchema),
@@ -133,7 +132,6 @@ export function emptyCodeCreateUpdateApiRequest(): CodeCreateUpdateApiRequest {
     name: "",
     codeType: CodeType.Qr,
     barcodeFormat: BarcodeFormat.QrCode,
-    fallbackUrl: "",
     content: { type: ContentType.Url, url: "https://example.com" },
     style: { ...defaultCodeStyle },
     rules: [],
@@ -156,16 +154,18 @@ export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApi
     name: code.name,
     codeType: CodeType.Qr,
     barcodeFormat: code.barcodeFormat,
-    fallbackUrl: code.fallbackUrl,
-    // A legacy code (no typed content) opens as an editable `url` forwarder seeded from its stored fallback.
-    content: code.content ?? { type: ContentType.Url, url: code.fallbackUrl },
+    content: code.content,
     style: { ...code.style },
-    rules: code.rules.map((rule) => ({
-      order: rule.order,
-      conditionType: rule.conditionType,
-      conditionValue: rule.conditionValue ?? "",
-      destination: rule.destination,
-    })),
+    // The Default catch-all is derived from the content at submit, not user-authored — strip it on prefill so
+    // the round-trip doesn't accumulate duplicates.
+    rules: code.rules
+      .filter((rule) => rule.conditionType !== RuleConditionType.Default)
+      .map((rule) => ({
+        order: rule.order,
+        conditionType: rule.conditionType,
+        conditionValue: rule.conditionValue ?? "",
+        destination: rule.destination,
+      })),
   };
 }
 
@@ -173,25 +173,34 @@ export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApi
 export function toCreateCodeRequest(values: CodeCreateUpdateApiRequest): CodeCreateUpdateApiRequest {
   const { name, barcodeFormat, content, style, rules } = values;
   // Content shapes the request: a static type bakes its payload server-side (no redirect, no rules); a
-  // self-routed type (mobileApp) derives its fallback + device rules server-side; a plain URL keeps its rules.
+  // self-routed type (mobileApp) derives its device rules + optional Default server-side; a plain URL keeps
+  // its rules and carries its destination as a trailing Default catch-all (the fallback column is retired).
   const isStatic = !isDynamicType(content.type);
   const selfRouted = content.type === ContentType.MobileApp;
+  const routed =
+    isStatic || selfRouted
+      ? []
+      : rules.map((rule, index) => ({
+          order: index + 1,
+          conditionType: rule.conditionType,
+          conditionValue: (rule.conditionValue ?? "").trim(),
+          destination: rule.destination.trim(),
+        }));
+
   return {
     name: name.trim() || "Untitled code",
     codeType: CodeType.Qr,
     barcodeFormat,
-    fallbackUrl:
-      isStatic || selfRouted ? "" : content.type === ContentType.Url ? content.url.trim() : "",
     rules:
-      isStatic || selfRouted
-        ? []
-        : rules.map((rule, index) => ({
-            order: index + 1,
-            conditionType: rule.conditionType,
-            conditionValue: (rule.conditionValue ?? "").trim(),
-            destination: rule.destination.trim(),
-          })),
+      content.type === ContentType.Url
+        ? [...routed, defaultRule(routed.length + 1, content.url.trim())]
+        : routed,
     style,
     content,
   };
+}
+
+/** The catch-all a plain `url` code carries — always matches, ordered last so specific rules win. */
+function defaultRule(order: number, destination: string): CodeRuleDto {
+  return { order, conditionType: RuleConditionType.Default, conditionValue: "", destination };
 }

@@ -6,14 +6,14 @@ namespace SmartQr.Tests.E2E.Support;
 /// <summary>Builders for the JSON request bodies the codes endpoints accept.</summary>
 public static class CodeRequests
 {
-    /// <summary>A create/update body. <paramref name="rules"/> is the ordered rule set; pass <c>[]</c> for none.</summary>
-    public static object Code(string name, string fallbackUrl, IEnumerable<object>? rules = null) => new
+    /// <summary>A plain url create/update body — carries the url content plus <paramref name="rules"/> and a trailing Default catch-all to <paramref name="destination"/>. The catch-all is a rule now (the fallback column is retired), so the code still resolves for every scan.</summary>
+    public static object Code(string name, string destination, IEnumerable<object>? rules = null) => new
     {
         name,
         codeType = "Qr",
         barcodeFormat = "QrCode",
-        fallbackUrl,
-        rules = rules?.ToArray() ?? [],
+        content = new { type = "url", url = destination },
+        rules = (rules ?? []).Append(DefaultRule(destination)).ToArray(),
     };
 
     /// <summary>A single routing rule body.</summary>
@@ -29,24 +29,26 @@ public static class CodeRequests
     public static object IosRule(string destination, int order = 1)
         => Rule(order, "Device", "Ios", destination);
 
-    /// <summary>A create/update body carrying typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>) — empty fallback + no rules; the backend derives the payload from the content.</summary>
+    /// <summary>A Default catch-all rule — matches any scan; ordered last so specific rules win. Replaces the retired fallback URL.</summary>
+    public static object DefaultRule(string destination, int order = 99)
+        => Rule(order, "Default", null, destination);
+
+    /// <summary>A create/update body carrying typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>) — no rules; the backend derives the payload from the content.</summary>
     public static object Content(string name, object content) => new
     {
         name,
         codeType = "Qr",
         barcodeFormat = "QrCode",
-        fallbackUrl = "",
         rules = Array.Empty<object>(),
         content,
     };
 
-    /// <summary>A mobile-app-link create/update body — sends the typed store links + fallback choice; the backend derives the device rules + fallback URL.</summary>
+    /// <summary>A mobile-app-link create/update body — sends the typed store links + fallback choice; the backend derives the device rules plus an optional Default catch-all (only when a fallback store is chosen).</summary>
     public static object MobileApp(string name, string? appStore = null, string? playStore = null, string? other = null, string? fallback = null) => new
     {
         name,
         codeType = "Qr",
         barcodeFormat = "QrCode",
-        fallbackUrl = "",
         rules = Array.Empty<object>(),
         content = new { type = "mobileApp", appStore, playStore, other, fallback },
     };

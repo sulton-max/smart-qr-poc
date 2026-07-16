@@ -29,7 +29,8 @@ public sealed class RoutingService : IRoutingService
                 };
         }
 
-        return new RouteDecision { Outcome = RouteOutcome.Redirect, DestinationUrl = config.FallbackUrl };
+        // No rule matched and there is no Default catch-all rule → the code deliberately does not resolve here.
+        return new RouteDecision { Outcome = RouteOutcome.NotFound };
     }
 
     private static bool Matches(RouteRule rule, ScanContext ctx) => rule.ConditionType switch

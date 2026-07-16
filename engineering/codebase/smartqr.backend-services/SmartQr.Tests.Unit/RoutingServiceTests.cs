@@ -4,7 +4,7 @@ using SmartQr.Redirect.Api.Infrastructure.Routing;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the routing engine: first-match-wins, fallback, active/expiry gating (pure logic, no I/O).</summary>
+/// <summary>Proves the routing engine: first-match-wins, the optional Default catch-all, active/expiry gating (pure logic, no I/O).</summary>
 public class RoutingServiceTests
 {
     private readonly RoutingService _routingService = new();
@@ -13,7 +13,6 @@ public class RoutingServiceTests
     {
         CodeId = Guid.NewGuid(),
         Slug = "abc1234",
-        FallbackUrl = "https://fallback.example",
         IsActive = true,
         NeverExpires = true,
         Rules = rules,
@@ -35,6 +34,15 @@ public class RoutingServiceTests
         Destination = destination,
     };
 
+    private static RouteRule DefaultRule(int order, string destination) => new()
+    {
+        Id = Guid.NewGuid(),
+        Order = order,
+        ConditionType = RuleConditionType.Default,
+        ConditionValue = null,
+        Destination = destination,
+    };
+
     [Fact]
     public void First_matching_device_rule_wins()
     {
@@ -50,15 +58,26 @@ public class RoutingServiceTests
     }
 
     [Fact]
-    public void Falls_back_when_no_rule_matches()
+    public void No_matching_rule_and_no_default_is_not_found()
     {
         var config = Config(DeviceRule(1, "Ios", "https://apple.example"));
 
         var decision = _routingService.Evaluate(config, Context(DeviceType.Desktop));
 
+        Assert.Equal(RouteOutcome.NotFound, decision.Outcome);
+    }
+
+    [Fact]
+    public void Default_rule_catches_all_when_no_specific_rule_matches()
+    {
+        var config = Config(
+            DeviceRule(1, "Ios", "https://apple.example"),
+            DefaultRule(2, "https://catch-all.example"));
+
+        var decision = _routingService.Evaluate(config, Context(DeviceType.Desktop));
+
         Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
-        Assert.Equal("https://fallback.example", decision.DestinationUrl);
-        Assert.Null(decision.MatchedRuleId);
+        Assert.Equal("https://catch-all.example", decision.DestinationUrl);
     }
 
     [Fact]

@@ -25,9 +25,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         code.Id.Should().NotBeEmpty();
         code.Slug.Should().NotBeNullOrWhiteSpace();
         code.ShortUrl.Should().Be($"{AppFixture.RedirectBaseUrl}/{code.Slug}");
-        code.FallbackUrl.Should().Be("https://example.com");
-        code.Rules.Should().ContainSingle()
-            .Which.ConditionValue.Should().Be("Ios");
+        code.Rules.Should().HaveCount(2); // the iOS device rule + the Default catch-all
+        code.Rules.Should().Contain(r => r.ConditionValue == "Ios");
+        code.Rules.Should().Contain(r => r.Destination == "https://example.com"); // the Default catch-all
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
     }
 
     [Fact]
-    public async Task List_WithQuery_FiltersByNameOrFallback()
+    public async Task List_WithQuery_FiltersByName()
     {
         var owner = await CreateGuestClientAsync();
         await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("App download", "https://store.example"));
@@ -66,8 +66,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var filtered = await (await owner.Client.GetAsync("/api/codes?q=download"))
             .ReadEnvelopeAsync<List<CodeDtoModel>>();
 
-        // "App download" matches on name; "Menu" matches on its fallback URL containing "download".
-        filtered.Select(c => c.Name).Should().BeEquivalentTo(["App download", "Menu"]);
+        // Name-only match: the fallback_url column is retired, so "Menu" (whose destination contains "download")
+        // no longer matches — the destination now lives in the typed content / rules.
+        filtered.Select(c => c.Name).Should().BeEquivalentTo(["App download"]);
     }
 
     [Fact]
@@ -109,9 +110,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         updated.ScanCount.Should().Be(created.ScanCount);
         updated.CreatedAt.Should().Be(created.CreatedAt);
         updated.Name.Should().Be("App download (updated)");
-        updated.FallbackUrl.Should().Be("https://example.com/new");
-        updated.Rules.Should().ContainSingle()
-            .Which.Destination.Should().Be("https://apps.apple.com/app/id111111111");
+        updated.Rules.Should().HaveCount(2); // the iOS device rule + the Default catch-all
+        updated.Rules.Should().Contain(r => r.Destination == "https://apps.apple.com/app/id111111111");
+        updated.Rules.Should().Contain(r => r.Destination == "https://example.com/new"); // the Default catch-all
     }
 
     [Fact]
@@ -257,8 +258,8 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
                 CodeRequests.MobileApp("Notion", appStore: "https://apps.apple.com/us/app/notion/id1232780281")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
-        // One store link is enough — the server derives the iOS device rule and the fallback destination.
-        code.FallbackUrl.Should().Be("https://apps.apple.com/us/app/notion/id1232780281");
+        // One store link is enough — the server derives the iOS device rule. No fallback store was chosen, so
+        // there is no Default rule: a non-iOS device deliberately does not resolve.
         code.Rules.Should().ContainSingle().Which.ConditionValue.Should().Be("Ios");
         code.Content!.Type.Should().Be("mobileApp");
     }
@@ -314,9 +315,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
                 CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a", playStore: "https://play.google.com/b", fallback: "playStore")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
-        // Other devices resolve to the chosen link (Android), not the default first store (iOS).
-        code.FallbackUrl.Should().Be("https://play.google.com/b");
-        code.Rules.Should().HaveCount(2);
+        // Other devices resolve to the chosen store (Android) via the Default catch-all, not the first store (iOS).
+        code.Rules.Should().HaveCount(3); // 2 device rules + the Default catch-all
+        code.Rules.Should().Contain(r => r.ConditionValue == null && r.Destination == "https://play.google.com/b");
     }
 
     [Fact]
@@ -330,7 +331,6 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
             name = "Later",
             codeType = "Qr",
             barcodeFormat = "QrCode",
-            fallbackUrl = "https://example.com",
             rules = Array.Empty<object>(),
             content = new { type = "youtube" },
         });
@@ -351,7 +351,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
             name = "Styled",
             codeType = "Qr",
             barcodeFormat = "QrCode",
-            fallbackUrl = "https://example.com",
+            content = new { type = "url", url = "https://example.com" },
             rules = Array.Empty<object>(),
             style = Style(gradient: true),
         })).ReadEnvelopeAsync<CodeDtoModel>();
@@ -365,7 +365,6 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
             name = "Styled",
             codeType = "Qr",
             barcodeFormat = "QrCode",
-            fallbackUrl = "https://example.com",
             rules = Array.Empty<object>(),
             style = Style(gradient: false),
         });

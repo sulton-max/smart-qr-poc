@@ -29,7 +29,7 @@ public sealed class MobileAppLinkContentSpec : IContentTypeSpec
 
     /// <inheritdoc />
     public ContentProjection Project(CodeContent content) =>
-        content is MobileAppLinkContent model ? Project(model) : new ContentProjection(string.Empty, []);
+        content is MobileAppLinkContent model ? Project(model) : new ContentProjection([]);
 
     /// <summary>Derives the device rules + fallback from the typed model.</summary>
     private static ContentProjection Project(MobileAppLinkContent model)
@@ -43,7 +43,8 @@ public sealed class MobileAppLinkContentSpec : IContentTypeSpec
         if (model.PlayStore is not null)
             rules.Add(new RuleDto { Order = order++, ConditionType = RuleConditionType.Device, ConditionValue = "Android", Destination = model.PlayStore });
 
-        // Other/unknown devices resolve to the chosen store's link; absent a choice, the first available — a code always resolves.
+        // Optional catch-all: the chosen store becomes a trailing Default rule. Absent a choice, there is no
+        // catch-all — a device that is neither iOS nor Android resolves to NotFound (the code stays restrictive).
         var chosen = model.Fallback switch
         {
             MobileAppStore.AppStore => model.AppStore,
@@ -51,7 +52,9 @@ public sealed class MobileAppLinkContentSpec : IContentTypeSpec
             MobileAppStore.Other => model.Other,
             _ => null,
         };
-        var fallback = chosen ?? model.AppStore ?? model.PlayStore ?? model.Other ?? string.Empty;
-        return new ContentProjection(fallback, rules);
+        if (chosen is not null)
+            rules.Add(new RuleDto { Order = order++, ConditionType = RuleConditionType.Default, ConditionValue = null, Destination = chosen });
+
+        return new ContentProjection(rules);
     }
 }

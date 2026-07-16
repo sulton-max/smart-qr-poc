@@ -157,7 +157,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             name = "Parity",
             codeType = "Qr",
             barcodeFormat = "QrCode",
-            fallbackUrl = "https://example.com",
+            content = new { type = "url", url = "https://example.com" },
             rules = Array.Empty<object>(),
         }));
         createResponse.EnsureSuccessStatusCode();
@@ -196,7 +196,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             name = "Styled",
             codeType = "Qr",
             barcodeFormat = "QrCode",
-            fallbackUrl = "https://example.com",
+            content = new { type = "url", url = "https://example.com" },
             rules = Array.Empty<object>(),
             style,
         }));
@@ -303,7 +303,6 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             name = "WiFi parity",
             codeType = "Qr",
             barcodeFormat = "QrCode",
-            fallbackUrl = "",
             rules = Array.Empty<object>(),
             content = wifi,
         }));

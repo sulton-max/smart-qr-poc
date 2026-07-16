@@ -26,9 +26,6 @@ public sealed record CodeUpdateCommand
     /// <summary>Rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Default destination when no rule matches (the safety net).</summary>
-    public required string FallbackUrl { get; init; }
-
     /// <summary>Replacement ordered routing rules (the whole set).</summary>
     public IReadOnlyList<RuleDto> Rules { get; init; } = [];
 

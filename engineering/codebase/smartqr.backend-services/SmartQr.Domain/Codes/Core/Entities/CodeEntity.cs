@@ -29,9 +29,6 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <summary>Gets or sets the rendering symbology of the code (QR by default; other formats for barcodes).</summary>
     public BarcodeFormat BarcodeFormat { get; set; }
 
-    /// <summary>Gets or sets the default destination of the code, used when no routing rule matches. The safety net.</summary>
-    public required string FallbackUrl { get; set; }
-
     /// <summary>Gets or sets whether the code resolves at all. Disabling never deletes — GWDNBM "codes never die".</summary>
     public bool IsActive { get; set; }
 

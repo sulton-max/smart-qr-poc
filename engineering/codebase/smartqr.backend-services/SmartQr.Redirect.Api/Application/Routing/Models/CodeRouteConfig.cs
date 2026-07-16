@@ -9,9 +9,6 @@ public sealed record CodeRouteConfig
     /// <summary>The slug (cache key).</summary>
     public required string Slug { get; init; }
 
-    /// <summary>Default destination when no rule matches.</summary>
-    public required string FallbackUrl { get; init; }
-
     /// <summary>Whether the code resolves at all.</summary>
     public bool IsActive { get; init; }
 
