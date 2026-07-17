@@ -17,9 +17,6 @@ public sealed record CodeCreateCommand
     /// <summary>Display name.</summary>
     public required string Name { get; init; }
 
-    /// <summary>High-level kind of code.</summary>
-    public CodeType CodeType { get; init; } = CodeType.Qr;
-
     /// <summary>Rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 

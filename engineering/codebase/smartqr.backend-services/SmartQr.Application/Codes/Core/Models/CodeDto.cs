@@ -19,9 +19,6 @@ public sealed record CodeDto
     /// <summary>Display name.</summary>
     public required string Name { get; init; }
 
-    /// <summary>High-level kind of code.</summary>
-    public required CodeType CodeType { get; init; }
-
     /// <summary>Rendering symbology.</summary>
     public required BarcodeFormat BarcodeFormat { get; init; }
 

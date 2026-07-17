@@ -370,7 +370,6 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
                 Slug = Guid.NewGuid().ToString("N")[..7], // unique 7-char slug per code
                 UserId = Guid.Parse(owner.UserId),
                 Name = $"seed-{i}",
-                CodeType = CodeType.Qr,
                 BarcodeFormat = BarcodeFormat.QrCode,
                 StyleJson = "{}",
                 IsActive = true,

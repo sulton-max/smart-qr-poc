@@ -38,7 +38,6 @@ public sealed record CodeDtoModel
     public string Slug { get; init; } = "";
     public string ShortUrl { get; init; } = "";
     public string Name { get; init; } = "";
-    public string CodeType { get; init; } = "";
     public string BarcodeFormat { get; init; } = "";
     public bool IsActive { get; init; }
     public long ScanCount { get; init; }

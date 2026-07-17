@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
-import type { CodeContent, CodeStyleDto, CodeType } from "@/domain/codes";
+import type { BarcodeFormat, CodeContent, CodeStyleDto } from "@/domain/codes";
 import { codesApiClient } from "@/integration/codes";
 
 /** @internal CSS var (with hex fallback) for the muted "preview unavailable" caption color. */
@@ -20,8 +20,8 @@ export interface QrPreviewProps {
   /** The typed content; when static, the server encodes its payload so the preview matches the saved asset. */
   readonly content: CodeContent | null;
 
-  /** The coarse code kind, derived from the chosen symbology in the builder. */
-  readonly codeType: CodeType;
+  /** The symbology to render — `QrCode` renders the styled path, any other format a plain barcode. */
+  readonly barcodeFormat: BarcodeFormat;
 
   /** The visual style sent to the server renderer. */
   readonly style: CodeStyleDto;
@@ -41,7 +41,7 @@ export interface QrPreviewProps {
 export function QrPreview({
   value,
   content,
-  codeType,
+  barcodeFormat,
   style,
   size = 240,
   debounceMs = 280,
@@ -68,7 +68,7 @@ export function QrPreview({
       setError(false);
 
       codesApiClient
-        .preview({ value: value || " ", content: content ?? undefined, codeType, style }, controller.signal)
+        .preview({ value: value || " ", content: content ?? undefined, barcodeFormat, style }, controller.signal)
         .then((markup) => {
           if (controller.signal.aborted) return;
           setSvg(markup);
@@ -88,7 +88,7 @@ export function QrPreview({
     return () => clearTimeout(timer);
     // Deps tracked via serialized `styleKey`/`contentKey` (above), not the raw deep objects.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, contentKey, codeType, styleKey, debounceMs]);
+  }, [value, contentKey, barcodeFormat, styleKey, debounceMs]);
 
   // Cancel any in-flight request on unmount.
   useEffect(() => () => controllerRef.current?.abort(), []);

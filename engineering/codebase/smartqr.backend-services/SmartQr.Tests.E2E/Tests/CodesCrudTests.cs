@@ -329,7 +329,6 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var response = await owner.Client.PostJsonAsync("/api/codes", new
         {
             name = "Later",
-            codeType = "Qr",
             barcodeFormat = "QrCode",
             rules = Array.Empty<object>(),
             content = new { type = "youtube" },
@@ -349,7 +348,6 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var created = await (await owner.Client.PostJsonAsync("/api/codes", new
         {
             name = "Styled",
-            codeType = "Qr",
             barcodeFormat = "QrCode",
             content = new { type = "url", url = "https://example.com" },
             rules = Array.Empty<object>(),
@@ -363,7 +361,6 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         await owner.Client.PutJsonAsync($"/api/codes/{created.Id}", new
         {
             name = "Styled",
-            codeType = "Qr",
             barcodeFormat = "QrCode",
             rules = Array.Empty<object>(),
             style = Style(gradient: false),

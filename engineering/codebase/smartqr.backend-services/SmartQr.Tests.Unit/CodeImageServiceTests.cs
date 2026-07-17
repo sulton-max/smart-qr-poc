@@ -13,7 +13,6 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
 using ZXing;
 using ZXing.Common;
 using DomainBarcodeFormat = SmartQr.Domain.Codes.Core.Enums.BarcodeFormat;
-using DomainCodeType = SmartQr.Domain.Codes.Core.Enums.CodeType;
 
 namespace SmartQr.Tests.Unit;
 
@@ -70,7 +69,6 @@ public sealed class CodeImageServiceTests
         Slug = slug,
         UserId = Guid.NewGuid(),
         Name = "Test code",
-        CodeType = DomainCodeType.Qr,
         BarcodeFormat = DomainBarcodeFormat.QrCode,
         StyleJson = "{}",
         Content = content,

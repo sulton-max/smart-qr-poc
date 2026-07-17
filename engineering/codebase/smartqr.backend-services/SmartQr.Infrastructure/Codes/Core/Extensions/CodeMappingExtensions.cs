@@ -14,7 +14,6 @@ public static class CodeMappingExtensions
         Slug = e.Slug,
         ShortUrl = $"{redirectBaseUrl.TrimEnd('/')}/{e.Slug}",
         Name = e.Name,
-        CodeType = e.CodeType,
         BarcodeFormat = e.BarcodeFormat,
         IsActive = e.IsActive,
         ScanCount = e.ScanCount,

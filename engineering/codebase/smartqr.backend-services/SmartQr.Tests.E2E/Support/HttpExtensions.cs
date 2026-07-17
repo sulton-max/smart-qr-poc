@@ -10,7 +10,6 @@ public static class CodeRequests
     public static object Code(string name, string destination, IEnumerable<object>? rules = null) => new
     {
         name,
-        codeType = "Qr",
         barcodeFormat = "QrCode",
         content = new { type = "url", url = destination },
         rules = (rules ?? []).Append(DefaultRule(destination)).ToArray(),
@@ -37,7 +36,6 @@ public static class CodeRequests
     public static object Content(string name, object content) => new
     {
         name,
-        codeType = "Qr",
         barcodeFormat = "QrCode",
         rules = Array.Empty<object>(),
         content,
@@ -47,7 +45,6 @@ public static class CodeRequests
     public static object MobileApp(string name, string? appStore = null, string? playStore = null, string? other = null, string? fallback = null) => new
     {
         name,
-        codeType = "Qr",
         barcodeFormat = "QrCode",
         rules = Array.Empty<object>(),
         content = new { type = "mobileApp", appStore, playStore, other, fallback },

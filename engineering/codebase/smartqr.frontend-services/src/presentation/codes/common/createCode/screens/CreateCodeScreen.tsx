@@ -12,7 +12,7 @@ import { Card, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Grid, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
-import { BarcodeFormat, CodeType, type CodeDto } from "@/domain/codes";
+import { type CodeDto } from "@/domain/codes";
 import { ContentType } from "@/domain/codes/content";
 import {
   CreateCodeSchema,
@@ -199,14 +199,11 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                     const urlDestination = content.type === ContentType.Url ? content.url : "";
                     const previewValue =
                       saved?.shortUrl ?? existingCode?.shortUrl ?? (urlDestination || `${REDIRECT_BASE}/preview`);
-                    // The preview endpoint's coarse kind: QR symbology → "qr", any other (1D/2D) → "barcode".
-                    const previewCodeType: CodeType =
-                      barcodeFormat === BarcodeFormat.QrCode ? CodeType.Qr : CodeType.Barcode;
                     return (
                       <PreviewView
                         previewValue={previewValue}
                         previewContent={content}
-                        previewCodeType={previewCodeType}
+                        previewBarcodeFormat={barcodeFormat}
                         previewStyle={style}
                         foreground={style.foregroundColor}
                         background={style.backgroundColor}

@@ -25,6 +25,7 @@
 | `planning.md` | Versions roadmap, decisions, component tracker, ordered backlog, open questions |
 | `vector-sweep.md` | Full-stack capability-vector map — app vs SDK vs neither, per-vector verdict (adopt/migrate/polish/add/defer), FE-infra adopt bundle, trim list, sequenced plan |
 | `content-model-rewire.md` | Polymorphic `CodeContent` rewire handoff (DONE 2026-07-03) — one model, three roles; backend-owned encoding |
+| `validation.md` | Validation issues + restructure (analysis only) — verified wiring, V1–V7 issues, decided shape (command-scoped · nested `CodeContentValidator` · `SetInheritanceValidator`), rejected RuleSets + why, deferred 2-layer convention |
 
 ## Engineering — Architecture (`engineering/architecture/`)
 
@@ -46,7 +47,11 @@
 | `v0.2/v0.2.md` | v0.2 (Migration layer) — bespoke migrator extracted to SDK + adopted across all 3 apps |
 | `v0.3/v0.3.md` | v0.3 (Accounts & ownership) — Google sign-in, guest-code claim, cross-device ownership |
 | `v0.4/v0.4.md` | v0.4 (SDK adoption) — extract non-business infra to backend-beta + adopt `@wow-two-beta/ui` fully |
-| `v0.5/v0.5.md` | v0.5 (TBD — brainstorm) — planning scaffold seeded from v0.4 deferrals + backlog |
+| `v0.5/v0.5.md` | v0.5 (Code styling) — server-authoritative render · shapes · gradients · center emoji · design system + dark mode |
+| `v0.6/v0.6.md` | v0.6 (Code-rendering SDK extraction) — render engine + style contract → SDK; accordion builder + colors-panel redesign |
+| `v0.7/v0.7.md` | v0.7 (Static content and export) — **active** — static content types · barcodes UI · download/print export · builder correctness |
+| `v0.9/v0.9.md` | v0.9 (Interactive landing hero) — parked experiment (QR-simulation hero canvas); its own doc says renumber/merge later |
+| `v0.11/v0.11.md` | v0.11 (Content mode — static/dynamic) — parked, may shift. Architecture: bakeability = f(content, rules) · URL-vs-payload family split · 14 `CM{n}` decisions (rule-count lock · create-time lock · new-code-not-flip · resolve page · slug-vs-GUID · dynamic-only slug) · 3 open forks (`Encode()` shape · the `url` fork — blocked on `p0.1` M1 · resolve-page host) · build outline; Iteration 1 = logic design |
 
 ## Engineering — Codebase: Backend (`engineering/codebase/smartqr.backend-services/`)
 

@@ -1,12 +1,9 @@
-import type { BarcodeFormat, CodeContent, CodeRuleDto, CodeStyleDto, CodeType } from "@/domain/codes";
+import type { BarcodeFormat, CodeContent, CodeRuleDto, CodeStyleDto } from "@/domain/codes";
 
 /** Defines the create/update code request body — shared for POST create and PUT replace (the id rides the URL). */
 export interface CodeCreateUpdateApiRequest {
   /** The code's display name. */
   name: string;
-
-  /** The coarse render kind. */
-  codeType: CodeType;
 
   /** The symbology the code renders as. */
   barcodeFormat: BarcodeFormat;

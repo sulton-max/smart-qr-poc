@@ -38,7 +38,6 @@ public sealed class CodeUpdateCommandHandler(
 
             // Apply editable fields — slug, scan count, and creation timestamp are deliberately untouched.
             code.Name = request.Name;
-            code.CodeType = request.CodeType;
             code.BarcodeFormat = request.BarcodeFormat;
 
             // Persist style only when the request carries one — an omitted block preserves the saved style.

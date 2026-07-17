@@ -65,7 +65,6 @@ public sealed class CodeCreateCommandHandler(
                 Slug = slug,
                 UserId = request.UserId,
                 Name = request.Name,
-                CodeType = request.CodeType,
                 // Defaults that used to live on the entity now originate here, at creation.
                 BarcodeFormat = request.BarcodeFormat, // command defaults this to QrCode
                 IsActive = true,                       // new codes resolve immediately

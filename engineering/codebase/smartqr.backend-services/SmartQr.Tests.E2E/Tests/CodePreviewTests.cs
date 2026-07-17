@@ -41,7 +41,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(("foregroundColor", "#FF8800")),
         });
 
@@ -61,7 +61,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(
                 ("moduleShape", "dots"),
                 ("finderShape", "rounded"),
@@ -85,13 +85,13 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var defaultStyle = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = DefaultStyle(),
         });
         var explicitSquare = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(
                 ("moduleShape", "square"),
                 ("finderShape", "square"),
@@ -107,7 +107,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(("transparentBackground", true)),
         });
 
@@ -117,17 +117,49 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     }
 
     [Fact]
-    public async Task Preview_LinkCodeType_Returns400()
+    public async Task Preview_HonoursEachBarcodeFormat_NotOnlyCode128()
     {
-        // Full valid style so the 400 comes from the Link-code guard, not from binding.
-        var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+        // Regression: the request used to carry a coarse `codeType`, and any non-QR kind resolved to
+        // `BarcodeFormat ?? Code128` — the builder never sent a format, so every 1D/2D symbology
+        // previewed as Code128 while the saved asset rendered the real one. `barcodeFormat` is the
+        // sole symbology now; distinct formats must produce distinct symbols.
+        async Task<string> RenderAsync(string barcodeFormat)
+        {
+            var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+            {
+                value = "012345678905",
+                barcodeFormat,
+                style = DefaultStyle(),
+            });
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        var code128 = await RenderAsync("Code128");
+        var ean13 = await RenderAsync("Ean13");
+
+        ean13.Should().NotBe(code128);
+    }
+
+    [Fact]
+    public async Task Preview_AbsentBarcodeFormat_DefaultsToQr()
+    {
+        var implicitQr = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Link",
             style = DefaultStyle(),
         });
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var explicitQr = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
+        {
+            value = "https://smartqr.app/abc1234",
+            barcodeFormat = "QrCode",
+            style = DefaultStyle(),
+        });
+
+        implicitQr.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await implicitQr.Content.ReadAsStringAsync()).Should().Be(await explicitQr.Content.ReadAsStringAsync());
     }
 
     [Fact]
@@ -140,7 +172,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = partial,
         });
 
@@ -155,7 +187,6 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var createResponse = await owner.Client.PostAsync("/api/codes", JsonBody(new
         {
             name = "Parity",
-            codeType = "Qr",
             barcodeFormat = "QrCode",
             content = new { type = "url", url = "https://example.com" },
             rules = Array.Empty<object>(),
@@ -172,7 +203,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = shortUrl,
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = DefaultStyle(),
         });
         var preview = await previewResponse.Content.ReadAsStringAsync();
@@ -194,7 +225,6 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var createResponse = await owner.Client.PostAsync("/api/codes", JsonBody(new
         {
             name = "Styled",
-            codeType = "Qr",
             barcodeFormat = "QrCode",
             content = new { type = "url", url = "https://example.com" },
             rules = Array.Empty<object>(),
@@ -215,7 +245,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = shortUrl,
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style,
         });
         (await previewResponse.Content.ReadAsStringAsync()).Should().Be(savedImage);
@@ -227,7 +257,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(("gradient", new
             {
                 type = "linear",
@@ -255,7 +285,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(("gradient", new
             {
                 // Radial carries no angle — proves the polymorphic union deserializes without it.
@@ -280,7 +310,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = "https://smartqr.app/abc1234",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = StyleWith(("emoji", new { glyph = "🎉", sizeRatio = 0.25 })),
         });
 
@@ -301,7 +331,6 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var createResponse = await owner.Client.PostAsync("/api/codes", JsonBody(new
         {
             name = "WiFi parity",
-            codeType = "Qr",
             barcodeFormat = "QrCode",
             rules = Array.Empty<object>(),
             content = wifi,
@@ -316,7 +345,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
             value = " ",
-            codeType = "Qr",
+            barcodeFormat = "QrCode",
             style = DefaultStyle(),
             content = wifi,
         });

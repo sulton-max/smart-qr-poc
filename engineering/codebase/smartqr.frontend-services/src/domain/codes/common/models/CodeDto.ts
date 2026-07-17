@@ -18,9 +18,6 @@ export interface CodeDto {
   /** The code's display name. */
   name: string;
 
-  /** The coarse code kind (enum value comes back verbatim). */
-  codeType: string;
-
   /** The symbology the code renders as. */
   barcodeFormat: BarcodeFormat;
 

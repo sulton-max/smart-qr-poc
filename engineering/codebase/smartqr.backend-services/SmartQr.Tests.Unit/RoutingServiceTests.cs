@@ -17,7 +17,6 @@ public class RoutingServiceTests
         Slug = "abc1234",
         UserId = Guid.NewGuid(),
         Name = "Test",
-        CodeType = CodeType.Qr,
         BarcodeFormat = BarcodeFormat.QrCode,
         StyleJson = "{}",
         Content = new UrlContent { Url = "https://example.com" },

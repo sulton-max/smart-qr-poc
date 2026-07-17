@@ -2,7 +2,7 @@ import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundati
 import { Button, ButtonVariant, CopyButton } from "@wow-two-beta/ui/presentation/actions";
 import { Card, Text } from "@wow-two-beta/ui/presentation/display";
 import { Surface } from "@wow-two-beta/ui/presentation/layout";
-import { ImageFormat, isDynamicContent, type CodeContent, type CodeDto, type CodeStyleDto, type CodeType, type Gradient } from "@/domain/codes";
+import { ImageFormat, isDynamicContent, type CodeContent, type CodeDto, type BarcodeFormat, type CodeStyleDto, type Gradient } from "@/domain/codes";
 import { codesApiClient } from "@/integration/codes";
 import { ContrastCallout } from "@/presentation/codes/design/components/ContrastCallout";
 import { QrPreview } from "../components/QrPreview";
@@ -15,8 +15,8 @@ export interface PreviewViewProps {
   /** The typed content the server bakes into the preview (static types), or the dynamic fallback. */
   readonly previewContent: CodeContent;
 
-  /** The coarse render kind — QR vs barcode. */
-  readonly previewCodeType: CodeType;
+  /** The symbology driving the render — `QrCode` renders the styled path, any other format a plain barcode. */
+  readonly previewBarcodeFormat: BarcodeFormat;
 
   /** The visual style driving the render. */
   readonly previewStyle: CodeStyleDto;
@@ -50,7 +50,7 @@ export interface PreviewViewProps {
 export function PreviewView({
   previewValue,
   previewContent,
-  previewCodeType,
+  previewBarcodeFormat,
   previewStyle,
   foreground,
   background,
@@ -63,7 +63,7 @@ export function PreviewView({
 }: PreviewViewProps) {
   return (
     <Card className="surface-soft flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
-      <QrPreview value={previewValue} content={previewContent} codeType={previewCodeType} style={previewStyle} />
+      <QrPreview value={previewValue} content={previewContent} barcodeFormat={previewBarcodeFormat} style={previewStyle} />
       <Text size={SizePreset.Xs} color="muted" align="center">
         Live preview — the final asset rendered server-side (vector-first), so what you see
         is what you download.

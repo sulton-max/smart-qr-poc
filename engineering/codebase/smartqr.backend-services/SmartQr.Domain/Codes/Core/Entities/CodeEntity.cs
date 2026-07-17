@@ -23,9 +23,6 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <summary>Gets or sets the human-friendly name of the code shown in the dashboard.</summary>
     public required string Name { get; set; }
 
-    /// <summary>Gets or sets the high-level kind of the code.</summary>
-    public required CodeType CodeType { get; set; }
-
     /// <summary>Gets or sets the rendering symbology of the code (QR by default; other formats for barcodes).</summary>
     public BarcodeFormat BarcodeFormat { get; set; }
 

@@ -1,12 +1,12 @@
-import type { CodeContent, CodeStyleDto, CodeType } from "@/domain/codes";
+import type { BarcodeFormat, CodeContent, CodeStyleDto } from "@/domain/codes";
 
 /** Defines the live-preview request body — renders a code without persisting it. */
 export interface CodePreviewApiRequest {
   /** The fallback data when content is dynamic or absent. */
   value: string;
 
-  /** The coarse render kind. */
-  codeType: CodeType;
+  /** The symbology to render — `QrCode` renders the styled path, any other format a plain barcode. */
+  barcodeFormat: BarcodeFormat;
 
   /** The visual style to render. */
   style: CodeStyleDto;

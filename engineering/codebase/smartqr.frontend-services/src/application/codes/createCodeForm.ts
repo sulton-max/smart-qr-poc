@@ -5,7 +5,6 @@ import { z } from "zod";
 
 import {
   BarcodeFormat,
-  CodeType,
   EccLevel,
   FinderShape,
   ModuleShape,
@@ -104,7 +103,6 @@ const codeStyleSchema = z.object({
 export const CreateCodeSchema = z
   .object({
     name: z.string(),
-    codeType: enumOf(CodeType),
     barcodeFormat: enumOf(BarcodeFormat),
     content: contentSchema,
     style: codeStyleSchema,
@@ -130,7 +128,6 @@ export const CreateCodeSchema = z
 export function emptyCodeCreateUpdateApiRequest(): CodeCreateUpdateApiRequest {
   return {
     name: "",
-    codeType: CodeType.Qr,
     barcodeFormat: BarcodeFormat.QrCode,
     content: { type: ContentType.Url, url: "https://example.com" },
     style: { ...defaultCodeStyle },
@@ -152,7 +149,6 @@ export function emptyCodeRule(): CodeRuleDto {
 export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApiRequest {
   return {
     name: code.name,
-    codeType: CodeType.Qr,
     barcodeFormat: code.barcodeFormat,
     content: code.content,
     style: { ...code.style },
@@ -189,7 +185,6 @@ export function toCreateCodeRequest(values: CodeCreateUpdateApiRequest): CodeCre
 
   return {
     name: name.trim() || "Untitled code",
-    codeType: CodeType.Qr,
     barcodeFormat,
     rules:
       content.type === ContentType.Url

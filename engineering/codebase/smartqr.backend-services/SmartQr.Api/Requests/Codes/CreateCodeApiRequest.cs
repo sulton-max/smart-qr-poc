@@ -10,9 +10,6 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the code's display name.</summary>
     public required string Name { get; init; }
 
-    /// <summary>Gets the high-level kind of code.</summary>
-    public CodeType CodeType { get; init; } = CodeType.Qr;
-
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
@@ -36,7 +33,6 @@ public static class CreateCodeApiRequestExtensions
         {
             UserId = userId,
             Name = request.Name,
-            CodeType = request.CodeType,
             BarcodeFormat = request.BarcodeFormat,
             Rules = request.Rules.ToRuleDtos(),
             Style = request.Style?.ToStyleSpec(),
