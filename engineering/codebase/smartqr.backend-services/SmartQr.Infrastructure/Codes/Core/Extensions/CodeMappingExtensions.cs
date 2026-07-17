@@ -17,7 +17,6 @@ public static class CodeMappingExtensions
         CodeType = e.CodeType,
         BarcodeFormat = e.BarcodeFormat,
         IsActive = e.IsActive,
-        NeverExpires = e.NeverExpires,
         ScanCount = e.ScanCount,
         CreatedAt = e.CreatedAt,
         Rules = e.Rules

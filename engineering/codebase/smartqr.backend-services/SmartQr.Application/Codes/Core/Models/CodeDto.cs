@@ -28,9 +28,6 @@ public sealed record CodeDto
     /// <summary>Whether the code currently resolves.</summary>
     public bool IsActive { get; init; }
 
-    /// <summary>Whether the code is exempt from expiry/scan caps (the never-expire promise).</summary>
-    public bool NeverExpires { get; init; }
-
     /// <summary>Running scan total.</summary>
     public long ScanCount { get; init; }
 

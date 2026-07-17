@@ -32,12 +32,6 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <summary>Gets or sets whether the code resolves at all. Disabling never deletes — GWDNBM "codes never die".</summary>
     public bool IsActive { get; set; }
 
-    /// <summary>Gets or sets whether the code is exempt from expiry. Default true — the never-expire promise.</summary>
-    public bool NeverExpires { get; set; }
-
-    /// <summary>Gets or sets an optional hard expiry of the code (ignored when <see cref="NeverExpires"/> is set).</summary>
-    public DateTimeOffset? ExpiresAt { get; set; }
-
     /// <summary>Gets or sets the JSON style descriptor of the code (foreground/background colors, module shape, logo ref).</summary>
     /// <remarks>Raw <c>jsonb</c> string, not a CLR graph — style is applied only at render time, never queried server-side.</remarks>
     public string StyleJson { get; set; }

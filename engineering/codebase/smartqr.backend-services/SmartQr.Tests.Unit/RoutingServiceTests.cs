@@ -22,7 +22,6 @@ public class RoutingServiceTests
         StyleJson = "{}",
         Content = new UrlContent { Url = "https://example.com" },
         IsActive = true,
-        NeverExpires = true,
         Rules = [.. rules],
     };
 
@@ -98,27 +97,5 @@ public class RoutingServiceTests
         var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
 
         Assert.Equal(RouteOutcome.NotFound, decision.Outcome);
-    }
-
-    [Fact]
-    public void Expired_code_is_gone()
-    {
-        var code = Code() with { NeverExpires = false, ExpiresAt = DateTimeOffset.UnixEpoch.AddDays(-1) };
-
-        var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
-
-        Assert.Equal(RouteOutcome.Gone, decision.Outcome);
-    }
-
-    [Fact]
-    public void Never_expires_ignores_past_expiry()
-    {
-        var code = Code(DeviceRule(1, "Ios", "https://apple.example"))
-            with { NeverExpires = true, ExpiresAt = DateTimeOffset.UnixEpoch.AddDays(-1) };
-
-        var decision = _routingService.Evaluate(code, Context(DeviceType.Ios));
-
-        Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
-        Assert.Equal("https://apple.example", decision.DestinationUrl);
     }
 }

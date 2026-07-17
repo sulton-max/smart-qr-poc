@@ -20,7 +20,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         BarcodeFormat = BarcodeFormat.QrCode,
         StyleJson = "{}",
         IsActive = true,
-        NeverExpires = true,
         Content = new UrlContent { Url = "https://fallback.example" },
         Rules = rules.ToList(),
     };
@@ -39,7 +38,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
             IsActive = true,
-            NeverExpires = true,
             Content = new UrlContent { Url = "https://site.example" },
             Rules =
             [
@@ -126,7 +124,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
             IsActive = true,
-            NeverExpires = true,
             Content = new UrlContent { Url = "https://old.example" },
             Rules =
             [
@@ -199,7 +196,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
             IsActive = true,
-            NeverExpires = true,
             Content = new UrlContent { Url = "https://site.example" },
             Rules =
             [
@@ -249,7 +245,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         BarcodeFormat = BarcodeFormat.QrCode,
         StyleJson = "{}",
         IsActive = true,
-        NeverExpires = true,
         Content = new UrlContent { Url = destination },
         Rules = [],
     };

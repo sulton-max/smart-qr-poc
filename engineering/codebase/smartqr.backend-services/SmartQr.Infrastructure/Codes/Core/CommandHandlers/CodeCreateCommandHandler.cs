@@ -69,7 +69,6 @@ public sealed class CodeCreateCommandHandler(
                 // Defaults that used to live on the entity now originate here, at creation.
                 BarcodeFormat = request.BarcodeFormat, // command defaults this to QrCode
                 IsActive = true,                       // new codes resolve immediately
-                NeverExpires = true,                   // the create request carries no expiry → the never-expire promise holds
                 StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
                     ? StyleSpecJson.Serialize(style)
                     : "{}",

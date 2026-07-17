@@ -15,11 +15,6 @@ public sealed class RoutingService : IRoutingService
         if (!code.IsActive)
             return new RouteDecision { Outcome = RouteOutcome.NotFound };
 
-        if (!code.NeverExpires
-            && code.ExpiresAt is { } expiry
-            && context.NowUtc >= expiry)
-            return new RouteDecision { Outcome = RouteOutcome.Gone };
-
         foreach (var rule in code.Rules.OrderBy(r => r.Order))
         {
             if (Matches(rule, context))

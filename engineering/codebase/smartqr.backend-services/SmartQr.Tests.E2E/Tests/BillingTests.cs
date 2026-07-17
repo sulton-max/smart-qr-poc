@@ -374,7 +374,6 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
                 BarcodeFormat = BarcodeFormat.QrCode,
                 StyleJson = "{}",
                 IsActive = true,
-                NeverExpires = true,
                 Content = new UrlContent { Url = "https://seed.example" },
             });
         await ctx.SaveChangesAsync();

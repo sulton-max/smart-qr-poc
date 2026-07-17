@@ -40,7 +40,6 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
             IsActive = true,
-            NeverExpires = true,
             Content = new UrlContent { Url = "https://fallback.example" },
             Rules =
             [
@@ -120,7 +119,6 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     BarcodeFormat = BarcodeFormat.QrCode,
                     StyleJson = "{}",
                     IsActive = true,
-                    NeverExpires = true,
                     Content = new UrlContent { Url = "https://still-works.example" },
                     // A plain url code carries its destination as a Default catch-all rule.
                     Rules =

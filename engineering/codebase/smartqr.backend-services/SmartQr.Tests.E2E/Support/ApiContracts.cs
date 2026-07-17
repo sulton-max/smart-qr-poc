@@ -41,7 +41,6 @@ public sealed record CodeDtoModel
     public string CodeType { get; init; } = "";
     public string BarcodeFormat { get; init; } = "";
     public bool IsActive { get; init; }
-    public bool NeverExpires { get; init; }
     public long ScanCount { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];

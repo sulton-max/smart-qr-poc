@@ -8,7 +8,4 @@ public enum RouteOutcome
 
     /// <summary>No such code / inactive (404).</summary>
     NotFound,
-
-    /// <summary>Expired or scan-capped (410 Gone).</summary>
-    Gone,
 }

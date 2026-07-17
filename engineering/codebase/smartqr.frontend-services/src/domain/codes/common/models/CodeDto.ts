@@ -27,9 +27,6 @@ export interface CodeDto {
   /** Whether the code is active. */
   isActive: boolean;
 
-  /** Whether the code never expires. */
-  neverExpires: boolean;
-
   /** The lifetime scan count. */
   scanCount: number;
 

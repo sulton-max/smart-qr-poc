@@ -44,13 +44,8 @@ public static class RedirectEndpoints
 
         var decision = routingService.Evaluate(code, context);
 
-        switch (decision.Outcome)
-        {
-            case RouteOutcome.NotFound:
-                return Results.NotFound();
-            case RouteOutcome.Gone:
-                return Results.StatusCode(StatusCodes.Status410Gone);
-        }
+        if (decision.Outcome == RouteOutcome.NotFound)
+            return Results.NotFound();
 
         // Fire-and-forget — the redirect never waits on analytics.
         recorder.Enqueue(new ScanRecord
