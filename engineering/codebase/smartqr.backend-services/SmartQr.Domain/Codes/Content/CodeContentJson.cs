@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using SmartQr.Common.Domain.Serialization.Json;
 
 namespace SmartQr.Domain.Codes.Content;
 
@@ -21,7 +22,7 @@ public static class CodeContentJson
         AllowOutOfOrderMetadataProperties = true,
 
         // Polymorphism from the CodeContentType enum — no per-type discriminator attributes to drift.
-        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { CodeContentPolymorphism.Configure } },
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { CodeContent.Subtypes.ToJsonModifier() } },
     };
 
     /// <summary>Serializes content to its jsonb string form, emitting the <c>type</c> discriminator.</summary>

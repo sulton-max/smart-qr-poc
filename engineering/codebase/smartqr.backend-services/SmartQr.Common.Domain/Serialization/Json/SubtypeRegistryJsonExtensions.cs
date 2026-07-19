@@ -1,0 +1,38 @@
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+
+namespace SmartQr.Common.Domain.Serialization.Json;
+
+/// <summary>Binds a <see cref="SubtypeRegistry{TBase,TKind}"/> to System.Text.Json.</summary>
+public static class SubtypeRegistryJsonExtensions
+{
+    private const string DefaultDiscriminatorPropertyName = "type";
+
+    /// <summary>
+    /// Builds a <see cref="DefaultJsonTypeInfoResolver"/> modifier that attaches the registry's subtypes to
+    /// <typeparamref name="TBase"/> as a discriminated union. Subtypes declare no attributes — the registry is the
+    /// single source, so no per-type token can drift from the enum.
+    /// </summary>
+    /// <typeparam name="TBase">The polymorphic base type.</typeparam>
+    /// <typeparam name="TKind">The enum discriminating the subtypes.</typeparam>
+    /// <param name="registry">The registry to bind.</param>
+    /// <param name="discriminatorPropertyName">The JSON property carrying the discriminator.</param>
+    public static Action<JsonTypeInfo> ToJsonModifier<TBase, TKind>(
+        this SubtypeRegistry<TBase, TKind> registry,
+        string discriminatorPropertyName = DefaultDiscriminatorPropertyName)
+        where TBase : class
+        where TKind : struct, Enum
+    {
+        return typeInfo =>
+        {
+            if (typeInfo.Type != typeof(TBase))
+                return;
+
+            var polymorphism = new JsonPolymorphismOptions { TypeDiscriminatorPropertyName = discriminatorPropertyName };
+            foreach (var (_, type, discriminator) in registry.Subtypes)
+                polymorphism.DerivedTypes.Add(new JsonDerivedType(type, discriminator));
+
+            typeInfo.PolymorphismOptions = polymorphism;
+        };
+    }
+}

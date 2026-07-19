@@ -50,8 +50,8 @@
 | `v0.5/v0.5.md` | v0.5 (Code styling) — server-authoritative render · shapes · gradients · center emoji · design system + dark mode |
 | `v0.6/v0.6.md` | v0.6 (Code-rendering SDK extraction) — render engine + style contract → SDK; accordion builder + colors-panel redesign |
 | `v0.7/v0.7.md` | v0.7 (Static content and export) — **active** — static content types · barcodes UI · download/print export · builder correctness |
-| `v0.9/v0.9.md` | v0.9 (Interactive landing hero) — parked experiment (QR-simulation hero canvas); its own doc says renumber/merge later |
-| `v0.11/v0.11.md` | v0.11 (Content mode — static/dynamic) — parked, may shift. Architecture: bakeability = f(content, rules) · URL-vs-payload family split · 14 `CM{n}` decisions (rule-count lock · create-time lock · new-code-not-flip · resolve page · slug-vs-GUID · dynamic-only slug) · 3 open forks (`Encode()` shape · the `url` fork — blocked on `p0.1` M1 · resolve-page host) · build outline; Iteration 1 = logic design |
+| `v0.9/v0.9.md` | v0.9 (Content mode — static/dynamic) — **next Feature**. Architecture: **a rule carries content** (CM15) · CM1–CM17 · `CodeRule` hierarchy (`ConditionalRule` · `DefaultRule` · `DefaultPointerRule`, `TargetOrder`) · F1 open (`Encode()` home) · F3 open (resolve-page host) · F5 resolved (one base content type) · Iterations 1–7 (logic → content → condition → rule → code+entity → requests+serialization → forms) |
+| `v0.11/v0.11.md` | v0.11 (Interactive landing hero) — parked experiment (QR-simulation hero canvas); renumbered off v0.9 on 2026-07-18 |
 
 ## Engineering — Codebase: Backend (`engineering/codebase/smartqr.backend-services/`)
 

@@ -1,4 +1,5 @@
 import { ContentType } from "../enums/ContentType";
+import { WifiEncryption } from "../enums/WifiEncryption";
 
 /** Represents the static Wi-Fi join content — network credentials plus a hidden-SSID flag. */
 export interface WifiContent {
@@ -8,11 +9,11 @@ export interface WifiContent {
   /** The network SSID. */
   ssid: string;
 
-  /** The optional network password. */
+  /** The network password; absent on an open network. */
   password?: string;
 
-  /** The optional encryption type (e.g. WPA, WEP). */
-  encryption?: string;
+  /** The encryption scheme the network uses. */
+  encryption: WifiEncryption;
 
   /** Whether the network SSID is hidden. */
   hidden: boolean;

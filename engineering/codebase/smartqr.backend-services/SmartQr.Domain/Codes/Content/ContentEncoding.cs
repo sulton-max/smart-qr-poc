@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -23,21 +24,8 @@ public static partial class ContentEncoding
         return Newline().Replace(escaped, "\\n");
     }
 
-    /// <summary><c>2026-07-01T18:30</c> (datetime-local) → <c>20260701T183000</c>; date-only → <c>20260701</c>; anything else passes through. Mirrors <c>toICalDate</c>.</summary>
-    public static string ToICalDate(string? value)
-    {
-        var v = Clean(value);
-
-        var dateTime = ICalDateTime().Match(v);
-        if (dateTime.Success)
-        {
-            var seconds = dateTime.Groups[6].Success ? dateTime.Groups[6].Value : "00";
-            return $"{dateTime.Groups[1].Value}{dateTime.Groups[2].Value}{dateTime.Groups[3].Value}T{dateTime.Groups[4].Value}{dateTime.Groups[5].Value}{seconds}";
-        }
-
-        var date = ICalDate().Match(v);
-        return date.Success ? $"{date.Groups[1].Value}{date.Groups[2].Value}{date.Groups[3].Value}" : v;
-    }
+    /// <summary><c>2026-07-01 18:30</c> → <c>20260701T183000</c> — the iCal basic (compact) form, carrying no time zone.</summary>
+    public static string ToICalDate(DateTime value) => value.ToString("yyyyMMdd'T'HHmmss", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Encodes a value for an <c>application/x-www-form-urlencoded</c> query segment — space → <c>+</c>, unreserved
@@ -72,10 +60,4 @@ public static partial class ContentEncoding
 
     [GeneratedRegex(@"\r?\n")]
     private static partial Regex Newline();
-
-    [GeneratedRegex(@"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$")]
-    private static partial Regex ICalDateTime();
-
-    [GeneratedRegex(@"^(\d{4})-(\d{2})-(\d{2})$")]
-    private static partial Regex ICalDate();
 }

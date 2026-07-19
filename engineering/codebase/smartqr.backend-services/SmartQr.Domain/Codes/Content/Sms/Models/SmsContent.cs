@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using SmartQr.Domain.Codes.Core.Enums;
-
 namespace SmartQr.Domain.Codes.Content.Sms.Models;
 
 /// <summary>Pre-filled SMS — encodes to <c>SMSTO:phone</c>, or <c>SMSTO:phone:message</c> when a message is supplied.</summary>
@@ -11,10 +8,6 @@ public sealed record SmsContent : CodeContent
 
     /// <summary>Optional prefilled message.</summary>
     public string? Message { get; init; }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CodeContentType Type => CodeContentType.Sms;
 
     /// <inheritdoc />
     public override string Encode()

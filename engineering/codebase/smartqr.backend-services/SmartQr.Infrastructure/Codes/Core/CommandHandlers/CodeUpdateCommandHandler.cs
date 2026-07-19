@@ -32,7 +32,7 @@ public sealed class CodeUpdateCommandHandler(
                 return AppResult<CodeUpdateResult.Success>.Fail(AppError.Of(AppErrorType.NotFound, "Code not found"));
 
             // A backend content spec (e.g. mobileApp) owns its routing — derive the fallback + device rules from the content.
-            var projection = request.Content is { } routed && ContentTypes.Resolve(routed.Type) is { } spec
+            var projection = request.Content is { } routed && ContentTypes.Resolve(CodeContent.Subtypes.KindOf(routed)) is { } spec
                 ? spec.Project(routed)
                 : null;
 

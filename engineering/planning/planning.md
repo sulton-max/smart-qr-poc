@@ -21,9 +21,17 @@ Shipped + the active/next version only — future work lives in the ordered back
 | v0.4 | SDK adoption | Adoption | extract all non-business-logic infra to the SDK (incl. the test baseline + the migrator/EF test harness → `Testing.Data`); adopt `@wow-two-beta/ui` fully | ✅ |
 | v0.5 | Code styling | Feature | server-authoritative render (preview == download) · module + finder-eye shapes · linear/radial gradients · transparency · center emoji · design system (lavender/violet/teal · Geist) + dark mode · builder tabs + sticky preview | ✅ |
 | v0.6 | Code-rendering SDK extraction | Adoption | extract QR/barcode render engine + style contract → SDK; adopt it + the SDK result/error model; builder grouped into accordion sections + colors-panel dense-row redesign | ✅ |
-| v0.7 | Static content and export | Feature | static content types (URL · vCard · WiFi · calendar · geo · email/SMS/phone · text) · barcodes UI · download + print-ready export · builder validation/slug + info popovers + server-preview parity | 🚧 |
+| v0.7 | Static content and export | Feature | static content types (URL · vCard · WiFi · calendar · geo · email/SMS/phone · text) · barcodes UI · download + print-ready export · server-preview parity. *(Rescoped 2026-07-18 — validation/slug/popovers → v0.9)* | 🚧 |
+| v0.8 | *(reserved — Adoption)* | Adoption | SDK extraction pass pairing v0.7; expected small (render engine · migrator · test harness · result model already extracted) | ⏳ |
+| v0.9 | Content mode (static / dynamic) | Feature | per-code static/dynamic mode locked at create · **a rule carries content** (content-model v2) · `CodeRule` hierarchy · minimal resolve page · opposite-mode copy | ⏳ |
 
 > Work hierarchy (Version → Iteration → Task), lifecycle, and numbering → `wow-two-ws/conventions/planning/`.
+>
+> **Two-cycle restored 2026-07-17:** v0.8 is the Adoption half of the v0.7 cycle. The file-upload era (logo UI · PDF export) previously annotated `v0.8` in the backlog **shifts one Feature slot later**.
+>
+> **Renumbered 2026-07-18:** content mode `v0.11` → **`v0.9`** (the next Feature); the interactive-landing-hero experiment `v0.9` → **`v0.11`**, off the mainline. Its design iteration runs ahead of the slot because the mode axis is expensive to retrofit.
+>
+> **v0.7 rescoped 2026-07-18:** validation · unique-slug · info popovers · the model-shape remainder moved to `v0.9` — all four sit on surfaces the content-model v2 reshapes. v0.7 keeps **barcodes + export**; its static-content task is shipped and awaits a tick.
 
 ## Decisions
 
@@ -165,12 +173,12 @@ strike-through + ✅ when done (kept for traceability).
 
 | Item | Type | Notes |
 |---|---|---|
-| Logo UI wiring | feature | → **v0.8 (file upload)** — compositing already built in the SDK Codes engine; expose in the builder (needs image upload) |
+| Logo UI wiring | feature | → **file-upload era** (shifted off `v0.8` 2026-07-17 — that slot is the v0.7 Adoption half; content mode sequences ahead of file upload) — compositing already built in the SDK Codes engine; expose in the builder (needs image upload) |
 | ~~Module shapes + gradients~~ | feature | ✅ shipped v0.5 — 7 module + 3+3 finder shapes, linear/radial foreground gradient |
 | ~~Radial gradient radius~~ | feature | ✅ v0.6 — `GradientSpec.Radius` scales the SvgRenderer radial `r`; wired request→spec→render + edit round-trip |
 | Frames + CTA captions | feature | → **decoration era** (with logo/file-upload) — outer frame + a "Scan me" label; **research which frame styles lift conversion first** before building |
 | `StyleSpec` schema-evolution upgrader | infra | versioned model + lazy on-read `vN→current` upgrade chain (additive fields need none — new fields go in optional); build at the first breaking change, then extract the versioned-model + upgrader pattern to the backend-beta SDK |
-| PDF export | feature | → **v0.8 (file upload)** — print/file era, alongside SVG + PNG |
+| PDF export | feature | → **file-upload era** (shifted off `v0.8` 2026-07-17) — print/file era, alongside SVG + PNG |
 | Download, not preview | feature | → **v0.7** — SVG/PNG buttons open a tab; make them download (`Content-Disposition: attachment` / client blob) + a download icon. On-demand render, nothing saved server-side |
 | Print readiness | feature | → **v0.7** — print-grade export (vector + quiet zone + ECC headroom + size guidance); **extensible** — output-fidelity contract that composes new render layers (logo bumps ECC, frames add margin) without restructuring |
 | Shape & eyes panel redesign | feature | 🔄 Axis 1 locked (Variant D — body `32px` grid + paired eyes), applied to `ShapeControls.tsx` + spec appended to `engineering/research/design-research/design-research.md`. Remaining axes: 2 eye-pair · 3 glyph anatomy · 4 dividers/labels · 5 states |
@@ -180,6 +188,9 @@ strike-through + ✅ when done (kept for traceability).
 
 | Item | Type | Notes |
 |---|---|---|
+| **Content mode (static / dynamic)** | feature | → **`v0.9`** (next Feature; ahead of file upload) — per-code mode chosen at create, locked after; dynamic offered for every bakeable type; mode chip on the card; opposite-mode copy both ways. **Sequence early — retrofitting the mode axis after more content types ship gets expensive.** Design + decisions: `version-track/v0.9/v0.9.md` |
+| Minimal resolve page (dynamic non-URL) | feature | → **with content mode** — a dynamic WiFi/vCard/calendar code can't 302 to its payload, so it needs a page that hands the payload to the device. Ship **styleless/minimal** to unblock the mode axis; the designed/editable version is *Dynamic content pages* (below) |
+| Content versioning | feature | → **later** (~v0.12+) — editing a static code's content mints a version of the same code instead of a manual new code; version history + per-version symbol. Without it, a rotating WiFi password accumulates unrelated codes |
 | Barcodes UI | feature | → **v0.7** — Code128 / EAN / UPC / DataMatrix / PDF417 / Aztec (engine exists) |
 | Content-type templates | feature | → **v0.7** static set (URL · vCard · WiFi · calendar · geo · email/SMS/phone · text). app-store needs **device routing → routing version**; menu → dynamic pages |
 | Link-in-bio | feature | → **dynamic pages micro-SaaS** (a mini link hub is a hosted, editable page) |

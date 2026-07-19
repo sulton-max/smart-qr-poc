@@ -18,6 +18,12 @@
 - **Adaptive mini-form per rule row** - each rule a self-contained row; pick condition → relevant operator+value inputs appear; auto-populated sub-options. `core-wedge · M`
 - **Plain-language rule readout + scan simulator** - render each rule as a sentence ("If country is Japan, send to …") + "test this scan" simulator (pick fake country/device/time → see which rule wins). `core-wedge · M`
 - **Dynamic destination / edit-after-print** - one stable code whose target/rules change without reprinting; edit propagates to next scan. The platform the wedge rides on (table-stakes), not the wedge itself. `enabler · S`
+- **Static-vs-dynamic mode choice at create** - per-code mode picked before generate and locked after (the symbol's bytes differ: static bakes the payload, dynamic bakes the short link); dynamic offered for every type whose content *could* be baked, so print-then-change is solved up front rather than discovered after 10K copies. `core-wedge · M`
+- **Pre-create baked-payload notice** - at generate time on a static choice, state that the payload is baked and any later content change yields a different symbol; offer dynamic inline as the escape. The single highest-leverage moment for the wedge — the user is holding the print decision. `core-wedge · S`
+- **Mode chip on the code card** - static/dynamic surfaced as a chip on the card, never folded into the content-type picker; two orthogonal axes (what it carries vs how it resolves) stay two controls. `core-wedge · S`
+- **Opposite-mode copy** - one-click "make a dynamic copy" / "make a static copy" — copies content into a **new** code with the opposite mode, both directions; never an in-place flip, since a printed symbol can't be rewritten. `core-wedge · S`
+- **Static-vs-dynamic comparison matrix** - decision aid at the mode choice: offline-works · edit-after-print · scan analytics · symbol density, per mode. `enabler · S`
+- **Dynamic-advantage onboarding + info affordances** - surface why dynamic wins (edit after print · smaller/cleaner symbol · analytics possible) at onboarding and behind builder info popovers. Marketing material, not a nag. `enabler · S`
 
 ---
 
@@ -71,6 +77,8 @@
 - **App Store smart link** - one code routes iOS→App Store / Android→Play / desktop→landing by device; a labeled preset over device-routing. `core-wedge · S`
 - **Restaurant / PDF menu** - host uploaded PDF or built mobile menu page; time-of-day daypart auto-swap; edit-after-print + never-expire = #1 cafe ask. Heaviest content type — needs the hosted-page renderer; sequence LATE. `core-wedge · L`
 - **vCard / digital business card** - static contact payload (near-zero infra) vs dynamic hosted contact page ("Add to contacts", editable-after-print → never-expire fit) gated on the hosted-page renderer. `core-wedge · S` (static) / `M–L` (dynamic)
+  - **Social handles on a vCard** - LinkedIn / Instagram / WhatsApp / X as contact methods alongside phone/email/url. vCard 4.0 carries them natively (`X-SOCIALPROFILE` / typed `URL`), so the static payload supports it — scanner support varies by phone. `adjacent · S`
+  - **Multi-person vCard** - one code carrying several contacts (a team, a family, a stand). The vCard spec allows concatenated `BEGIN:VCARD` blocks, so a static payload is technically possible, but payload size explodes the symbol and iOS/Android import behaviour is inconsistent. A hosted page with per-contact download is the reliable shape → gated on the hosted-page renderer. `adjacent · M` — analyze before committing
 - **WiFi access** - static network-credentials payload vs dynamic rotate-password-without-reprinting (cafe/gym never-expire wedge) on hosted-page infra. `core-wedge · S` (static) / `M–L` (dynamic)
 - **Calendar event** - calendar-event payload or dynamic hosted variant; dynamic edits time/venue after flyers print (never-expire); timezone is the gotcha. `adjacent · M`
 - **Geo / location** - map-location payload; dynamic variant routes Apple vs Google Maps by device; real-estate/venue ICP. `adjacent · S`
@@ -79,6 +87,7 @@
 - **Document / file host** - upload → hosted URL; swap-file-without-reprinting = never-expire; shares file-host backend with Menu PDF; opt-in download analytics only. `adjacent · M`
 - **Link-in-bio / multi-link hub** - hosted Linktree-style multi-link page (title/bio/avatar/theme/ordered links); a hosted-page-BUILDER product smuggled in as a content type, reinforces the wedge only trivially. `adjacent · L` — de-scope to a later batch (separate product)
 - **Plain text** - arbitrary text shown on scan, no network; static text cannot expire or route — no wedge mechanism applies. `off-wedge · S`
+- **Declared-but-unbuilt content types (16)** - removed from the backend `CodeContentType` enum 2026-07-18; re-add per type when built, never as a speculative enum member. Social handles (`WhatsApp` · `Facebook` · `Instagram` · `Twitter` · `YouTube` · `TikTok` · `LinkedIn`) fold under *Social media profile* above. Hosted-file types (`Pdf` · `Image` · `Video` · `Audio`) need file upload → file-upload era. Hosted-page types (`BusinessPage` · `Coupon` · `Menu` · `Feedback`) need the hosted-page renderer → *Dynamic content pages* venture. `Crypto` stays dropped (regulated rails). `adjacent · varies`
 - **Crypto / pay-link** - crypto address or hosted pay-link; regulated-rails boundary risk + near-zero demand + unrelated to never-expire/routing. `DROP (off-wedge) · S`
 
 ---
@@ -104,6 +113,7 @@
 
 ## Management, accounts & developer surface
 
+- **Content versioning (static codes)** - editing a static code's content mints a **version** of the same code instead of forcing a manual new code; version history + the symbol per version; branching to a separate code stays available. Without it a cafe rotating a WiFi password accumulates 10+ unrelated codes. `core-wedge · M`
 - **Management — search, folders, tags, bulk ops** - organize many codes (search shipped; folders/tags/bulk CSV/template-locking backlog); table-stakes at scale, Pro/Agency tier. `adjacent · M`
 - **Accounts, guest claim & cross-device ownership** - start anonymous, claim guest codes into a Google account, manage across devices; claim-on-sign-in shipped. Cross-device subscription merge undecided. `adjacent · M`
 - **Custom domain (CNAME) on the $5 tier** - branded short domain (qr.yourbrand.com) without enterprise sales (incumbents gate at $30+); per-domain TLS + host→code resolution + CNAME verification = heaviest infra, the deliberate $5-tier wedge. Protect sequencing (after never-expire hardening + geo). `core-wedge · L`
@@ -115,6 +125,7 @@
 ## Analytics (calm, opt-in pull)
 
 - **Scan analytics — metrics & dimensions** - scans over time + breakdowns by device/OS/country/hour, opt-in pull, calm dashboard; downgrade keeps redirect, loses analytics. BLOCKED on raw-vs-unique scan-count semantics — bind to a written rule before build: RAW counts only, NO footprint dedup (DROP that sub-option), NO IP/UA at rest, aggregate-only. `adjacent · M` (data/query) / `L` (with dashboard)
+- **Static-code analytics posture** - a static code never touches the server, so scan analytics is structurally impossible, not merely absent; say so in the UI rather than showing a permanent zero next to dynamic codes' real counts. A dynamic-advantage proof point, delivered calmly. `enabler · S`
 
 ---
 

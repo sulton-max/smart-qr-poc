@@ -1,21 +1,17 @@
-using System.Text.Json.Serialization;
-using SmartQr.Domain.Codes.Core.Enums;
+using System.Globalization;
 
 namespace SmartQr.Domain.Codes.Content.Geo.Models;
 
 /// <summary>A geographic location — encodes to a <c>geo:lat,lng</c> URI.</summary>
 public sealed record GeoContent : CodeContent
 {
-    /// <summary>Latitude, as entered.</summary>
-    public required string Latitude { get; init; }
+    /// <summary>Latitude, in the range -90 to 90.</summary>
+    public required double Latitude { get; init; }
 
-    /// <summary>Longitude, as entered.</summary>
-    public required string Longitude { get; init; }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CodeContentType Type => CodeContentType.Geo;
+    /// <summary>Longitude, in the range -180 to 180.</summary>
+    public required double Longitude { get; init; }
 
     /// <inheritdoc />
-    public override string Encode() => $"geo:{ContentEncoding.Clean(Latitude)},{ContentEncoding.Clean(Longitude)}";
+    public override string Encode() =>
+        $"geo:{Latitude.ToString(CultureInfo.InvariantCulture)},{Longitude.ToString(CultureInfo.InvariantCulture)}";
 }

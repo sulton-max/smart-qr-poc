@@ -2,6 +2,8 @@ using System.Text.Json.Serialization.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using SmartQr.Application.Billing.Core.Services;
 using SmartQr.Domain.Codes.Content;
+using SmartQr.Common.Domain.Serialization.Json;
+using SmartQr.Domain.Codes.Rules.Models;
 using SmartQr.Application.Codes.Core.Services;
 using SmartQr.Application.Identity.Core.Services;
 using SmartQr.Infrastructure.Billing.Services;
@@ -110,10 +112,12 @@ public static partial class HostConfiguration
             .AddJsonStringEnums()
             .AddJsonOptions(options =>
             {
-                // CodeContent polymorphism is enum-driven (no attributes), so the endpoint serializer needs the same
-                // resolver the persistence options use — otherwise the API can't (de)serialize the discriminated union.
+                // CodeContent and CodeRule polymorphism is enum-driven (no attributes), so the endpoint serializer needs
+                // the same resolvers the persistence options use — otherwise the API can't (de)serialize either union.
                 var resolver = options.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver();
-                options.JsonSerializerOptions.TypeInfoResolver = resolver.WithAddedModifier(CodeContentPolymorphism.Configure);
+                options.JsonSerializerOptions.TypeInfoResolver = resolver
+                    .WithAddedModifier(CodeContent.Subtypes.ToJsonModifier())
+                    .WithAddedModifier(CodeRule.Subtypes.ToJsonModifier());
                 options.JsonSerializerOptions.AllowOutOfOrderMetadataProperties = true;
             });
         return builder;

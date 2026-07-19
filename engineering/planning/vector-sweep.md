@@ -61,6 +61,7 @@ Adopted today: `presentation/*`, `forms-engine/tanstack`, `foundation/{utils,sto
 | **Download / export** | opens a browser tab | `FileUpload` UI exists; no blob/`Content-Disposition` helper | **ADD** | v0.7 "download not tab" · v0.8 PDF. Small SDK helper or app-side. |
 | **File upload (logo)** | none | `FileUpload`/`FilePicker` UI (no upload queue) | **available** | v0.8 logo — UI ready, wire on arrival. |
 | **i18n** | English only | **SDK gap** — `LocaleProvider` planned; 43 hardcoded strings | **DEFER** | UZ-vs-global unresolved; both lack it. |
+| **Global client state** | none — no store | `foundation/storage` broker only; Storage v2 (`zustand-persist` · form-autosave) is Wave-2 | **DEFER → SDK-owned** | outsourced to the SDK chat (2026-07-13). Residual need ≈ builder-draft autosave; auth/theme/server/form state already covered by `/auth` · `ColorModeProvider` · `/query` · `/forms-engine`. Constraints passed: GWDNBM (persist silently) · guest-first (key by guest id). |
 | **Command palette / shortcuts** | none | `CommandPalette` UI; logic layer pending | **DEFER** | not in scope. |
 
 ### The frontend-infra adopt bundle (do this first)

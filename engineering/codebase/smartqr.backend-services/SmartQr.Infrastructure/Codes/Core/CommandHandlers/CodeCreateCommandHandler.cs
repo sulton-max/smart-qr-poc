@@ -54,7 +54,7 @@ public sealed class CodeCreateCommandHandler(
 
             // A backend content spec (e.g. mobileApp) owns its routing — derives device rules + an optional Default
             // catch-all from the content and overrides the client. Types without a spec keep the request's rules.
-            var projection = ContentTypes.Resolve(request.Content.Type) is { } spec
+            var projection = ContentTypes.Resolve(CodeContent.Subtypes.KindOf(request.Content)) is { } spec
                 ? spec.Project(request.Content)
                 : null;
 

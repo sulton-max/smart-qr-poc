@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using SmartQr.Domain.Codes.Core.Enums;
-
 namespace SmartQr.Domain.Codes.Content.Calendar.Models;
 
 /// <summary>A calendar event — encodes to an iCalendar <c>VEVENT</c> carrying only the filled fields; dates use the basic (compact) format.</summary>
@@ -9,21 +6,17 @@ public sealed record CalendarContent : CodeContent
     /// <summary>Event title (the only required field).</summary>
     public required string Title { get; init; }
 
-    /// <summary>Start, as a <c>datetime-local</c> / date string; formatted to the iCal basic form.</summary>
-    public required string Start { get; init; }
+    /// <summary>Event start, with no time zone; formatted to the iCal basic form.</summary>
+    public required DateTime Start { get; init; }
 
-    /// <summary>Optional end, as a <c>datetime-local</c> / date string.</summary>
-    public string? End { get; init; }
+    /// <summary>Optional event end; when present, later than the start.</summary>
+    public DateTime? End { get; init; }
 
     /// <summary>Optional location.</summary>
     public string? Location { get; init; }
 
     /// <summary>Optional description.</summary>
     public string? Description { get; init; }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CodeContentType Type => CodeContentType.Calendar;
 
     /// <inheritdoc />
     public override string Encode()
@@ -34,11 +27,10 @@ public sealed record CalendarContent : CodeContent
         if (title.Length > 0)
             lines.Add($"SUMMARY:{ContentEncoding.EscapeICal(title)}");
 
-        if (ContentEncoding.Clean(Start).Length > 0)
-            lines.Add($"DTSTART:{ContentEncoding.ToICalDate(Start)}");
+        lines.Add($"DTSTART:{ContentEncoding.ToICalDate(Start)}");
 
-        if (ContentEncoding.Clean(End).Length > 0)
-            lines.Add($"DTEND:{ContentEncoding.ToICalDate(End)}");
+        if (End is { } end)
+            lines.Add($"DTEND:{ContentEncoding.ToICalDate(end)}");
 
         var location = ContentEncoding.Clean(Location);
         if (location.Length > 0)

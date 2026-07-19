@@ -1,6 +1,6 @@
 namespace SmartQr.Domain.Codes.Core.Enums;
 
-/// <summary>Defines the dimension a routing rule matches against — evaluated top-to-bottom, first match wins.</summary>
+/// <summary>Defines the dimension a routing rule matches against — evaluated top-to-bottom, first match wins. The catch-all is a rule role, not a condition.</summary>
 public enum RuleConditionType
 {
     /// <summary>Represents a match on the device class (e.g. <c>Ios</c> → App Store).</summary>
@@ -14,7 +14,4 @@ public enum RuleConditionType
 
     /// <summary>Represents a match on a daily time window <c>HH:mm-HH:mm</c> (e.g. lunch vs dinner menu).</summary>
     TimeOfDay,
-
-    /// <summary>Represents an always-matching catch-all rule (alternative to the code's fallback URL).</summary>
-    Default,
 }

@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using SmartQr.Domain.Codes.Core.Enums;
-
 namespace SmartQr.Domain.Codes.Content.Email.Models;
 
 /// <summary>Pre-filled email — encodes to a <c>mailto:</c> URI with optional form-encoded subject / body query params.</summary>
@@ -14,10 +11,6 @@ public sealed record EmailContent : CodeContent
 
     /// <summary>Optional message body.</summary>
     public string? Body { get; init; }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CodeContentType Type => CodeContentType.Email;
 
     /// <inheritdoc />
     public override string Encode()

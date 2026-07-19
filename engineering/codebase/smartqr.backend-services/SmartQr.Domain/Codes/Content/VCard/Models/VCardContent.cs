@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using SmartQr.Domain.Codes.Core.Enums;
-
 namespace SmartQr.Domain.Codes.Content.VCard.Models;
 
 /// <summary>A contact card — encodes to a vCard 3.0 payload carrying only the filled fields, each iCal-escaped.</summary>
@@ -32,10 +29,6 @@ public sealed record VCardContent : CodeContent
 
     /// <summary>Free-form note.</summary>
     public string? Note { get; init; }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CodeContentType Type => CodeContentType.VCard;
 
     /// <inheritdoc />
     public override string Encode()

@@ -1,16 +1,9 @@
-import type { RuleConditionType } from "../enums/RuleConditionType";
+import type { ConditionalRuleDto } from "./ConditionalRuleDto";
+import type { DefaultPointerRuleDto } from "./DefaultPointerRuleDto";
+import type { DefaultRuleDto } from "./DefaultRuleDto";
 
-/** Represents a single routing rule — a condition mapped to a destination, matched in order. */
-export interface CodeRuleDto {
-  /** The 1-based match order (first match wins). */
-  order: number;
-
-  /** The signal this rule matches on. */
-  conditionType: RuleConditionType;
-
-  /** The value the condition compares against. */
-  conditionValue?: string;
-
-  /** The destination URL used when this rule matches. */
-  destination: string;
-}
+/**
+ * Represents one routing rule of a code. Conditional rules are matched in order, first match wins; at most one default
+ * rule serves whatever the conditional rules did not — its absence means an unmatched scan does not resolve.
+ */
+export type CodeRuleDto = ConditionalRuleDto | DefaultPointerRuleDto | DefaultRuleDto;
