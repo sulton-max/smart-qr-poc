@@ -1,6 +1,7 @@
-using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
-using SmartQr.Domain.Codes.Content;
+using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Rules.Models;
 using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -21,11 +22,12 @@ public sealed record CodeCreateCommand
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
     /// <summary>Optional ordered routing rules.</summary>
-    public IReadOnlyList<RuleDto> Rules { get; init; } = [];
+    /// <summary>How the symbol resolves; fixed for the life of the code.</summary>
+    public required ContentMode Mode { get; init; }
+
+    public required IReadOnlyList<CodeRule> Rules { get; init; }
 
     /// <summary>Optional style to persist; null leaves the code on the default style.</summary>
     public StyleSpec? Style { get; init; }
 
-    /// <summary>The typed content the code carries; static types bake a payload (<see cref="CodeContent.Encode"/>), dynamic types (url / mobileApp) resolve the redirect short link.</summary>
-    public required CodeContent Content { get; init; }
 }

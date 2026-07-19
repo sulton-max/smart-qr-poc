@@ -1,6 +1,6 @@
-using SmartQr.Application.Codes.Core.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
-using SmartQr.Domain.Codes.Content;
+using SmartQr.Application.Codes.Core.Models;
+using SmartQr.Domain.Codes.Rules.Models;
 using SmartQr.Domain.Codes.Core.Enums;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
@@ -24,11 +24,9 @@ public sealed record CodeUpdateCommand
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
     /// <summary>Replacement ordered routing rules (the whole set).</summary>
-    public IReadOnlyList<RuleDto> Rules { get; init; } = [];
+    public required IReadOnlyList<CodeRule> Rules { get; init; }
 
     /// <summary>Optional style to persist; null preserves the code's saved style.</summary>
     public StyleSpec? Style { get; init; }
 
-    /// <summary>Optional typed content to persist; null preserves the code's saved content. Static types bake a payload, dynamic types resolve the short link.</summary>
-    public CodeContent? Content { get; init; }
 }

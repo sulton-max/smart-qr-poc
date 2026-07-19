@@ -1,6 +1,6 @@
 using FluentValidation;
+using SmartQr.Application.Codes.Rules.Validation;
 using SmartQr.Application.Codes.Core.Commands;
-using SmartQr.Application.Codes.Content;
 
 namespace SmartQr.Application.Codes.Core.Validation;
 
@@ -16,8 +16,7 @@ public sealed class CodeUpdateCommandValidator : AbstractValidator<CodeUpdateCom
             .MaximumLength(200).WithMessage("Name must be 200 characters or fewer.");
 
         // A content type with a backend spec (e.g. mobileApp) owns its own validation → content-aware messages.
-        RuleFor(c => c).Custom((command, ctx) => ContentValidation.Apply(command.Content, ctx));
 
-        RuleForEach(c => c.Rules).SetValidator(new RuleDtoValidator());
+        RuleForEach(c => c.Rules).SetValidator(new CodeRuleValidator());
     }
 }

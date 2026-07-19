@@ -1,6 +1,7 @@
 using SmartQr.Application.Codes.Core.Commands;
-using SmartQr.Domain.Codes.Content;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Api.Requests.Codes;
 
@@ -13,14 +14,14 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Gets the optional ordered routing rules.</summary>
-    public IReadOnlyList<RuleApiRequest> Rules { get; init; } = [];
+    /// <summary>Gets how the symbol resolves — a baked payload (static) or the redirect short link (dynamic). Fixed for the life of the code.</summary>
+    public required ContentMode Mode { get; init; }
+
+    /// <summary>Gets the routing rules, each carrying the content it serves. At least one is required; every rule must carry the same content type.</summary>
+    public required IReadOnlyList<CodeRule> Rules { get; init; }
 
     /// <summary>Gets the optional style to persist — omitted leaves the code on the default style.</summary>
     public StyleApiRequest? Style { get; init; }
-
-    /// <summary>Gets the typed content the code carries (polymorphic on <c>type</c>); static types bake a payload, dynamic types resolve the redirect short link. A plain <c>url</c> carries a trailing Default rule to its destination.</summary>
-    public required CodeContent Content { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>
@@ -34,9 +35,9 @@ public static class CreateCodeApiRequestExtensions
             UserId = userId,
             Name = request.Name,
             BarcodeFormat = request.BarcodeFormat,
-            Rules = request.Rules.ToRuleDtos(),
+            Mode = request.Mode,
+            Rules = request.Rules,
             Style = request.Style?.ToStyleSpec(),
-            Content = request.Content,
         };
 
         return command;
