@@ -1,5 +1,6 @@
-using SmartQr.Domain.Codes.Content;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules.Models;
 using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 
 namespace SmartQr.Domain.Codes.Core.Entities;
@@ -13,8 +14,8 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <summary>Gets or sets the UUID primary key of the code.</summary>
     public required Guid Id { get; set; }
 
-    /// <summary>Gets or sets the short, URL-safe slug encoded into the printed code. Immutable once printed — the redirect lookup key.</summary>
-    public required string Slug { get; set; }
+    /// <summary>Gets or sets the short, URL-safe slug encoded into a dynamic code. Null on a static code, whose symbol never reaches the redirect.</summary>
+    public string? Slug { get; set; }
 
     /// <summary>Gets or sets the id of the user who owns this code.</summary>
     /// <remarks>A bare <see cref="Guid"/>, not an FK — a guest owner has no <c>users</c> row.</remarks>
@@ -33,9 +34,12 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <remarks>Raw <c>jsonb</c> string, not a CLR graph — style is applied only at render time, never queried server-side.</remarks>
     public string StyleJson { get; set; }
 
-    /// <summary>Gets or sets the typed content the code carries — a polymorphic <see cref="CodeContent"/> persisted as <c>content_json</c> jsonb via an EF value converter. Always present: a code with no explicit content defaults to a url content pointing at its fallback.</summary>
-    /// <remarks>Static content bakes its payload into the symbol (<see cref="CodeContent.Encode"/>); dynamic content (url / mobileApp) resolves as the redirect short link.</remarks>
-    public required CodeContent Content { get; set; }
+    /// <summary>Gets or sets how the code's symbol resolves. Set at create and never changed — the two modes bake different bytes.</summary>
+    public ContentMode Mode { get; set; }
+
+    /// <summary>Gets or sets the kind of content every rule of this code carries.</summary>
+    /// <remarks>Code-level: a code is "a WiFi code", so all its rules carry the same content type — enforced on write.</remarks>
+    public CodeContentType ContentType { get; set; }
 
     /// <summary>Gets or sets the running total of scans of the code (denormalized for fast display).</summary>
     public long ScanCount { get; set; }
@@ -46,7 +50,7 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     /// <summary>Gets or sets the last-update timestamp of the code.</summary>
     public DateTimeOffset UpdatedAt { get; set; }
 
-    /// <summary>Gets or sets the ordered routing rules of the code, evaluated before falling back.</summary>
-    /// <remarks>An EF navigation, not a stored column — configured in <c>CodeEntityConfiguration</c>.</remarks>
-    public List<RoutingRuleEntity> Rules { get; set; } = [];
+    /// <summary>Gets or sets the routing rules of the code, each carrying the content it serves. Never empty — no rules means no content.</summary>
+    /// <remarks>Conditional rules are matched in order; at most one default rule serves the rest. Persisted as a <c>rules</c> jsonb document.</remarks>
+    public List<CodeRule> Rules { get; set; } = [];
 }

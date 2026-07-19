@@ -15,8 +15,8 @@ public sealed class SubtypeRegistry<TBase, TKind>
     where TBase : class
     where TKind : struct, Enum
 {
-    private readonly Dictionary<TKind, Type> typesByKind;
-    private readonly Dictionary<Type, TKind> kindsByType;
+    private readonly Dictionary<TKind, Type> _typesByKind;
+    private readonly Dictionary<Type, TKind> _kindsByType;
 
     /// <summary>Creates the registry, validating that the set covers every <typeparamref name="TKind"/> member exactly once.</summary>
     /// <param name="subtypes">Each discriminator member paired with the concrete type it identifies.</param>
@@ -32,19 +32,19 @@ public sealed class SubtypeRegistry<TBase, TKind>
                 throw new ArgumentException($"'{type.Name}' is abstract and cannot be a subtype.", nameof(subtypes));
         }
 
-        typesByKind = [];
-        kindsByType = [];
+        _typesByKind = [];
+        _kindsByType = [];
 
         foreach (var (kind, type) in subtypes)
         {
-            if (!typesByKind.TryAdd(kind, type))
+            if (!_typesByKind.TryAdd(kind, type))
                 throw new ArgumentException($"'{kind}' is mapped more than once.", nameof(subtypes));
 
-            if (!kindsByType.TryAdd(type, kind))
+            if (!_kindsByType.TryAdd(type, kind))
                 throw new ArgumentException($"'{type.Name}' is mapped more than once.", nameof(subtypes));
         }
 
-        var missing = Enum.GetValues<TKind>().Where(kind => !typesByKind.ContainsKey(kind)).ToArray();
+        var missing = Enum.GetValues<TKind>().Where(kind => !_typesByKind.ContainsKey(kind)).ToArray();
         if (missing.Length > 0)
             throw new ArgumentException($"'{typeof(TKind).Name}' members without a subtype: {string.Join(", ", missing)}.", nameof(subtypes));
 
@@ -56,11 +56,11 @@ public sealed class SubtypeRegistry<TBase, TKind>
 
     /// <summary>Resolves the concrete type a discriminator member identifies.</summary>
     /// <param name="kind">The discriminator member.</param>
-    public Type TypeOf(TKind kind) => typesByKind[kind];
+    public Type TypeOf(TKind kind) => _typesByKind[kind];
 
     /// <summary>Resolves the discriminator member of an instance's concrete type.</summary>
     /// <param name="instance">The instance to classify.</param>
-    public TKind KindOf(TBase instance) => kindsByType[instance.GetType()];
+    public TKind KindOf(TBase instance) => _kindsByType[instance.GetType()];
 
     // Serialize the member through the wire's string-enum converter so the token honors any
     // [JsonStringEnumMemberName] override — the enum member stays the single source.

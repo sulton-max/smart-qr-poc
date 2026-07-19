@@ -1,6 +1,7 @@
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
-using SmartQr.Domain.Codes.Content;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Application.Codes.Core.Models;
 
@@ -10,17 +11,23 @@ public sealed record CodeDto
     /// <summary>Code id.</summary>
     public required Guid Id { get; init; }
 
-    /// <summary>Immutable public slug encoded into the printed code.</summary>
-    public required string Slug { get; init; }
+    /// <summary>Public slug encoded into a dynamic code; null on a static code.</summary>
+    public string? Slug { get; init; }
 
-    /// <summary>The short URL the code resolves through (what's actually encoded).</summary>
-    public required string ShortUrl { get; init; }
+    /// <summary>The short URL a dynamic code resolves through (what's actually encoded); null on a static code.</summary>
+    public string? ShortUrl { get; init; }
 
     /// <summary>Display name.</summary>
     public required string Name { get; init; }
 
     /// <summary>Rendering symbology.</summary>
     public required BarcodeFormat BarcodeFormat { get; init; }
+
+    /// <summary>How the symbol resolves — baked payload (static) or short link (dynamic). Fixed at create.</summary>
+    public required ContentMode Mode { get; init; }
+
+    /// <summary>The kind of content every rule of this code carries.</summary>
+    public required CodeContentType ContentType { get; init; }
 
     /// <summary>Whether the code currently resolves.</summary>
     public bool IsActive { get; init; }
@@ -31,12 +38,9 @@ public sealed record CodeDto
     /// <summary>Creation timestamp.</summary>
     public DateTimeOffset CreatedAt { get; init; }
 
-    /// <summary>Ordered routing rules.</summary>
-    public IReadOnlyList<RuleDto> Rules { get; init; } = [];
+    /// <summary>The routing rules, each carrying the content it serves.</summary>
+    public IReadOnlyList<CodeRule> Rules { get; init; } = [];
 
     /// <summary>The persisted visual style (deserialized from <c>StyleJson</c>; the render default when none was saved) — lets the builder round-trip a saved style on edit.</summary>
     public required StyleSpec Style { get; init; }
-
-    /// <summary>The persisted typed content (polymorphic on <c>type</c>); always present — a plain code carries a url content over its fallback. Lets the builder round-trip the content form on edit.</summary>
-    public required CodeContent Content { get; init; }
 }
