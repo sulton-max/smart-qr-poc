@@ -13,6 +13,9 @@ public sealed record UpdateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
+    /// <summary>Gets the kind of content every rule carries — the builder's content-type choice. Validated against the rules it ships with.</summary>
+    public required CodeContentType ContentType { get; init; }
+
     /// <summary>Gets the replacement routing rules (the whole set), each carrying the content it serves.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
@@ -32,6 +35,7 @@ public static class UpdateCodeApiRequestExtensions
             UserId = userId,
             Name = request.Name,
             BarcodeFormat = request.BarcodeFormat,
+            ContentType = request.ContentType,
             Rules = request.Rules,
             Style = request.Style?.ToStyleSpec(),
         };

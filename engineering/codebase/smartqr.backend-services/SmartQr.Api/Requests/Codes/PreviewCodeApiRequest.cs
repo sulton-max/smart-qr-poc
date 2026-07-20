@@ -1,17 +1,18 @@
-using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
-using SmartQr.Domain.Codes.Content;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules.Models;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents the stateless preview request body, rendered live from <see cref="Style"/> with no persistence.</summary>
+/// <summary>Represents the stateless preview request body, rendered live with no persistence.</summary>
 public sealed record PreviewCodeApiRequest
 {
-    /// <summary>Gets the fallback data to encode when <see cref="Content"/> is absent or dynamic — the short link on edit, a sample URL on create.</summary>
-    public required string Value { get; init; }
+    /// <summary>Gets how the symbol resolves — a static preview bakes the rule's content, a dynamic one a sample short link of the real length.</summary>
+    public required ContentMode Mode { get; init; }
 
-    /// <summary>Gets the optional typed content — when it bakes a payload (<see cref="CodeContent.Encode"/>), the preview encodes it server-side so it matches the saved asset; dynamic/absent content falls back to <see cref="Value"/>.</summary>
-    public CodeContent? Content { get; init; }
+    /// <summary>Gets the routing rules whose content the preview bakes.</summary>
+    public required IReadOnlyList<CodeRule> Rules { get; init; }
 
     /// <summary>Gets the symbology to render — <c>QrCode</c> renders the styled path, any other format renders a plain ZXing barcode.</summary>
     public BarcodeFormat? BarcodeFormat { get; init; }

@@ -2,21 +2,28 @@
 // and the submit normalizer. The form binds `CodeCreateUpdateApiRequest` directly (no separate `*Values` type).
 
 import { z } from "zod";
+import { Temporal } from "temporal-polyfill";
 
 import {
   BarcodeFormat,
+  CodeRuleType,
+  ContentMode,
+  ContentType,
   EccLevel,
   FinderShape,
+  MobileAppStoreType,
   ModuleShape,
+  RuleConditionType,
+  WifiEncryption,
   defaultCodeStyle,
+  emptyContent,
   type CodeDto,
   type CodeEmojiDto,
   type CodeLogoDto,
   type CodeRuleDto,
+  type ConditionalRuleDto,
   type Gradient,
 } from "@/domain/codes";
-import { ContentType, isDynamicType } from "@/domain/codes/content";
-import { RuleConditionType } from "@/domain/codes/rules";
 import type { CodeCreateUpdateApiRequest } from "@/integration/codes";
 
 /** A zod schema over a const-object enum's values, typed as the exact string-literal union it produces. */
@@ -27,16 +34,14 @@ function enumOf<T extends Record<string, string>>(source: T) {
 
 // ── Schema ──────────────────────────────────────────────────────────────────────
 // `content` is a discriminated union over `type`, each member mirroring its domain interface — payload
-// validation is the backend's; only rule-row destinations validate here (they render their own errors).
+// validation is the backend's; the form only shapes what the controls bind to.
 
 const contentSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal(ContentType.Url), url: z.string() }),
   z.object({
     type: z.literal(ContentType.MobileApp),
-    appStore: z.string().optional(),
-    playStore: z.string().optional(),
-    other: z.string().optional(),
-    fallback: z.string().optional(),
+    store: enumOf(MobileAppStoreType),
+    url: z.string(),
   }),
   z.object({ type: z.literal(ContentType.Text), text: z.string() }),
   z.object({
@@ -47,12 +52,12 @@ const contentSchema = z.discriminatedUnion("type", [
   }),
   z.object({ type: z.literal(ContentType.Sms), phone: z.string(), message: z.string().optional() }),
   z.object({ type: z.literal(ContentType.Phone), phone: z.string() }),
-  z.object({ type: z.literal(ContentType.Geo), latitude: z.string(), longitude: z.string() }),
+  z.object({ type: z.literal(ContentType.Geo), latitude: z.number(), longitude: z.number() }),
   z.object({
     type: z.literal(ContentType.Wifi),
     ssid: z.string(),
     password: z.string().optional(),
-    encryption: z.string().optional(),
+    encryption: enumOf(WifiEncryption),
     hidden: z.boolean(),
   }),
   z.object({
@@ -70,19 +75,25 @@ const contentSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal(ContentType.Calendar),
     title: z.string(),
-    start: z.string(),
-    end: z.string().optional(),
+    start: z.custom<Temporal.PlainDateTime>((value) => value instanceof Temporal.PlainDateTime),
+    end: z.custom<Temporal.PlainDateTime>((value) => value instanceof Temporal.PlainDateTime).optional(),
     location: z.string().optional(),
     description: z.string().optional(),
   }),
 ]);
 
-const codeRuleSchema = z.object({
-  order: z.number(),
-  conditionType: enumOf(RuleConditionType),
-  conditionValue: z.string(),
-  destination: z.string(),
-});
+// A rule is its role plus the content it serves — the catch-all is a role, never a condition.
+const codeRuleSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal(CodeRuleType.Conditional),
+    order: z.number(),
+    condition: enumOf(RuleConditionType),
+    conditionValue: z.string(),
+    content: contentSchema,
+  }),
+  z.object({ type: z.literal(CodeRuleType.Default), content: contentSchema }),
+  z.object({ type: z.literal(CodeRuleType.DefaultPointer), targetOrder: z.number() }),
+]);
 
 const codeStyleSchema = z.object({
   foregroundColor: z.string(),
@@ -99,49 +110,38 @@ const codeStyleSchema = z.object({
   emoji: z.custom<CodeEmojiDto>().optional(),
 });
 
-/** Whole-form validator — discriminated content union + rules array, with content-gated row validation. */
-export const CreateCodeSchema = z
-  .object({
-    name: z.string(),
-    barcodeFormat: enumOf(BarcodeFormat),
-    content: contentSchema,
-    style: codeStyleSchema,
-    rules: z.array(codeRuleSchema),
-  })
-  .superRefine((values, ctx) => {
-    // Row destinations are sent only for a plain URL forwarder — validate them only then.
-    if (values.content.type !== ContentType.Url) return;
-    values.rules.forEach((rule, index) => {
-      if (!rule.destination.trim()) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["rules", index, "destination"],
-          message: "Add a destination URL for this rule.",
-        });
-      }
-    });
-  });
+/** Whole-form validator — the code's identity plus the rules carrying its content. */
+export const CreateCodeSchema = z.object({
+  name: z.string(),
+  barcodeFormat: enumOf(BarcodeFormat),
+  mode: enumOf(ContentMode).optional(),
+  contentType: enumOf(ContentType),
+  style: codeStyleSchema,
+  rules: z.array(codeRuleSchema).min(1),
+});
 
 // ── Factories + mappers ─────────────────────────────────────────────────────────
 
-/** The blank builder request for create mode — a `url` forwarder seeded with a sample so the preview renders. */
+/** The blank builder request for create mode — a static `url` code carrying one default rule. */
 export function emptyCodeCreateUpdateApiRequest(): CodeCreateUpdateApiRequest {
   return {
     name: "",
     barcodeFormat: BarcodeFormat.QrCode,
-    content: { type: ContentType.Url, url: "https://example.com" },
+    mode: ContentMode.Static,
+    contentType: ContentType.Url,
     style: { ...defaultCodeStyle },
-    rules: [],
+    rules: [{ type: CodeRuleType.Default, content: { type: ContentType.Url, url: "https://example.com" } }],
   };
 }
 
-/** A fresh empty routing rule for `useFieldArray('rules').push` — `order` is reassigned by row index at submit. */
-export function emptyCodeRule(): CodeRuleDto {
+/** A fresh conditional rule for `useFieldArray('rules').push` — `order` is reassigned by row index at submit. */
+export function emptyConditionalRule(contentType: ContentType): ConditionalRuleDto {
   return {
+    type: CodeRuleType.Conditional,
     order: 0,
-    conditionType: RuleConditionType.Device,
+    condition: RuleConditionType.Device,
     conditionValue: "",
-    destination: "",
+    content: emptyContent(contentType),
   };
 }
 
@@ -150,52 +150,22 @@ export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApi
   return {
     name: code.name,
     barcodeFormat: code.barcodeFormat,
-    content: code.content,
+    contentType: code.contentType,
     style: { ...code.style },
-    // The Default catch-all is derived from the content at submit, not user-authored — strip it on prefill so
-    // the round-trip doesn't accumulate duplicates.
-    rules: code.rules
-      .filter((rule) => rule.conditionType !== RuleConditionType.Default)
-      .map((rule) => ({
-        order: rule.order,
-        conditionType: rule.conditionType,
-        conditionValue: rule.conditionValue ?? "",
-        destination: rule.destination,
-      })),
+    rules: code.rules.map((rule) => ({ ...rule })),
   };
 }
 
-/** Normalizes the builder request for submit — trims fields and content-gates the routing rules. */
+/** Normalizes the builder request for submit — trims the name and renumbers the conditional rules. */
 export function toCreateCodeRequest(values: CodeCreateUpdateApiRequest): CodeCreateUpdateApiRequest {
-  const { name, barcodeFormat, content, style, rules } = values;
-  // Content shapes the request: a static type bakes its payload server-side (no redirect, no rules); a
-  // self-routed type (mobileApp) derives its device rules + optional Default server-side; a plain URL keeps
-  // its rules and carries its destination as a trailing Default catch-all (the fallback column is retired).
-  const isStatic = !isDynamicType(content.type);
-  const selfRouted = content.type === ContentType.MobileApp;
-  const routed =
-    isStatic || selfRouted
-      ? []
-      : rules.map((rule, index) => ({
-          order: index + 1,
-          conditionType: rule.conditionType,
-          conditionValue: (rule.conditionValue ?? "").trim(),
-          destination: rule.destination.trim(),
-        }));
+  let order = 0;
+  const rules: CodeRuleDto[] = values.rules.map((rule) =>
+    rule.type === CodeRuleType.Conditional ? { ...rule, order: ++order } : { ...rule },
+  );
 
   return {
-    name: name.trim() || "Untitled code",
-    barcodeFormat,
-    rules:
-      content.type === ContentType.Url
-        ? [...routed, defaultRule(routed.length + 1, content.url.trim())]
-        : routed,
-    style,
-    content,
+    ...values,
+    name: values.name.trim() || "Untitled code",
+    rules,
   };
-}
-
-/** The catch-all a plain `url` code carries — always matches, ordered last so specific rules win. */
-function defaultRule(order: number, destination: string): CodeRuleDto {
-  return { order, conditionType: RuleConditionType.Default, conditionValue: "", destination };
 }

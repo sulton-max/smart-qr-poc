@@ -1,82 +1,41 @@
 import { Field, Select, UrlInput } from "@wow-two-beta/ui/presentation/forms";
-import type { MobileAppLinkContent } from "@/domain/codes/content";
+import { MobileAppStoreType, type MobileAppLinkContent } from "@/domain/codes/content";
 import type { ContentControlsProps } from "./fields";
 
-/** Defines one mobile-app destination — a store link plus the "default for other devices" option label. */
-interface MobileAppInput {
-  /** The content property this input binds to. */
-  readonly key: "appStore" | "playStore" | "other";
+/** The store picker's labels and per-store placeholder. */
+const StoreDisplays: Record<MobileAppStoreType, { label: string; placeholder: string }> = {
+  [MobileAppStoreType.AppStore]: { label: "App Store (iOS)", placeholder: "https://apps.apple.com/app/…" },
+  [MobileAppStoreType.PlayStore]: { label: "Google Play", placeholder: "https://play.google.com/store/apps/…" },
+  [MobileAppStoreType.Other]: { label: "Other", placeholder: "https://yourapp.com or another store" },
+};
 
-  /** The input's field label. */
-  readonly label: string;
-
-  /** The label shown for this link in the fallback picker. */
-  readonly fallbackLabel: string;
-
-  /** The input's placeholder. */
-  readonly placeholder: string;
-}
-
-// The three destination inputs. The fallback is chosen among the links the user actually filled; "other" is
-// an optional custom catch-all. Order defines the default (first filled link wins).
-const MobileAppInputs: readonly MobileAppInput[] = [
-  { key: "appStore", label: "App Store (iOS) URL", fallbackLabel: "App Store (iOS)", placeholder: "https://apps.apple.com/app/…" },
-  { key: "playStore", label: "Google Play URL", fallbackLabel: "Google Play", placeholder: "https://play.google.com/store/apps/…" },
-  { key: "other", label: "Other devices URL (optional)", fallbackLabel: "Other devices URL", placeholder: "https://yourapp.com or another store" },
-];
-
-/** Resolves the active fallback key: the saved choice if it's still a filled link, else the first filled link. */
-function getActiveFallback(value: MobileAppLinkContent): string | undefined {
-  const filled = MobileAppInputs.filter((o) => (value[o.key] ?? "").trim());
-  return filled.some((o) => o.key === value.fallback) ? value.fallback : filled[0]?.key;
-}
-
-/**
- * Renders mobile-app-link controls — store links plus a "default for other devices" picker chosen among the
- * filled links (the separate "other" URL is optional). The backend derives the device rules + fallback.
- */
+/** Renders one app-store link — the store it points at plus its URL. The rule carrying it supplies the device condition. */
 export function MobileAppControls({ value, onChange }: ContentControlsProps<MobileAppLinkContent>) {
-  const filled = MobileAppInputs.filter((o) => (value[o.key] ?? "").trim());
-  const activeFallback = getActiveFallback(value);
-
-  // Merge a link change (blank → absent), keeping `fallback` pointing at a link that's still filled.
-  const setLink = (key: MobileAppInput["key"], v: string) => {
-    const next: MobileAppLinkContent = { ...value, [key]: v || undefined };
-    onChange({ ...next, fallback: getActiveFallback(next) });
-  };
-
   return (
     <>
-      {MobileAppInputs.map((input) => (
-        <Field key={input.key} label={input.label}>
-          <UrlInput
-            ring="sm"
-            value={value[input.key] ?? ""}
-            placeholder={input.placeholder}
-            onChange={(e) => setLink(input.key, e.target.value)}
-          />
-        </Field>
-      ))}
-
-      {/* Only a real choice (≥2 filled links) needs a picker; one link is the fallback by default. */}
-      {filled.length > 1 && (
-        <Field label="Other devices open">
-          <Select
-            value={activeFallback}
-            onValueChange={(o) => o && onChange({ ...value, fallback: o.itemKey })}
-            getOptionLabel={(k) => MobileAppInputs.find((i) => i.key === k)?.fallbackLabel}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              {filled.map((o) => (
-                <Select.Item key={o.key} itemKey={o.key} label={o.fallbackLabel} />
-              ))}
-            </Select.Content>
-          </Select>
-        </Field>
-      )}
+      <Field label="Store">
+        <Select<MobileAppStoreType>
+          value={value.store}
+          onValueChange={(opt) => opt && onChange({ ...value, store: opt.itemKey })}
+        >
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            {Object.values(MobileAppStoreType).map((store) => (
+              <Select.Item key={store} itemKey={store} label={StoreDisplays[store].label} />
+            ))}
+          </Select.Content>
+        </Select>
+      </Field>
+      <Field label="Store URL">
+        <UrlInput
+          ring="sm"
+          value={value.url}
+          placeholder={StoreDisplays[value.store].placeholder}
+          onChange={(e) => onChange({ ...value, url: e.target.value })}
+        />
+      </Field>
     </>
   );
 }

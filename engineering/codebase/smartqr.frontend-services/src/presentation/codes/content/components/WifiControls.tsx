@@ -1,11 +1,11 @@
 import { Field, TextInput } from "@wow-two-beta/ui/presentation/forms";
-import type { WifiContent } from "@/domain/codes/content";
+import { WifiEncryption, type WifiContent } from "@/domain/codes/content";
 import { type ContentControlsProps, type SelectOption, SelectField } from "./fields";
 
 const ENCRYPTION_OPTIONS: readonly SelectOption[] = [
-  { value: "WPA", label: "WPA/WPA2" },
-  { value: "WEP", label: "WEP" },
-  { value: "nopass", label: "None" },
+  { value: WifiEncryption.Wpa, label: "WPA/WPA2" },
+  { value: WifiEncryption.Wep, label: "WEP" },
+  { value: WifiEncryption.None, label: "None" },
 ];
 
 const HIDDEN_OPTIONS: readonly SelectOption[] = [
@@ -27,7 +27,7 @@ export function WifiControls({ value, onChange }: ContentControlsProps<WifiConte
         label="Security"
         value={value.encryption}
         options={ENCRYPTION_OPTIONS}
-        onChange={(encryption) => onChange({ ...value, encryption })}
+        onChange={(encryption) => onChange({ ...value, encryption: encryption as WifiEncryption })}
       />
       <SelectField
         label="Hidden network"

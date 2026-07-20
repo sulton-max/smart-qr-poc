@@ -23,6 +23,9 @@ public sealed record CodeUpdateCommand
     /// <summary>Rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
+    /// <summary>The kind of content every rule carries.</summary>
+    public required CodeContentType ContentType { get; init; }
+
     /// <summary>Replacement ordered routing rules (the whole set).</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 

@@ -1,41 +1,34 @@
-// Content operations — factories + predicates over the typed `CodeContent` union the builder holds directly.
+// Content operations — factories over the typed `CodeContent` union a rule carries.
 
-import { contentType, type CodeContent } from "./models";
+import { Temporal } from "temporal-polyfill";
+
+import type { CodeContent } from "./models";
 import { ContentType } from "./enums/ContentType";
-import { ContentMode } from "./enums/ContentMode";
+import { MobileAppStoreType } from "./enums/MobileAppStoreType";
+import { WifiEncryption } from "./enums/WifiEncryption";
 
 /** Builds the minimal typed content for a type — the discriminator plus its required fields blank. Used to seed a fresh content type. */
 export function emptyContent(id: ContentType): CodeContent {
   switch (id) {
     case ContentType.Url:
-      return { type: "url", url: "" };
+      return { type: ContentType.Url, url: "" };
     case ContentType.MobileApp:
-      return { type: "mobileApp" };
+      return { type: ContentType.MobileApp, store: MobileAppStoreType.AppStore, url: "" };
     case ContentType.Text:
-      return { type: "text", text: "" };
+      return { type: ContentType.Text, text: "" };
     case ContentType.Email:
-      return { type: "email", to: "" };
+      return { type: ContentType.Email, to: "" };
     case ContentType.Sms:
-      return { type: "sms", phone: "" };
+      return { type: ContentType.Sms, phone: "" };
     case ContentType.Phone:
-      return { type: "phone", phone: "" };
+      return { type: ContentType.Phone, phone: "" };
     case ContentType.Geo:
-      return { type: "geo", latitude: "", longitude: "" };
+      return { type: ContentType.Geo, latitude: 0, longitude: 0 };
     case ContentType.Wifi:
-      return { type: "wifi", ssid: "", hidden: false };
+      return { type: ContentType.Wifi, ssid: "", encryption: WifiEncryption.Wpa, hidden: false };
     case ContentType.VCard:
-      return { type: "vCard", firstName: "" };
+      return { type: ContentType.VCard, firstName: "" };
     case ContentType.Calendar:
-      return { type: "calendar", title: "", start: "" };
+      return { type: ContentType.Calendar, title: "", start: Temporal.Now.plainDateTimeISO().round("minute") };
   }
-}
-
-/** A code resolves through its redirect short link (dynamic) rather than a baked payload — true for url / mobileApp / absent content. */
-export function isDynamicContent(content: CodeContent | null | undefined): boolean {
-  return content == null || contentType(content.type).mode === ContentMode.Dynamic;
-}
-
-/** Whether a content type resolves through the forwarder short link (dynamic) rather than baking its payload (static). */
-export function isDynamicType(id: ContentType): boolean {
-  return contentType(id).mode === ContentMode.Dynamic;
 }

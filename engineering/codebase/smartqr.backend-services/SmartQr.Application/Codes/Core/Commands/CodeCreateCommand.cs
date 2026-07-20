@@ -21,6 +21,9 @@ public sealed record CodeCreateCommand
     /// <summary>Rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
+    /// <summary>The kind of content every rule carries.</summary>
+    public required CodeContentType ContentType { get; init; }
+
     /// <summary>Optional ordered routing rules.</summary>
     /// <summary>How the symbol resolves; fixed for the life of the code.</summary>
     public required ContentMode Mode { get; init; }

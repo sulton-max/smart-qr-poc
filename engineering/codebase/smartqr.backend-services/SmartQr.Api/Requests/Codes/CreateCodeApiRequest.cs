@@ -14,6 +14,9 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
+    /// <summary>Gets the kind of content every rule carries — the builder's content-type choice. Validated against the rules it ships with.</summary>
+    public required CodeContentType ContentType { get; init; }
+
     /// <summary>Gets how the symbol resolves — a baked payload (static) or the redirect short link (dynamic). Fixed for the life of the code.</summary>
     public required ContentMode Mode { get; init; }
 
@@ -35,6 +38,7 @@ public static class CreateCodeApiRequestExtensions
             UserId = userId,
             Name = request.Name,
             BarcodeFormat = request.BarcodeFormat,
+            ContentType = request.ContentType,
             Mode = request.Mode,
             Rules = request.Rules,
             Style = request.Style?.ToStyleSpec(),

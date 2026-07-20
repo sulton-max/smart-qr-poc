@@ -7,6 +7,8 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 
+using SmartQr.Domain.Codes.Rules;
+
 namespace SmartQr.Infrastructure.Codes.Core.Services;
 
 /// <summary>Builds the code's short URL and renders it via the code generation library, applying the code's persisted style.</summary>
@@ -16,9 +18,7 @@ public sealed class CodeImageService(ICodeRenderer renderer, ApiSettings setting
     public RenderedCode Render(CodeEntity code, ImageFormat format)
     {
         var shortUrl = $"{settings.RedirectBaseUrl.TrimEnd('/')}/{code.Slug}";
-
-        // Static codes bake their own payload (WiFi / vCard / geo / …) into the symbol; dynamic codes (Encode() null) encode the redirect short link.
-        var payload = code.Content.Encode() ?? shortUrl;
+        var payload = CodePayload.Resolve(code.Mode, code.Rules, shortUrl);
 
         // Read the persisted style off the entity, falling back to the default for an empty StyleJson.
         var style = StyleSpecJson.Deserialize(code.StyleJson);

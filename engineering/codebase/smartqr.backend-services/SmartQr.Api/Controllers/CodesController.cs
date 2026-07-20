@@ -7,7 +7,9 @@ using SmartQr.Infrastructure.Codes.Core.Extensions;
 using SmartQr.Api.Requests.Codes;
 using WoW.Two.Sdk.Backend.Beta.Codes;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models;
+using SmartQr.Application.Settings;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules;
 using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
 using WoW.Two.Sdk.Backend.Beta.Web.Contracts;
@@ -22,20 +24,26 @@ public sealed class CodesController(
     ICodeRepository repository,
     ICodeImageService imageService,
     ICodeRenderer renderer,
-    ICurrentUser currentUser) : ControllerBase
+    ICurrentUser currentUser,
+    ApiSettings settings) : ControllerBase
 {
+    // A dynamic preview has no slug yet; a same-length stand-in renders an identically sized symbol.
+    private const string SlugPlaceholder = "preview";
+
+
     /// <summary>Renders a live, unsaved SVG preview from the supplied style — stateless, no DB. The builder previews the exact bytes the export produces.</summary>
-    /// <remarks>Anonymous-or-guest allowed: it is a pure render with no ownership. <c>value</c> is encoded verbatim into the symbol.</remarks>
+    /// <remarks>Anonymous-or-guest allowed: it is a pure render with no ownership.</remarks>
     [HttpPost("preview")]
     [Produces("image/svg+xml")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Preview([FromBody] PreviewCodeApiRequest request)
     {
-        // Static content encodes its payload server-side (same encoder as the saved asset → true preview parity); dynamic/absent content falls back to the supplied value (the short link).
+        // The same resolver the saved asset uses, so the preview is byte-identical; a dynamic preview stands in a
+        // sample slug of the real length, which renders an identically sized symbol.
         var rendered = renderer.Render(new CodeRenderRequest
         {
-            Payload = request.Content?.Encode() ?? request.Value,
+            Payload = CodePayload.Resolve(request.Mode, request.Rules, $"{settings.RedirectBaseUrl.TrimEnd('/')}/{SlugPlaceholder}"),
             Symbology = request.ResolveSymbology().ToRender(),
             Format = ImageFormat.Svg,
             Style = request.ToStyleSpec(),
