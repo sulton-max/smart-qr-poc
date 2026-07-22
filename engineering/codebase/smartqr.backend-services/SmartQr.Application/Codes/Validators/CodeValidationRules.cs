@@ -1,4 +1,4 @@
-namespace SmartQr.Application.Codes.Core.Validation;
+namespace SmartQr.Application.Codes.Validators;
 
 /// <summary>Shared predicates for the code validators — kept in one place so create, update, and rule validation agree.</summary>
 internal static class CodeValidationRules

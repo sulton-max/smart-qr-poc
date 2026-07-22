@@ -1,12 +1,13 @@
 using FluentValidation;
+using SmartQr.Application.Codes.Content.Validators;
 using SmartQr.Domain.Codes.Rules.Models;
 
-namespace SmartQr.Application.Codes.Rules.Validation;
+namespace SmartQr.Application.Codes.Rules.Validators;
 
-/// <summary>Validates one routing rule's shape, dispatching on its role — a conditional rule needs an order and an operand, a pointer needs a target.</summary>
+/// <summary>Validates one rule, dispatching on its role — a conditional rule needs an order and an operand, a pointer a target, and either content-bearing role its content.</summary>
 public sealed class CodeRuleValidator : AbstractValidator<CodeRule>
 {
-    /// <summary>Builds the per-role rule-shape rules.</summary>
+    /// <summary>Builds the per-role rule rules.</summary>
     public CodeRuleValidator()
     {
         When(rule => rule is ConditionalRule, () =>
@@ -16,7 +17,14 @@ public sealed class CodeRuleValidator : AbstractValidator<CodeRule>
 
             RuleFor(rule => ((ConditionalRule)rule).ConditionValue)
                 .NotEmpty().WithMessage("Rule condition value is required.");
+
+            RuleFor(rule => ((ConditionalRule)rule).Content)
+                .SetValidator(new CodeContentValidator());
         });
+
+        When(rule => rule is DefaultRule, () =>
+            RuleFor(rule => ((DefaultRule)rule).Content)
+                .SetValidator(new CodeContentValidator()));
 
         When(rule => rule is DefaultPointerRule, () =>
             RuleFor(rule => ((DefaultPointerRule)rule).TargetOrder)

@@ -1,7 +1,7 @@
 using FluentValidation;
 using SmartQr.Application.Billing.Core.Commands;
 
-namespace SmartQr.Application.Billing.Core.Validation;
+namespace SmartQr.Application.Billing.Core.Validators;
 
 /// <summary>Validates checkout input shape — the requested plan must be a defined enum value.</summary>
 public sealed class BillingCheckoutCommandValidator : AbstractValidator<BillingCheckoutCommand>

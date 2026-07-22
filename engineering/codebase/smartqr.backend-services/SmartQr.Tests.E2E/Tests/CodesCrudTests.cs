@@ -218,7 +218,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Static("Contact", "vCard", new { type = "vCard", firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.Static("Contact", "vCard", new { type = "vCard", firstName = "Ada", email = "ada@example.com" }))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
 
@@ -227,6 +227,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         content.Should().NotBeNull();
         content!.Type.Should().Be("vCard");
         content.FirstName.Should().Be("Ada");
+        content.Email.Should().Be("ada@example.com");
     }
 
     // ── Style persistence round-trip (create → edit → re-render reflects the new style) ──

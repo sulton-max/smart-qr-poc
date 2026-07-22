@@ -74,6 +74,7 @@ public sealed record ContentDtoModel
     public string? Ssid { get; init; }
     public string? Password { get; init; }
     public string? FirstName { get; init; }
+    public string? Email { get; init; }
 }
 
 /// <summary>Wire shape of <c>BillingStatusDto</c> (GET <c>/api/billing/me</c>) — <c>Plan</c> is the enum name (string-enum JSON).</summary>
