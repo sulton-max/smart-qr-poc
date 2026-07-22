@@ -4,7 +4,7 @@ using SmartQr.Application.Codes.Core.Commands;
 
 namespace SmartQr.Application.Codes.Core.Validation;
 
-/// <summary>Validates create-code input shape — name, the fallback destination, and each routing rule.</summary>
+/// <summary>Validates create-code input shape — name and each routing rule.</summary>
 public sealed class CodeCreateCommandValidator : AbstractValidator<CodeCreateCommand>
 {
     /// <summary>Builds the create-code rules.</summary>

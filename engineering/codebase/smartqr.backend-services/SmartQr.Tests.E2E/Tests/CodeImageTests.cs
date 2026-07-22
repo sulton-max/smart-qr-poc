@@ -14,8 +14,9 @@ public sealed class CodeImageTests(AppFixture fixture) : E2EBase(fixture)
     public async Task GetImage_Svg_ReturnsSvgContentType_NonEmpty()
     {
         var owner = await CreateGuestClientAsync();
+        // Dynamic so the symbol encodes the redirect short link — a renderable payload to assert non-empty bytes on.
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Render svg", "https://example.com"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.DynamicUrl("Render svg", "https://example.com"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var response = await owner.Client.GetAsync($"/api/codes/{code.Id}/image?format=svg");
 
@@ -30,7 +31,7 @@ public sealed class CodeImageTests(AppFixture fixture) : E2EBase(fixture)
     {
         var owner = await CreateGuestClientAsync();
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Render png", "https://example.com"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.DynamicUrl("Render png", "https://example.com"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var response = await owner.Client.GetAsync($"/api/codes/{code.Id}/image?format=png");
 
@@ -46,7 +47,7 @@ public sealed class CodeImageTests(AppFixture fixture) : E2EBase(fixture)
         // A static code renders its baked payload rather than a short link — the full stack still returns a valid image.
         var owner = await CreateGuestClientAsync();
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Content("WiFi svg", new { type = "wifi", ssid = "Net", password = "pw" })))
+            CodeRequests.Static("WiFi svg", "wifi", new { type = "wifi", ssid = "Net", password = "pw", encryption = "wpa" })))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         var response = await owner.Client.GetAsync($"/api/codes/{code.Id}/image?format=svg");

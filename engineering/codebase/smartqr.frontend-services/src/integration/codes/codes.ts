@@ -17,7 +17,7 @@ export const codesApiClient = {
     return readData<CodeDto>(res);
   },
 
-  /** Lists the owner's codes; `q` case-insensitively filters name or fallback URL (server-side `contains`). */
+  /** Lists the owner's codes; `q` case-insensitively filters name (server-side `contains`). */
   async list(q?: string): Promise<CodeDto[]> {
     const query = q && q.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
     const res = await fetch(`${API_BASE}/api/codes${query}`, {

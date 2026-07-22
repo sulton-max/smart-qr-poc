@@ -7,7 +7,12 @@ using SmartQr.Tests.E2E.Harness;
 namespace SmartQr.Tests.E2E.Tests;
 
 /// <summary>E2E for the stateless preview endpoint — styled SVG rendered live from the request, no persistence, anonymous-allowed.</summary>
-/// <remarks>The wire <c>style</c> block is <c>required</c> (every field): the builder always sends the full style, so each test supplies all fields and overrides only what it asserts on. A missing field fails binding (400) — see <see cref="Preview_MissingRequiredStyleField_Returns400"/>.</remarks>
+/// <remarks>
+/// The wire <c>style</c> block is <c>required</c> (every field): the builder always sends the full style, so each test
+/// supplies all fields and overrides only what it asserts on. A missing field fails binding (400) — see
+/// <see cref="Preview_MissingRequiredStyleField_Returns400"/>. The preview payload derives from <c>mode</c> + <c>rules</c>
+/// (there is no <c>value</c> field): a static text rule bakes its text verbatim, so it reproduces any exact payload.
+/// </remarks>
 [Collection(AppCollection.Name)]
 public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -34,13 +39,20 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         return style;
     }
 
+    /// <summary>A static preview rule set of one default rule carrying <paramref name="content"/> — the preview bakes the content's payload.</summary>
+    private static object[] Rules(object content) => [new { type = "default", content }];
+
+    /// <summary>A static preview rule set that bakes <paramref name="text"/> verbatim — reproduces an arbitrary payload the way the retired <c>value</c> field did.</summary>
+    private static object[] TextRules(string text) => [new { type = "default", content = new { type = "text", text } }];
+
     [Fact]
     public async Task Preview_ReturnsSvgContentType_WithRequestedForegroundColor()
     {
         // Anonymous client — preview is a pure render with no ownership.
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(("foregroundColor", "#FF8800")),
         });
@@ -60,7 +72,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         // moduleShape "dots" ⇒ circle arcs in the data body; finderShape "rounded" ⇒ a separate evenodd eye group.
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(
                 ("moduleShape", "dots"),
@@ -84,13 +97,15 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         // (same other fields) must be byte-identical — guards against a square-shape regression.
         var defaultStyle = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = DefaultStyle(),
         });
         var explicitSquare = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(
                 ("moduleShape", "square"),
@@ -106,7 +121,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     {
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(("transparentBackground", true)),
         });
@@ -127,7 +143,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         {
             var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
             {
-                value = "012345678905",
+                mode = "static",
+                rules = TextRules("012345678905"),
                 barcodeFormat,
                 style = DefaultStyle(),
             });
@@ -147,13 +164,15 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     {
         var implicitQr = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             style = DefaultStyle(),
         });
 
         var explicitQr = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = DefaultStyle(),
         });
@@ -171,7 +190,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
 
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = partial,
         });
@@ -188,8 +208,9 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         {
             name = "Parity",
             barcodeFormat = "QrCode",
-            content = new { type = "url", url = "https://example.com" },
-            rules = Array.Empty<object>(),
+            mode = "dynamic",
+            contentType = "url",
+            rules = Rules(new { type = "url", url = "https://example.com" }),
         }));
         createResponse.EnsureSuccessStatusCode();
         using var created = System.Text.Json.JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
@@ -199,10 +220,12 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
 
         var savedImage = await owner.Client.GetStringAsync($"/api/codes/{id}/image?format=svg");
 
-        // Preview the SAME payload (the short URL the saved code encodes) with the default style.
+        // Preview the SAME payload (the short URL the saved code encodes) with the default style — a static text rule
+        // bakes the short URL verbatim, matching what the dynamic saved code encodes.
         var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = shortUrl,
+            mode = "static",
+            rules = TextRules(shortUrl),
             barcodeFormat = "QrCode",
             style = DefaultStyle(),
         });
@@ -226,8 +249,9 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         {
             name = "Styled",
             barcodeFormat = "QrCode",
-            content = new { type = "url", url = "https://example.com" },
-            rules = Array.Empty<object>(),
+            mode = "dynamic",
+            contentType = "url",
+            rules = Rules(new { type = "url", url = "https://example.com" }),
             style,
         }));
         createResponse.EnsureSuccessStatusCode();
@@ -244,7 +268,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         // The saved styled image equals the preview of the same payload + style (parity holds for styled codes).
         var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = shortUrl,
+            mode = "static",
+            rules = TextRules(shortUrl),
             barcodeFormat = "QrCode",
             style,
         });
@@ -256,7 +281,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     {
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(("gradient", new
             {
@@ -284,7 +310,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     {
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(("gradient", new
             {
@@ -309,7 +336,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     {
         var response = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = "https://smartqr.app/abc1234",
+            mode = "static",
+            rules = TextRules("https://smartqr.app/abc1234"),
             barcodeFormat = "QrCode",
             style = StyleWith(("emoji", new { glyph = "🎉", sizeRatio = 0.25 })),
         });
@@ -326,14 +354,15 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         // Server-preview parity for STATIC content: the preview encodes the typed content with the SAME encoder as
         // the saved asset (backend owns encoding), so a default-style preview of the content equals the saved image.
         var owner = await CreateGuestClientAsync();
-        var wifi = new { type = "wifi", ssid = "Cafe", password = "beans123" };
+        var wifi = new { type = "wifi", ssid = "Cafe", password = "beans123", encryption = "wpa" };
 
         var createResponse = await owner.Client.PostAsync("/api/codes", JsonBody(new
         {
             name = "WiFi parity",
             barcodeFormat = "QrCode",
-            rules = Array.Empty<object>(),
-            content = wifi,
+            mode = "static",
+            contentType = "wifi",
+            rules = Rules(wifi),
         }));
         createResponse.EnsureSuccessStatusCode();
         using var created = System.Text.Json.JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
@@ -344,10 +373,10 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         // Preview the SAME typed content with the default style → the server bakes the identical payload.
         var previewResponse = await AnonymousClient.PostAsJsonAsync("/api/codes/preview", new
         {
-            value = " ",
+            mode = "static",
+            rules = Rules(wifi),
             barcodeFormat = "QrCode",
             style = DefaultStyle(),
-            content = wifi,
         });
         (await previewResponse.Content.ReadAsStringAsync()).Should().Be(savedImage);
     }

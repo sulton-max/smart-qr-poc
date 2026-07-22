@@ -1,4 +1,6 @@
 using System.Text.Json;
+using SmartQr.Common.Domain.Codes.Content.MobileApp.Enums;
+using SmartQr.Common.Domain.Codes.Content.Wifi.Enums;
 using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Content.Calendar.Models;
 using SmartQr.Domain.Codes.Content.Email.Models;
@@ -13,25 +15,21 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// The polymorphic wire/jsonb contract for <see cref="CodeContent"/> — every type serializes with the camelCase
-/// <c>type</c> discriminator (and no property collides with it) and round-trips back to the same concrete record.
-/// Guards the persistence + wire shape without a DB or host (this is what a bare serialize would have caught).
-/// </summary>
+/// <summary>Proves the polymorphic wire and jsonb contract for <see cref="CodeContent"/> — discriminator, then round-trip.</summary>
 public sealed class CodeContentJsonTests
 {
     public static TheoryData<CodeContent, string> Cases() => new()
     {
         { new UrlContent { Url = "https://x.io" }, "url" },
-        { new MobileAppLinkContent { AppStore = "https://apps.apple.com/a" }, "mobileApp" },
+        { new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }, "mobileApp" },
         { new TextContent { Text = "hi there" }, "text" },
         { new EmailContent { To = "a@b.com", Subject = "Hi" }, "email" },
         { new SmsContent { Phone = "+15550100", Message = "hey" }, "sms" },
         { new PhoneContent { Phone = "+15550100" }, "phone" },
-        { new GeoContent { Latitude = "41.31", Longitude = "69.24" }, "geo" },
-        { new WifiContent { Ssid = "Cafe", Password = "pw", Hidden = true }, "wifi" },
+        { new GeoContent { Latitude = 41.31, Longitude = 69.24 }, "geo" },
+        { new WifiContent { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa, Hidden = true }, "wifi" },
         { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
-        { new CalendarContent { Title = "Launch", Start = "2026-07-01T18:30" }, "calendar" },
+        { new CalendarContent { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) }, "calendar" },
     };
 
     [Theory]
@@ -60,12 +58,13 @@ public sealed class CodeContentJsonTests
     public void Deserializes_when_the_type_discriminator_is_not_first()
     {
         // Postgres jsonb reorders object keys, so a stored code can come back with "type" last, not first.
-        var reordered = """{"ssid":"Cafe","password":"pw","hidden":true,"type":"wifi"}""";
+        var reordered = """{"ssid":"Cafe","password":"pw","encryption":"wpa","hidden":true,"type":"wifi"}""";
 
         var restored = CodeContentJson.Deserialize(reordered);
 
         var wifi = Assert.IsType<WifiContent>(restored);
         Assert.Equal("Cafe", wifi.Ssid);
+        Assert.Equal(WifiEncryption.Wpa, wifi.Encryption);
         Assert.True(wifi.Hidden);
     }
 

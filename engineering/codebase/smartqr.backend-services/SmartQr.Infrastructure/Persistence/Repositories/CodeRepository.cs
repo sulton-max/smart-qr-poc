@@ -18,17 +18,16 @@ public sealed class CodeRepository(AppDbContext db) : ICodeRepository
 
     /// <inheritdoc />
     public Task<CodeEntity?> GetByIdAsync(Guid id, CancellationToken ct) =>
-        db.Codes.Include(c => c.Rules).FirstOrDefaultAsync(c => c.Id == id, ct);
+        db.Codes.FirstOrDefaultAsync(c => c.Id == id, ct);
 
     /// <inheritdoc />
     public Task<CodeEntity?> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken ct) =>
-        db.Codes.Include(c => c.Rules).FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, ct);
+        db.Codes.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, ct);
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<CodeEntity>> ListByUserAsync(Guid userId, string? q, CancellationToken ct)
     {
         var query = db.Codes
-            .Include(c => c.Rules)
             .Where(c => c.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(q))
@@ -47,17 +46,8 @@ public sealed class CodeRepository(AppDbContext db) : ICodeRepository
     public async Task<CodeEntity> UpdateAsync(CodeEntity code, CancellationToken ct)
     {
         // Replace the whole rule set: delete existing rows, insert the new (fresh-id) ones in one SaveChanges.
-        var newRules = code.Rules.ToList();
-
-        var existingRules = await db.RoutingRules
-            .Where(r => r.CodeId == code.Id)
-            .ToListAsync(ct);
-
-        db.RoutingRules.RemoveRange(existingRules);
-        db.RoutingRules.AddRange(newRules);
+        // The rules are a jsonb column on the code, so the whole set saves with the row.
         await db.SaveChangesAsync(ct);
-
-        code.Rules = newRules.OrderBy(r => r.Order).ToList();
         return code;
     }
 
@@ -65,7 +55,6 @@ public sealed class CodeRepository(AppDbContext db) : ICodeRepository
     public async Task<CodeEntity?> SetActiveAsync(Guid id, Guid userId, bool isActive, CancellationToken ct)
     {
         var code = await db.Codes
-            .Include(c => c.Rules)
             .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, ct);
 
         if (code is null)
@@ -79,19 +68,12 @@ public sealed class CodeRepository(AppDbContext db) : ICodeRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(Guid id, Guid userId, CancellationToken ct)
     {
-        // Owner-scoped hard delete. Rules removed explicitly so the cascade is provider-independent (not reliant on SQLite's FK pragma). No-op if not theirs.
+        // Owner-scoped hard delete; the rules ride the row, so there is nothing to cascade. No-op if not theirs.
         var removed = await db.Codes
             .Where(c => c.Id == id && c.UserId == userId)
             .ExecuteDeleteAsync(ct);
 
-        if (removed == 0)
-            return false;
-
-        await db.RoutingRules
-            .Where(r => r.CodeId == id)
-            .ExecuteDeleteAsync(ct);
-
-        return true;
+        return removed > 0;
     }
 
     /// <inheritdoc />

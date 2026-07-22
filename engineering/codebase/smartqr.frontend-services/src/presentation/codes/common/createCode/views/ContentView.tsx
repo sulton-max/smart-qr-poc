@@ -1,11 +1,11 @@
-import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
+import { Orientation, SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import {
   ToggleButton,
   ToggleButtonGroup,
   ToggleButtonGroupVariant,
   ToggleMode,
 } from "@wow-two-beta/ui/presentation/actions";
-import { Divider, Orientation } from "@wow-two-beta/ui/presentation/layout";
+import { Divider } from "@wow-two-beta/ui/presentation/layout";
 import { Field, Select, TextInput } from "@wow-two-beta/ui/presentation/forms";
 import type { AppForm } from "@wow-two-beta/ui/forms-engine";
 import {

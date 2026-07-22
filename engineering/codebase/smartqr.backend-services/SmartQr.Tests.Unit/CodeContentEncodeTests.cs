@@ -1,3 +1,6 @@
+using System.Globalization;
+using SmartQr.Common.Domain.Codes.Content.MobileApp.Enums;
+using SmartQr.Common.Domain.Codes.Content.Wifi.Enums;
 using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Content.Calendar.Models;
 using SmartQr.Domain.Codes.Content.Email.Models;
@@ -12,11 +15,7 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// Backend payload-encoding parity for the polymorphic <see cref="CodeContent"/> types — mirrors the frontend's
-/// <c>contentTypes.test.ts</c> case-for-case so the server-side encoders stay byte-for-byte identical to the builder
-/// preview (the whole point of moving encoding server-side). Pure logic — no DB, no host.
-/// </summary>
+/// <summary>Proves payload-encoding parity for every polymorphic <see cref="CodeContent"/> type.</summary>
 public sealed class CodeContentEncodeTests
 {
     [Fact]
@@ -25,8 +24,8 @@ public sealed class CodeContentEncodeTests
         // url / mobileApp carry the redirect short link, not a baked payload → Encode() is null, IsStatic false.
         Assert.Null(new UrlContent { Url = "https://x.io" }.Encode());
         Assert.False(new UrlContent { Url = "https://x.io" }.IsStatic);
-        Assert.Null(new MobileAppLinkContent { AppStore = "https://apps.apple.com/a" }.Encode());
-        Assert.False(new MobileAppLinkContent { AppStore = "https://apps.apple.com/a" }.IsStatic);
+        Assert.Null(new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }.Encode());
+        Assert.False(new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }.IsStatic);
     }
 
     [Fact]
@@ -56,7 +55,7 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void Geo_encodes_to_geo_lat_lng()
     {
-        Assert.Equal("geo:41.31,69.24", new GeoContent { Latitude = "41.31", Longitude = "69.24" }.Encode());
+        Assert.Equal("geo:41.31,69.24", new GeoContent { Latitude = 41.31, Longitude = 69.24 }.Encode());
     }
 
     [Fact]
@@ -64,26 +63,26 @@ public sealed class CodeContentEncodeTests
     {
         Assert.Equal(
             "WIFI:T:WPA;S:Cafe;P:p@ss;;",
-            new WifiContent { Ssid = "Cafe", Password = "p@ss", Encryption = "WPA" }.Encode());
+            new WifiContent { Ssid = "Cafe", Password = "p@ss", Encryption = WifiEncryption.Wpa }.Encode());
 
         // Reserved chars in SSID / password are backslash-escaped.
         Assert.Equal(
             "WIFI:T:WPA;S:My\\;Net;P:a\\\"b\\,c;;",
-            new WifiContent { Ssid = "My;Net", Password = "a\"b,c", Encryption = "WPA" }.Encode());
+            new WifiContent { Ssid = "My;Net", Password = "a\"b,c", Encryption = WifiEncryption.Wpa }.Encode());
 
         Assert.Equal(
             "WIFI:T:nopass;S:Open;;",
-            new WifiContent { Ssid = "Open", Encryption = "nopass" }.Encode());
+            new WifiContent { Ssid = "Open", Encryption = WifiEncryption.None }.Encode());
 
         Assert.Equal(
             "WIFI:T:WPA;S:Hid;P:x;H:true;;",
-            new WifiContent { Ssid = "Hid", Password = "x", Encryption = "WPA", Hidden = true }.Encode());
+            new WifiContent { Ssid = "Hid", Password = "x", Encryption = WifiEncryption.Wpa, Hidden = true }.Encode());
     }
 
     [Fact]
-    public void Wifi_defaults_blank_encryption_to_wpa()
+    public void Wifi_wep_encryption_encodes_the_wep_token()
     {
-        Assert.Equal("WIFI:T:WPA;S:Net;P:pw;;", new WifiContent { Ssid = "Net", Password = "pw" }.Encode());
+        Assert.Equal("WIFI:T:WEP;S:Net;P:pw;;", new WifiContent { Ssid = "Net", Password = "pw", Encryption = WifiEncryption.Wep }.Encode());
     }
 
     [Fact]
@@ -113,8 +112,8 @@ public sealed class CodeContentEncodeTests
         var output = new CalendarContent
         {
             Title = "Launch",
-            Start = "2026-07-01T18:30",
-            End = "2026-07-01T19:00",
+            Start = new DateTime(2026, 7, 1, 18, 30, 0),
+            End = new DateTime(2026, 7, 1, 19, 0, 0),
             Location = "HQ",
         }.Encode();
 
@@ -127,12 +126,12 @@ public sealed class CodeContentEncodeTests
     }
 
     [Theory]
-    [InlineData("2026-07-01T18:30", "20260701T183000")]
+    [InlineData("2026-07-01T18:30:00", "20260701T183000")]
     [InlineData("2026-07-01T18:30:45", "20260701T183045")]
-    [InlineData("2026-07-01", "20260701")]
-    [InlineData("", "")]
-    public void ToICalDate_formats_datetime_date_and_passes_through_unknown(string input, string expected)
+    [InlineData("2026-07-01T00:00:00", "20260701T000000")]
+    public void ToICalDate_formats_datetime_to_ical_basic_form(string input, string expected)
     {
-        Assert.Equal(expected, ContentEncoding.ToICalDate(input));
+        var value = DateTime.Parse(input, CultureInfo.InvariantCulture, DateTimeStyles.None);
+        Assert.Equal(expected, ContentEncoding.ToICalDate(value));
     }
 }

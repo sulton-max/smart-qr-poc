@@ -9,5 +9,5 @@ public interface IRoutingService
     /// <summary>Evaluates the code's rules top-to-bottom (first match wins), enforcing active and expiry first; no match means the code does not resolve.</summary>
     /// <param name="code">The scanned code with its routing rules loaded.</param>
     /// <param name="context">The resolved scan context (device, geo, language, time).</param>
-    RouteDecision Evaluate(CodeEntity code, ScanContext context);
+    RoutingResult Evaluate(CodeEntity code, ScanContext context);
 }

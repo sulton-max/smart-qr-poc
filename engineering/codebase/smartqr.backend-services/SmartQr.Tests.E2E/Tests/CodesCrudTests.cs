@@ -16,7 +16,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("App download", "https://example.com",
+            CodeRequests.DynamicUrl("App download", "https://example.com",
                 [CodeRequests.IosRule("https://apps.apple.com/app/id000000000")]));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -27,14 +27,14 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         code.ShortUrl.Should().Be($"{AppFixture.RedirectBaseUrl}/{code.Slug}");
         code.Rules.Should().HaveCount(2); // the iOS device rule + the Default catch-all
         code.Rules.Should().Contain(r => r.ConditionValue == "Ios");
-        code.Rules.Should().Contain(r => r.Destination == "https://example.com"); // the Default catch-all
+        code.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://example.com"); // the Default catch-all's content
     }
 
     [Fact]
     public async Task Create_WhenAnonymous_Returns401()
     {
         var response = await AnonymousClient.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Nope", "https://example.com"));
+            CodeRequests.StaticUrl("Nope", "https://example.com"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -45,9 +45,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
         var stranger = await CreateGuestClientAsync();
 
-        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Mine A", "https://a.example"));
-        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Mine B", "https://b.example"));
-        await stranger.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Theirs", "https://c.example"));
+        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Mine A", "https://a.example"));
+        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Mine B", "https://b.example"));
+        await stranger.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Theirs", "https://c.example"));
 
         var ownerList = await (await owner.Client.GetAsync("/api/codes")).ReadEnvelopeAsync<List<CodeDtoModel>>();
 
@@ -59,9 +59,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
     public async Task List_WithQuery_FiltersByName()
     {
         var owner = await CreateGuestClientAsync();
-        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("App download", "https://store.example"));
-        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Menu", "https://download.example/menu"));
-        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Brochure", "https://brochure.example"));
+        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("App download", "https://store.example"));
+        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Menu", "https://download.example/menu"));
+        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Brochure", "https://brochure.example"));
 
         var filtered = await (await owner.Client.GetAsync("/api/codes?q=download"))
             .ReadEnvelopeAsync<List<CodeDtoModel>>();
@@ -78,7 +78,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var stranger = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Secret", "https://secret.example"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.StaticUrl("Secret", "https://secret.example"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var ownerGet = await owner.Client.GetAsync($"/api/codes/{created.Id}");
         ownerGet.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -96,13 +96,13 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("App download", "https://example.com",
+            CodeRequests.DynamicUrl("App download", "https://example.com",
                 [CodeRequests.IosRule("https://apps.apple.com/app/id000000000", 1),
-                 CodeRequests.Rule(2, "Device", "Android", "https://play.google.com/store")])))
+                 CodeRequests.ConditionalRule("Device", "Android", new { type = "url", url = "https://play.google.com/store" }, 2)])))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         var updated = await (await owner.Client.PutJsonAsync($"/api/codes/{created.Id}",
-            CodeRequests.Code("App download (updated)", "https://example.com/new",
+            CodeRequests.DynamicUrl("App download (updated)", "https://example.com/new",
                 [CodeRequests.IosRule("https://apps.apple.com/app/id111111111", 1)])))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
@@ -111,8 +111,8 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         updated.CreatedAt.Should().Be(created.CreatedAt);
         updated.Name.Should().Be("App download (updated)");
         updated.Rules.Should().HaveCount(2); // the iOS device rule + the Default catch-all
-        updated.Rules.Should().Contain(r => r.Destination == "https://apps.apple.com/app/id111111111");
-        updated.Rules.Should().Contain(r => r.Destination == "https://example.com/new"); // the Default catch-all
+        updated.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://apps.apple.com/app/id111111111");
+        updated.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://example.com/new"); // the Default catch-all's content
     }
 
     [Fact]
@@ -122,10 +122,10 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var stranger = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Mine", "https://mine.example"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.StaticUrl("Mine", "https://mine.example"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var response = await stranger.Client.PutJsonAsync($"/api/codes/{created.Id}",
-            CodeRequests.Code("Hijacked", "https://evil.example"));
+            CodeRequests.StaticUrl("Hijacked", "https://evil.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -135,7 +135,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
     {
         var owner = await CreateGuestClientAsync();
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Toggle me", "https://toggle.example"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.StaticUrl("Toggle me", "https://toggle.example"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var disabled = await (await owner.Client.PatchJsonAsync($"/api/codes/{created.Id}/active", new { isActive = false }))
             .ReadEnvelopeAsync<CodeDtoModel>();
@@ -151,7 +151,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
     {
         var owner = await CreateGuestClientAsync();
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Delete me", "https://delete.example"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.StaticUrl("Delete me", "https://delete.example"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var delete = await owner.Client.DeleteAsync($"/api/codes/{created.Id}");
         delete.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -167,7 +167,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var stranger = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Mine", "https://mine.example"))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.StaticUrl("Mine", "https://mine.example"))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var strangerDelete = await stranger.Client.DeleteAsync($"/api/codes/{created.Id}");
         strangerDelete.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -185,39 +185,31 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("", "https://example.com"));
+            CodeRequests.StaticUrl("", "https://example.com"));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
+    // ── Static content — the payload is baked into the symbol; each rule carries its typed content ──
+
     [Fact]
-    public async Task Create_WithNonHttpFallbackUrl_Returns400()
+    public async Task Create_StaticCode_RoundTripsContent()
     {
         var owner = await CreateGuestClientAsync();
 
         var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("Bad URL", "ftp://example.com"));
+            CodeRequests.Static("Cafe WiFi", "wifi", new { type = "wifi", ssid = "Cafe", password = "beans123", encryption = "wpa" }));
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest, "the fallback URL must be an absolute http(s) URL");
-    }
-
-    // ── Static content (v0.7) — the payload is baked into the symbol; no fallback URL, no routing ──
-
-    [Fact]
-    public async Task Create_StaticCode_WithEmptyFallback_Returns200_AndRoundTripsContent()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Content("Cafe WiFi", new { type = "wifi", ssid = "Cafe", password = "beans123" }));
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK, "static codes carry a non-URL payload, so the fallback URL rule is skipped");
+        response.StatusCode.Should().Be(HttpStatusCode.OK, "static codes carry a non-URL payload baked from typed content");
         var code = await response.ReadEnvelopeAsync<CodeDtoModel>();
 
-        code.Content.Should().NotBeNull();
-        code.Content!.Type.Should().Be("wifi");
-        code.Content.Ssid.Should().Be("Cafe");
-        code.Content.Password.Should().Be("beans123");
+        // The typed content lives in the code's single default rule, not a top-level content field.
+        code.Rules.Should().ContainSingle();
+        var content = code.Rules[0].Content;
+        content.Should().NotBeNull();
+        content!.Type.Should().Be("wifi");
+        content.Ssid.Should().Be("Cafe");
+        content.Password.Should().Be("beans123");
     }
 
     [Fact]
@@ -226,115 +218,15 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Content("Contact", new { type = "vCard", firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.Static("Contact", "vCard", new { type = "vCard", firstName = "Ada" }))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
 
-        fetched.Content.Should().NotBeNull();
-        fetched.Content!.Type.Should().Be("vCard");
-        fetched.Content.FirstName.Should().Be("Ada");
-    }
-
-    [Fact]
-    public async Task Create_DynamicCode_WithEmptyFallback_StillReturns400()
-    {
-        // The static relaxation stays scoped: a dynamic code (no baked payload) still requires a fallback URL.
-        var owner = await CreateGuestClientAsync();
-
-        var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("No fallback", ""));
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    // ── Mobile app link (v0.7) — backend derives device rules + fallback; content-aware validation ──
-
-    [Fact]
-    public async Task Create_MobileApp_WithOnlyIosLink_Returns200_DerivesRuleAndFallback()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        var code = await (await owner.Client.PostJsonAsync("/api/codes",
-                CodeRequests.MobileApp("Notion", appStore: "https://apps.apple.com/us/app/notion/id1232780281")))
-            .ReadEnvelopeAsync<CodeDtoModel>();
-
-        // One store link is enough — the server derives the iOS device rule. No fallback store was chosen, so
-        // there is no Default rule: a non-iOS device deliberately does not resolve.
-        code.Rules.Should().ContainSingle().Which.ConditionValue.Should().Be("Ios");
-        code.Content!.Type.Should().Be("mobileApp");
-    }
-
-    [Fact]
-    public async Task Create_MobileApp_WithNoLinks_Returns400_WithStoreLinkMessage_NotFallbackUrl()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.MobileApp("Empty app"));
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        var body = await response.Content.ReadAsStringAsync();
-        body.Should().Contain("at least one", "the message must be content-aware")
-            .And.NotContain("fallback URL is required", "the app-link UI has no fallback-URL field");
-    }
-
-    [Fact]
-    public async Task Create_MobileApp_WithNonHttpLink_Returns400_WithStoreLabel()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.MobileApp("Bad", appStore: "notaurl"));
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync()).Should().Contain("App Store link");
-    }
-
-    [Fact]
-    public async Task Update_MobileApp_ReDerivesRoutingFromLinks()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        var created = await (await owner.Client.PostJsonAsync("/api/codes",
-                CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a")))
-            .ReadEnvelopeAsync<CodeDtoModel>();
-
-        var updated = await (await owner.Client.PutJsonAsync($"/api/codes/{created.Id}",
-                CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a", playStore: "https://play.google.com/b")))
-            .ReadEnvelopeAsync<CodeDtoModel>();
-
-        updated.Rules.Should().HaveCount(2);
-        updated.Rules.Select(r => r.ConditionValue).Should().BeEquivalentTo(["Ios", "Android"]);
-    }
-
-    [Fact]
-    public async Task Create_MobileApp_HonorsChosenFallbackLink()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        var code = await (await owner.Client.PostJsonAsync("/api/codes",
-                CodeRequests.MobileApp("App", appStore: "https://apps.apple.com/a", playStore: "https://play.google.com/b", fallback: "playStore")))
-            .ReadEnvelopeAsync<CodeDtoModel>();
-
-        // Other devices resolve to the chosen store (Android) via the Default catch-all, not the first store (iOS).
-        code.Rules.Should().HaveCount(3); // 2 device rules + the Default catch-all
-        code.Rules.Should().Contain(r => r.ConditionValue == null && r.Destination == "https://play.google.com/b");
-    }
-
-    [Fact]
-    public async Task Create_WithUnsupportedContentType_Returns400()
-    {
-        var owner = await CreateGuestClientAsync();
-
-        // A content type with no typed model (youtube) isn't representable in the polymorphic wire contract → rejected at binding.
-        var response = await owner.Client.PostJsonAsync("/api/codes", new
-        {
-            name = "Later",
-            barcodeFormat = "QrCode",
-            rules = Array.Empty<object>(),
-            content = new { type = "youtube" },
-        });
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        fetched.Rules.Should().ContainSingle();
+        var content = fetched.Rules[0].Content;
+        content.Should().NotBeNull();
+        content!.Type.Should().Be("vCard");
+        content.FirstName.Should().Be("Ada");
     }
 
     // ── Style persistence round-trip (create → edit → re-render reflects the new style) ──
@@ -349,8 +241,9 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         {
             name = "Styled",
             barcodeFormat = "QrCode",
-            content = new { type = "url", url = "https://example.com" },
-            rules = Array.Empty<object>(),
+            mode = "dynamic",
+            contentType = "url",
+            rules = new object[] { CodeRequests.DefaultRule(new { type = "url", url = "https://example.com" }) },
             style = Style(gradient: true),
         })).ReadEnvelopeAsync<CodeDtoModel>();
 
@@ -358,11 +251,13 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         withGradient.Should().Contain("<linearGradient");
 
         // Edit to a solid style → the saved image must no longer carry the gradient (style round-trips on update, no clobber-to-default).
+        // The update body carries no mode — it is fixed at create.
         await owner.Client.PutJsonAsync($"/api/codes/{created.Id}", new
         {
             name = "Styled",
             barcodeFormat = "QrCode",
-            rules = Array.Empty<object>(),
+            contentType = "url",
+            rules = new object[] { CodeRequests.DefaultRule(new { type = "url", url = "https://example.com" }) },
             style = Style(gradient: false),
         });
 

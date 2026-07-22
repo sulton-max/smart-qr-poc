@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Infrastructure.Persistence.Repositories;
 using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules.Models;
 using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
@@ -10,7 +12,7 @@ namespace SmartQr.Tests.Integration;
 /// <summary>Integration tests for the persistence path against the provider-switchable test database (Postgres or SQLite).</summary>
 public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
-    private static CodeEntity NewCode(Guid user, string slug, params RoutingRuleEntity[] rules) => new()
+    private static CodeEntity NewCode(Guid user, string slug, params CodeRule[] rules) => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,
@@ -18,8 +20,9 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Name = "Test",
         BarcodeFormat = BarcodeFormat.QrCode,
         StyleJson = "{}",
+        Mode = ContentMode.Dynamic,
+        ContentType = CodeContentType.Url,
         IsActive = true,
-        Content = new UrlContent { Url = "https://fallback.example" },
         Rules = rules.ToList(),
     };
 
@@ -35,12 +38,13 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "App download",
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
+            Mode = ContentMode.Dynamic,
+            ContentType = CodeContentType.Url,
             IsActive = true,
-            Content = new UrlContent { Url = "https://site.example" },
             Rules =
             [
-                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 2, ConditionType = RuleConditionType.Device, ConditionValue = "Android", Destination = "https://play.example" },
-                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://apple.example" },
+                new ConditionalRule { Order = 2, Condition = RuleConditionType.Device, ConditionValue = "Android", Content = new UrlContent { Url = "https://play.example" } },
+                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new UrlContent { Url = "https://apple.example" } },
             ],
         };
 
@@ -49,7 +53,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
 
         Assert.NotNull(loaded);
         Assert.Equal("abc1234", loaded!.Slug);
-        Assert.Equal(2, loaded.Rules.Count);
+        Assert.Equal(2, loaded.Rules.Count); // the jsonb rules document round-trips
         Assert.NotEqual(default, loaded.CreatedAt); // auto-set by the DbContext on insert
     }
 
@@ -120,11 +124,12 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "Old",
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
+            Mode = ContentMode.Dynamic,
+            ContentType = CodeContentType.Url,
             IsActive = true,
-            Content = new UrlContent { Url = "https://old.example" },
             Rules =
             [
-                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://old.example/ios" },
+                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new UrlContent { Url = "https://old.example/ios" } },
             ],
         };
         await new CodeRepository(NewContext()).AddAsync(code, default);
@@ -143,8 +148,8 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         loaded!.Name = "New";
         loaded.Rules =
         [
-            new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Country, ConditionValue = "US", Destination = "https://new.example/us" },
-            new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 2, ConditionType = RuleConditionType.Country, ConditionValue = "UK", Destination = "https://new.example/uk" },
+            new ConditionalRule { Order = 1, Condition = RuleConditionType.Country, ConditionValue = "US", Content = new UrlContent { Url = "https://new.example/us" } },
+            new ConditionalRule { Order = 2, Condition = RuleConditionType.Country, ConditionValue = "UK", Content = new UrlContent { Url = "https://new.example/uk" } },
         ];
         await repo.UpdateAsync(loaded, default);
 
@@ -154,7 +159,8 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Assert.Equal(5, reloaded.ScanCount); // preserved
         Assert.Equal("New", reloaded.Name);
         Assert.Equal(2, reloaded.Rules.Count);
-        Assert.DoesNotContain(reloaded.Rules, r => r.Destination == "https://old.example/ios");
+        // The whole rule set was replaced — the old iOS rule's content is gone.
+        Assert.DoesNotContain(reloaded.Rules.OfType<ConditionalRule>(), r => r.Content is UrlContent { Url: "https://old.example/ios" });
     }
 
     [Fact]
@@ -178,7 +184,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
     }
 
     [Fact]
-    public async Task Delete_removes_only_for_owner_and_cascades_rules()
+    public async Task Delete_removes_only_for_owner_with_its_rules()
     {
         var user = Guid.NewGuid();
         var stranger = Guid.NewGuid();
@@ -191,11 +197,12 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "ToDelete",
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
+            Mode = ContentMode.Dynamic,
+            ContentType = CodeContentType.Url,
             IsActive = true,
-            Content = new UrlContent { Url = "https://site.example" },
             Rules =
             [
-                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = codeId, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://ios.example" },
+                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new UrlContent { Url = "https://ios.example" } },
             ],
         };
         await new CodeRepository(NewContext()).AddAsync(code, default);
@@ -204,12 +211,9 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Assert.False(await new CodeRepository(NewContext()).DeleteAsync(codeId, stranger, default));
         Assert.NotNull(await new CodeRepository(NewContext()).GetByIdAsync(codeId, default));
 
-        // Owner deletes; code (and its rules) gone.
+        // Owner deletes; the code — and its rules, which ride the jsonb column — are gone with the row.
         Assert.True(await new CodeRepository(NewContext()).DeleteAsync(codeId, user, default));
         Assert.Null(await new CodeRepository(NewContext()).GetByIdAsync(codeId, default));
-
-        await using var ctx = NewContext();
-        Assert.Empty(ctx.RoutingRules.Where(r => r.CodeId == codeId));
     }
 
     [Fact]
@@ -239,8 +243,10 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Name = name,
         BarcodeFormat = BarcodeFormat.QrCode,
         StyleJson = "{}",
+        Mode = ContentMode.Dynamic,
+        ContentType = CodeContentType.Url,
         IsActive = true,
-        Content = new UrlContent { Url = destination },
-        Rules = [],
+        // The destination now lives in the typed content of a catch-all rule, not a fallback_url column.
+        Rules = [new DefaultRule { Content = new UrlContent { Url = destination } }],
     };
 }

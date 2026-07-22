@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using SmartQr.Domain.Codes.Content.Url.Models;
+using SmartQr.Common.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Content.Phone.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
+using SmartQr.Domain.Codes.Rules.Models;
 using SmartQr.Persistence.DataContexts;
 using SmartQr.Redirect.Api.Application.Routing.Models;
 using SmartQr.Redirect.Api.Application.Routing.Services;
@@ -12,6 +14,11 @@ using SmartQr.Tests.Integration.Harness;
 namespace SmartQr.Tests.Integration;
 
 /// <summary>End-to-end redirect data path against the provider-switchable test database — seed a code, the cached code store reads it, the evaluator resolves the destination.</summary>
+/// <remarks>
+/// Rules carry <see cref="PhoneContent"/>: the evaluator resolves a match by encoding the matched rule's content
+/// (<c>tel:…</c>). url / mobileApp content encode to null — they are the redirect types whose hot-path resolve is
+/// deferred — so an encodable (static) content type exercises a resolved-destination outcome here.
+/// </remarks>
 public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
     /// <summary>Builds the redirect routing services over the shared test database — the code store resolves <see cref="AppDbContext"/> per scope from the fixture, so it reads the same data the seeder writes (both providers).</summary>
@@ -38,13 +45,14 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             Name = "App",
             BarcodeFormat = BarcodeFormat.QrCode,
             StyleJson = "{}",
+            Mode = ContentMode.Dynamic,
+            ContentType = CodeContentType.Phone,
             IsActive = true,
-            Content = new UrlContent { Url = "https://fallback.example" },
             Rules =
             [
-                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 1, ConditionType = RuleConditionType.Device, ConditionValue = "Ios", Destination = "https://apple.example" },
+                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new PhoneContent { Phone = "+15551111" } },
                 // The catch-all is a trailing Default rule — it replaces the retired fallback_url column.
-                new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 2, ConditionType = RuleConditionType.Default, Destination = "https://fallback.example" },
+                new DefaultRule { Content = new PhoneContent { Phone = "+15559999" } },
             ],
         });
         await ctx.SaveChangesAsync();
@@ -66,10 +74,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("route123", default);
         Assert.NotNull(code);
 
-        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("route123", DeviceType.Ios));
+        var result = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("route123", DeviceType.Ios));
 
-        Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
-        Assert.Equal("https://apple.example", decision.DestinationUrl);
+        var redirect = Assert.IsType<RoutingResult.Redirect>(result);
+        Assert.Equal("tel:+15551111", redirect.Destination);
     }
 
     [Fact]
@@ -79,11 +87,11 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         await using var sp = BuildProvider();
 
         var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("route123", default);
-        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("route123", DeviceType.Desktop));
+        var result = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("route123", DeviceType.Desktop));
 
-        Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
-        Assert.Equal("https://fallback.example", decision.DestinationUrl);
-        Assert.NotNull(decision.MatchedRuleId); // the Default rule matched — it is a rule like any other
+        var redirect = Assert.IsType<RoutingResult.Redirect>(result);
+        Assert.Equal("tel:+15559999", redirect.Destination);
+        Assert.Null(redirect.MatchedRuleOrder); // the catch-all Default rule carries no order — it is never order-matched
     }
 
     [Fact]
@@ -116,13 +124,11 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     Name = $"code-{i}",
                     BarcodeFormat = BarcodeFormat.QrCode,
                     StyleJson = "{}",
+                    Mode = ContentMode.Dynamic,
+                    ContentType = CodeContentType.Phone,
                     IsActive = true,
-                    Content = new UrlContent { Url = "https://still-works.example" },
-                    // A plain url code carries its destination as a Default catch-all rule.
-                    Rules =
-                    [
-                        new RoutingRuleEntity { Id = Guid.NewGuid(), CodeId = id, Order = 1, ConditionType = RuleConditionType.Default, Destination = "https://still-works.example" },
-                    ],
+                    // A single-destination code carries its destination as a Default catch-all rule.
+                    Rules = [new DefaultRule { Content = new PhoneContent { Phone = "+15550000" } }],
                 });
             }
 
@@ -135,8 +141,8 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         var code = await sp.GetRequiredService<IRedirectCodeRepository>().GetAsync("overcap1", default);
         Assert.NotNull(code);
 
-        var decision = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("overcap1", DeviceType.Desktop));
-        Assert.Equal(RouteOutcome.Redirect, decision.Outcome);
-        Assert.Equal("https://still-works.example", decision.DestinationUrl);
+        var result = sp.GetRequiredService<IRoutingService>().Evaluate(code!, Scan("overcap1", DeviceType.Desktop));
+        var redirect = Assert.IsType<RoutingResult.Redirect>(result);
+        Assert.Equal("tel:+15550000", redirect.Destination);
     }
 }

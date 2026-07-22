@@ -31,20 +31,37 @@ public sealed record UserSummaryDtoModel
     public string Email { get; init; } = "";
 }
 
-/// <summary>Wire shape of <c>CodeDto</c>.</summary>
+/// <summary>Wire shape of <c>CodeDto</c> — a code carries no top-level content; each rule carries the content it serves. Slug / short URL are null on a static code.</summary>
 public sealed record CodeDtoModel
 {
     public Guid Id { get; init; }
-    public string Slug { get; init; } = "";
-    public string ShortUrl { get; init; } = "";
+    public string? Slug { get; init; }
+    public string? ShortUrl { get; init; }
     public string Name { get; init; } = "";
     public string BarcodeFormat { get; init; } = "";
+
+    /// <summary>How the symbol resolves — <c>static</c> (baked payload) or <c>dynamic</c> (redirect short link).</summary>
+    public string Mode { get; init; } = "";
+
+    /// <summary>The kind of content every rule of this code carries (e.g. <c>url</c>, <c>wifi</c>).</summary>
+    public string ContentType { get; init; } = "";
+
     public bool IsActive { get; init; }
     public long ScanCount { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
-    public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];
 
-    /// <summary>Structured content descriptor (content type + fields + baked static payload); null for a legacy/plain code.</summary>
+    /// <summary>The polymorphic routing rules, each carrying the content it serves.</summary>
+    public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];
+}
+
+/// <summary>Wire shape of the polymorphic <c>CodeRule</c> — the <c>type</c> discriminator (<c>conditional</c> / <c>default</c> / <c>defaultPointer</c>) plus the fields for that role; a rule carries its own <see cref="Content"/>.</summary>
+public sealed record RuleDtoModel
+{
+    public string Type { get; init; } = "";
+    public int? Order { get; init; }
+    public string? Condition { get; init; }
+    public string? ConditionValue { get; init; }
+    public int? TargetOrder { get; init; }
     public ContentDtoModel? Content { get; init; }
 }
 
@@ -52,20 +69,11 @@ public sealed record CodeDtoModel
 public sealed record ContentDtoModel
 {
     public string Type { get; init; } = "";
+    public string? Url { get; init; }
+    public string? Text { get; init; }
     public string? Ssid { get; init; }
     public string? Password { get; init; }
     public string? FirstName { get; init; }
-    public string? AppStore { get; init; }
-    public string? PlayStore { get; init; }
-}
-
-/// <summary>Wire shape of <c>RuleDto</c>.</summary>
-public sealed record RuleDtoModel
-{
-    public int Order { get; init; }
-    public string ConditionType { get; init; } = "";
-    public string? ConditionValue { get; init; }
-    public string Destination { get; init; } = "";
 }
 
 /// <summary>Wire shape of <c>BillingStatusDto</c> (GET <c>/api/billing/me</c>) — <c>Plan</c> is the enum name (string-enum JSON).</summary>

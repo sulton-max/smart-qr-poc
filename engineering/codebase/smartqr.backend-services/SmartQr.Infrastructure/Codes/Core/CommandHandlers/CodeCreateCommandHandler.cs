@@ -2,13 +2,13 @@ using Microsoft.Extensions.Logging;
 using SmartQr.Application.Billing.Core;
 using SmartQr.Application.Billing.Core.Services;
 using SmartQr.Application.Codes.Core.Commands;
-using SmartQr.Application.Codes.Content;
 using SmartQr.Application.Codes.Core.Models;
 using SmartQr.Application.Codes.Core.Services;
 using SmartQr.Infrastructure.Codes.Core.Extensions;
 using SmartQr.Application.Settings;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 using SmartQr.Domain.Billing.Enums;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Codes.Core.Entities;
 using WoW.Two.Sdk.Backend.Beta.Foundation.Errors;
 using WoW.Two.Sdk.Backend.Beta.Mediator.Cqrs;
@@ -44,19 +44,16 @@ public sealed class CodeCreateCommandHandler(
                     AppErrorType.PaymentRequired,
                     $"Plan '{plan}' allows at most {cap} codes. Upgrade to create more."));
 
-            // Allocate a slug that isn't already taken.
-            string slug;
-            do
+            // Only a dynamic code resolves through the redirect, so only a dynamic code needs a slug.
+            string? slug = null;
+            if (request.Mode is ContentMode.Dynamic)
             {
-                slug = slugGenerator.Next();
+                do
+                {
+                    slug = slugGenerator.Next();
+                }
+                while (await repository.SlugExistsAsync(slug, ct));
             }
-            while (await repository.SlugExistsAsync(slug, ct));
-
-            // A backend content spec (e.g. mobileApp) owns its routing — derives device rules + an optional Default
-            // catch-all from the content and overrides the client. Types without a spec keep the request's rules.
-            var projection = ContentTypes.Resolve(CodeContent.Subtypes.KindOf(request.Content)) is { } spec
-                ? spec.Project(request.Content)
-                : null;
 
             var codeId = Guid.NewGuid();
             var entity = new CodeEntity
@@ -71,19 +68,10 @@ public sealed class CodeCreateCommandHandler(
                 StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
                     ? StyleSpecJson.Serialize(style)
                     : "{}",
-                // Typed content persisted via the EF value converter — always present (the create request requires it).
-                Content = request.Content,
-                Rules = (projection?.Rules ?? request.Rules)
-                    .Select(r => new RoutingRuleEntity
-                    {
-                        Id = Guid.NewGuid(),
-                        CodeId = codeId,
-                        Order = r.Order,
-                        ConditionType = r.ConditionType,
-                        ConditionValue = r.ConditionValue,
-                        Destination = r.Destination,
-                    })
-                    .ToList(),
+                Mode = request.Mode,
+                ContentType = request.ContentType,
+                // The rules carry the code's content; persisted as one jsonb document via the EF value converter.
+                Rules = [.. request.Rules],
             };
 
             await repository.AddAsync(entity, ct);

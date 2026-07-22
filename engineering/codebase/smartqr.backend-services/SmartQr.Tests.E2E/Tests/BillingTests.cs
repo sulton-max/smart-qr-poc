@@ -1,9 +1,9 @@
 using System.Net;
 using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Billing.Entities;
 using SmartQr.Domain.Billing.Enums;
-using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Entities;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Tests.E2E.Harness;
@@ -95,7 +95,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         before.Usage.CodeCount.Should().Be(0);
 
         // Usage reflects live code count.
-        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("One", "https://x.example"));
+        await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("One", "https://x.example"));
 
         var after = await GetMeAsync(owner);
         after.Usage.CodeCount.Should().Be(1);
@@ -142,7 +142,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
         await SeedCodesAsync(owner, 2); // Free cap = 3, count < cap
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Third", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Third", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -153,7 +153,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
         await SeedCodesAsync(owner, 3); // Free cap = 3, count == cap (no subscription row ⇒ Free)
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Over", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Over", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.PaymentRequired); // 402
     }
@@ -165,7 +165,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Solo, "sub_solo", "cus_solo"); // cap = 25
         await SeedCodesAsync(owner, 25);
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("Over", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Over", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.PaymentRequired); // 402
     }
@@ -177,7 +177,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Agency, "sub_ag", "cus_ag"); // cap = int.MaxValue
         await SeedCodesAsync(owner, 30); // well past every bounded tier
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("AnotherOne", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("AnotherOne", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -279,11 +279,11 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
 
         // Free cap = 3: first three succeed.
         for (var i = 0; i < 3; i++)
-            (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code($"code-{i}", "https://x.example")))
+            (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl($"code-{i}", "https://x.example")))
                 .StatusCode.Should().Be(HttpStatusCode.OK);
 
         // The fourth exceeds the cap → 402.
-        (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("over-cap", "https://x.example")))
+        (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("over-cap", "https://x.example")))
             .StatusCode.Should().Be(HttpStatusCode.PaymentRequired);
 
         // A first-time subscribe (checkout.session.completed) lifts the user to Pro.
@@ -300,7 +300,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         (await GetMeAsync(owner)).Plan.Should().Be("pro");
 
         // The next create — which would have been over the Free cap — now succeeds.
-        (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.Code("after-upgrade", "https://x.example")))
+        (await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("after-upgrade", "https://x.example")))
             .StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -312,9 +312,16 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         // Owner subscribes (Pro) then prints a code while subscribed.
         await SeedSubscriptionAsync(owner, Plan.Pro, "sub_cancel", "cus_c");
         const string destination = "https://still-works.example";
-        var code = await (await owner.Client.PostJsonAsync(
-                "/api/codes", CodeRequests.Code("keeper", destination)))
-            .ReadEnvelopeAsync<CodeDtoModel>();
+        // A dynamic code that resolves to the destination on scan: url content encodes to null (redirect types don't
+        // resolve on the hot path yet), so the destination rides a text rule, whose payload encodes to the string verbatim.
+        var code = await (await owner.Client.PostJsonAsync("/api/codes", new
+        {
+            name = "keeper",
+            barcodeFormat = "QrCode",
+            mode = "dynamic",
+            contentType = "text",
+            rules = new object[] { CodeRequests.DefaultRule(new { type = "text", text = destination }) },
+        })).ReadEnvelopeAsync<CodeDtoModel>();
 
         // Sanity: it resolves on the Redirect host while subscribed. Compare as Uri — a bare host canonicalises to a trailing slash.
         var expected = new Uri(destination);
@@ -372,8 +379,11 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
                 Name = $"seed-{i}",
                 BarcodeFormat = BarcodeFormat.QrCode,
                 StyleJson = "{}",
+                Mode = ContentMode.Dynamic,
+                ContentType = CodeContentType.Url,
                 IsActive = true,
-                Content = new UrlContent { Url = "https://seed.example" },
+                // These codes only need to count toward the per-plan cap — no rules required.
+                Rules = [],
             });
         await ctx.SaveChangesAsync();
     }

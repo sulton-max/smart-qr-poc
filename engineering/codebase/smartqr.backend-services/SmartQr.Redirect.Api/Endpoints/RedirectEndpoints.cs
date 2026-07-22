@@ -42,9 +42,7 @@ public static class RedirectEndpoints
             IpAddress = ip,
         };
 
-        var decision = routingService.Evaluate(code, context);
-
-        if (decision.Outcome == RouteOutcome.NotFound)
+        if (routingService.Evaluate(code, context) is not RoutingResult.Redirect redirect)
             return Results.NotFound();
 
         // Fire-and-forget — the redirect never waits on analytics.
@@ -57,11 +55,11 @@ public static class RedirectEndpoints
             Os = OsFromUserAgent(userAgent),
             Referrer = context.Referrer,
             UserAgentHash = HashUserAgent(userAgent),
-            MatchedRuleId = decision.MatchedRuleId,
-            DestinationUrl = decision.DestinationUrl!,
+            MatchedRuleOrder = redirect.MatchedRuleOrder,
+            DestinationUrl = redirect.Destination,
         });
 
-        return Results.Redirect(decision.DestinationUrl!, permanent: false); // 302
+        return Results.Redirect(redirect.Destination, permanent: false); // 302
     }
 
     private static string? ParsePrimaryLanguage(string acceptLanguage)

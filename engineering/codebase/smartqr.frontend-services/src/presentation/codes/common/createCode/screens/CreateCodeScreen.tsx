@@ -12,15 +12,13 @@ import { Card, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, Grid, Stack } from "@wow-two-beta/ui/presentation/layout";
 import { ArrowLeft } from "lucide-react";
-import { type CodeDto } from "@/domain/codes";
-import { ContentType } from "@/domain/codes/content";
+import { ContentMode, type CodeDto } from "@/domain/codes";
 import {
   CreateCodeSchema,
   emptyCodeCreateUpdateApiRequest,
   toCodeCreateUpdateApiRequest,
   toCreateCodeRequest,
 } from "@/application/codes";
-import { REDIRECT_BASE } from "@/integration/common";
 import { codesApiClient, type CodeCreateUpdateApiRequest } from "@/integration/codes";
 import { useAppForm } from "@/form";
 import { ContentView, DesignView, RoutingView, PreviewView } from "../views";
@@ -159,7 +157,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
             <div key={tab} className="flex flex-col gap-5 motion-safe:animate-fade-in">
               {tab === CodeTab.Content && (
-                <ContentView form={form} isEdit={isEdit} existingCode={existingCode} />
+                <ContentView form={form} isEdit={isEdit} existingCode={existingCode ?? undefined} />
               )}
 
               {tab === CodeTab.Design && <DesignView form={form} />}
@@ -192,17 +190,15 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             a design/content/format change lands, never on name or rule-row keystrokes. */}
         <form.Subscribe selector={(s) => s.values.style}>
           {(style) => (
-            <form.Subscribe selector={(s) => s.values.content}>
-              {(content) => (
+            <form.Subscribe selector={(s) => s.values.rules}>
+              {(rules) => (
                 <form.Subscribe selector={(s) => s.values.barcodeFormat}>
-                  {(barcodeFormat) => {
-                    const urlDestination = content.type === ContentType.Url ? content.url : "";
-                    const previewValue =
-                      saved?.shortUrl ?? existingCode?.shortUrl ?? (urlDestination || `${REDIRECT_BASE}/preview`);
-                    return (
+                  {(barcodeFormat) => (
+                    <form.Subscribe selector={(s) => s.values.mode}>
+                      {(mode) => (
                       <PreviewView
-                        previewValue={previewValue}
-                        previewContent={content}
+                        previewMode={existingCode?.mode ?? mode ?? ContentMode.Static}
+                        previewRules={rules}
                         previewBarcodeFormat={barcodeFormat}
                         previewStyle={style}
                         foreground={style.foregroundColor}
@@ -214,8 +210,9 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
                         onBack={onBack}
                         onCreateAnother={handleCreateAnother}
                       />
-                    );
-                  }}
+                      )}
+                    </form.Subscribe>
+                  )}
                 </form.Subscribe>
               )}
             </form.Subscribe>

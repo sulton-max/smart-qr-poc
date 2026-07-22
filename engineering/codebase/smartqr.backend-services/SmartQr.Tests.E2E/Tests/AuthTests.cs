@@ -54,7 +54,7 @@ public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
         // A guest creates a code...
         var guest = await CreateGuestClientAsync();
         var created = await (await guest.Client.PostJsonAsync(
-                "/api/codes", CodeRequests.Code("Guest menu", "https://example.com/menu")))
+                "/api/codes", CodeRequests.StaticUrl("Guest menu", "https://example.com/menu")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         // ...then signs in on the SAME device (the guest cookie rides along on the request).
@@ -72,7 +72,7 @@ public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
         // Device A: sign in, create a code.
         var (_, deviceA) = await SignInAsync(Token("sub-dave", "dave@example.com", "Dave"));
         var created = await (await deviceA.PostJsonAsync(
-                "/api/codes", CodeRequests.Code("Shop", "https://example.com/shop")))
+                "/api/codes", CodeRequests.StaticUrl("Shop", "https://example.com/shop")))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         // Device B: a brand-new client signs in to the SAME account (no shared cookie) and sees the code.

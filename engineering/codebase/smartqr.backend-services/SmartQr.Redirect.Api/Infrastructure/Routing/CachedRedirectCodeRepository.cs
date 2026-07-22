@@ -27,7 +27,6 @@ public sealed class CachedRedirectCodeRepository(
 
         var code = await db.Codes
             .AsNoTracking()
-            .Include(c => c.Rules)
             .FirstOrDefaultAsync(c => c.Slug == slug, ct);
 
         // Cache hits and misses (short negative TTL) so a flood of unknown slugs can't hammer the DB.

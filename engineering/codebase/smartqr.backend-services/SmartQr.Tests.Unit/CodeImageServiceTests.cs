@@ -1,10 +1,13 @@
 using SkiaSharp;
+using SmartQr.Common.Domain.Codes.Content.Wifi.Enums;
+using SmartQr.Common.Domain.Codes.Core.Enums;
 using SmartQr.Infrastructure.Codes.Core.Services;
 using SmartQr.Application.Settings;
 using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Content.Wifi.Models;
 using SmartQr.Domain.Codes.Core.Entities;
+using SmartQr.Domain.Codes.Rules.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Models;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering;
 using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Matrix;
@@ -16,11 +19,8 @@ using DomainBarcodeFormat = SmartQr.Domain.Codes.Core.Enums.BarcodeFormat;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// The v0.7 static/dynamic split proven where it matters — the encoded payload. A static code (typed content whose
-/// <see cref="CodeContent.Encode"/> returns a payload) must render a symbol that decodes to that payload; a dynamic/legacy
-/// code must decode to the redirect short link. Each case goes through the real render pipeline, rasterizes to PNG, and decodes with ZXing.
-/// </summary>
+/// <summary>Proves the static / dynamic split at the encoded payload — a rendered symbol decodes to what its mode dictates.</summary>
+/// <remarks>Each case runs the real render pipeline, rasterizes to PNG, and decodes with ZXing.</remarks>
 public sealed class CodeImageServiceTests
 {
     private const string RedirectBase = "https://redirect.test";
@@ -36,7 +36,7 @@ public sealed class CodeImageServiceTests
     {
         // The backend encodes the payload from the typed content (WifiContent.Encode()), not a client-baked string.
         const string payload = "WIFI:T:WPA;S:CoffeeShop;P:latte123;;";
-        var code = Code(content: new WifiContent { Ssid = "CoffeeShop", Password = "latte123" });
+        var code = Code(content: new WifiContent { Ssid = "CoffeeShop", Password = "latte123", Encryption = WifiEncryption.Wpa });
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -47,7 +47,7 @@ public sealed class CodeImageServiceTests
     public void Dynamic_code_encodes_the_redirect_short_link()
     {
         // A dynamic content whose Encode() is null (url) → the symbol carries the redirect short link, not a baked payload.
-        var code = Code(slug: "abc1234", content: new UrlContent { Url = "https://example.com" });
+        var code = Code(slug: "abc1234", content: new UrlContent { Url = "https://example.com" }, mode: ContentMode.Dynamic);
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -58,12 +58,13 @@ public sealed class CodeImageServiceTests
     public void Dynamic_content_without_a_baked_payload_still_encodes_the_short_link()
     {
         // A url code persists its typed content but Encode() is null (dynamic) → the symbol carries the short link, not the fields.
-        var code = Code(slug: "xyz9999", content: new UrlContent { Url = "https://example.com" });
+        var code = Code(slug: "xyz9999", content: new UrlContent { Url = "https://example.com" }, mode: ContentMode.Dynamic);
 
         Assert.Equal($"{RedirectBase}/xyz9999", Decode(_service.Render(code, ImageFormat.Png).Content));
     }
 
-    private static CodeEntity Code(CodeContent content, string slug = "slug0001") => new()
+    // A static code bakes rule[0]'s content into the symbol; a dynamic code encodes the redirect short link instead.
+    private static CodeEntity Code(CodeContent content, string slug = "slug0001", ContentMode mode = ContentMode.Static) => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,
@@ -71,7 +72,8 @@ public sealed class CodeImageServiceTests
         Name = "Test code",
         BarcodeFormat = DomainBarcodeFormat.QrCode,
         StyleJson = "{}",
-        Content = content,
+        Mode = mode,
+        Rules = [new DefaultRule { Content = content }],
     };
 
     /// <summary>Decodes a PNG QR back to its text via ZXing over the SkiaSharp-decoded RGBA pixels. Returns null if undecodable.</summary>

@@ -2,7 +2,7 @@ import { ColorTone, SizePreset, SurfaceVariant } from "@wow-two-beta/ui/foundati
 import { Button, ButtonVariant, CopyButton } from "@wow-two-beta/ui/presentation/actions";
 import { Card, Text } from "@wow-two-beta/ui/presentation/display";
 import { Surface } from "@wow-two-beta/ui/presentation/layout";
-import { ImageFormat, isDynamicContent, type CodeContent, type CodeDto, type BarcodeFormat, type CodeStyleDto, type Gradient } from "@/domain/codes";
+import { ContentMode, ImageFormat, type CodeDto, type CodeRuleDto, type BarcodeFormat, type CodeStyleDto, type Gradient } from "@/domain/codes";
 import { codesApiClient } from "@/integration/codes";
 import { ContrastCallout } from "@/presentation/codes/design/components/ContrastCallout";
 import { QrPreview } from "../components/QrPreview";
@@ -10,10 +10,10 @@ import { QrPreview } from "../components/QrPreview";
 /** Defines props for the persistent preview column — the live render, scannability note, and post-save actions. */
 export interface PreviewViewProps {
   /** The value the preview encodes (short link on edit, sample URL on create). */
-  readonly previewValue: string;
+  readonly previewMode: ContentMode;
 
   /** The typed content the server bakes into the preview (static types), or the dynamic fallback. */
-  readonly previewContent: CodeContent;
+  readonly previewRules: readonly CodeRuleDto[];
 
   /** The symbology driving the render — `QrCode` renders the styled path, any other format a plain barcode. */
   readonly previewBarcodeFormat: BarcodeFormat;
@@ -48,8 +48,8 @@ export interface PreviewViewProps {
 
 /** Renders the builder's right column: the live server-rendered preview, the scannability callout, and — once saved — the short link + downloads. */
 export function PreviewView({
-  previewValue,
-  previewContent,
+  previewMode,
+  previewRules,
   previewBarcodeFormat,
   previewStyle,
   foreground,
@@ -63,7 +63,7 @@ export function PreviewView({
 }: PreviewViewProps) {
   return (
     <Card className="surface-soft flex flex-col items-center gap-4 p-6 lg:sticky lg:top-6 lg:self-start">
-      <QrPreview value={previewValue} content={previewContent} barcodeFormat={previewBarcodeFormat} style={previewStyle} />
+      <QrPreview mode={previewMode} rules={previewRules} barcodeFormat={previewBarcodeFormat} style={previewStyle} />
       <Text size={SizePreset.Xs} color="muted" align="center">
         Live preview — the final asset rendered server-side (vector-first), so what you see
         is what you download.
@@ -88,7 +88,7 @@ export function PreviewView({
           className="w-full"
         >
           <Text size={SizePreset.Sm} weight="medium" role="status">{isEdit ? "Changes saved ✓" : "Code created ✓"}</Text>
-          {isDynamicContent(saved.content) ? (
+          {saved.mode === ContentMode.Dynamic && saved.shortUrl ? (
             <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={saved.shortUrl}>
               {saved.shortUrl}
             </Text>
@@ -98,7 +98,7 @@ export function PreviewView({
             </Text>
           )}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {isDynamicContent(saved.content) && (
+            {saved.mode === ContentMode.Dynamic && saved.shortUrl && (
               <CopyButton size={SizePreset.Sm} text={saved.shortUrl} aria-label="Copy short URL">
                 Copy link
               </CopyButton>

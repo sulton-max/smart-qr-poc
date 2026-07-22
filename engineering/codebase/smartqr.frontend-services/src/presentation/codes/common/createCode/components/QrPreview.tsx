@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Spinner } from "@wow-two-beta/ui/presentation/feedback";
-import type { BarcodeFormat, CodeContent, CodeStyleDto } from "@/domain/codes";
+import type { BarcodeFormat, CodeRuleDto, ContentMode, CodeStyleDto } from "@/domain/codes";
 import { codesApiClient } from "@/integration/codes";
 
 /** @internal CSS var (with hex fallback) for the muted "preview unavailable" caption color. */
@@ -14,11 +14,11 @@ const LoadingScrimLight = "bg-white/60";
 const LoadingScrimDark = "dark:bg-black/40";
 
 export interface QrPreviewProps {
-  /** The fallback data when `content` is dynamic/absent — the short link on edit, a sample URL on create. */
-  readonly value: string;
+  /** How the symbol resolves — a static preview bakes the rules' content, a dynamic one a sample short link. */
+  readonly mode: ContentMode;
 
-  /** The typed content; when static, the server encodes its payload so the preview matches the saved asset. */
-  readonly content: CodeContent | null;
+  /** The rules whose content the preview bakes. */
+  readonly rules: readonly CodeRuleDto[];
 
   /** The symbology to render — `QrCode` renders the styled path, any other format a plain barcode. */
   readonly barcodeFormat: BarcodeFormat;
@@ -39,8 +39,8 @@ export interface QrPreviewProps {
  * debounced so it isn't fired per-keystroke, and superseded requests are aborted.
  */
 export function QrPreview({
-  value,
-  content,
+  mode,
+  rules,
   barcodeFormat,
   style,
   size = 240,
@@ -54,7 +54,7 @@ export function QrPreview({
 
   // Serialize style + content so the effect re-runs on any individual field change.
   const styleKey = JSON.stringify(style);
-  const contentKey = JSON.stringify(content);
+  const rulesKey = JSON.stringify(rules);
   // Track the latest in-flight controller so we can abort superseded requests.
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -68,7 +68,7 @@ export function QrPreview({
       setError(false);
 
       codesApiClient
-        .preview({ value: value || " ", content: content ?? undefined, barcodeFormat, style }, controller.signal)
+        .preview({ mode, rules: [...rules], barcodeFormat, style }, controller.signal)
         .then((markup) => {
           if (controller.signal.aborted) return;
           setSvg(markup);
@@ -86,9 +86,9 @@ export function QrPreview({
     }, debounceMs);
 
     return () => clearTimeout(timer);
-    // Deps tracked via serialized `styleKey`/`contentKey` (above), not the raw deep objects.
+    // Deps tracked via serialized `styleKey`/`rulesKey` (above), not the raw deep objects.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, contentKey, barcodeFormat, styleKey, debounceMs]);
+  }, [mode, rulesKey, barcodeFormat, styleKey, debounceMs]);
 
   // Cancel any in-flight request on unmount.
   useEffect(() => () => controllerRef.current?.abort(), []);

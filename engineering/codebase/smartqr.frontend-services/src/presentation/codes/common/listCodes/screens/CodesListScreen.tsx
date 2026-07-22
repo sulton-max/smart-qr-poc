@@ -17,6 +17,7 @@ import {
 import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
 import type { CodeDto } from "@/domain/codes/common";
 import { ContentType } from "@/domain/codes/content";
+import { CodeRuleType } from "@/domain/codes/rules";
 import { codesApiClient } from "@/integration/codes";
 
 /** Defines props for the codes dashboard screen. */
@@ -29,6 +30,16 @@ interface CodesListScreenProps {
 }
 
 /** Renders the codes dashboard — searchable list, per-row Edit / Enable-Disable / Delete. Fetches and mutations are owner-scoped via the credentials cookie. */
+/** The URL a code sends scanners to — the first url-typed rule content, when it has one. */
+function destinationOf(code: CodeDto): string | undefined {
+  for (const rule of code.rules) {
+    if (rule.type === CodeRuleType.DefaultPointer) continue;
+    const { content } = rule;
+    if (content.type === ContentType.Url) return content.url;
+  }
+  return undefined;
+}
+
 export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
   const [codes, setCodes] = useState<CodeDto[]>([]);
   const [query, setQuery] = useState("");
@@ -147,6 +158,7 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                     {code.isActive ? "Active" : "Inactive"}
                   </span>
                 </div>
+                {code.shortUrl && (
                 <div className="mt-1 flex items-center gap-2">
                   <a
                     href={code.shortUrl}
@@ -159,9 +171,10 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                   </a>
                   <CopyButton size={SizePreset.Xs} variant={ButtonVariant.Ghost} tone={ColorTone.Neutral} text={code.shortUrl} aria-label="Copy short URL" />
                 </div>
-                {code.content.type === ContentType.Url && (
-                  <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={code.content.url}>
-                    → {code.content.url}
+                )}
+                {destinationOf(code) && (
+                  <Text size={SizePreset.Sm} color="muted" isTruncated className="mt-1" title={destinationOf(code)}>
+                    → {destinationOf(code)}
                   </Text>
                 )}
               </div>

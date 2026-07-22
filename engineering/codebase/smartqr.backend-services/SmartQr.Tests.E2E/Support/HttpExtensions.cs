@@ -3,50 +3,56 @@ namespace SmartQr.Tests.E2E.Support;
 // The JSON request/response plumbing (AsJson / PostJsonAsync / PutJsonAsync / PatchJsonAsync /
 // ReadEnvelopeAsync) lives in the SDK testing package — WoW.Two.Sdk.Backend.Beta.Testing.Web.HttpExtensions.
 
-/// <summary>Builders for the JSON request bodies the codes endpoints accept.</summary>
+/// <summary>Builders for the JSON request bodies the codes endpoints accept — every rule carries the content it serves.</summary>
 public static class CodeRequests
 {
-    /// <summary>A plain url create/update body — carries the url content plus <paramref name="rules"/> and a trailing Default catch-all to <paramref name="destination"/>. The catch-all is a rule now (the fallback column is retired), so the code still resolves for every scan.</summary>
-    public static object Code(string name, string destination, IEnumerable<object>? rules = null) => new
+    /// <summary>A static url create body — one default rule carrying the url content. Static content bakes its payload; the code never reaches the redirect.</summary>
+    public static object StaticUrl(string name, string destination) => new
     {
         name,
         barcodeFormat = "QrCode",
-        content = new { type = "url", url = destination },
-        rules = (rules ?? []).Append(DefaultRule(destination)).ToArray(),
+        mode = "static",
+        contentType = "url",
+        rules = new object[] { DefaultRule(new { type = "url", url = destination }) },
     };
 
-    /// <summary>A single routing rule body.</summary>
-    public static object Rule(int order, string conditionType, string? conditionValue, string destination) => new
+    /// <summary>A dynamic url create body — the given conditional rules plus a default catch-all, each carrying url content.</summary>
+    public static object DynamicUrl(string name, string destination, IEnumerable<object>? rules = null) => new
     {
+        name,
+        barcodeFormat = "QrCode",
+        mode = "dynamic",
+        contentType = "url",
+        rules = (rules ?? []).Append(DefaultRule(new { type = "url", url = destination })).ToArray(),
+    };
+
+    /// <summary>A create/update body carrying one default rule with typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>).</summary>
+    public static object Static(string name, string contentType, object content) => new
+    {
+        name,
+        barcodeFormat = "QrCode",
+        mode = "static",
+        contentType,
+        rules = new object[] { DefaultRule(content) },
+    };
+
+    /// <summary>A conditional routing rule carrying the content it serves.</summary>
+    public static object ConditionalRule(string condition, string conditionValue, object content, int order = 1) => new
+    {
+        type = "conditional",
         order,
-        conditionType,
+        condition,
         conditionValue,
-        destination,
-    };
-
-    /// <summary>An iOS device rule (matches <c>DeviceType.Ios</c>).</summary>
-    public static object IosRule(string destination, int order = 1)
-        => Rule(order, "Device", "Ios", destination);
-
-    /// <summary>A Default catch-all rule — matches any scan; ordered last so specific rules win. Replaces the retired fallback URL.</summary>
-    public static object DefaultRule(string destination, int order = 99)
-        => Rule(order, "Default", null, destination);
-
-    /// <summary>A create/update body carrying typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>) — no rules; the backend derives the payload from the content.</summary>
-    public static object Content(string name, object content) => new
-    {
-        name,
-        barcodeFormat = "QrCode",
-        rules = Array.Empty<object>(),
         content,
     };
 
-    /// <summary>A mobile-app-link create/update body — sends the typed store links + fallback choice; the backend derives the device rules plus an optional Default catch-all (only when a fallback store is chosen).</summary>
-    public static object MobileApp(string name, string? appStore = null, string? playStore = null, string? other = null, string? fallback = null) => new
-    {
-        name,
-        barcodeFormat = "QrCode",
-        rules = Array.Empty<object>(),
-        content = new { type = "mobileApp", appStore, playStore, other, fallback },
-    };
+    /// <summary>An iOS device rule (matches <c>DeviceType.Ios</c>), carrying url content.</summary>
+    public static object IosRule(string destination, int order = 1)
+        => ConditionalRule("Device", "Ios", new { type = "url", url = destination }, order);
+
+    /// <summary>The default catch-all rule, carrying the content served when no conditional rule matches.</summary>
+    public static object DefaultRule(object content) => new { type = "default", content };
+
+    /// <summary>The default-pointer rule, nominating an existing rule's content by its order.</summary>
+    public static object DefaultPointerRule(int targetOrder) => new { type = "defaultPointer", targetOrder };
 }

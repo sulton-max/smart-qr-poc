@@ -2,13 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SmartQr.Domain.Codes.Content;
 using SmartQr.Domain.Codes.Core.Entities;
+using SmartQr.Domain.Codes.Rules;
+using SmartQr.Domain.Codes.Rules.Models;
 using SmartQr.Persistence.Constants;
 
 namespace SmartQr.Persistence.Configurations;
 
-/// <summary>Configures the codes table mapping and relationships.</summary>
+/// <summary>Configures the codes table mapping.</summary>
 public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
 {
     public void Configure(EntityTypeBuilder<CodeEntity> builder)
@@ -17,7 +18,8 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
 
         builder.HasKey(e => e.Id);
 
-        // Slug is the immutable public identifier encoded into the printed code — must be unique and fast to look up.
+        // Only a dynamic code has a slug — a static symbol carries its payload and never reaches the redirect.
+        // Postgres treats NULLs as distinct, so the unique index admits every static code.
         builder
             .HasIndex(e => e.Slug)
             .IsUnique();
@@ -27,30 +29,24 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
             .HasColumnType(PostgresColumnTypes.Jsonb)
             .IsRequired();
 
-        // Typed polymorphic content ⇄ content_json jsonb, via the one STJ options object shared with the wire (CodeContentJson).
-        // Required — every code carries a typed content (a url content over its fallback when none was chosen); the column is NOT NULL.
-        var contentConverter = new ValueConverter<CodeContent, string>(
-            content => CodeContentJson.Serialize(content),
-            json => CodeContentJson.Deserialize(json)!);
+        // The rules — each carrying the content it serves — persist as one jsonb document rather than a table:
+        // they are only ever read with their code, and a relational shape would need a nullable column per
+        // variant-specific member. Serialized through the same options the wire uses (CodeRuleJson).
+        var rulesConverter = new ValueConverter<List<CodeRule>, string>(
+            rules => CodeRuleJson.Serialize(rules),
+            json => CodeRuleJson.Deserialize(json));
 
-        // Records give structural equality; the comparer lets EF change-track the reference-typed jsonb graph (content is immutable → the snapshot is the same instance).
-        var contentComparer = new ValueComparer<CodeContent>(
-            (left, right) => left == right,
-            content => content.GetHashCode(),
-            content => content);
+        // Records give structural equality; the comparer lets EF change-track the reference-typed jsonb graph.
+        var rulesComparer = new ValueComparer<List<CodeRule>>(
+            (left, right) => left!.SequenceEqual(right!),
+            rules => rules.Aggregate(0, (hash, rule) => HashCode.Combine(hash, rule.GetHashCode())),
+            rules => rules.ToList());
 
         builder
-            .Property(e => e.Content)
-            .HasColumnName("content_json")
+            .Property(e => e.Rules)
+            .HasColumnName("rules")
             .HasColumnType(PostgresColumnTypes.Jsonb)
-            .HasConversion(contentConverter, contentComparer)
+            .HasConversion(rulesConverter, rulesComparer)
             .IsRequired();
-
-        // ── Relationships ──
-        builder
-            .HasMany(e => e.Rules)
-            .WithOne()
-            .HasForeignKey(r => r.CodeId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

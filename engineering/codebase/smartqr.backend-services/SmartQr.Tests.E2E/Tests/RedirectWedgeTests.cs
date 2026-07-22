@@ -8,6 +8,12 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 namespace SmartQr.Tests.E2E.Tests;
 
 /// <summary>The wedge — a code created/edited through the Api host resolves on the Redirect host's next scan; covers device-rule match, fallback, async scan-count, and live re-route on edit.</summary>
+/// <remarks>
+/// The destinations ride <c>text</c> rules, not <c>url</c> rules: url / mobileApp content encode to null (they are the
+/// redirect types whose hot-path resolve is deferred), so a url rule would 404 on scan. A text rule encodes its payload
+/// verbatim, so the redirect resolves to the exact destination string — the wedge, scan-count, and re-route mechanics
+/// are what these tests exercise, independent of the content type carried.
+/// </remarks>
 [Collection(AppCollection.Name)]
 public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -20,15 +26,29 @@ public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
     private const string IosDestination = "https://apps.apple.com/app/id000000000";
     private const string FallbackUrl = "https://example.com";
 
+    /// <summary>A dynamic code whose iOS scanners get <paramref name="iosDestination"/> and everyone else the <paramref name="fallback"/>, both carried as text rules that encode verbatim.</summary>
+    private static object AppCode(string name, string fallback, string iosDestination) => new
+    {
+        name,
+        barcodeFormat = "QrCode",
+        mode = "dynamic",
+        contentType = "text",
+        rules = new[]
+        {
+            CodeRequests.ConditionalRule("Device", "Ios", new { type = "text", text = iosDestination }),
+            CodeRequests.DefaultRule(new { type = "text", text = fallback }),
+        },
+    };
+
     [Fact]
     public async Task Scan_IosDevice_RedirectsToRuleDestination_AndIncrementsScanCount()
     {
         var owner = await CreateGuestClientAsync();
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("App download", FallbackUrl, [CodeRequests.IosRule(IosDestination)])))
+            AppCode("App download", FallbackUrl, IosDestination)))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
-        var scan = await ScanAsync(code.Slug, IosUserAgent);
+        var scan = await ScanAsync(code.Slug!, IosUserAgent);
 
         scan.StatusCode.Should().Be(HttpStatusCode.Found); // 302
         scan.Headers.Location!.ToString().Should().Be(IosDestination);
@@ -47,10 +67,10 @@ public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
     {
         var owner = await CreateGuestClientAsync();
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("App download", FallbackUrl, [CodeRequests.IosRule(IosDestination)])))
+            AppCode("App download", FallbackUrl, IosDestination)))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
-        var scan = await ScanAsync(code.Slug, DesktopUserAgent);
+        var scan = await ScanAsync(code.Slug!, DesktopUserAgent);
 
         scan.StatusCode.Should().Be(HttpStatusCode.Found);
         // Bare host → the redirect's Uri canonicalises to a root slash (example.com → example.com/). Compare as Uri.
@@ -62,20 +82,20 @@ public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
     {
         var owner = await CreateGuestClientAsync();
         var code = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Code("App download", FallbackUrl, [CodeRequests.IosRule(IosDestination)])))
+            AppCode("App download", FallbackUrl, IosDestination)))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
-        var first = await ScanAsync(code.Slug, IosUserAgent);
+        var first = await ScanAsync(code.Slug!, IosUserAgent);
         first.Headers.Location!.ToString().Should().Be(IosDestination);
 
         // Re-point the iOS rule through the Api host. The slug (printed code) is unchanged.
         const string newDestination = "https://apps.apple.com/app/id111111111";
         var updated = await (await owner.Client.PutJsonAsync($"/api/codes/{code.Id}",
-                CodeRequests.Code("App download (updated)", FallbackUrl, [CodeRequests.IosRule(newDestination)])))
+                AppCode("App download (updated)", FallbackUrl, newDestination)))
             .ReadEnvelopeAsync<CodeDtoModel>();
         updated.Slug.Should().Be(code.Slug);
 
-        var second = await ScanAsync(code.Slug, IosUserAgent);
+        var second = await ScanAsync(code.Slug!, IosUserAgent);
         second.StatusCode.Should().Be(HttpStatusCode.Found);
         second.Headers.Location!.ToString().Should().Be(newDestination);
     }

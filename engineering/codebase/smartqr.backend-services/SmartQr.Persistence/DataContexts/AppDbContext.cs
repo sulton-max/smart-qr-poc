@@ -16,8 +16,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : AppDb
     /// <summary>Gets the dynamic codes (QR / barcode / link) set.</summary>
     public DbSet<CodeEntity> Codes => Set<CodeEntity>();
 
-    /// <summary>Gets the per-code ordered routing rules set.</summary>
-    public DbSet<RoutingRuleEntity> RoutingRules => Set<RoutingRuleEntity>();
 
     /// <summary>Gets the append-only scan/click events set.</summary>
     public DbSet<ScanEventEntity> ScanEvents => Set<ScanEventEntity>();

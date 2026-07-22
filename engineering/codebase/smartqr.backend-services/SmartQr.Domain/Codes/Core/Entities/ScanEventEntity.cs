@@ -34,7 +34,7 @@ public sealed record ScanEventEntity : IKeyedEntity<Guid>, IHasTableName
     public string? UserAgentHash { get; set; }
 
     /// <summary>Gets or sets the id of the routing rule that matched the scan event, if any (null = fell back).</summary>
-    public Guid? MatchedRuleId { get; set; }
+    public int? MatchedRuleOrder { get; set; }
 
     /// <summary>Gets or sets the destination of the scan event the scan was sent to.</summary>
     public required string DestinationUrl { get; set; }

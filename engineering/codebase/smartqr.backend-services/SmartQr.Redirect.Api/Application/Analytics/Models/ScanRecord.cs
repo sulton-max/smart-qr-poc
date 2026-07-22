@@ -27,7 +27,7 @@ public sealed record ScanRecord
     public string? UserAgentHash { get; init; }
 
     /// <summary>Matched rule id (null = fell back).</summary>
-    public Guid? MatchedRuleId { get; init; }
+    public int? MatchedRuleOrder { get; init; }
 
     /// <summary>Destination the scan was sent to.</summary>
     public required string DestinationUrl { get; init; }

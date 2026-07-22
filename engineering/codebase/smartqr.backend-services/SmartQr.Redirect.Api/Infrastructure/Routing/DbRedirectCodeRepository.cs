@@ -18,7 +18,6 @@ public sealed class DbRedirectCodeRepository(IServiceScopeFactory scopeFactory) 
 
         return await db.Codes
             .AsNoTracking()
-            .Include(c => c.Rules)
             .FirstOrDefaultAsync(c => c.Slug == slug, ct);
     }
 }

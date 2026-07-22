@@ -66,7 +66,7 @@ public sealed class ScanFlushBackgroundService(
                 Os = r.Os,
                 Referrer = r.Referrer,
                 UserAgentHash = r.UserAgentHash,
-                MatchedRuleId = r.MatchedRuleId,
+                MatchedRuleOrder = r.MatchedRuleOrder,
                 DestinationUrl = r.DestinationUrl,
             });
         }
