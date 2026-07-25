@@ -26,6 +26,7 @@
 | `vector-sweep.md` | Full-stack capability-vector map — app vs SDK vs neither, per-vector verdict (adopt/migrate/polish/add/defer), FE-infra adopt bundle, trim list, sequenced plan |
 | `content-model-rewire.md` | Polymorphic `CodeContent` rewire handoff (DONE 2026-07-03) — one model, three roles; backend-owned encoding |
 | `validation.md` | Validation issues + restructure (analysis only) — verified wiring, V1–V7 issues, decided shape (command-scoped · nested `CodeContentValidator` · `SetInheritanceValidator`), rejected RuleSets + why, deferred 2-layer convention |
+| `validation-patterns.md` | Cited validation-pattern taxonomy for the ecosystem convention — 5 axes (reporting · composition · selection · **state reach** · placement), rigour-tagged names (`[E]`/`[F]`/`[D]`/`[N]`), **transition constraint** deep dive (options a–d), recommendation: two-step validation + async SDK seam |
 
 ## Engineering — Architecture (`engineering/architecture/`)
 
@@ -50,6 +51,7 @@
 | `v0.5/v0.5.md` | v0.5 (Code styling) — server-authoritative render · shapes · gradients · center emoji · design system + dark mode |
 | `v0.6/v0.6.md` | v0.6 (Code-rendering SDK extraction) — render engine + style contract → SDK; accordion builder + colors-panel redesign |
 | `v0.7/v0.7.md` | v0.7 (Static content and export) — **active** — static content types · barcodes UI · download/print export · builder correctness |
+| `v0.9/handoff.md` | v0.9 continuity — state (model sweep + UI redesign done, all suites green) · do-next (resolve page CM9 · blocked transition constraint) · **error ordering: decided** (resolve first) · read-seam coordination · don'ts |
 | `v0.9/v0.9.md` | v0.9 (Content mode — static/dynamic) — **next Feature**. Architecture: **a rule carries content** (CM15) · CM1–CM17 · `CodeRule` hierarchy (`ConditionalRule` · `DefaultRule` · `DefaultPointerRule`, `TargetOrder`) · F1 open (`Encode()` home) · F3 open (resolve-page host) · F5 resolved (one base content type) · Iterations 1–7 (logic → content → condition → rule → code+entity → requests+serialization → forms) |
 | `v0.11/v0.11.md` | v0.11 (Interactive landing hero) — parked experiment (QR-simulation hero canvas); renumbered off v0.9 on 2026-07-18 |
 

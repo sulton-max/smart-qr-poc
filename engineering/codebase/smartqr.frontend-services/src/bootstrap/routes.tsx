@@ -1,4 +1,5 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ContentMode } from "@/domain/codes";
 import { BillingScreen, ReturnStatus } from "@/presentation/billing";
 import { CodesListScreen, CreateCodeScreen } from "@/presentation/codes";
 
@@ -10,13 +11,24 @@ export function CodesListRoute() {
     <CodesListScreen
       onCreate={() => navigate("/app/new")}
       onEdit={(id) => navigate(`/app/${id}/edit`)}
+      onCopy={(id, mode) => navigate(`/app/new?copyOf=${id}&mode=${mode}`)}
     />
   );
 }
 
 export function CreateCodeRoute() {
   const navigate = useNavigate();
-  return <CreateCodeScreen onBack={() => navigate("/app")} />;
+  const [searchParams] = useSearchParams();
+  // `?copyOf` prefills a fresh builder from another code (CM5); `?mode` names the side of the axis to copy into.
+  const raw = searchParams.get("mode");
+  const copyMode = raw === ContentMode.Static || raw === ContentMode.Dynamic ? raw : undefined;
+  return (
+    <CreateCodeScreen
+      copyFromId={searchParams.get("copyOf") ?? undefined}
+      copyMode={copyMode}
+      onBack={() => navigate("/app")}
+    />
+  );
 }
 
 export function EditCodeRoute() {

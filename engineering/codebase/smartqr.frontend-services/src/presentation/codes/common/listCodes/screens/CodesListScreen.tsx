@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ColorTone, SizePreset } from "@wow-two-beta/ui/foundation/utils";
 import { Button, ButtonVariant, CopyButton } from "@wow-two-beta/ui/presentation/actions";
 import { SearchInput } from "@wow-two-beta/ui/presentation/forms";
-import { Card, EmptyState, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
+import { Badge, Card, EmptyState, Heading, HeadingSize, Text } from "@wow-two-beta/ui/presentation/display";
 import { Alert, Spinner } from "@wow-two-beta/ui/presentation/feedback";
 import { Center, HStack, Stack } from "@wow-two-beta/ui/presentation/layout";
 import {
@@ -14,11 +14,13 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@wow-two-beta/ui/presentation/overlays";
-import { Pencil, Plus, QrCode, Trash2 } from "lucide-react";
+import { CopyPlus, Pencil, Plus, QrCode, Trash2 } from "lucide-react";
 import type { CodeDto } from "@/domain/codes/common";
-import { ContentType } from "@/domain/codes/content";
+import { ContentMode, ContentType } from "@/domain/codes/content";
 import { CodeRuleType } from "@/domain/codes/rules";
+import { oppositeMode } from "@/application/codes";
 import { codesApiClient } from "@/integration/codes";
+import { ContentModeDisplays } from "@/presentation/codes/content/components/ContentModeDisplays";
 
 /** Defines props for the codes dashboard screen. */
 interface CodesListScreenProps {
@@ -27,6 +29,9 @@ interface CodesListScreenProps {
 
   /** Fires when the user opens the builder in edit mode. */
   readonly onEdit: (id: string) => void;
+
+  /** Fires when the user copies a code across the mode axis — opens the builder prefilled, in `mode` (CM5). */
+  readonly onCopy: (id: string, mode: ContentMode) => void;
 }
 
 /** Renders the codes dashboard — searchable list, per-row Edit / Enable-Disable / Delete. Fetches and mutations are owner-scoped via the credentials cookie. */
@@ -40,7 +45,12 @@ function destinationOf(code: CodeDto): string | undefined {
   return undefined;
 }
 
-export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
+/** Whether the opposite-mode copy is legal — a static copy needs a single rule, since two destinations can't bake (CM2). */
+function canCopyToOppositeMode(code: CodeDto): boolean {
+  return oppositeMode(code.mode) === ContentMode.Dynamic || code.rules.length === 1;
+}
+
+export function CodesListScreen({ onCreate, onEdit, onCopy }: CodesListScreenProps) {
   const [codes, setCodes] = useState<CodeDto[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -153,6 +163,10 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                   <span className="truncate font-medium" title={code.name}>
                     {code.name}
                   </span>
+                  {/* CM7 — mode is its own axis, so it reads as a chip here, never folded into the type. */}
+                  <Badge variant={ContentModeDisplays[code.mode].badge} size={SizePreset.Xs} className="shrink-0">
+                    {ContentModeDisplays[code.mode].label}
+                  </Badge>
                   <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                     <span className={`size-1.5 rounded-full ${code.isActive ? "bg-accent" : "bg-subtle-foreground"}`} />
                     {code.isActive ? "Active" : "Inactive"}
@@ -185,7 +199,20 @@ export function CodesListScreen({ onCreate, onEdit }: CodesListScreenProps) {
                   <Text size={SizePreset.Xs} color="muted">scans</Text>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center justify-end gap-1">
+                  {/* CM4/CM5 — no in-place flip exists, so crossing the axis mints a new code from this one's content. */}
+                  {canCopyToOppositeMode(code) && (
+                    <Button
+                      size={SizePreset.Sm}
+                      variant={ButtonVariant.Ghost}
+                      tone={ColorTone.Neutral}
+                      leadingSlot={<CopyPlus size={15} />}
+                      isDisabled={busyId === code.id}
+                      onClick={() => onCopy(code.id, oppositeMode(code.mode))}
+                    >
+                      {`Copy as ${ContentModeDisplays[oppositeMode(code.mode)].label.toLowerCase()}`}
+                    </Button>
+                  )}
                   <Button
                     size={SizePreset.Sm}
                     variant={ButtonVariant.Ghost}

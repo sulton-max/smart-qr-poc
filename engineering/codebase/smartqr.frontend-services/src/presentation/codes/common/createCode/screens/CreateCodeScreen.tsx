@@ -16,21 +16,22 @@ import { ContentMode, type CodeDto } from "@/domain/codes";
 import {
   CreateCodeSchema,
   emptyCodeCreateUpdateApiRequest,
+  oppositeMode,
   toCodeCreateUpdateApiRequest,
+  toCopyCodeCreateUpdateApiRequest,
   toCreateCodeRequest,
 } from "@/application/codes";
 import { codesApiClient, type CodeCreateUpdateApiRequest } from "@/integration/codes";
 import { useAppForm } from "@/form";
-import { ContentView, DesignView, RoutingView, PreviewView } from "../views";
+import { ContentModeDisplays } from "@/presentation/codes/content/components/ContentModeDisplays";
+import { ContentView, DesignView, PreviewView } from "../views";
 
-/** Defines the code builder's grouped sections — Content · Design · Routing. */
+/** Defines the code builder's grouped sections — Content · Design. Rules live under Content: a rule carries content. */
 const CodeTab = {
-  /** Refers to the content-type + payload section. */
+  /** Refers to the identity + content section (name, type, mode, the rules carrying the content). */
   Content: "content",
   /** Refers to the styling section (colors / shape / center). */
   Design: "design",
-  /** Refers to the routing-rules section. */
-  Routing: "routing",
 } as const;
 
 type CodeTab = (typeof CodeTab)[keyof typeof CodeTab];
@@ -40,6 +41,12 @@ export interface CreateCodeScreenProps {
   /** The id of the code to edit (PUT); unset → create (POST). */
   readonly codeId?: string;
 
+  /** The id of a code to copy into a fresh builder — stays create (POST), prefilled from that code (CM5). */
+  readonly copyFromId?: string;
+
+  /** The mode the copy is created in; defaults to the opposite of the source code's. */
+  readonly copyMode?: ContentMode;
+
   /** Fires when the user returns to the codes list. */
   readonly onBack?: () => void;
 
@@ -48,8 +55,10 @@ export interface CreateCodeScreenProps {
 }
 
 /** Renders the code builder — create, or edit when `codeId` set. Edit submits a full replace; slug is read-only (printed, immutable). */
-export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenProps) {
+export function CreateCodeScreen({ codeId, copyFromId, copyMode, onBack, onSaved }: CreateCodeScreenProps) {
   const isEdit = Boolean(codeId);
+  // A copy loads the source code the same way an edit does, then submits as a create.
+  const sourceId = codeId ?? copyFromId;
 
   // The active builder section.
   const [tab, setTab] = useState<CodeTab>(CodeTab.Content);
@@ -57,8 +66,10 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
   const [existingCode, setExistingCode] = useState<CodeDto | null>(null);
   // The saved code after a successful create/update — drives the post-save panel. Not form data.
   const [saved, setSaved] = useState<CodeDto | null>(null);
-  // Edit-mode fetch state.
-  const [loading, setLoading] = useState(isEdit);
+  // The mode a copy is being created in — set once the source loads, so the header can name it.
+  const [copiedInto, setCopiedInto] = useState<ContentMode | null>(null);
+  // Edit / copy fetch state.
+  const [loading, setLoading] = useState(Boolean(sourceId));
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const form = useAppForm<CodeCreateUpdateApiRequest>({
@@ -74,18 +85,25 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     },
   });
 
-  // Edit mode: load once, then reseed the form values + dirty baseline via reset(data).
+  // Edit / copy: load once, then reseed the form values + dirty baseline via reset(data). A copy never sets
+  // `existingCode` — that backs the source's short link and preview mode, and the copy is a different symbol.
   useEffect(() => {
-    if (!codeId) return;
+    if (!sourceId) return;
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
     codesApiClient
-      .get(codeId)
+      .get(sourceId)
       .then((code) => {
         if (cancelled) return;
-        setExistingCode(code);
-        form.reset(toCodeCreateUpdateApiRequest(code));
+        if (codeId) {
+          setExistingCode(code);
+          form.reset(toCodeCreateUpdateApiRequest(code));
+          return;
+        }
+        const mode = copyMode ?? oppositeMode(code.mode);
+        setCopiedInto(mode);
+        form.reset(toCopyCodeCreateUpdateApiRequest(code, mode));
       })
       .catch((e: unknown) => {
         if (!cancelled) setLoadError(e instanceof Error ? e.message : "Failed to load the code");
@@ -96,7 +114,7 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
     return () => {
       cancelled = true;
     };
-  }, [codeId, form]);
+  }, [sourceId, codeId, copyMode, form]);
 
   // "Create another" clears only the saved panel — the builder keeps its values for a quick variant.
   function handleCreateAnother() {
@@ -128,12 +146,14 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
         )}
         <div>
           <Heading level={1} size={HeadingSize.Xl} weight="bold">
-            {isEdit ? "Edit code" : "Create a code"}
+            {isEdit ? "Edit code" : copiedInto ? "Copy code" : "Create a code"}
           </Heading>
           <Text color="muted">
             {isEdit
               ? "Update the destination and routing — the printed code keeps working."
-              : "One code, many destinations — and it never expires."}
+              : copiedInto
+                ? `A new ${ContentModeDisplays[copiedInto].label.toLowerCase()} code with the same content — the original keeps working.`
+                : "One code, many destinations — and it never expires."}
           </Text>
         </div>
       </Stack>
@@ -151,7 +171,6 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
             >
               <ToggleButton value={CodeTab.Content} className="flex-1">Content</ToggleButton>
               <ToggleButton value={CodeTab.Design} className="flex-1">Design</ToggleButton>
-              <ToggleButton value={CodeTab.Routing} className="flex-1">Routing</ToggleButton>
             </ToggleButtonGroup>
 
             {/* key={tab} re-mounts on switch so the fade-through re-fires; motion-safe respects reduced-motion. */}
@@ -161,8 +180,6 @@ export function CreateCodeScreen({ codeId, onBack, onSaved }: CreateCodeScreenPr
               )}
 
               {tab === CodeTab.Design && <DesignView form={form} />}
-
-              {tab === CodeTab.Routing && <RoutingView form={form} />}
             </div>
 
             <form.Subscribe selector={(s) => s.isSubmitting}>

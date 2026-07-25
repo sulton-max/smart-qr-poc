@@ -99,6 +99,57 @@ Considered (owner's proposal, mirroring `ValidateForEntityEventAndThrowAsync(con
 
 ---
 
+## Phase-1 placement — a behavior, not a handler call
+
+*Analysis 2026-07-25, owner-requested. Convention § Phases currently says "resolve in the handler"; the owner wants an earlier mediator behavior instead. Verdict: possible, and preferable.*
+
+**The constraint.** `AddMediatorValidationBehavior()` is generic over `TRequest` and calls `ValidateAndThrow(request)`. Anything that must beat it has to be a behavior registered ahead of it — the pipeline has no other "earlier".
+
+**What makes it easy: the handler re-queries anyway.** Under § *Layer independence* a service must not skip existence because a caller resolved it. So the gate behavior does **not** need to hand the entity to the handler — no scoped stash, no ambient `EntityAccessor`, no request/response type surgery. Its only job is to **order the error**. That deletes the hard part of the design.
+
+**Shape:**
+
+```
+EntityGateBehavior<TRequest, TResponse>   // registered BEFORE ValidationBehavior
+  where TRequest : ITargetsEntity         // marker: exposes the target id
+```
+
+- `ITargetsEntity { Guid TargetId { get; } }` — a marker on the command. Untargeted commands (create, query) don't implement it, so the behavior is a no-op pass-through and the pipeline order stays uniform.
+- `IEntityGate<TRequest>` → `Task<AppError?>` — `null` passes, non-null short-circuits with `NotFound` / `Forbidden`. **One gate per targeted aggregate**, not per command.
+- returns an `AppResult` failure rather than throwing — the terminal `ExceptionToResultBehavior` already handles the throw path, but a gate has no exceptional case.
+
+**Ordering check.** `EntityGate` → `Validation` → handler. Framing (401/415/400-binding) is already ahead of all three, in the host.
+
+**Not blocked on the read seam.** The gate only *reads* — a PK probe plus an owner comparison. The EF-attach trap is a write-path problem. Dapper or a repository read both work today.
+
+**Cost.** Two reads per targeted command (gate + handler). Accepted per § *Layer independence*; caching the resolution is the fix, and it lands once for both call sites.
+
+**Rejected alternatives:**
+
+- *async `IValidator<T>` reading the DB in an earlier behavior* — breaks "a validator is pure", and needs the async SDK seam.
+- *one behavior, two validation passes selected by rule-set* — RuleSets are unreachable through the pipeline (§ *Shape — rejected: RuleSets*).
+- *keep it in the handler* — works, but the order then rests on per-handler discipline, which is what a convention exists to remove.
+
+**Home.** The behavior + marker + gate interface are generic infra → backend-beta SDK. Per the extract-in-the-`+0.1` doctrine: build inline in smart-qr first, extract after it has one real consumer.
+
+---
+
+## Lower-pass placement — service level
+
+*Analysis 2026-07-25, owner-requested. Resolves the convention's remaining § Open item.*
+
+**Verdict: service level.** Not an EF interceptor, not a repository guard.
+
+- **EF `SavingChanges` interceptor** — sees only the tracked graph. A cross-aggregate `COUNT` inside it is a nested read on the live transaction; it works and is a footgun. Worse, it fires *after* all business logic, so the failure surfaces as an exception from persistence with no command context to name a field.
+- **repository guard** — a repository would have to inject other repositories to reach sibling aggregates. That is the mix-and-match to avoid, and it makes repositories hold business rules.
+- **service level** — the service already composes the repositories, so a cross-aggregate check has its inputs to hand, and the failure maps to an `AppError` with no new dependency anywhere.
+
+**Fits the read/write split.** Reads (single-entity and aggregate integrity probes) go through Dapper; the write goes through EF. A service-level check is one Dapper read then one EF write — no repository cross-injection, one place that knows both halves.
+
+**The honest caveat.** Check-then-write is a race: a concurrent insert can land between the probe and `SaveChanges`. Service-level validation buys the **good error message**; only a DB constraint (unique index, check constraint) buys the **guarantee**. Both, always — never the probe alone for anything that must hold.
+
+---
+
 ## Deferred — own chats
 
 - **2-layer validation convention** (`wow-two-ws`) — presentation layer + persistence/infra layer. Solves both directions: data validated at presentation then mutated internally and

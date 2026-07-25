@@ -22,6 +22,7 @@ import {
   type CodeLogoDto,
   type CodeRuleDto,
   type ConditionalRuleDto,
+  type DefaultRuleDto,
   type Gradient,
 } from "@/domain/codes";
 import type { CodeCreateUpdateApiRequest } from "@/integration/codes";
@@ -145,6 +146,16 @@ export function emptyConditionalRule(contentType: ContentType): ConditionalRuleD
   };
 }
 
+/** A fresh catch-all rule — serves whatever the conditional rules did not match. At most one per code. */
+export function emptyDefaultRule(contentType: ContentType): DefaultRuleDto {
+  return { type: CodeRuleType.Default, content: emptyContent(contentType) };
+}
+
+/** The other side of the mode axis — what an opposite-mode copy is created as (CM5). */
+export function oppositeMode(mode: ContentMode): ContentMode {
+  return mode === ContentMode.Static ? ContentMode.Dynamic : ContentMode.Static;
+}
+
 /** Maps a loaded code to the builder request for edit-mode prefill — feed to `form.reset(...)`. */
 export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApiRequest {
   return {
@@ -156,7 +167,22 @@ export function toCodeCreateUpdateApiRequest(code: CodeDto): CodeCreateUpdateApi
   };
 }
 
-/** Normalizes the builder request for submit — trims the name and renumbers the conditional rules. */
+/**
+ * Maps a loaded code to the builder request for an opposite-mode copy (CM5) — same content and style, a new
+ * symbol. The two modes bake different bytes, so a copy is the only way across the axis; the original is untouched.
+ */
+export function toCopyCodeCreateUpdateApiRequest(code: CodeDto, mode: ContentMode): CodeCreateUpdateApiRequest {
+  return {
+    name: `${code.name} copy`,
+    barcodeFormat: code.barcodeFormat,
+    mode,
+    contentType: code.contentType,
+    style: { ...code.style },
+    rules: code.rules.map((rule) => ({ ...rule })),
+  };
+}
+
+/** Normalizes the builder request for submit — trims the name, renumbers the conditional rules, applies CM2. */
 export function toCreateCodeRequest(values: CodeCreateUpdateApiRequest): CodeCreateUpdateApiRequest {
   let order = 0;
   const rules: CodeRuleDto[] = values.rules.map((rule) =>
@@ -166,6 +192,9 @@ export function toCreateCodeRequest(values: CodeCreateUpdateApiRequest): CodeCre
   return {
     ...values,
     name: values.name.trim() || "Untitled code",
+    // CM2 — two destinations can't be baked into one symbol, so 2+ rules force dynamic. Mirrors the server's
+    // rule-set check. Left absent on update, where mode is not part of the contract (CM3).
+    mode: values.mode && rules.length > 1 ? ContentMode.Dynamic : values.mode,
     rules,
   };
 }
