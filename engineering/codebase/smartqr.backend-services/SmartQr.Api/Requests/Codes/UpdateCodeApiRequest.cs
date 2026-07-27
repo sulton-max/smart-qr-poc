@@ -19,7 +19,7 @@ public sealed record UpdateCodeApiRequest
     /// <summary>Gets the replacement routing rules (the whole set), each carrying the content it serves.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Gets the style to persist. Required: this is a full replace, not a patch, so the client sends the whole block.</summary>
+    /// <summary>Gets the style the code renders with — a full replace, not a patch, so the client sends the whole block.</summary>
     public required StyleApiRequest Style { get; init; }
 }
 

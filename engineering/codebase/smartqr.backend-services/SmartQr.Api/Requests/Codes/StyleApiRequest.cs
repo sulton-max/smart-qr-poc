@@ -3,7 +3,7 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents a code's style block — shared by the preview, create, and update requests. On preview it is <c>required</c> (the builder always sends the full style); on create/update the block is optional, but every field is <c>required</c> when the block is present.</summary>
+/// <summary>Represents a code's style block — one shape shared by the preview, create, and update requests, so a preview renders byte-identically to what a save produces.</summary>
 public sealed record StyleApiRequest
 {
     /// <summary>Gets the foreground (dark module) color as <c>#RRGGBB</c>.</summary>
@@ -21,7 +21,7 @@ public sealed record StyleApiRequest
     /// <summary>Gets the quiet-zone width in modules, floored to 4.</summary>
     public required int QuietZoneModules { get; init; }
 
-    /// <summary>Gets the optional center logo — absent when no logo is overlaid.</summary>
+    /// <summary>Gets the center logo overlaid on the symbol; absent leaves the center clear.</summary>
     public LogoApiRequest? Logo { get; init; }
 
     /// <summary>Gets the data-module (body) shape, floored to ECC Q server-side when non-square.</summary>
@@ -33,10 +33,10 @@ public sealed record StyleApiRequest
     /// <summary>Gets the inner finder-pupil (3×3) shape, independent of <see cref="FinderShape"/>.</summary>
     public required FinderDotShape FinderDotShape { get; init; }
 
-    /// <summary>Gets the optional foreground gradient — replaces the solid foreground when present.</summary>
+    /// <summary>Gets the foreground gradient; it replaces the solid foreground when present.</summary>
     public GradientApiRequest? Gradient { get; init; }
 
-    /// <summary>Gets the optional center emoji overlay.</summary>
+    /// <summary>Gets the emoji mark overlaid at the code's center.</summary>
     public EmojiApiRequest? Emoji { get; init; }
 }
 

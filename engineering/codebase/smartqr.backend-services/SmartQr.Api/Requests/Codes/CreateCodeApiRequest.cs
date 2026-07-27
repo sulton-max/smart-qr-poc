@@ -23,7 +23,7 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the routing rules, each carrying the content it serves. At least one is required; every rule must carry the same content type.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Gets the style to persist. Required: a code always has a style, so the client sends the full block rather than relying on a server default.</summary>
+    /// <summary>Gets the style the code renders with — a code always has one, so the client sends the whole block rather than leaning on a server default.</summary>
     public required StyleApiRequest Style { get; init; }
 }
 

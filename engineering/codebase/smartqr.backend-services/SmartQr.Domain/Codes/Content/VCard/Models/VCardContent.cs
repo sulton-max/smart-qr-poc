@@ -3,7 +3,7 @@ namespace SmartQr.Domain.Codes.Content.VCard.Models;
 /// <summary>A contact card — encodes to a vCard 3.0 payload carrying only the filled fields, each iCal-escaped.</summary>
 public sealed record VCardContent : CodeContent
 {
-    /// <summary>Given name (the only required field).</summary>
+    /// <summary>Given name.</summary>
     public required string FirstName { get; init; }
 
     /// <summary>Family name.</summary>

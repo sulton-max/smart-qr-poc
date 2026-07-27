@@ -4,7 +4,7 @@ import type { EccLevel } from "../enums/EccLevel";
 import type { FinderShape } from "../enums/FinderShape";
 import type { ModuleShape } from "../enums/ModuleShape";
 
-/** Represents an optional center logo overlay baked into the code render. */
+/** Represents a center logo overlay baked into the code render. */
 export interface CodeLogoDto {
   /** The logo image as a data URL. */
   dataUrl: string;
@@ -13,7 +13,7 @@ export interface CodeLogoDto {
   sizeRatio: number;
 }
 
-/** Represents an optional center emoji overlay baked into the code render. */
+/** Represents a center emoji overlay baked into the code render. */
 export interface CodeEmojiDto {
   /** The emoji glyph. */
   glyph: string;
@@ -22,7 +22,7 @@ export interface CodeEmojiDto {
   sizeRatio: number;
 }
 
-/** Represents a code's visual style — colors, shapes, ECC, and the optional center overlays. */
+/** Represents a code's visual style — colors, shapes, ECC, and the center overlays. */
 export interface CodeStyleDto {
   /** The foreground color (#RRGGBB). */
   foregroundColor: string;
@@ -39,7 +39,7 @@ export interface CodeStyleDto {
   /** The quiet-zone width in modules. */
   quietZoneModules: number;
 
-  /** The optional center logo overlay. */
+  /** The center logo overlay. */
   logo?: CodeLogoDto;
 
   /** The data-module shape. */
@@ -51,9 +51,9 @@ export interface CodeStyleDto {
   /** The finder (eye) pupil shape. */
   finderDotShape: FinderShape;
 
-  /** The optional foreground gradient (solid foreground when absent). */
+  /** The foreground gradient; the solid foreground renders when absent. */
   gradient?: Gradient;
 
-  /** The optional center emoji overlay. */
+  /** The center emoji overlay. */
   emoji?: CodeEmojiDto;
 }

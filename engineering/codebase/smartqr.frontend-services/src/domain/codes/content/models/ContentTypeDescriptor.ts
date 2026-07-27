@@ -8,7 +8,7 @@ export interface ContentTypeDescriptor {
   /** The display label. */
   label: string;
 
-  /** The optional helper text rendered above the fields. */
+  /** The helper text rendered above the fields. */
   note?: string;
 }
 

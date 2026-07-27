@@ -29,7 +29,7 @@ public sealed record CodeUpdateCommand
     /// <summary>Replacement ordered routing rules (the whole set).</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Optional style to persist; null preserves the code's saved style.</summary>
+    /// <summary>The style the code renders with — a full replace, so it overwrites the saved style.</summary>
     public required StyleSpec Style { get; init; }
 
 }

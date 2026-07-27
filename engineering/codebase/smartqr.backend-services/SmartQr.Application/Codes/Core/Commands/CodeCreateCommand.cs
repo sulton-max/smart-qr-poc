@@ -8,7 +8,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Application.Codes.Core.Commands;
 
-/// <summary>Creates a dynamic code with an optional ordered rule set.</summary>
+/// <summary>Creates a code — its identity, the rules carrying its content, and the style it renders with.</summary>
 public sealed record CodeCreateCommand
     : ICommand<AppResult<CodeCreateResult.Success>>
 {
@@ -24,13 +24,13 @@ public sealed record CodeCreateCommand
     /// <summary>The kind of content every rule carries.</summary>
     public required CodeContentType ContentType { get; init; }
 
-    /// <summary>Optional ordered routing rules.</summary>
+    /// <summary>The routing rules, each carrying the content it serves; conditional rules are matched in their given order.</summary>
     /// <summary>How the symbol resolves; fixed for the life of the code.</summary>
     public required ContentMode Mode { get; init; }
 
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Optional style to persist; null leaves the code on the default style.</summary>
+    /// <summary>The style the code renders with.</summary>
     public required StyleSpec Style { get; init; }
 
 }

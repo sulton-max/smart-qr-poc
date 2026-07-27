@@ -6,7 +6,7 @@ public sealed record SmsContent : CodeContent
     /// <summary>Recipient phone number.</summary>
     public required string Phone { get; init; }
 
-    /// <summary>Optional prefilled message.</summary>
+    /// <summary>Message text prefilled in the composer.</summary>
     public string? Message { get; init; }
 
     /// <inheritdoc />

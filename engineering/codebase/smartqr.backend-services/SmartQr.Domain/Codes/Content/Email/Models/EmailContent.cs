@@ -1,15 +1,15 @@
 namespace SmartQr.Domain.Codes.Content.Email.Models;
 
-/// <summary>Pre-filled email — encodes to a <c>mailto:</c> URI with optional form-encoded subject / body query params.</summary>
+/// <summary>Pre-filled email — encodes to a <c>mailto:</c> URI, form-encoding the subject / body as query params.</summary>
 public sealed record EmailContent : CodeContent
 {
     /// <summary>Recipient address.</summary>
     public required string To { get; init; }
 
-    /// <summary>Optional subject line.</summary>
+    /// <summary>Subject line prefilled in the composer.</summary>
     public string? Subject { get; init; }
 
-    /// <summary>Optional message body.</summary>
+    /// <summary>Body text prefilled in the composer.</summary>
     public string? Body { get; init; }
 
     /// <inheritdoc />

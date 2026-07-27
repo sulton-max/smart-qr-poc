@@ -11,6 +11,6 @@ public sealed record CodeListQuery
     /// <summary>Id of the user whose codes to list.</summary>
     public required Guid UserId { get; init; }
 
-    /// <summary>Optional case-insensitive filter — matches codes whose name contains the term.</summary>
+    /// <summary>Case-insensitive filter — matches codes whose name contains the term; absent lists them all.</summary>
     public string? Q { get; init; }
 }

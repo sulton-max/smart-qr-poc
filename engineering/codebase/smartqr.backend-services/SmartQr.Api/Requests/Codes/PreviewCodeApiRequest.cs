@@ -17,7 +17,7 @@ public sealed record PreviewCodeApiRequest
     /// <summary>Gets the symbology to render — <c>QrCode</c> renders the styled path, any other format renders a plain ZXing barcode.</summary>
     public BarcodeFormat? BarcodeFormat { get; init; }
 
-    /// <summary>Gets the style to render with — <c>required</c>: the builder always sends the full style block, so an absent block fails binding (400).</summary>
+    /// <summary>Gets the style to render with — the preview renders exactly what a save would produce, so it takes the same whole block.</summary>
     public required StyleApiRequest Style { get; init; }
 
     /// <summary>Gets the symbology to render — the supplied <see cref="BarcodeFormat"/>, defaulting to QR when absent.</summary>
@@ -27,7 +27,7 @@ public sealed record PreviewCodeApiRequest
 /// <summary>Provides mapping for <see cref="PreviewCodeApiRequest"/>.</summary>
 public static class PreviewCodeApiRequestExtensions
 {
-    /// <summary>Maps the request's <c>required</c> style block to a <see cref="StyleSpec"/> directly — the wire always carries every field, so there is nothing to default.</summary>
+    /// <summary>Maps the style block to a <see cref="StyleSpec"/> directly — the wire carries every field, so there is nothing to default.</summary>
     /// <param name="request">The preview request whose style block is projected.</param>
     public static StyleSpec ToStyleSpec(this PreviewCodeApiRequest request) => request.Style.ToStyleSpec();
 }

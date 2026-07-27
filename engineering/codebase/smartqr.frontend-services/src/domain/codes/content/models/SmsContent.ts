@@ -1,6 +1,6 @@
 import { ContentType } from "../enums/ContentType";
 
-/** Represents the static sms content — a recipient phone plus optional prefilled message. */
+/** Represents sms content — opens the scanner's SMS composer addressed to the number. */
 export interface SmsContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Sms;
@@ -8,6 +8,6 @@ export interface SmsContent {
   /** The recipient phone number. */
   phone: string;
 
-  /** The optional prefilled message text. */
+  /** The message text prefilled in the composer. */
   message?: string;
 }

@@ -3,19 +3,19 @@ namespace SmartQr.Domain.Codes.Content.Calendar.Models;
 /// <summary>A calendar event — encodes to an iCalendar <c>VEVENT</c> carrying only the filled fields; dates use the basic (compact) format.</summary>
 public sealed record CalendarContent : CodeContent
 {
-    /// <summary>Event title (the only required field).</summary>
+    /// <summary>Event title.</summary>
     public required string Title { get; init; }
 
     /// <summary>Event start, with no time zone; formatted to the iCal basic form.</summary>
     public required DateTime Start { get; init; }
 
-    /// <summary>Optional event end; when present, later than the start.</summary>
+    /// <summary>Event end; later than the start when given.</summary>
     public DateTime? End { get; init; }
 
-    /// <summary>Optional location.</summary>
+    /// <summary>Event location.</summary>
     public string? Location { get; init; }
 
-    /// <summary>Optional description.</summary>
+    /// <summary>Event description.</summary>
     public string? Description { get; init; }
 
     /// <inheritdoc />

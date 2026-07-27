@@ -1,6 +1,6 @@
 import { ContentType } from "../enums/ContentType";
 
-/** Represents the static vCard contact content — only the first name is required. */
+/** Represents vCard contact content — the scanner saves it straight to their contacts. */
 export interface VCardContent {
   /** The content-type discriminator. */
   type: typeof ContentType.VCard;
@@ -8,27 +8,27 @@ export interface VCardContent {
   /** The contact's first name. */
   firstName: string;
 
-  /** The contact's optional last name. */
+  /** The contact's last name. */
   lastName?: string;
 
-  /** The contact's optional organization. */
+  /** The contact's organization. */
   org?: string;
 
-  /** The contact's optional job title. */
+  /** The contact's job title. */
   title?: string;
 
-  /** The contact's optional phone number. */
+  /** The contact's phone number. */
   phone?: string;
 
-  /** The contact's optional email address. */
+  /** The contact's email address. */
   email?: string;
 
-  /** The contact's optional website URL. */
+  /** The contact's website URL. */
   url?: string;
 
-  /** The contact's optional postal address. */
+  /** The contact's postal address. */
   address?: string;
 
-  /** The contact's optional free-text note. */
+  /** The contact's free-text note. */
   note?: string;
 }

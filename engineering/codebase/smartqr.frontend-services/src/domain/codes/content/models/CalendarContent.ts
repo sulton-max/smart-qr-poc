@@ -2,7 +2,7 @@ import { Temporal } from "temporal-polyfill";
 
 import { ContentType } from "../enums/ContentType";
 
-/** Represents the static iCalendar event content — title and start are required, the rest optional. */
+/** Represents iCalendar event content — the scanner adds the event to their calendar. */
 export interface CalendarContent {
   /** The content-type discriminator. */
   type: typeof ContentType.Calendar;
@@ -13,12 +13,12 @@ export interface CalendarContent {
   /** The event start date-time. */
   start: Temporal.PlainDateTime;
 
-  /** The optional event end date-time; when present, later than the start. */
+  /** The event end date-time; later than the start when given. */
   end?: Temporal.PlainDateTime;
 
-  /** The optional event location. */
+  /** The event location. */
   location?: string;
 
-  /** The optional event description. */
+  /** The event description. */
   description?: string;
 }
