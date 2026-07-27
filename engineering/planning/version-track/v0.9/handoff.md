@@ -41,11 +41,14 @@ Iteration 7's remaining items landed and are browser-verified end to end (guest 
 
 The UI is **last**, not next. v0.9's main focus is the model, and the model isn't swept until validation is.
 
-1. **Finish validation** — the 2 analyses in `engineering/planning/validation.md` (§ *Phase-1 placement*, § *Lower-pass placement*) need sign-off, then build.
-2. **Re-scan all models** — the sweep isn't done; validation is what closes it. Iteration 6's open validation items are the remainder.
+1. ~~**Presentation validation**~~ — **DONE 2026-07-28.** P1 ✅ P3 ✅ P2 ✅ P8 ✅ · P4 closed. All 5 error shapes verified rendering in the browser against the real API. Detail: `engineering/planning/validation.md` § *Presentation validation*. **No new mechanisms** — the in-handler resolve stayed the template (owner); the behavior route is Iteration 9.
+2. **Re-scan all models** — validation is what closes the sweep.
 3. **Routing** — CM9's model half: F1 (`Encode()` drops the `?`) + CM16 (resolve path) + `RoutingResult.Page`.
 4. **Resolve pages** — only if needed then; gated on F3.
-5. **UI redesign** — the parked follow-ups in `v0.9.md` § Iteration 7.
+5. **Iteration 8** — mode lock + copy UX (`v0.9.md`).
+6. **Iteration 9** — validation integration sweep: async validation · the pre-validation behavior · static⟹1-rule on update · lower-pass placement · concurrency tokens.
+
+**Docs corrected while reading the source:** every `CodeRuleSetValidator` invariant Iteration 6 lists as open is already implemented. The open items were stale, not pending.
 
 ## Then — 1 forked, 1 blocked
 

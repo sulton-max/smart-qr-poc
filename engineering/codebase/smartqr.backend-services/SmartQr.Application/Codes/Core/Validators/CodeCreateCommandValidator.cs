@@ -6,6 +6,9 @@ using SmartQr.Application.Codes.Rules.Validators;
 namespace SmartQr.Application.Codes.Core.Validators;
 
 /// <summary>Validates create-code input — the name, each rule with the content it carries, and the rule set as a whole.</summary>
+/// <remarks>Composes the two validators below: a member added to <see cref="CodeRule"/> or <see cref="CodeRuleSet"/> needs its rule added there, not here.</remarks>
+/// <seealso cref="CodeRuleValidator"/>
+/// <seealso cref="CodeRuleSetValidator"/>
 public sealed class CodeCreateCommandValidator : AbstractValidator<CodeCreateCommand>
 {
     /// <summary>Builds the create-code rules.</summary>
@@ -19,7 +22,6 @@ public sealed class CodeCreateCommandValidator : AbstractValidator<CodeCreateCom
         RuleForEach(command => command.Rules).SetValidator(new CodeRuleValidator());
 
         RuleFor(command => new CodeRuleSet(command.Mode, command.ContentType, command.Rules))
-            .SetValidator(new CodeRuleSetValidator())
-            .OverridePropertyName(nameof(CodeCreateCommand.Rules));
+            .SetValidator(new CodeRuleSetValidator());
     }
 }

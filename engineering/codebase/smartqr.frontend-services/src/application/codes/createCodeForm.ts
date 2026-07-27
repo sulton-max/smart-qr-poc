@@ -3,6 +3,7 @@
 
 import { z } from "zod";
 import { Temporal } from "temporal-polyfill";
+import { defaultMapFieldPath } from "@wow-two-beta/ui/forms-engine";
 
 import {
   BarcodeFormat,
@@ -180,6 +181,19 @@ export function toCopyCodeCreateUpdateApiRequest(code: CodeDto, mode: ContentMod
     style: { ...code.style },
     rules: code.rules.map((rule) => ({ ...rule })),
   };
+}
+
+// A rule's content binds as one object (`rules[0].content`) because the per-type `*Controls` are dumb
+// value/onChange groups, so no form field exists at `rules[0].content.url`. The server validates the leaf
+// and reports the leaf path, which would otherwise be filed at a path nothing subscribes to and never render.
+const ContentLeafPath = /^(rules\[\d+]\.content)\..+$/;
+
+/**
+ * Rewrites a server error path onto a bound form path — camelCase per segment, then collapses a content
+ * leaf onto the object the controls actually bind. The message lands on the right rule's content group.
+ */
+export function mapCodeFieldPath(serverPath: string): string {
+  return defaultMapFieldPath(serverPath).replace(ContentLeafPath, "$1");
 }
 
 /** Normalizes the builder request for submit — trims the name, renumbers the conditional rules, applies CM2. */

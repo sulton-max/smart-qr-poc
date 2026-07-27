@@ -16,6 +16,7 @@ import { ContentMode, type CodeDto } from "@/domain/codes";
 import {
   CreateCodeSchema,
   emptyCodeCreateUpdateApiRequest,
+  mapCodeFieldPath,
   oppositeMode,
   toCodeCreateUpdateApiRequest,
   toCopyCodeCreateUpdateApiRequest,
@@ -75,6 +76,8 @@ export function CreateCodeScreen({ codeId, copyFromId, copyMode, onBack, onSaved
   const form = useAppForm<CodeCreateUpdateApiRequest>({
     defaultValues: emptyCodeCreateUpdateApiRequest(),
     schema: CreateCodeSchema,
+    // Server field errors carry the leaf path (`Rules[0].Content.Url`); the form binds content as one object.
+    mapFieldPath: mapCodeFieldPath,
     // onSubmit is the only failure path — a thrown SDK ApiError maps to fields, the remainder to submitError.
     onSubmit: async (values) => {
       const request = toCreateCodeRequest(values);

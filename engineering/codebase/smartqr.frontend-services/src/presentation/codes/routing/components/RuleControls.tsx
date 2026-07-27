@@ -22,6 +22,30 @@ const AddRuleLabel = "Add a routing rule";
 /** Add-catch-all footer button label — only offered when the code has no catch-all. */
 const AddDefaultLabel = "Add a catch-all";
 
+/**
+ * Renders the whole-set failures the server reports against `rules` — at most one catch-all, unique orders, a
+ * live pointer target, non-empty. They belong to the list, not to any row, and `rules` is an array with no input
+ * of its own, so without this they would be filed on a known path that nothing draws and vanish.
+ */
+function RuleSetErrors({ form }: { readonly form: AppForm<CodeCreateUpdateApiRequest> }) {
+  return (
+    <form.Field name="rules">
+      {(f) =>
+        f.errors.length === 0 ? null : (
+          <ul className="flex flex-col gap-1">
+            {f.errors.map((message) => (
+              // Matches what the SDK `Field` renders for a leaf error, so a list error reads the same as a field one.
+              <li key={message} className="text-sm text-destructive">
+                {message}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </form.Field>
+  );
+}
+
 /** Defines props for the routing-rule builder — drives rule edits through `useFieldArray`. */
 export interface RuleControlsProps {
   /** The code-builder form (owns the `rules` array + the per-row field paths). */
@@ -63,6 +87,8 @@ export function RuleControls({ form, contentType }: RuleControlsProps) {
   if (isSingleDefault) {
     return (
       <div className="flex flex-col gap-4">
+        <RuleSetErrors form={form} />
+
         <rows.Field index={0} name="content">
           {(f) => <ContentTypeControls content={f.value} onChange={(next) => f.setValue(next)} />}
         </rows.Field>
@@ -87,6 +113,8 @@ export function RuleControls({ form, contentType }: RuleControlsProps) {
         <p className="text-sm font-medium">Routing rules</p>
         <p className="text-xs text-muted-foreground">Matched top-down — the first match wins</p>
       </div>
+
+      <RuleSetErrors form={form} />
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <Sortable onReorder={reorder}>
