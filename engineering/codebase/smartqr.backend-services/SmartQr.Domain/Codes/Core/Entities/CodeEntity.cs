@@ -31,8 +31,8 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
     public bool IsActive { get; set; }
 
     /// <summary>Gets or sets the JSON style descriptor of the code (foreground/background colors, module shape, logo ref).</summary>
-    /// <remarks>Raw <c>jsonb</c> string, not a CLR graph — style is applied only at render time, never queried server-side.</remarks>
-    public string StyleJson { get; set; }
+    /// <remarks>Raw <c>jsonb</c> string, not a CLR graph — style is applied only at render time, never queried server-side. Never null: an unstyled code stores <c>"{}"</c>, which reads back as <see cref="Style.Models.StyleSpec.Default"/>.</remarks>
+    public required string StyleJson { get; set; }
 
     /// <summary>Gets or sets how the code's symbol resolves. Set at create and never changed — the two modes bake different bytes.</summary>
     public ContentMode Mode { get; set; }

@@ -30,6 +30,6 @@ public sealed record CodeUpdateCommand
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
     /// <summary>Optional style to persist; null preserves the code's saved style.</summary>
-    public StyleSpec? Style { get; init; }
+    public required StyleSpec Style { get; init; }
 
 }

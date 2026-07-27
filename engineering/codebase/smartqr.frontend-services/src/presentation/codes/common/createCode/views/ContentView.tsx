@@ -52,7 +52,7 @@ export function ContentView({ form, isEdit, existingCode }: ContentViewProps) {
   // CM2: `rules.Count > 1` implies dynamic — so the picker locks rather than letting an unbakeable pair through.
   // The reverse doesn't hold: one rule stays a free choice. `toCreateCodeRequest` normalizes the sent value.
   const isModeLocked = rules.length > 1;
-  const mode = isModeLocked ? ContentMode.Dynamic : (selectedMode ?? ContentMode.Static);
+  const mode = isModeLocked ? ContentMode.Dynamic : selectedMode;
 
   return (
     <>

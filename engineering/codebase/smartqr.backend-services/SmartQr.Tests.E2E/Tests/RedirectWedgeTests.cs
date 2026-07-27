@@ -38,6 +38,7 @@ public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
             CodeRequests.ConditionalRule("Device", "Ios", new { type = "text", text = iosDestination }),
             CodeRequests.DefaultRule(new { type = "text", text = fallback }),
         },
+        style = CodeRequests.Style(),
     };
 
     [Fact]

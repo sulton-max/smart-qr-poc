@@ -19,8 +19,8 @@ public sealed record UpdateCodeApiRequest
     /// <summary>Gets the replacement routing rules (the whole set), each carrying the content it serves.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Gets the optional style to persist — omitted preserves the code's saved style.</summary>
-    public StyleApiRequest? Style { get; init; }
+    /// <summary>Gets the style to persist. Required: this is a full replace, not a patch, so the client sends the whole block.</summary>
+    public required StyleApiRequest Style { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="UpdateCodeApiRequest"/>.</summary>
@@ -37,7 +37,7 @@ public static class UpdateCodeApiRequestExtensions
             BarcodeFormat = request.BarcodeFormat,
             ContentType = request.ContentType,
             Rules = request.Rules,
-            Style = request.Style?.ToStyleSpec(),
+            Style = request.Style.ToStyleSpec(),
         };
 
         return command;

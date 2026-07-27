@@ -52,6 +52,7 @@
 | `v0.6/v0.6.md` | v0.6 (Code-rendering SDK extraction) — render engine + style contract → SDK; accordion builder + colors-panel redesign |
 | `v0.7/v0.7.md` | v0.7 (Static content and export) — **active** — static content types · barcodes UI · download/print export · builder correctness |
 | `v0.9/handoff.md` | v0.9 continuity — state (model sweep + UI redesign done, all suites green) · do-next (resolve page CM9 · blocked transition constraint) · **error ordering: decided** (resolve first) · read-seam coordination · don'ts |
+| `v0.9/review-checklist.md` | Every component the content-model v2 touched, grouped by the 9 sweep layers, with deletions per layer + a known-open list. Built from `git diff` over `8477648`→HEAD. For the owner's review pass before routing |
 | `v0.9/v0.9.md` | v0.9 (Content mode — static/dynamic) — **next Feature**. Architecture: **a rule carries content** (CM15) · CM1–CM17 · `CodeRule` hierarchy (`ConditionalRule` · `DefaultRule` · `DefaultPointerRule`, `TargetOrder`) · F1 open (`Encode()` home) · F3 open (resolve-page host) · F5 resolved (one base content type) · Iterations 1–7 (logic → content → condition → rule → code+entity → requests+serialization → forms) |
 | `v0.11/v0.11.md` | v0.11 (Interactive landing hero) — parked experiment (QR-simulation hero canvas); renumbered off v0.9 on 2026-07-18 |
 

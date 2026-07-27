@@ -65,9 +65,7 @@ public sealed class CodeCreateCommandHandler(
                 // Defaults that used to live on the entity now originate here, at creation.
                 BarcodeFormat = request.BarcodeFormat, // command defaults this to QrCode
                 IsActive = true,                       // new codes resolve immediately
-                StyleJson = request.Style is { } style  // persist the chosen style, else "{}" (→ StyleSpec.Default on read)
-                    ? StyleSpecJson.Serialize(style)
-                    : "{}",
+                StyleJson = StyleSpecJson.Serialize(request.Style), // a code always has a style; the client sends it whole
                 Mode = request.Mode,
                 ContentType = request.ContentType,
                 // The rules carry the code's content; persisted as one jsonb document via the EF value converter.

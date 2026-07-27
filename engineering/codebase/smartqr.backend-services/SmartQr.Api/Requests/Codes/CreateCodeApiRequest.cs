@@ -23,8 +23,8 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the routing rules, each carrying the content it serves. At least one is required; every rule must carry the same content type.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Gets the optional style to persist — omitted leaves the code on the default style.</summary>
-    public StyleApiRequest? Style { get; init; }
+    /// <summary>Gets the style to persist. Required: a code always has a style, so the client sends the full block rather than relying on a server default.</summary>
+    public required StyleApiRequest Style { get; init; }
 }
 
 /// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>
@@ -41,7 +41,7 @@ public static class CreateCodeApiRequestExtensions
             ContentType = request.ContentType,
             Mode = request.Mode,
             Rules = request.Rules,
-            Style = request.Style?.ToStyleSpec(),
+            Style = request.Style.ToStyleSpec(),
         };
 
         return command;

@@ -6,6 +6,19 @@ namespace SmartQr.Tests.E2E.Support;
 /// <summary>Builders for the JSON request bodies the codes endpoints accept — every rule carries the content it serves.</summary>
 public static class CodeRequests
 {
+    /// <summary>The full style block every create/update body carries — style is <c>required</c>: a code always has one.</summary>
+    public static object Style() => new
+    {
+        foregroundColor = "#000000",
+        backgroundColor = "#FFFFFF",
+        transparentBackground = false,
+        eccLevel = "Q",
+        quietZoneModules = 4,
+        moduleShape = "square",
+        finderShape = "square",
+        finderDotShape = "square",
+    };
+
     /// <summary>A static url create body — one default rule carrying the url content. Static content bakes its payload; the code never reaches the redirect.</summary>
     public static object StaticUrl(string name, string destination) => new
     {
@@ -14,6 +27,7 @@ public static class CodeRequests
         mode = "static",
         contentType = "url",
         rules = new object[] { DefaultRule(new { type = "url", url = destination }) },
+        style = Style(),
     };
 
     /// <summary>A dynamic url create body — the given conditional rules plus a default catch-all, each carrying url content.</summary>
@@ -24,6 +38,7 @@ public static class CodeRequests
         mode = "dynamic",
         contentType = "url",
         rules = (rules ?? []).Append(DefaultRule(new { type = "url", url = destination })).ToArray(),
+        style = Style(),
     };
 
     /// <summary>A create/update body carrying one default rule with typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>).</summary>
@@ -34,6 +49,7 @@ public static class CodeRequests
         mode = "static",
         contentType,
         rules = new object[] { DefaultRule(content) },
+        style = Style(),
     };
 
     /// <summary>A conditional routing rule carrying the content it serves.</summary>

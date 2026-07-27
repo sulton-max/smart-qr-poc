@@ -31,6 +31,6 @@ public sealed record CodeCreateCommand
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
     /// <summary>Optional style to persist; null leaves the code on the default style.</summary>
-    public StyleSpec? Style { get; init; }
+    public required StyleSpec Style { get; init; }
 
 }

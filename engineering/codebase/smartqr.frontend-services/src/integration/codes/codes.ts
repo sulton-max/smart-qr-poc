@@ -1,6 +1,11 @@
 import type { CodeDto, ImageFormat } from "@/domain/codes/common";
 import { API_BASE, problemError, readData } from "../common/client";
-import type { CodeCreateUpdateApiRequest, CodePreviewApiRequest, CodeSetActiveApiRequest } from "./models";
+import type {
+  CodeCreateUpdateApiRequest,
+  CodePreviewApiRequest,
+  CodeSetActiveApiRequest,
+  CodeUpdateApiRequest,
+} from "./models";
 
 /** The codes API client — code CRUD, image URLs, and the server-rendered live preview. */
 export const codesApiClient = {
@@ -38,8 +43,8 @@ export const codesApiClient = {
     return readData<CodeDto>(res);
   },
 
-  /** Replaces a code in full; slug, scan count, and creation time are server-preserved. */
-  async update(id: string, request: CodeCreateUpdateApiRequest): Promise<CodeDto> {
+  /** Replaces a code in full; slug, scan count, creation time — and `mode` (CM3) — are server-preserved. */
+  async update(id: string, request: CodeUpdateApiRequest): Promise<CodeDto> {
     const res = await fetch(`${API_BASE}/api/codes/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

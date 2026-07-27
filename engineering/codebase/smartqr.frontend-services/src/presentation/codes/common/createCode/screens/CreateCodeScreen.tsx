@@ -21,6 +21,7 @@ import {
   toCodeCreateUpdateApiRequest,
   toCopyCodeCreateUpdateApiRequest,
   toCreateCodeRequest,
+  toUpdateCodeRequest,
 } from "@/application/codes";
 import { codesApiClient, type CodeCreateUpdateApiRequest } from "@/integration/codes";
 import { useAppForm } from "@/form";
@@ -80,8 +81,9 @@ export function CreateCodeScreen({ codeId, copyFromId, copyMode, onBack, onSaved
     mapFieldPath: mapCodeFieldPath,
     // onSubmit is the only failure path — a thrown SDK ApiError maps to fields, the remainder to submitError.
     onSubmit: async (values) => {
-      const request = toCreateCodeRequest(values);
-      const dto = codeId ? await codesApiClient.update(codeId, request) : await codesApiClient.create(request);
+      const dto = codeId
+        ? await codesApiClient.update(codeId, toUpdateCodeRequest(values))
+        : await codesApiClient.create(toCreateCodeRequest(values));
       setSaved(dto);
       setExistingCode(dto);
       onSaved?.();
@@ -217,7 +219,7 @@ export function CreateCodeScreen({ codeId, copyFromId, copyMode, onBack, onSaved
                     <form.Subscribe selector={(s) => s.values.mode}>
                       {(mode) => (
                       <PreviewView
-                        previewMode={existingCode?.mode ?? mode ?? ContentMode.Static}
+                        previewMode={mode}
                         previewRules={rules}
                         previewBarcodeFormat={barcodeFormat}
                         previewStyle={style}

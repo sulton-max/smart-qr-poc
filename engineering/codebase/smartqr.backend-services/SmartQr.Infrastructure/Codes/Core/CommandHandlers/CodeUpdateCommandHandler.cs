@@ -35,11 +35,8 @@ public sealed class CodeUpdateCommandHandler(
             code.Name = request.Name;
             code.BarcodeFormat = request.BarcodeFormat;
 
-            // Persist style only when the request carries one — an omitted block preserves the saved style.
-            if (request.Style is { } style)
-                code.StyleJson = StyleSpecJson.Serialize(style);
-
-            // Persist content only when the request carries it — an omitted block preserves saved content (mirrors style).
+            // Full replace: the request always carries the whole style block, so there is nothing to preserve.
+            code.StyleJson = StyleSpecJson.Serialize(request.Style);
 
             // Full replace of the rule set; mode is absent from the update contract, so it can never change.
             code.ContentType = request.ContentType;

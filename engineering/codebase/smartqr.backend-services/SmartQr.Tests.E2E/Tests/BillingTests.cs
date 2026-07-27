@@ -321,6 +321,7 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
             mode = "dynamic",
             contentType = "text",
             rules = new object[] { CodeRequests.DefaultRule(new { type = "text", text = destination }) },
+            style = CodeRequests.Style(),
         })).ReadEnvelopeAsync<CodeDtoModel>();
 
         // Sanity: it resolves on the Redirect host while subscribed. Compare as Uri — a bare host canonicalises to a trailing slash.

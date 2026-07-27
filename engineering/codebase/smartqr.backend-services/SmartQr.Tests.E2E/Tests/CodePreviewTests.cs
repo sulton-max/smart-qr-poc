@@ -211,6 +211,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             mode = "dynamic",
             contentType = "url",
             rules = Rules(new { type = "url", url = "https://example.com" }),
+            style = DefaultStyle(),
         }));
         createResponse.EnsureSuccessStatusCode();
         using var created = System.Text.Json.JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
@@ -363,6 +364,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
             mode = "static",
             contentType = "wifi",
             rules = Rules(wifi),
+            style = DefaultStyle(),
         }));
         createResponse.EnsureSuccessStatusCode();
         using var created = System.Text.Json.JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());

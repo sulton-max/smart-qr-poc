@@ -6,6 +6,7 @@ using SmartQr.Domain.Codes.Content.Text.Models;
 using SmartQr.Domain.Codes.Content.Url.Models;
 using SmartQr.Domain.Codes.Core.Enums;
 using SmartQr.Domain.Codes.Rules.Models;
+using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Tests.Unit;
 
@@ -25,6 +26,7 @@ public class CodeValidationPathTests
         ContentType = CodeContentType.Url,
         Mode = mode,
         Rules = rules,
+        Style = StyleSpec.Default,
     };
 
     private static ConditionalRule Conditional(int order, string url) => new()
