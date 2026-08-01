@@ -4,6 +4,9 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Folder Name="/docs/">
+    <File Path="review-checklist.md" />
+  </Folder>
   <Folder Name="/services/">
     <Project Path="SmartQr.Api/SmartQr.Api.csproj" />
     <Project Path="SmartQr.Application/SmartQr.Application.csproj" />

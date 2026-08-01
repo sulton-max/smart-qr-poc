@@ -42,7 +42,7 @@ Iteration 7's remaining items landed and are browser-verified end to end (guest 
 The UI is **last**, not next. v0.9's main focus is the model, and the model isn't swept until validation is.
 
 1. ~~**Presentation validation**~~ — **DONE 2026-07-28.** P1 ✅ P3 ✅ P2 ✅ P8 ✅ · P4 closed. All 5 error shapes verified rendering in the browser against the real API. Detail: `engineering/planning/validation.md` § *Presentation validation*. **No new mechanisms** — the in-handler resolve stayed the template (owner); the behavior route is Iteration 9.
-2. **Re-scan all models** — validation is what closes the sweep.
+2. ~~**Re-scan all models**~~ — **DONE 2026-07-28.** Shapes verified symmetric; 2 defects fixed. What's left is how they *read* → **Iteration 7.5** (current): model type comments → type names (`*ValueObject`) → member comments/names, each staged and committed separately.
 3. **Routing** — CM9's model half: F1 (`Encode()` drops the `?`) + CM16 (resolve path) + `RoutingResult.Page`.
 4. **Resolve pages** — only if needed then; gated on F3.
 5. **Iteration 8** — mode lock + copy UX (`v0.9.md`).
