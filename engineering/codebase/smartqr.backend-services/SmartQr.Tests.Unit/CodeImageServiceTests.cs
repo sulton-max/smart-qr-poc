@@ -34,9 +34,9 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Static_code_bakes_its_content_payload_into_the_symbol()
     {
-        // The backend encodes the payload from the typed content (WifiContent.Encode()), not a client-baked string.
+        // The backend encodes the payload from the typed content (WifiContentValueObject.Encode()), not a client-baked string.
         const string payload = "WIFI:T:WPA;S:CoffeeShop;P:latte123;;";
-        var code = Code(content: new WifiContent { Ssid = "CoffeeShop", Password = "latte123", Encryption = WifiEncryption.Wpa });
+        var code = Code(content: new WifiContentValueObject { Ssid = "CoffeeShop", Password = "latte123", Encryption = WifiEncryption.Wpa });
 
         var png = _service.Render(code, ImageFormat.Png);
 

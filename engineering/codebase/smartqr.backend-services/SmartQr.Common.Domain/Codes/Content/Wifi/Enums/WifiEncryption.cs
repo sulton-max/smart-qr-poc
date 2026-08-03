@@ -1,6 +1,6 @@
 namespace SmartQr.Common.Domain.Codes.Content.Wifi.Enums;
 
-/// <summary>Defines the Wi-Fi encryption scheme a network uses — the <c>T:</c> field of the WIFI payload.</summary>
+/// <summary>Defines the authentication scheme a Wi-Fi network runs.</summary>
 public enum WifiEncryption
 {
     /// <summary>Represents WPA / WPA2 / WPA3 personal.</summary>

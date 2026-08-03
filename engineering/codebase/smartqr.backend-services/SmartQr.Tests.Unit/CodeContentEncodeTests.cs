@@ -63,26 +63,26 @@ public sealed class CodeContentEncodeTests
     {
         Assert.Equal(
             "WIFI:T:WPA;S:Cafe;P:p@ss;;",
-            new WifiContent { Ssid = "Cafe", Password = "p@ss", Encryption = WifiEncryption.Wpa }.Encode());
+            new WifiContentValueObject { Ssid = "Cafe", Password = "p@ss", Encryption = WifiEncryption.Wpa }.Encode());
 
         // Reserved chars in SSID / password are backslash-escaped.
         Assert.Equal(
             "WIFI:T:WPA;S:My\\;Net;P:a\\\"b\\,c;;",
-            new WifiContent { Ssid = "My;Net", Password = "a\"b,c", Encryption = WifiEncryption.Wpa }.Encode());
+            new WifiContentValueObject { Ssid = "My;Net", Password = "a\"b,c", Encryption = WifiEncryption.Wpa }.Encode());
 
         Assert.Equal(
             "WIFI:T:nopass;S:Open;;",
-            new WifiContent { Ssid = "Open", Encryption = WifiEncryption.None }.Encode());
+            new WifiContentValueObject { Ssid = "Open", Encryption = WifiEncryption.None }.Encode());
 
         Assert.Equal(
             "WIFI:T:WPA;S:Hid;P:x;H:true;;",
-            new WifiContent { Ssid = "Hid", Password = "x", Encryption = WifiEncryption.Wpa, Hidden = true }.Encode());
+            new WifiContentValueObject { Ssid = "Hid", Password = "x", Encryption = WifiEncryption.Wpa, Hidden = true }.Encode());
     }
 
     [Fact]
     public void Wifi_wep_encryption_encodes_the_wep_token()
     {
-        Assert.Equal("WIFI:T:WEP;S:Net;P:pw;;", new WifiContent { Ssid = "Net", Password = "pw", Encryption = WifiEncryption.Wep }.Encode());
+        Assert.Equal("WIFI:T:WEP;S:Net;P:pw;;", new WifiContentValueObject { Ssid = "Net", Password = "pw", Encryption = WifiEncryption.Wep }.Encode());
     }
 
     [Fact]

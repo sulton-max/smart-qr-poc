@@ -27,7 +27,7 @@ public sealed class CodeContentJsonTests
         { new SmsContent { Phone = "+15550100", Message = "hey" }, "sms" },
         { new PhoneContent { Phone = "+15550100" }, "phone" },
         { new GeoContent { Latitude = 41.31, Longitude = 69.24 }, "geo" },
-        { new WifiContent { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa, Hidden = true }, "wifi" },
+        { new WifiContentValueObject { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa, Hidden = true }, "wifi" },
         { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
         { new CalendarContent { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) }, "calendar" },
     };
@@ -62,7 +62,7 @@ public sealed class CodeContentJsonTests
 
         var restored = CodeContentJson.Deserialize(reordered);
 
-        var wifi = Assert.IsType<WifiContent>(restored);
+        var wifi = Assert.IsType<WifiContentValueObject>(restored);
         Assert.Equal("Cafe", wifi.Ssid);
         Assert.Equal(WifiEncryption.Wpa, wifi.Encryption);
         Assert.True(wifi.Hidden);

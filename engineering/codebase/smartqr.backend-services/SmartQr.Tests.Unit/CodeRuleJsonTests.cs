@@ -66,7 +66,7 @@ public sealed class CodeRuleJsonTests
                 Order = 1,
                 Condition = RuleConditionType.Country,
                 ConditionValue = "UZ",
-                Content = new WifiContent { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa },
+                Content = new WifiContentValueObject { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa },
             },
             new DefaultPointerRule { TargetOrder = 1 },
         ];
@@ -79,7 +79,7 @@ public sealed class CodeRuleJsonTests
     [Fact]
     public void Nested_content_keeps_its_own_discriminator()
     {
-        var rule = new DefaultRule { Content = new WifiContent { Ssid = "Cafe", Encryption = WifiEncryption.Wpa } };
+        var rule = new DefaultRule { Content = new WifiContentValueObject { Ssid = "Cafe", Encryption = WifiEncryption.Wpa } };
 
         var json = CodeRuleJson.Serialize([rule]);
 

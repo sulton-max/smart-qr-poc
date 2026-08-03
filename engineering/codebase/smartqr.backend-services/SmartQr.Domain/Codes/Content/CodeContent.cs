@@ -23,7 +23,7 @@ public abstract record CodeContent
         (CodeContentType.Sms, typeof(Sms.Models.SmsContent)),
         (CodeContentType.Phone, typeof(Phone.Models.PhoneContent)),
         (CodeContentType.Geo, typeof(Geo.Models.GeoContent)),
-        (CodeContentType.Wifi, typeof(Wifi.Models.WifiContent)),
+        (CodeContentType.Wifi, typeof(Wifi.Models.WifiContentValueObject)),
         (CodeContentType.VCard, typeof(VCard.Models.VCardContent)),
         (CodeContentType.Calendar, typeof(Calendar.Models.CalendarContent)));
 

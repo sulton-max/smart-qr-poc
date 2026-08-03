@@ -5,7 +5,7 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates Wi-Fi join credentials.</summary>
-public sealed class WifiContentValidator : AbstractValidator<WifiContent>
+public sealed class WifiContentValidator : AbstractValidator<WifiContentValueObject>
 {
     /// <summary>Builds the wifi-content rules.</summary>
     public WifiContentValidator()
