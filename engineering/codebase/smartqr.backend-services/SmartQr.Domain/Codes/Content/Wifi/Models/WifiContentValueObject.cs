@@ -19,5 +19,5 @@ public sealed record WifiContentValueObject : CodeContent
     public bool Hidden { get; init; }
 
     /// <inheritdoc />
-    public override string Encode() => Encryption.ToPayload(Ssid, Password, Hidden);
+    public override string Encode() => this.ToPayload();
 }

@@ -24,7 +24,7 @@ public sealed class CodeContentJsonTests
         { new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }, "mobileApp" },
         { new TextContent { Text = "hi there" }, "text" },
         { new EmailContent { To = "a@b.com", Subject = "Hi" }, "email" },
-        { new SmsContent { Phone = "+15550100", Message = "hey" }, "sms" },
+        { new SmsContentValueObject { Phone = "+15550100", Message = "hey" }, "sms" },
         { new PhoneContent { Phone = "+15550100" }, "phone" },
         { new GeoContent { Latitude = 41.31, Longitude = 69.24 }, "geo" },
         { new WifiContentValueObject { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa, Hidden = true }, "wifi" },

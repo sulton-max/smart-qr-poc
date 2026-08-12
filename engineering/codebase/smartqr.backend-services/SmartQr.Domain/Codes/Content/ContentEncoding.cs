@@ -15,7 +15,8 @@ public static partial class ContentEncoding
     public static string Clean(string? value) => (value ?? string.Empty).Trim();
 
     /// <summary>Escapes the reserved characters in a <c>WIFI:</c> payload segment (<c>\ ; , : "</c>) — mirrors <c>escWifi</c>.</summary>
-    public static string EscapeWifi(string value) => WifiReserved().Replace(value, @"\$1");
+    /// <remarks>Null-normalizes but does not trim, unlike <see cref="Clean"/> — a leading or trailing space is legal in an SSID and in a key.</remarks>
+    public static string EscapeWifi(string? value) => WifiReserved().Replace(value ?? string.Empty, @"\$1");
 
     /// <summary>Escapes a vCard / iCal property value (<c>\ ; ,</c> plus newlines → literal <c>\n</c>) — mirrors <c>escIcal</c>.</summary>
     public static string EscapeICal(string value)

@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Content.Sms.Models;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates a pre-filled SMS.</summary>
-public sealed class SmsContentValidator : AbstractValidator<SmsContent>
+public sealed class SmsContentValidator : AbstractValidator<SmsContentValueObject>
 {
     /// <summary>Builds the sms-content rules.</summary>
     public SmsContentValidator() =>

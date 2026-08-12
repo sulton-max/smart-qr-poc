@@ -20,7 +20,7 @@ public abstract record CodeContent
         (CodeContentType.MobileApp, typeof(MobileApp.Models.MobileAppLinkContent)),
         (CodeContentType.Text, typeof(Text.Models.TextContent)),
         (CodeContentType.Email, typeof(Email.Models.EmailContent)),
-        (CodeContentType.Sms, typeof(Sms.Models.SmsContent)),
+        (CodeContentType.Sms, typeof(Sms.Models.SmsContentValueObject)),
         (CodeContentType.Phone, typeof(Phone.Models.PhoneContent)),
         (CodeContentType.Geo, typeof(Geo.Models.GeoContent)),
         (CodeContentType.Wifi, typeof(Wifi.Models.WifiContentValueObject)),
