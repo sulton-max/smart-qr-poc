@@ -32,7 +32,8 @@ public sealed class CodeRepository(AppDbContext db) : ICodeRepository
 
         if (!string.IsNullOrWhiteSpace(q))
         {
-            // Lower-case both sides → SQL lower() — reliably case-insensitive on PG and SQLite (raw LIKE is case-sensitive on PG).
+            // Lower-case both sides → SQL lower() — reliably case-insensitive on PG and SQLite (raw LIKE is
+            // case-sensitive on PG).
             var term = q.Trim().ToLowerInvariant();
             query = query.Where(c => c.Name.ToLower().Contains(term));
         }

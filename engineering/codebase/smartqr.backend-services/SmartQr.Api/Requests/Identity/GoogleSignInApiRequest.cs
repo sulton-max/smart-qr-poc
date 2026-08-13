@@ -12,7 +12,7 @@ public sealed record GoogleSignInApiRequest
 /// <summary>Provides mapping for <see cref="GoogleSignInApiRequest"/>.</summary>
 public static class GoogleSignInApiRequestExtensions
 {
-    /// <summary>Maps the request to its <see cref="GoogleSignInCommand"/>, carrying the caller's guest id (when present) for the claim step.</summary>
+    /// <summary>Maps the request to its <see cref="GoogleSignInCommand"/>, carrying the caller's guest id.</summary>
     public static GoogleSignInCommand ToCommand(this GoogleSignInApiRequest request, Guid? guestId) =>
         new() { IdToken = request.IdToken, GuestId = guestId };
 }

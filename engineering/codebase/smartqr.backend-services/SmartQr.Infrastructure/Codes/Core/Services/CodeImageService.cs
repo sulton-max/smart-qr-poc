@@ -11,7 +11,7 @@ using SmartQr.Domain.Codes.Rules;
 
 namespace SmartQr.Infrastructure.Codes.Core.Services;
 
-/// <summary>Builds the code's short URL and renders it via the code generation library, applying the code's persisted style.</summary>
+/// <summary>Builds the code's short URL and renders it with the code's persisted style.</summary>
 public sealed class CodeImageService(ICodeRenderer renderer, ApiSettings settings) : ICodeImageService
 {
     /// <inheritdoc />

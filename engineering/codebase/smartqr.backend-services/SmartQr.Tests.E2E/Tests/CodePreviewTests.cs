@@ -6,17 +6,12 @@ using SmartQr.Tests.E2E.Harness;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E for the stateless preview endpoint — styled SVG rendered live from the request, no persistence, anonymous-allowed.</summary>
-/// <remarks>
-/// The wire <c>style</c> block is <c>required</c> (every field): the builder always sends the full style, so each test
-/// supplies all fields and overrides only what it asserts on. A missing field fails binding (400) — see
-/// <see cref="Preview_MissingRequiredStyleField_Returns400"/>. The preview payload derives from <c>mode</c> + <c>rules</c>
-/// (there is no <c>value</c> field): a static text rule bakes its text verbatim, so it reproduces any exact payload.
-/// </remarks>
+/// <summary>E2E for the stateless preview endpoint — styled SVG rendered live, no persistence, anonymous.</summary>
+/// <remarks>The <c>style</c> block is <c>required</c> in full — override only the fields under test.</remarks>
 [Collection(AppCollection.Name)]
 public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
 {
-    /// <summary>The full default style block (solid black on white, ECC Q, quiet zone 4, square geometry, no logo) — the square/default baseline every test starts from and selectively overrides.</summary>
+    /// <summary>The full default style block — solid black on white, ECC Q, quiet zone 4, square, no logo.</summary>
     private static Dictionary<string, object?> DefaultStyle() => new()
     {
         ["foregroundColor"] = "#000000",
@@ -30,7 +25,7 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         ["finderDotShape"] = "square",
     };
 
-    /// <summary>Clones the default style and applies the given field overrides — keeps each test's inputs full while spotlighting the fields under test.</summary>
+    /// <summary>Clones the default style and applies the given field overrides.</summary>
     private static Dictionary<string, object?> StyleWith(params (string Key, object? Value)[] overrides)
     {
         var style = DefaultStyle();
@@ -39,10 +34,10 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         return style;
     }
 
-    /// <summary>A static preview rule set of one default rule carrying <paramref name="content"/> — the preview bakes the content's payload.</summary>
+    /// <summary>A static preview rule set of one default rule carrying <paramref name="content"/>.</summary>
     private static object[] Rules(object content) => [new { type = "default", content }];
 
-    /// <summary>A static preview rule set that bakes <paramref name="text"/> verbatim — reproduces an arbitrary payload the way the retired <c>value</c> field did.</summary>
+    /// <summary>A static preview rule set that bakes <paramref name="text"/> verbatim into the payload.</summary>
     private static object[] TextRules(string text) => [new { type = "default", content = new { type = "text", text } }];
 
     [Fact]
@@ -184,7 +179,8 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
     [Fact]
     public async Task Preview_MissingRequiredStyleField_Returns400()
     {
-        // The style block is required and every field is required: dropping one (here eccLevel) must fail binding (400).
+        // The style block is required and every field is required: dropping one (here eccLevel) must fail binding
+        // (400).
         var partial = DefaultStyle();
         partial.Remove("eccLevel");
 

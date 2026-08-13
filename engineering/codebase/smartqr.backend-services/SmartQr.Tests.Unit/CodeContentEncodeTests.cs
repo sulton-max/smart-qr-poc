@@ -24,8 +24,16 @@ public sealed class CodeContentEncodeTests
         // url / mobileApp carry the redirect short link, not a baked payload → Encode() is null, IsStatic false.
         Assert.Null(new UrlContent { Url = "https://x.io" }.Encode());
         Assert.False(new UrlContent { Url = "https://x.io" }.IsStatic);
-        Assert.Null(new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }.Encode());
-        Assert.False(new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }.IsStatic);
+        Assert.Null(new MobileAppLinkContent
+        {
+            Store = MobileAppStoreType.AppStore,
+            Url = "https://apps.apple.com/a"
+        }.Encode());
+        Assert.False(new MobileAppLinkContent
+        {
+            Store = MobileAppStoreType.AppStore,
+            Url = "https://apps.apple.com/a"
+        }.IsStatic);
     }
 
     [Fact]
@@ -40,7 +48,9 @@ public sealed class CodeContentEncodeTests
     {
         Assert.Equal("tel:+15550100", new PhoneContent { Phone = "+15550100" }.Encode());
         Assert.Equal("SMSTO:+15550100", new SmsContentValueObject { Phone = "+15550100" }.Encode());
-        Assert.Equal("SMSTO:+15550100:hey", new SmsContentValueObject { Phone = "+15550100", Message = "hey" }.Encode());
+        Assert.Equal(
+            "SMSTO:+15550100:hey",
+            new SmsContentValueObject { Phone = "+15550100", Message = "hey" }.Encode());
     }
 
     [Fact]
@@ -68,7 +78,12 @@ public sealed class CodeContentEncodeTests
         // Reserved chars in SSID / password are backslash-escaped.
         Assert.Equal(
             "WIFI:T:WPA;S:My\\;Net;P:a\\\"b\\,c;;",
-            new WifiContentValueObject { Ssid = "My;Net", Password = "a\"b,c", Encryption = WifiEncryption.Wpa }.Encode());
+            new WifiContentValueObject
+            {
+                Ssid = "My;Net",
+                Password = "a\"b,c",
+                Encryption = WifiEncryption.Wpa
+            }.Encode());
 
         Assert.Equal(
             "WIFI:T:nopass;S:Open;;",
@@ -76,13 +91,21 @@ public sealed class CodeContentEncodeTests
 
         Assert.Equal(
             "WIFI:T:WPA;S:Hid;P:x;H:true;;",
-            new WifiContentValueObject { Ssid = "Hid", Password = "x", Encryption = WifiEncryption.Wpa, Hidden = true }.Encode());
+            new WifiContentValueObject
+            {
+                Ssid = "Hid",
+                Password = "x",
+                Encryption = WifiEncryption.Wpa,
+                Hidden = true
+            }.Encode());
     }
 
     [Fact]
     public void Wifi_wep_encryption_encodes_the_wep_token()
     {
-        Assert.Equal("WIFI:T:WEP;S:Net;P:pw;;", new WifiContentValueObject { Ssid = "Net", Password = "pw", Encryption = WifiEncryption.Wep }.Encode());
+        Assert.Equal(
+            "WIFI:T:WEP;S:Net;P:pw;;",
+            new WifiContentValueObject { Ssid = "Net", Password = "pw", Encryption = WifiEncryption.Wep }.Encode());
     }
 
     [Fact]

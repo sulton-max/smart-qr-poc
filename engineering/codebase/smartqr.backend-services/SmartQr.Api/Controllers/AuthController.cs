@@ -15,9 +15,12 @@ namespace SmartQr.Api.Controllers;
 /// <summary>Handles authentication — Google sign-in and sign-out.</summary>
 [ApiController]
 [Route("api/auth")]
-public sealed class AuthController(ISender sender, ICurrentUser currentUser, IGuestSession guestSession) : ControllerBase
+public sealed class AuthController(
+    ISender sender,
+    ICurrentUser currentUser,
+    IGuestSession guestSession) : ControllerBase
 {
-    /// <summary>Signs in with a Google ID token, claiming the caller's guest codes and issuing the session cookie.</summary>
+    /// <summary>Signs in with a Google ID token, claiming the guest's codes and issuing the session cookie.</summary>
     [HttpPost("google")]
     [ProducesResponseType<ApiResponse<CurrentUserDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -39,7 +42,7 @@ public sealed class AuthController(ISender sender, ICurrentUser currentUser, IGu
             fail => Task.FromResult<IActionResult>(this.ToProblem(fail.Error)));
     }
 
-    /// <summary>Signs out — clears both the session cookie and the guest cookie, returning the caller to anonymous.</summary>
+    /// <summary>Signs out — clears the session and guest cookies, returning the caller to anonymous.</summary>
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout()
@@ -60,6 +63,8 @@ public sealed class AuthController(ISender sender, ICurrentUser currentUser, IGu
         ];
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+        return HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identity));
     }
 }

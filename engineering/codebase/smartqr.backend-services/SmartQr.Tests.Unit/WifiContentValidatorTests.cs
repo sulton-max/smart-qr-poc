@@ -5,7 +5,7 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 namespace SmartQr.Tests.Unit;
 
 /// <summary>Proves the password rule is gated on the encryption scheme, in both directions.</summary>
-/// <remarks>The gate is a trailing <c>When</c>, which FluentValidation applies to every validator in that <c>RuleFor</c> — a test is cheaper than re-deriving that each time the rule is read.</remarks>
+/// <remarks>The trailing <c>When</c> applies to every validator in that <c>RuleFor</c>.</remarks>
 public sealed class WifiContentValidatorTests
 {
     private readonly WifiContentValidator _validator = new();

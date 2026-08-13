@@ -9,7 +9,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>Handles <see cref="BillingPortalCommand"/> — opens a Customer Portal session from the caller's stored Stripe customer id.</summary>
+/// <summary>Handles <see cref="BillingPortalCommand"/> — opens a Customer Portal session for the caller.</summary>
 public sealed class BillingPortalCommandHandler(
     ISubscriptionRepository subscriptions,
     IBillingBroker gateway,
@@ -31,7 +31,8 @@ public sealed class BillingPortalCommandHandler(
 
             var url = await gateway.CreatePortalSessionAsync(subscription.StripeCustomerId, settings.CancelUrl, ct);
 
-            return AppResult<BillingPortalResult.Success>.Ok(new BillingPortalResult.Success(new PortalSessionDto { Url = url }));
+            return AppResult<BillingPortalResult.Success>.Ok(
+            new BillingPortalResult.Success(new PortalSessionDto { Url = url }));
         }
         catch (Exception ex)
         {

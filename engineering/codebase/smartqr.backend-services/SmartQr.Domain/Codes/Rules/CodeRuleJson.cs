@@ -5,11 +5,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Domain.Codes.Rules;
 
-/// <summary>
-/// (De)serializes a code's polymorphic <see cref="CodeRule"/> list to/from its <c>rules</c> jsonb document. The
-/// single options object shared by the EF value converter and any manual (de)serialization; it binds both unions,
-/// since every rule carries a <see cref="CodeContent"/>.
-/// </summary>
+/// <summary>(De)serializes a code's <see cref="CodeRule"/> list to/from its <c>rules</c> jsonb document.</summary>
 public static class CodeRuleJson
 {
     /// <summary>The shared serializer options — jsonb defaults plus the rule and content subtype bindings.</summary>

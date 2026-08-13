@@ -6,7 +6,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E auth flow — Google sign-in (find-or-create), guest-code claim, cross-device ownership, and sign-out, with Google verification stubbed.</summary>
+/// <summary>E2E auth — Google sign-in (find-or-create), guest-code claim, cross-device ownership, sign-out.</summary>
 [Collection(AppCollection.Name)]
 public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -95,8 +95,10 @@ public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
         cookies!.Should().Contain(c => c.StartsWith($"{AppFixture.AuthCookieName}=;", StringComparison.Ordinal));
     }
 
-    /// <summary>Signs in with the fake Google token from a given client (default: a fresh anonymous one) and returns a client carrying the issued session cookie.</summary>
-    private async Task<(HttpResponseMessage Response, HttpClient Authed)> SignInAsync(string idToken, HttpClient? from = null)
+    /// <summary>Signs in with the fake Google token and returns a client carrying the session cookie.</summary>
+    private async Task<(
+        HttpResponseMessage Response,
+        HttpClient Authed)> SignInAsync(string idToken, HttpClient? from = null)
     {
         var client = from ?? AnonymousClient;
         var response = await client.PostJsonAsync("/api/auth/google", new { idToken });

@@ -9,7 +9,7 @@ using SmartQr.Redirect.Api.Infrastructure.Routing;
 namespace SmartQr.Tests.Unit;
 
 /// <summary>Proves the routing engine — first-match-wins, the optional catch-all, and active gating.</summary>
-/// <remarks>Carry <see cref="PhoneContent"/> in a rule to exercise a Redirect: url / mobileApp content encodes to null.</remarks>
+/// <remarks>Carry <see cref="PhoneContent"/> in a rule to exercise a Redirect — url content encodes to null.</remarks>
 public class RoutingServiceTests
 {
     private readonly RoutingService _routingService = new();

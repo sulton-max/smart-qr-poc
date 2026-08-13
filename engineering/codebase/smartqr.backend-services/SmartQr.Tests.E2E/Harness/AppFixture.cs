@@ -27,7 +27,7 @@ using BillingPricesSettings = SmartQr.Application.Settings.BillingPricesSettings
 
 namespace SmartQr.Tests.E2E.Harness;
 
-/// <summary>Boots the Api and Redirect hosts over one shared Postgres container via the SDK <see cref="MultiHostFixture"/>; Respawn resets data tables (except <c>migration_history</c>) between tests.</summary>
+/// <summary>Boots the Api and Redirect hosts over a shared Postgres container, Respawn-reset between tests.</summary>
 public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
 {
     /// <summary>Name of the identity cookie the Api host sets on guest provisioning.</summary>
@@ -36,10 +36,10 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
     /// <summary>Name of the session cookie the Api host sets on Google sign-in.</summary>
     public const string AuthCookieName = "sqr-auth";
 
-    /// <summary>Stable redirect base for each code's <c>shortUrl</c> (set via <c>REDIRECT_BASE_URL</c>) so assertions are port-independent.</summary>
+    /// <summary>Stable redirect base for each code's <c>shortUrl</c>, set via <c>REDIRECT_BASE_URL</c>.</summary>
     public const string RedirectBaseUrl = "https://redirect.smartqr.test";
 
-    /// <summary>Fake Stripe price id wired into the Api host for the Solo plan (the inverse <c>Billing:Prices</c> map resolves it back to <see cref="WoW.Two.Sdk.Backend.Beta"/>-free Solo).</summary>
+    /// <summary>Fake Stripe price id wired into the Api host for the Solo plan.</summary>
     public const string PriceSolo = "price_solo";
 
     /// <summary>Fake Stripe price id wired into the Api host for the Pro plan.</summary>
@@ -50,7 +50,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
 
     private readonly PostgresFixture _postgres;
 
-    /// <summary>The fake Stripe broker wired into the Api host — set <see cref="FakeBillingBroker.NextEvent"/> to drive a webhook, read its captured last-call fields after a checkout/portal. No real Stripe.</summary>
+    /// <summary>The fake Stripe broker wired into the Api host — no network; tests stage its responses.</summary>
     public FakeBillingBroker Gateway { get; } = new();
 
     /// <summary>The shared Postgres fixture (container and Respawn).</summary>
@@ -62,15 +62,18 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
     /// <summary>The redirect (hot-path) host.</summary>
     public WebApiTestHost<RedirectProgram> RedirectHost { get; }
 
-    /// <summary>Registers the shared container and both hosts; they build during <see cref="MultiHostFixture.StartAsync"/>.</summary>
+    /// <summary>Registers the shared container and both hosts.</summary>
     public AppFixture()
     {
-        _postgres = AddSharedFixture(new PostgresFixture(new PostgreSqlBuilder().WithImage("postgres:16-alpine").Build()));
+        _postgres = AddSharedFixture(
+            new PostgresFixture(new PostgreSqlBuilder().WithImage("postgres:16-alpine").Build()));
 
         ApiHost = AddHost(new WebApiTestHost<ApiProgram>
         {
-            // The SDK host has no connection-string knob — inject it the way the app reads it (DatabaseOptions:ConnectionString).
-            // The hook runs at build time (after the container has started), so the connection string is available; it mirrors the DB_CONNECTION env seam.
+            // The SDK host has no connection-string knob — inject it the way the app reads it
+            // (DatabaseOptions:ConnectionString).
+            // The hook runs at build time (after the container has started), so the connection string is available; it
+            // mirrors the DB_CONNECTION env seam.
             ConfigureHostHook = builder => builder.ConfigureAppConfiguration((_, config) =>
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
@@ -114,12 +117,13 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
     public HttpClient CreateApiClient() => ApiHost.CreateClient();
 
     /// <summary>A fresh client against the Redirect host. Redirects are NOT followed so 302s can be asserted.</summary>
-    public HttpClient CreateRedirectClient() => RedirectHost.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+    public HttpClient CreateRedirectClient() => RedirectHost.CreateClient(
+        new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
     {
         AllowAutoRedirect = false,
     });
 
-    /// <summary>A new <see cref="AppDbContext"/> on the shared container (snake_case convention) for seeding rows the API can't create directly — e.g. an existing subscription before a <c>subscription.updated</c> / cancel webhook.</summary>
+    /// <summary>A new <see cref="AppDbContext"/> on the shared container — seeds rows the API can't create.</summary>
     public AppDbContext NewDbContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -128,7 +132,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
         return new AppDbContext(options.Options);
     }
 
-    /// <summary>POSTs a raw body with a <c>Stripe-Signature</c> header to the webhook endpoint — its contract (no envelope, no auth); the staged <see cref="Gateway"/> event drives the outcome.</summary>
+    /// <summary>POSTs a raw body with a <c>Stripe-Signature</c> header to the webhook endpoint.</summary>
     public static Task<HttpResponseMessage> PostWebhookAsync(HttpClient client, string signature = "test-sig")
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/billing/webhook")
@@ -139,7 +143,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
         return client.SendAsync(request);
     }
 
-    /// <summary>Points both hosts at the shared container before they build (env is the authoritative cross-host seam).</summary>
+    /// <summary>Points both hosts at the shared container before they build.</summary>
     protected override void ConfigureEnvironment()
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION", _postgres.ConnectionString);
@@ -151,8 +155,8 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
     protected override ValueTask InitializeStateAsync(CancellationToken cancellationToken = default) =>
         _postgres.InitializeRespawnerAsync(cancellationToken);
 
-    /// <summary>Provisions a guest via <c>POST /api/identity/guest</c> and returns an Api client carrying the <c>user-id</c> cookie.</summary>
-    /// <remarks>The cookie is <c>Secure</c> and won't round-trip over the test host's <c>http://</c>, so it's lifted from <c>Set-Cookie</c> and attached as a raw header.</remarks>
+    /// <summary>Provisions a guest and returns an Api client carrying the <c>user-id</c> cookie.</summary>
+    /// <remarks>The <c>Secure</c> cookie won't round-trip over <c>http://</c>, so it's sent as a raw header.</remarks>
     public async Task<GuestClient> CreateGuestClientAsync()
     {
         var client = ApiHost.CreateClient();
@@ -171,7 +175,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
 
     private static string? ExtractUserId(HttpResponseMessage response) => ExtractCookie(response, UserIdCookieName);
 
-    /// <summary>Lifts a cookie value out of the response's <c>Set-Cookie</c> headers by name, or null when absent.</summary>
+    /// <summary>Lifts a cookie value out of the response's <c>Set-Cookie</c> headers, or null when absent.</summary>
     public static string? ExtractCookie(HttpResponseMessage response, string name)
     {
         if (!response.Headers.TryGetValues("Set-Cookie", out var cookies))
@@ -189,14 +193,14 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
         return null;
     }
 
-    /// <summary>Starts the topology for xUnit — container up, both hosts built and migrated, Respawn snapshotted.</summary>
+    /// <summary>Starts the topology for xUnit — container up, hosts built and migrated, Respawn snapshotted.</summary>
     Task IAsyncLifetime.InitializeAsync() => StartAsync().AsTask();
 
     /// <summary>Disposes the hosts then the container for xUnit's <see cref="IAsyncLifetime"/> contract.</summary>
     Task IAsyncLifetime.DisposeAsync() => DisposeAsync().AsTask();
 }
 
-/// <summary>An authenticated guest: the <see cref="HttpClient"/> carrying the identity cookie plus its raw id.</summary>
+/// <summary>An authenticated guest: the <see cref="HttpClient"/> carrying the identity cookie plus its id.</summary>
 /// <param name="Client">Api client carrying the <c>user-id</c> cookie.</param>
 /// <param name="UserId">The provisioned guest id (string form of the cookie value).</param>
 public sealed record GuestClient(HttpClient Client, string UserId);
@@ -205,11 +209,11 @@ public sealed record GuestClient(HttpClient Client, string UserId);
 [CollectionDefinition(AppCollection.Name)]
 public sealed class AppCollection : ICollectionFixture<AppFixture>
 {
-    /// <summary>The collection name — every E2E test class joins this so they share the container and run serially.</summary>
+    /// <summary>The collection name — every E2E test class joins it to share the container and run serially.</summary>
     public const string Name = "smart-qr-e2e";
 }
 
-/// <summary>Convenience base for E2E tests — wires the shared fixture, resets the DB per test, and exposes fresh clients.</summary>
+/// <summary>Base for E2E tests — wires the shared fixture, resets the DB per test, exposes fresh clients.</summary>
 public abstract class E2EBase(AppFixture fixture) : IAsyncLifetime
 {
     /// <summary>The shared app fixture (container and two hosts).</summary>
@@ -224,7 +228,7 @@ public abstract class E2EBase(AppFixture fixture) : IAsyncLifetime
     /// <summary>Provisions a guest and returns a client carrying its cookie.</summary>
     protected Task<GuestClient> CreateGuestClientAsync() => Fixture.CreateGuestClientAsync();
 
-    /// <summary>Resets the DB and clears any billing webhook event / captured calls staged on the shared fake gateway.</summary>
+    /// <summary>Resets the DB and clears the staged webhook event and captured calls on the fake gateway.</summary>
     public async Task InitializeAsync()
     {
         await Fixture.ResetAsync();

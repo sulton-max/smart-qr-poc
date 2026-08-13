@@ -5,8 +5,8 @@ using SmartQr.Application.Codes.Rules.Validators;
 
 namespace SmartQr.Application.Codes.Core.Validators;
 
-/// <summary>Validates create-code input — the name, each rule with the content it carries, and the rule set as a whole.</summary>
-/// <remarks>Composes the two validators below: a member added to <see cref="CodeRule"/> or <see cref="CodeRuleSet"/> needs its rule added there, not here.</remarks>
+/// <summary>Validates create-code input — the name, each rule and its content, and the rule set as a whole.</summary>
+/// <remarks>A new <see cref="CodeRule"/> or <see cref="CodeRuleSet"/> member gets its rule there, not here.</remarks>
 /// <seealso cref="CodeRuleValidator"/>
 /// <seealso cref="CodeRuleSetValidator"/>
 public sealed class CodeCreateCommandValidator : AbstractValidator<CodeCreateCommand>

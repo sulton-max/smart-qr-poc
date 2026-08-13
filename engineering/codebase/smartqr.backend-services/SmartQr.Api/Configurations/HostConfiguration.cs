@@ -20,7 +20,8 @@ public static partial class HostConfiguration
             o.EnableOutputCache = false;
             o.EnableRateLimiting = false;
 
-            // Scan the Application assembly's FluentValidation validators so AddApiDefaults registers them behind the SDK adapter.
+            // Scan the Application assembly's FluentValidation validators so AddApiDefaults registers them behind the
+            // SDK adapter.
             o.ValidatorAssemblies.Add(typeof(SmartQr.Application.ApplicationAssembly).Assembly);
         });
 
@@ -70,15 +71,7 @@ public static partial class HostConfiguration
         return app;
     }
 
-    /// <summary>
-    /// Overrides the SDK secure-headers floor on SPA HTML responses so Google Identity Services works:
-    /// sets <c>Cross-Origin-Opener-Policy: same-origin-allow-popups</c> (lets the GIS popup keep a usable
-    /// <c>window.opener</c> to <c>postMessage</c> the credential back) and drops <c>Cross-Origin-Embedder-Policy</c>
-    /// (<c>require-corp</c> blocks the cross-origin GIS iframe/script). Scoped to <c>text/html</c> responses, so API
-    /// (JSON) responses keep the hardened defaults. Registered first in the pipeline so its <c>OnStarting</c> callback
-    /// attaches to every response — including static <c>index.html</c> and the fallback SPA document — and, being
-    /// registered first, runs last in the LIFO <c>OnStarting</c> chain, winning over the SDK secure-headers middleware.
-    /// </summary>
+    /// <summary>Overrides the SDK secure-headers floor on SPA HTML so Google Identity Services works.</summary>
     private static WebApplication UseGisFriendlyOpenerPolicy(this WebApplication app)
     {
         app.Use(async (context, next) =>

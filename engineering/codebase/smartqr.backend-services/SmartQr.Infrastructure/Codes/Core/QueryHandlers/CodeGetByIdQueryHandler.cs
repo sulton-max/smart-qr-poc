@@ -28,7 +28,8 @@ public sealed class CodeGetByIdQueryHandler(
             if (code is null)
                 return AppResult<CodeGetByIdResult.Success>.Fail(AppError.Of(AppErrorType.NotFound, "Code not found"));
 
-            return AppResult<CodeGetByIdResult.Success>.Ok(new CodeGetByIdResult.Success(code.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeGetByIdResult.Success>.Ok(
+            new CodeGetByIdResult.Success(code.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {

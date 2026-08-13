@@ -19,7 +19,7 @@ using DomainBarcodeFormat = SmartQr.Domain.Codes.Core.Enums.BarcodeFormat;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the static / dynamic split at the encoded payload — a rendered symbol decodes to what its mode dictates.</summary>
+/// <summary>Proves the static/dynamic split at the encoded payload — a rendered symbol decodes per its mode.</summary>
 /// <remarks>Each case runs the real render pipeline, rasterizes to PNG, and decodes with ZXing.</remarks>
 public sealed class CodeImageServiceTests
 {
@@ -34,9 +34,15 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Static_code_bakes_its_content_payload_into_the_symbol()
     {
-        // The backend encodes the payload from the typed content (WifiContentValueObject.Encode()), not a client-baked string.
+        // The backend encodes the payload from the typed content (WifiContentValueObject.Encode()), not a client-baked
+        // string.
         const string payload = "WIFI:T:WPA;S:CoffeeShop;P:latte123;;";
-        var code = Code(content: new WifiContentValueObject { Ssid = "CoffeeShop", Password = "latte123", Encryption = WifiEncryption.Wpa });
+        var code = Code(content: new WifiContentValueObject
+        {
+            Ssid = "CoffeeShop",
+            Password = "latte123",
+            Encryption = WifiEncryption.Wpa
+        });
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -46,8 +52,12 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Dynamic_code_encodes_the_redirect_short_link()
     {
-        // A dynamic content whose Encode() is null (url) → the symbol carries the redirect short link, not a baked payload.
-        var code = Code(slug: "abc1234", content: new UrlContent { Url = "https://example.com" }, mode: ContentMode.Dynamic);
+        // A dynamic content whose Encode() is null (url) → the symbol carries the redirect short link, not a baked
+        // payload.
+        var code = Code(
+            slug: "abc1234",
+            content: new UrlContent { Url = "https://example.com" },
+            mode: ContentMode.Dynamic);
 
         var png = _service.Render(code, ImageFormat.Png);
 
@@ -57,14 +67,21 @@ public sealed class CodeImageServiceTests
     [Fact]
     public void Dynamic_content_without_a_baked_payload_still_encodes_the_short_link()
     {
-        // A url code persists its typed content but Encode() is null (dynamic) → the symbol carries the short link, not the fields.
-        var code = Code(slug: "xyz9999", content: new UrlContent { Url = "https://example.com" }, mode: ContentMode.Dynamic);
+        // A url code persists its typed content but Encode() is null (dynamic) → the symbol carries the short link, not
+        // the fields.
+        var code = Code(
+            slug: "xyz9999",
+            content: new UrlContent { Url = "https://example.com" },
+            mode: ContentMode.Dynamic);
 
         Assert.Equal($"{RedirectBase}/xyz9999", Decode(_service.Render(code, ImageFormat.Png).Content));
     }
 
     // A static code bakes rule[0]'s content into the symbol; a dynamic code encodes the redirect short link instead.
-    private static CodeEntity Code(CodeContent content, string slug = "slug0001", ContentMode mode = ContentMode.Static) => new()
+    private static CodeEntity Code(
+        CodeContent content,
+        string slug = "slug0001",
+        ContentMode mode = ContentMode.Static) => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,
@@ -76,7 +93,7 @@ public sealed class CodeImageServiceTests
         Rules = [new DefaultRule { Content = content }],
     };
 
-    /// <summary>Decodes a PNG QR back to its text via ZXing over the SkiaSharp-decoded RGBA pixels. Returns null if undecodable.</summary>
+    /// <summary>Decodes a PNG QR back to its text with ZXing, or null when undecodable.</summary>
     private static string? Decode(byte[] png)
     {
         using var bitmap = SKBitmap.Decode(png)
@@ -102,7 +119,11 @@ public sealed class CodeImageServiceTests
 
     private static SKBitmap ToRgba(SKBitmap source)
     {
-        var converted = new SKBitmap(new SKImageInfo(source.Width, source.Height, SKColorType.Rgba8888, SKAlphaType.Premul));
+        var converted = new SKBitmap(new SKImageInfo(
+            source.Width,
+            source.Height,
+            SKColorType.Rgba8888,
+            SKAlphaType.Premul));
         using var canvas = new SKCanvas(converted);
         canvas.Clear(SKColors.White); // flatten any transparency to white so contrast survives for the decoder
         canvas.DrawBitmap(source, 0, 0);

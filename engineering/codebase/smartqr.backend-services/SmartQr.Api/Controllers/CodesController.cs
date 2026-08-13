@@ -31,7 +31,7 @@ public sealed class CodesController(
     private const string SlugPlaceholder = "preview";
 
 
-    /// <summary>Renders a live, unsaved SVG preview from the supplied style — stateless, no DB. The builder previews the exact bytes the export produces.</summary>
+    /// <summary>Renders an unsaved SVG preview from the supplied style — the exact bytes an export produces.</summary>
     /// <remarks>Anonymous-or-guest allowed: it is a pure render with no ownership.</remarks>
     [HttpPost("preview")]
     [Produces("image/svg+xml")]
@@ -43,7 +43,10 @@ public sealed class CodesController(
         // sample slug of the real length, which renders an identically sized symbol.
         var rendered = renderer.Render(new CodeRenderRequest
         {
-            Payload = CodePayload.Resolve(request.Mode, request.Rules, $"{settings.RedirectBaseUrl.TrimEnd('/')}/{SlugPlaceholder}"),
+            Payload = CodePayload.Resolve(
+                request.Mode,
+                request.Rules,
+                $"{settings.RedirectBaseUrl.TrimEnd('/')}/{SlugPlaceholder}"),
             Symbology = request.ResolveSymbology().ToRender(),
             Format = ImageFormat.Svg,
             Style = request.ToStyleSpec(),
@@ -128,7 +131,10 @@ public sealed class CodesController(
     [ProducesResponseType<ApiResponse<CodeDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> SetActiveById(Guid id, [FromBody] SetActiveCodeApiRequest request, CancellationToken ct)
+    public async Task<IActionResult> SetActiveById(
+        Guid id,
+        [FromBody] SetActiveCodeApiRequest request,
+        CancellationToken ct)
     {
         if (currentUser.Id is not { } userId)
             return Unauthorized();

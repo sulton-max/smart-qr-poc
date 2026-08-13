@@ -11,6 +11,6 @@ public interface ISubscriptionRepository
     /// <summary>Loads a subscription by its Stripe subscription id (<c>sub_…</c>), or null.</summary>
     Task<SubscriptionEntity?> GetByStripeSubscriptionIdAsync(string stripeSubscriptionId, CancellationToken ct);
 
-    /// <summary>Inserts a new subscription row when the user has none, otherwise overwrites the existing row's billing fields. Keyed by <paramref name="entity"/>'s <c>UserId</c>; returns the persisted row.</summary>
+    /// <summary>Inserts the user's subscription row, or overwrites the existing row's billing fields.</summary>
     Task<SubscriptionEntity> UpsertByUserAsync(SubscriptionEntity entity, CancellationToken ct);
 }

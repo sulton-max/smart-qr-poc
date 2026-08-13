@@ -10,10 +10,7 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// Locks the property path every validation failure reports. The frontend maps these paths onto form fields,
-/// so a path is a wire contract: change one and the message stops rendering on its field.
-/// </summary>
+/// <summary>Locks the property path every validation failure reports — the frontend maps it to a form field.</summary>
 /// <remarks>Paths are asserted verbatim rather than by shape — that is the point of the test.</remarks>
 public class CodeValidationPathTests
 {

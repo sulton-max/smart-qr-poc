@@ -4,7 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Tests.Migrations.Tests;
 
-/// <summary>Concurrency — two independent migrators apply the same source against the same DB; the advisory lock serializes them so it lands exactly once.</summary>
+/// <summary>Concurrency — two migrators on one DB serialize on the advisory lock; the source lands once.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class ConcurrencyTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {

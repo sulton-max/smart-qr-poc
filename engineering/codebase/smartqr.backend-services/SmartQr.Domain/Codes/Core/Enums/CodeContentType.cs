@@ -1,6 +1,6 @@
 namespace SmartQr.Domain.Codes.Core.Enums;
 
-/// <summary>Defines the kind of content a code encodes — the destination or payload the builder collects fields for. Every member is buildable; a type earns a member when it ships, never before.</summary>
+/// <summary>Defines the kind of content a code encodes — the destination or payload it carries.</summary>
 public enum CodeContentType
 {
     /// <summary>Represents a plain URL fronting a dynamic redirect.</summary>

@@ -11,7 +11,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>Handles <see cref="BillingCheckoutCommand"/> — resolves the plan's price id from config and creates a hosted Checkout session.</summary>
+/// <summary>Handles <see cref="BillingCheckoutCommand"/> — resolves the price id, opens a Checkout session.</summary>
 public sealed class BillingCheckoutCommandHandler(
     IBillingBroker gateway,
     BillingSettings settings,
@@ -35,7 +35,8 @@ public sealed class BillingCheckoutCommandHandler(
             var url = await gateway.CreateCheckoutSessionAsync(
                 request.UserId, priceId, settings.SuccessUrl, settings.CancelUrl, ct);
 
-            return AppResult<BillingCheckoutResult.Success>.Ok(new BillingCheckoutResult.Success(new CheckoutSessionDto { Url = url }));
+            return AppResult<BillingCheckoutResult.Success>.Ok(
+            new BillingCheckoutResult.Success(new CheckoutSessionDto { Url = url }));
         }
         catch (Exception ex)
         {

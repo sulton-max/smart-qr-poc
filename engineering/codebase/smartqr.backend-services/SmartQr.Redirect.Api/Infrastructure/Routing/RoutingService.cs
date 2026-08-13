@@ -7,8 +7,8 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>Provides rule evaluation for a scan — first match wins, then the optional catch-all; no match means the code does not resolve.</summary>
-/// <remarks>Pure and allocation-light: no I/O, so it runs in microseconds on the hot path. Context (device, geo, language) is resolved by the endpoint before evaluation.</remarks>
+/// <summary>Provides rule evaluation for a scan — first match wins, then the optional catch-all.</summary>
+/// <remarks>Resolve the scan context (device, geo, language) before evaluating.</remarks>
 public sealed class RoutingService : IRoutingService
 {
     /// <inheritdoc />
@@ -57,14 +57,19 @@ public sealed class RoutingService : IRoutingService
 
     private static bool Matches(ConditionalRule rule, ScanContext ctx) => rule.Condition switch
     {
-        RuleConditionType.Device => string.Equals(rule.ConditionValue, ctx.Device.ToString(), StringComparison.OrdinalIgnoreCase),
-        RuleConditionType.Country => ctx.CountryCode is not null && string.Equals(rule.ConditionValue, ctx.CountryCode, StringComparison.OrdinalIgnoreCase),
-        RuleConditionType.Language => ctx.Language is not null && string.Equals(rule.ConditionValue, ctx.Language, StringComparison.OrdinalIgnoreCase),
+        RuleConditionType.Device => string.Equals(
+            rule.ConditionValue,
+            ctx.Device.ToString(),
+            StringComparison.OrdinalIgnoreCase),
+        RuleConditionType.Country => ctx.CountryCode is not null
+            && string.Equals(rule.ConditionValue, ctx.CountryCode, StringComparison.OrdinalIgnoreCase),
+        RuleConditionType.Language => ctx.Language is not null
+            && string.Equals(rule.ConditionValue, ctx.Language, StringComparison.OrdinalIgnoreCase),
         RuleConditionType.TimeOfDay => MatchesTimeWindow(rule.ConditionValue, ctx.NowUtc),
         _ => false,
     };
 
-    /// <summary>Matches a daily <c>HH:mm-HH:mm</c> window (UTC; per-code timezone is a V2 item). Handles wrap past midnight.</summary>
+    /// <summary>Matches a daily UTC <c>HH:mm-HH:mm</c> window, wrapping past midnight.</summary>
     private static bool MatchesTimeWindow(string? window, DateTimeOffset now)
     {
         if (string.IsNullOrWhiteSpace(window))

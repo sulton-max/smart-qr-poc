@@ -12,7 +12,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Codes.Core.CommandHandlers;
 
-/// <summary>Handles <see cref="CodeUpdateCommand"/> — owner-scoped load, applies editable fields, replaces the whole rule set.</summary>
+/// <summary>Handles <see cref="CodeUpdateCommand"/> — owner-scoped load, applies edits, replaces all rules.</summary>
 public sealed class CodeUpdateCommandHandler(
     ICodeRepository repository,
     ApiSettings settings,
@@ -44,7 +44,8 @@ public sealed class CodeUpdateCommandHandler(
 
             var updated = await repository.UpdateAsync(code, ct);
 
-            return AppResult<CodeUpdateResult.Success>.Ok(new CodeUpdateResult.Success(updated.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeUpdateResult.Success>.Ok(
+            new CodeUpdateResult.Success(updated.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {

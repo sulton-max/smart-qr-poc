@@ -6,13 +6,10 @@ using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
 
 namespace SmartQr.Api;
 
-/// <summary>
-/// Renders an <see cref="AppError"/> failure arm as an RFC 9457 ProblemDetails response via the SDK's shared
-/// factory + status mapper — the single app-side error→HTTP seam (replaces the retired <c>ApiResults</c> map).
-/// </summary>
+/// <summary>Renders an <see cref="AppError"/> failure arm as an RFC 9457 ProblemDetails response.</summary>
 internal static class ControllerProblemExtensions
 {
-    /// <summary>Builds the ProblemDetails for <paramref name="error"/> using the registered SDK mapper + message resolver.</summary>
+    /// <summary>Builds the RFC 9457 ProblemDetails result for <paramref name="error"/>.</summary>
     public static IActionResult ToProblem(this ControllerBase controller, AppError error)
     {
         var http = controller.HttpContext;

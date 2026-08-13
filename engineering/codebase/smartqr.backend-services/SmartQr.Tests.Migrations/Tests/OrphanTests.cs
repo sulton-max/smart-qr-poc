@@ -5,7 +5,8 @@ using WoW.Two.Sdk.Backend.Beta.Data.Migrations.Bespoke;
 
 namespace SmartQr.Tests.Migrations.Tests;
 
-/// <summary>Orphan — an applied history row whose source folder is gone fails closed (<see cref="MigrationOrphanException"/>) unless <c>AllowOrphanedHistory</c> lets it proceed.</summary>
+/// <summary>Orphan — a history row whose source is gone throws <see cref="MigrationOrphanException"/>.</summary>
+/// <remarks><c>AllowOrphanedHistory</c> lets the apply proceed anyway.</remarks>
 [Collection(MigratorCollection.Name)]
 public sealed class OrphanTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {

@@ -8,14 +8,8 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// Proves the polymorphic wire and jsonb contract for <see cref="CodeRule"/> — the outer union, and the
-/// <see cref="Domain.Codes.Content.CodeContent"/> union nested inside it.
-/// </summary>
-/// <remarks>
-/// Rules persist as one <c>rules</c> jsonb column, so a broken discriminator corrupts stored codes rather than
-/// failing a request. <see cref="CodeContentJsonTests"/> covers the inner union alone; this covers both bound together.
-/// </remarks>
+/// <summary>Proves the wire and jsonb contract for <see cref="CodeRule"/> — outer union and nested content.</summary>
+/// <remarks><see cref="CodeContentJsonTests"/> covers the inner union alone; this covers both bound together.</remarks>
 public sealed class CodeRuleJsonTests
 {
     private static ConditionalRule Conditional() => new()
@@ -66,7 +60,12 @@ public sealed class CodeRuleJsonTests
                 Order = 1,
                 Condition = RuleConditionType.Country,
                 ConditionValue = "UZ",
-                Content = new WifiContentValueObject { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa },
+                Content = new WifiContentValueObject
+                {
+                    Ssid = "Cafe",
+                    Password = "pw",
+                    Encryption = WifiEncryption.Wpa
+                },
             },
             new DefaultPointerRule { TargetOrder = 1 },
         ];
@@ -79,7 +78,11 @@ public sealed class CodeRuleJsonTests
     [Fact]
     public void Nested_content_keeps_its_own_discriminator()
     {
-        var rule = new DefaultRule { Content = new WifiContentValueObject { Ssid = "Cafe", Encryption = WifiEncryption.Wpa } };
+        var rule = new DefaultRule { Content = new WifiContentValueObject
+        {
+            Ssid = "Cafe",
+            Encryption = WifiEncryption.Wpa
+        } };
 
         var json = CodeRuleJson.Serialize([rule]);
 

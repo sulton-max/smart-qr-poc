@@ -16,11 +16,11 @@ public static class PlanLimits
         [Plan.Agency] = int.MaxValue,
     };
 
-    /// <summary>Returns the maximum number of codes a plan may own. Agency returns <see cref="int.MaxValue"/> (effectively unlimited).</summary>
+    /// <summary>The maximum codes a plan may own; Agency returns <see cref="int.MaxValue"/>.</summary>
     public static int MaxCodes(Plan plan) =>
         MaxCodesByPlan.TryGetValue(plan, out var cap) ? cap : MaxCodesByPlan[Plan.Free];
 
-    /// <summary>Returns the cap as wired to the API — Agency's <see cref="int.MaxValue"/> collapses to the <see cref="Unlimited"/> sentinel.</summary>
+    /// <summary>The cap as wired to the API — Agency collapses to the <see cref="Unlimited"/> sentinel.</summary>
     public static int MaxCodesForApi(Plan plan)
     {
         var cap = MaxCodes(plan);

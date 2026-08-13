@@ -3,7 +3,7 @@ using SmartQr.Application.Billing.Core.Services;
 
 namespace SmartQr.Tests.E2E.Harness;
 
-/// <summary>In-memory <see cref="IBillingBroker"/> for tests — canned Checkout/Portal URLs, a test-supplied <see cref="BillingWebhookEvent"/>, and captured last calls; no network.</summary>
+/// <summary>In-memory <see cref="IBillingBroker"/> — canned URLs, a staged webhook event, captured calls.</summary>
 public sealed class FakeBillingBroker : IBillingBroker
 {
     /// <summary>URL returned by <see cref="CreateCheckoutSessionAsync"/>.</summary>
@@ -12,7 +12,7 @@ public sealed class FakeBillingBroker : IBillingBroker
     /// <summary>URL returned by <see cref="CreatePortalSessionAsync"/>.</summary>
     public string PortalUrl { get; init; } = "https://billing.stripe.com/p/session/test_fake";
 
-    /// <summary>The event <see cref="ParseWebhookEvent"/> returns. When null, an empty <c>Ignored</c> event is returned.</summary>
+    /// <summary>The event <see cref="ParseWebhookEvent"/> returns; null yields an <c>Ignored</c> event.</summary>
     public BillingWebhookEvent? NextEvent { get; set; }
 
     /// <summary>When set, <see cref="ParseWebhookEvent"/> throws this to simulate a failed signature check.</summary>
@@ -25,7 +25,12 @@ public sealed class FakeBillingBroker : IBillingBroker
     public string? LastPortalCustomerId { get; private set; }
 
     /// <inheritdoc />
-    public Task<string> CreateCheckoutSessionAsync(Guid userId, string priceId, string successUrl, string cancelUrl, CancellationToken ct)
+    public Task<string> CreateCheckoutSessionAsync(
+        Guid userId,
+        string priceId,
+        string successUrl,
+        string cancelUrl,
+        CancellationToken ct)
     {
         LastCheckout = (userId, priceId, successUrl, cancelUrl);
         return Task.FromResult(CheckoutUrl);
@@ -47,7 +52,7 @@ public sealed class FakeBillingBroker : IBillingBroker
         return NextEvent ?? new BillingWebhookEvent { Type = BillingWebhookEventType.Ignored };
     }
 
-    /// <summary>Clears staged state and captured calls between tests (the gateway is a shared singleton on the host).</summary>
+    /// <summary>Clears staged state and captured calls between tests.</summary>
     public void Reset()
     {
         NextEvent = null;

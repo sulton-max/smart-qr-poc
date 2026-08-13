@@ -6,7 +6,7 @@ namespace SmartQr.Api.Requests.Billing;
 /// <summary>Represents the checkout-billing request body.</summary>
 public sealed record CheckoutBillingApiRequest
 {
-    /// <summary>Gets the plan to subscribe to (enum-as-text, e.g. <c>"Pro"</c>; <see cref="Plan.Free"/> is rejected).</summary>
+    /// <summary>Gets the plan to subscribe to — <see cref="Plan.Free"/> is rejected.</summary>
     public required Plan Plan { get; init; }
 }
 

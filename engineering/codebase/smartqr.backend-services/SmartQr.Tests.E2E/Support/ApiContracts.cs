@@ -31,7 +31,7 @@ public sealed record UserSummaryDtoModel
     public string Email { get; init; } = "";
 }
 
-/// <summary>Wire shape of <c>CodeDto</c> — a code carries no top-level content; each rule carries the content it serves. Slug / short URL are null on a static code.</summary>
+/// <summary>Wire shape of <c>CodeDto</c> — rules carry the content; slug and short URL are null when static.</summary>
 public sealed record CodeDtoModel
 {
     public Guid Id { get; init; }
@@ -40,7 +40,7 @@ public sealed record CodeDtoModel
     public string Name { get; init; } = "";
     public string BarcodeFormat { get; init; } = "";
 
-    /// <summary>How the symbol resolves — <c>static</c> (baked payload) or <c>dynamic</c> (redirect short link).</summary>
+    /// <summary>How the symbol resolves — <c>static</c> (baked payload) or <c>dynamic</c> (short link).</summary>
     public string Mode { get; init; } = "";
 
     /// <summary>The kind of content every rule of this code carries (e.g. <c>url</c>, <c>wifi</c>).</summary>
@@ -54,7 +54,7 @@ public sealed record CodeDtoModel
     public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];
 }
 
-/// <summary>Wire shape of the polymorphic <c>CodeRule</c> — the <c>type</c> discriminator (<c>conditional</c> / <c>default</c> / <c>defaultPointer</c>) plus the fields for that role; a rule carries its own <see cref="Content"/>.</summary>
+/// <summary>Wire shape of <c>CodeRule</c> — the <c>type</c> discriminator plus that role's fields.</summary>
 public sealed record RuleDtoModel
 {
     public string Type { get; init; } = "";
@@ -65,7 +65,7 @@ public sealed record RuleDtoModel
     public ContentDtoModel? Content { get; init; }
 }
 
-/// <summary>Wire shape of the polymorphic <c>CodeContent</c> — the <c>type</c> discriminator plus the flattened typed fields (all optional; only those for that type are populated). No <c>payload</c>: it is derived server-side, never returned.</summary>
+/// <summary>Wire shape of <c>CodeContent</c> — <c>type</c> plus its fields; <c>payload</c> never returned.</summary>
 public sealed record ContentDtoModel
 {
     public string Type { get; init; } = "";
@@ -77,7 +77,7 @@ public sealed record ContentDtoModel
     public string? Email { get; init; }
 }
 
-/// <summary>Wire shape of <c>BillingStatusDto</c> (GET <c>/api/billing/me</c>) — <c>Plan</c> is the enum name (string-enum JSON).</summary>
+/// <summary>Wire shape of <c>BillingStatusDto</c> — <c>Plan</c> is the enum name (string-enum JSON).</summary>
 public sealed record BillingStatusDtoModel
 {
     /// <summary>The caller's plan name (e.g. <c>Free</c>, <c>Pro</c>).</summary>
@@ -93,7 +93,7 @@ public sealed record BillingStatusDtoModel
     public UsageDtoModel Usage { get; init; } = new();
 }
 
-/// <summary>Wire shape of <c>LimitsDto</c> — <c>MaxCodes</c> is <c>-1</c> for the unlimited (Agency) sentinel.</summary>
+/// <summary>Wire shape of <c>LimitsDto</c> — <c>MaxCodes</c> is <c>-1</c> for unlimited (Agency).</summary>
 public sealed record LimitsDtoModel
 {
     public int MaxCodes { get; init; }

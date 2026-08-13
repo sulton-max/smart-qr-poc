@@ -14,7 +14,7 @@ public sealed record CodeDto
     /// <summary>Public slug encoded into a dynamic code; null on a static code.</summary>
     public string? Slug { get; init; }
 
-    /// <summary>The short URL a dynamic code resolves through (what's actually encoded); null on a static code.</summary>
+    /// <summary>The short URL a dynamic code encodes and resolves through; null on a static code.</summary>
     public string? ShortUrl { get; init; }
 
     /// <summary>Display name.</summary>
@@ -41,6 +41,6 @@ public sealed record CodeDto
     /// <summary>The routing rules, each carrying the content it serves.</summary>
     public IReadOnlyList<CodeRule> Rules { get; init; } = [];
 
-    /// <summary>The persisted visual style (deserialized from <c>StyleJson</c>; the render default when none was saved) — lets the builder round-trip a saved style on edit.</summary>
+    /// <summary>The persisted visual style, or the render default when none was saved.</summary>
     public required StyleSpec Style { get; init; }
 }

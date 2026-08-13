@@ -7,13 +7,8 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>The wedge — a code created/edited through the Api host resolves on the Redirect host's next scan; covers device-rule match, fallback, async scan-count, and live re-route on edit.</summary>
-/// <remarks>
-/// The destinations ride <c>text</c> rules, not <c>url</c> rules: url / mobileApp content encode to null (they are the
-/// redirect types whose hot-path resolve is deferred), so a url rule would 404 on scan. A text rule encodes its payload
-/// verbatim, so the redirect resolves to the exact destination string — the wedge, scan-count, and re-route mechanics
-/// are what these tests exercise, independent of the content type carried.
-/// </remarks>
+/// <summary>The wedge — a code created or edited on the Api host resolves on the Redirect host's next scan.</summary>
+/// <remarks>Destinations ride <c>text</c> rules — <c>url</c> content encodes to null and would 404 on scan.</remarks>
 [Collection(AppCollection.Name)]
 public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -26,7 +21,7 @@ public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
     private const string IosDestination = "https://apps.apple.com/app/id000000000";
     private const string FallbackUrl = "https://example.com";
 
-    /// <summary>A dynamic code whose iOS scanners get <paramref name="iosDestination"/> and everyone else the <paramref name="fallback"/>, both carried as text rules that encode verbatim.</summary>
+    /// <summary>A dynamic code: iOS scanners get <paramref name="iosDestination"/>, others the fallback.</summary>
     private static object AppCode(string name, string fallback, string iosDestination) => new
     {
         name,

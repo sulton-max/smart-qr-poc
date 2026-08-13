@@ -5,11 +5,8 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// Proves the v0.5 shape seam: each <see cref="ModuleShape"/> emits its expected primitive, finder eyes render via their own
-/// <see cref="FinderShape"/>/<see cref="FinderDotShape"/> independent of the data body, and the all-square style stays on the
-/// byte-parity fast path. Geometry-only (no raster); the real decode proof lives in <see cref="QrDecodeRoundTripTests"/>.
-/// </summary>
+/// <summary>Proves the shape seam — <see cref="ModuleShape"/> primitives, eye shapes, the byte-parity path.</summary>
+/// <remarks>Geometry only — the decode proof lives in <see cref="QrDecodeRoundTripTests"/>.</remarks>
 public class SvgShapeTests
 {
     private readonly SvgRenderer _emitter = new();
@@ -82,7 +79,9 @@ public class SvgShapeTests
         // A 2-tall single-column dark run (outside any finder) must collapse into ONE bar, not two modules.
         // (The matrix is QR-sized so the geometry-driven eye group is also emitted — assert on the DATA path only.)
         var matrix = SingleColumnRun(size: 25, col: 12, startRow: 11, length: 2);
-        var data = DataPathBody(_emitter.Emit(matrix, StyleSpec.Default with { ModuleShape = ModuleShape.VerticalBars }));
+        var data = DataPathBody(_emitter.Emit(
+            matrix,
+            StyleSpec.Default with { ModuleShape = ModuleShape.VerticalBars }));
 
         // One bar ⇒ exactly one sub-path start; height 2 with 0.5 radius ⇒ vertical run of 2 - 2*0.5 = 1.
         Assert.Equal(1, CountOccurrences(data, "M"));
@@ -93,7 +92,9 @@ public class SvgShapeTests
     public void Horizontal_bars_merge_contiguous_row_runs()
     {
         var matrix = SingleRowRun(size: 25, row: 12, startCol: 11, length: 3);
-        var data = DataPathBody(_emitter.Emit(matrix, StyleSpec.Default with { ModuleShape = ModuleShape.HorizontalBars }));
+        var data = DataPathBody(_emitter.Emit(
+            matrix,
+            StyleSpec.Default with { ModuleShape = ModuleShape.HorizontalBars }));
 
         // One bar ⇒ one sub-path; width 3 with 0.5 radius ⇒ horizontal run of 3 - 2*0.5 = 2.
         Assert.Equal(1, CountOccurrences(data, "M"));
@@ -181,7 +182,7 @@ public class SvgShapeTests
         return positions;
     }
 
-    /// <summary>The <c>d</c> attribute of the FIRST foreground <c>&lt;path&gt;</c> — the data body (the eye group, when present, is the second path).</summary>
+    /// <summary>The <c>d</c> attribute of the FIRST foreground <c>&lt;path&gt;</c> — the data body.</summary>
     private static string DataPathBody(string svg)
     {
         var pathStart = svg.IndexOf("<path", StringComparison.Ordinal);

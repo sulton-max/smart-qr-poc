@@ -2,7 +2,7 @@ using WoW.Two.Sdk.Backend.Beta.Identity.OAuth.Google;
 
 namespace SmartQr.Tests.E2E.Harness;
 
-/// <summary>Deterministic <see cref="IGoogleIdTokenVerifier"/> for E2E — a valid token is <c>fake:{subject}:{email}:{name}</c>; anything else verifies as null.</summary>
+/// <summary>A valid token is <c>fake:{subject}:{email}:{name}</c>; anything else verifies as null.</summary>
 public sealed class FakeGoogleTokenVerifier : IGoogleIdTokenVerifier
 {
     /// <inheritdoc />

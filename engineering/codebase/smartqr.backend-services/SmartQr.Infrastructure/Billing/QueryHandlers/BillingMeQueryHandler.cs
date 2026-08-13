@@ -11,7 +11,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Billing.QueryHandlers;
 
-/// <summary>Handles <see cref="BillingMeQuery"/> — joins the caller's subscription (or a Free default) with plan limits and live code count.</summary>
+/// <summary>Handles <see cref="BillingMeQuery"/> — joins subscription (or Free) with limits and code count.</summary>
 public sealed class BillingMeQueryHandler(
     ISubscriptionRepository subscriptions,
     ICodeRepository codes,

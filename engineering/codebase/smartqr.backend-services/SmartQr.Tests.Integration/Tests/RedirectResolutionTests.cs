@@ -13,15 +13,11 @@ using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
 
-/// <summary>End-to-end redirect data path against the provider-switchable test database — seed a code, the cached code store reads it, the evaluator resolves the destination.</summary>
-/// <remarks>
-/// Rules carry <see cref="PhoneContent"/>: the evaluator resolves a match by encoding the matched rule's content
-/// (<c>tel:…</c>). url / mobileApp content encode to null — they are the redirect types whose hot-path resolve is
-/// deferred — so an encodable (static) content type exercises a resolved-destination outcome here.
-/// </remarks>
+/// <summary>The redirect data path — seeded code → cached store → evaluator → destination.</summary>
+/// <remarks>Rules carry <see cref="PhoneContent"/> — url content encodes to null, so nothing resolves.</remarks>
 public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
-    /// <summary>Builds the redirect routing services over the shared test database — the code store resolves <see cref="AppDbContext"/> per scope from the fixture, so it reads the same data the seeder writes (both providers).</summary>
+    /// <summary>Builds the redirect routing services over the shared test database.</summary>
     private ServiceProvider BuildProvider()
     {
         var services = new ServiceCollection();
@@ -50,7 +46,13 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new PhoneContent { Phone = "+15551111" } },
+                new ConditionalRule
+                {
+                    Order = 1,
+                    Condition = RuleConditionType.Device,
+                    ConditionValue = "Ios",
+                    Content = new PhoneContent { Phone = "+15551111" }
+                },
                 // The catch-all is a trailing Default rule — it replaces the retired fallback_url column.
                 new DefaultRule { Content = new PhoneContent { Phone = "+15559999" } },
             ],
@@ -91,7 +93,8 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
 
         var redirect = Assert.IsType<RoutingResult.Redirect>(result);
         Assert.Equal("tel:+15559999", redirect.Destination);
-        Assert.Null(redirect.MatchedRuleOrder); // the catch-all Default rule carries no order — it is never order-matched
+        // the catch-all Default rule carries no order — it is never order-matched
+        Assert.Null(redirect.MatchedRuleOrder);
     }
 
     [Fact]
@@ -104,7 +107,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Assert.Null(code); // endpoint maps this to 404
     }
 
-    /// <summary>Never-deactivate-on-downgrade — a code whose owner is far over their plan cap still resolves, since the redirect path is plan-agnostic.</summary>
+    /// <summary>Never-deactivate-on-downgrade — an over-cap owner's code still resolves.</summary>
     [Fact]
     public async Task Over_cap_owners_code_still_resolves()
     {

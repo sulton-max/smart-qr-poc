@@ -12,7 +12,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>Handles <see cref="BillingWebhookCommand"/> — verifies the signature and upserts the affected subscription; a bad signature maps to 400 so Stripe retries.</summary>
+/// <summary>Handles <see cref="BillingWebhookCommand"/> — verifies the signature, upserts the subscription.</summary>
 public sealed class BillingWebhookCommandHandler(
     ISubscriptionRepository subscriptions,
     IBillingBroker gateway,
@@ -90,8 +90,11 @@ public sealed class BillingWebhookCommandHandler(
         }, ct);
     }
 
-    /// <summary>Refreshes an existing row located by its Stripe subscription id, applying <paramref name="status"/> and refreshing plan and period end from the event.</summary>
-    private async Task RefreshFromSubscriptionAsync(BillingWebhookEvent e, SubscriptionStatus status, CancellationToken ct)
+    /// <summary>Refreshes the row for a subscription id — <paramref name="status"/>, plan, and period end.</summary>
+    private async Task RefreshFromSubscriptionAsync(
+        BillingWebhookEvent e,
+        SubscriptionStatus status,
+        CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(e.StripeSubscriptionId))
         {
@@ -102,7 +105,10 @@ public sealed class BillingWebhookCommandHandler(
         var existing = await subscriptions.GetByStripeSubscriptionIdAsync(e.StripeSubscriptionId, ct);
         if (existing is null)
         {
-            logger.LogWarning("No subscription row for {SubscriptionId}; skipping {EventType}", e.StripeSubscriptionId, e.Type);
+            logger.LogWarning(
+                "No subscription row for {SubscriptionId}; skipping {EventType}",
+                e.StripeSubscriptionId,
+                e.Type);
             return;
         }
 

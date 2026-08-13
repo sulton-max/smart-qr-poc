@@ -24,7 +24,7 @@ public sealed record CodeCreateCommand
     /// <summary>The kind of content every rule carries.</summary>
     public required CodeContentType ContentType { get; init; }
 
-    /// <summary>The routing rules, each carrying the content it serves; conditional rules are matched in their given order.</summary>
+    /// <summary>The routing rules, each carrying its content; conditional rules match in their given order.</summary>
     /// <summary>How the symbol resolves; fixed for the life of the code.</summary>
     public required ContentMode Mode { get; init; }
 

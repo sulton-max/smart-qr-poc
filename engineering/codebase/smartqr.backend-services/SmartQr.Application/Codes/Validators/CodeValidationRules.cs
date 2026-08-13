@@ -1,9 +1,9 @@
 namespace SmartQr.Application.Codes.Validators;
 
-/// <summary>Shared predicates for the code validators — kept in one place so create, update, and rule validation agree.</summary>
+/// <summary>Shared predicates for the create, update, and rule validators.</summary>
 internal static class CodeValidationRules
 {
-    /// <summary>True when the value is an absolute http/https URL (the redirect hot path 302s to it verbatim).</summary>
+    /// <summary>True when the value is an absolute http/https URL.</summary>
     public static bool IsAbsoluteHttpUrl(string? value) =>
         Uri.TryCreate(value, UriKind.Absolute, out var uri)
         && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);

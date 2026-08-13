@@ -6,14 +6,11 @@ namespace SmartQr.Domain.Codes.Rules;
 /// <summary>Resolves what a code's symbol carries — the one place the static / dynamic split is decided.</summary>
 public static class CodePayload
 {
-    /// <summary>
-    /// Resolves the payload baked into the symbol: a static code carries its own content, encoded; a dynamic code
-    /// carries the short link the redirect resolves. A static code has exactly one rule, since two destinations
-    /// cannot both be baked.
-    /// </summary>
+    /// <summary>Resolves the payload: baked content when static, the short link when dynamic.</summary>
     /// <param name="mode">How the code's symbol resolves.</param>
     /// <param name="rules">The code's rules, each carrying the content it serves.</param>
     /// <param name="shortUrl">The short link a dynamic code encodes.</param>
+    /// <remarks>Pass exactly one rule for a static code.</remarks>
     public static string Resolve(ContentMode mode, IReadOnlyList<CodeRule> rules, string shortUrl) =>
         mode is ContentMode.Dynamic ? shortUrl : Baked(rules);
 

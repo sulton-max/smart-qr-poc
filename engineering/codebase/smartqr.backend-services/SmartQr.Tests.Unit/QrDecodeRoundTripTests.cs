@@ -10,14 +10,13 @@ using ZXing.Common;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>
-/// The scannability gate: a styled QR must still <b>decode</b> back to its payload. Each shape goes through the real render
-/// pipeline (normalize → matrix → emit → rasterize to PNG), is rasterized to pixels via SkiaSharp, and decoded with ZXing.
-/// This is the test that proves "pretty AND scannable" — the finder/data split plus the ECC auto-bump keep the symbol readable.
-/// </summary>
+/// <summary>The scannability gate: a styled QR must still <b>decode</b> back to its payload.</summary>
 public sealed class QrDecodeRoundTripTests
 {
-    private readonly QrCodeRenderer _renderer = new(new QrMatrixGenerator(), new SvgRenderer(), new SkiaSvgRasterizer());
+    private readonly QrCodeRenderer _renderer = new(
+        new QrMatrixGenerator(),
+        new SvgRenderer(),
+        new SkiaSvgRasterizer());
     private const string Payload = "https://smartqr.app/abc1234";
 
     public static TheoryData<ModuleShape, FinderShape, FinderDotShape> Styles() => new()
@@ -53,7 +52,8 @@ public sealed class QrDecodeRoundTripTests
     [Fact]
     public void Gradient_qr_still_decodes_to_its_payload()
     {
-        // A foreground gradient is a fill change only (geometry untouched) — proves Skia rasterizes the gradient AND it scans.
+        // A foreground gradient is a fill change only (geometry untouched) — proves Skia rasterizes the gradient AND it
+        // scans.
         var style = StyleSpec.Default with
         {
             Gradient = new LinearGradientSpec
@@ -73,7 +73,8 @@ public sealed class QrDecodeRoundTripTests
     [Fact]
     public void Transparent_background_qr_still_decodes_to_its_payload()
     {
-        // Transparent bg rasterizes with no background rect; the decoder flattens transparency to white so contrast survives.
+        // Transparent bg rasterizes with no background rect; the decoder flattens transparency to white so contrast
+        // survives.
         var style = StyleSpec.Default with { TransparentBackground = true };
 
         Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
@@ -97,7 +98,7 @@ public sealed class QrDecodeRoundTripTests
         Assert.Equal(Payload, Decode(_renderer.RenderPng(Payload, style)));
     }
 
-    /// <summary>Decodes a PNG QR back to its text via ZXing over the SkiaSharp-decoded RGBA pixels. Returns null if undecodable.</summary>
+    /// <summary>Decodes a PNG QR back to its text with ZXing, or null when undecodable.</summary>
     private static string? Decode(byte[] png)
     {
         using var bitmap = SKBitmap.Decode(png)
@@ -126,7 +127,11 @@ public sealed class QrDecodeRoundTripTests
 
     private static SKBitmap ToRgba(SKBitmap source)
     {
-        var converted = new SKBitmap(new SKImageInfo(source.Width, source.Height, SKColorType.Rgba8888, SKAlphaType.Premul));
+        var converted = new SKBitmap(new SKImageInfo(
+            source.Width,
+            source.Height,
+            SKColorType.Rgba8888,
+            SKAlphaType.Premul));
         using var canvas = new SKCanvas(converted);
         canvas.Clear(SKColors.White); // flatten any transparency to white so contrast survives for the decoder
         canvas.DrawBitmap(source, 0, 0);

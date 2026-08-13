@@ -67,7 +67,8 @@ public class CodeRenderingTests
     [Fact]
     public void Default_style_svg_is_byte_for_byte_identical_to_qrcoder()
     {
-        // The regression gate: the emitter under StyleSpec.Default must reproduce the retired QRCoder SvgQRCode output exactly.
+        // The regression gate: the emitter under StyleSpec.Default must reproduce the retired QRCoder SvgQRCode output
+        // exactly.
         const string payload = "https://smartqr.app/abc1234";
 
         var emitted = _renderer.Render(new CodeRenderRequest

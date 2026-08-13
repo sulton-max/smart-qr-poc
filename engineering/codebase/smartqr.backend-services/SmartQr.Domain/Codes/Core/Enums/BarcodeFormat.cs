@@ -1,6 +1,6 @@
 namespace SmartQr.Domain.Codes.Core.Enums;
 
-/// <summary>Defines the concrete symbology used to render a code — QR by default; the rest cover the "all code types" surface.</summary>
+/// <summary>Defines the concrete symbology used to render a code — QR by default.</summary>
 public enum BarcodeFormat
 {
     /// <summary>Represents a QR code — 2D, the default.</summary>

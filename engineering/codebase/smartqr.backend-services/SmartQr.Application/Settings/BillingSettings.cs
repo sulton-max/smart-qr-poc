@@ -2,18 +2,18 @@ using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 
 namespace SmartQr.Application.Settings;
 
-/// <summary>Stripe billing settings (appsettings section <c>Billing</c>) — secrets carry an env-var overlay; appsettings holds empty placeholders.</summary>
+/// <summary>Stripe billing settings (appsettings section <c>Billing</c>) — secrets carry an env-var overlay.</summary>
 public class BillingSettings
 {
     /// <summary>Stripe secret API key (<c>sk_test_…</c>). Empty in appsettings; set via env / user-secrets.</summary>
     [EnvironmentVariable("BILLING_SECRET_KEY")]
     public string SecretKey { get; set; } = "";
 
-    /// <summary>Stripe webhook signing secret (<c>whsec_…</c>) — printed by <c>stripe listen</c>. Empty in appsettings.</summary>
+    /// <summary>Stripe webhook signing secret (<c>whsec_…</c>) — printed by <c>stripe listen</c>.</summary>
     [EnvironmentVariable("BILLING_WEBHOOK_SECRET")]
     public string WebhookSecret { get; set; } = "";
 
-    /// <summary>Stripe price ids per paid plan. Bound from <c>Billing:Prices</c> (appsettings / user-secrets). Never hardcoded.</summary>
+    /// <summary>Stripe price ids per paid plan, bound from <c>Billing:Prices</c>.</summary>
     public BillingPricesSettings Prices { get; set; } = new();
 
     /// <summary>Hosted Checkout success-redirect URL.</summary>

@@ -4,7 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Tests.Migrations.Tests;
 
-/// <summary>Rollback — with <c>AllowRollback</c>, <c>RollbackAsync()</c> runs the latest Rollback.sql and removes its history row; disabled (the default) it throws.</summary>
+/// <summary>Rollback — <c>AllowRollback</c> runs the latest Rollback.sql, drops its history row; else throws.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class RollbackTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {

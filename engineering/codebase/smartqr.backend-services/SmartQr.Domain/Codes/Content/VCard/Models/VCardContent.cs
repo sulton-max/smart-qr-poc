@@ -1,6 +1,6 @@
 namespace SmartQr.Domain.Codes.Content.VCard.Models;
 
-/// <summary>A contact card — encodes to a vCard 3.0 payload carrying only the filled fields, each iCal-escaped.</summary>
+/// <summary>A contact card — encodes to a vCard 3.0 payload carrying only the filled fields.</summary>
 public sealed record VCardContent : CodeContent
 {
     /// <summary>Given name.</summary>
@@ -60,7 +60,7 @@ public sealed record VCardContent : CodeContent
         return string.Join("\n", lines);
     }
 
-    /// <summary>Appends <c>{prefix}{escaped value}</c> when the value is non-blank; a blank value is omitted entirely.</summary>
+    /// <summary>Appends <c>{prefix}{escaped value}</c> when the value is non-blank.</summary>
     private static void AppendProperty(List<string> lines, string prefix, string? value)
     {
         var cleaned = ContentEncoding.Clean(value);

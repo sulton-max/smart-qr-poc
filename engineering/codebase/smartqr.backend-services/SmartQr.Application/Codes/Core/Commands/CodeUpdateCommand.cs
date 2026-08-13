@@ -7,7 +7,10 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Application.Codes.Core.Commands;
 
-/// <summary>Updates a code's editable fields and replaces its whole rule set. Owner-scoped; the slug, scan count, and creation timestamp are preserved.</summary>
+/// <summary>
+/// Updates a code's editable fields and replaces its whole rule set; the slug, scan count, and creation
+/// timestamp are preserved.
+/// </summary>
 public sealed record CodeUpdateCommand
     : ICommand<AppResult<CodeUpdateResult.Success>>
 {

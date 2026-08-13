@@ -3,12 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace SmartQr.Common.Domain.Serialization;
 
-/// <summary>
-/// The closed set of subtypes of a polymorphic base, each bound to a discriminator enum member. Declared once as a
-/// static member of the base it describes; the constructor rejects an incomplete or malformed set, so a missing
-/// variant fails at startup rather than on the first request. Serializer-agnostic — bind it with a
-/// <c>To{Format}</c> extension (see <see cref="Json.SubtypeRegistryJsonExtensions"/>).
-/// </summary>
+/// <summary>The closed set of subtypes of a polymorphic base, each bound to a discriminator enum member.</summary>
+/// <remarks>Declare once as a static member of the base; bind with a <c>To{Format}</c> extension.</remarks>
 /// <typeparam name="TBase">The polymorphic base type.</typeparam>
 /// <typeparam name="TKind">The enum discriminating the subtypes.</typeparam>
 public sealed class SubtypeRegistry<TBase, TKind>
@@ -18,15 +14,20 @@ public sealed class SubtypeRegistry<TBase, TKind>
     private readonly Dictionary<TKind, Type> _typesByKind;
     private readonly Dictionary<Type, TKind> _kindsByType;
 
-    /// <summary>Creates the registry, validating that the set covers every <typeparamref name="TKind"/> member exactly once.</summary>
+    /// <summary>Creates the registry, requiring one subtype per <typeparamref name="TKind"/> member.</summary>
     /// <param name="subtypes">Each discriminator member paired with the concrete type it identifies.</param>
-    /// <exception cref="ArgumentException">A subtype does not derive from <typeparamref name="TBase"/>, a kind or type repeats, or a <typeparamref name="TKind"/> member has no subtype.</exception>
+    /// <exception cref="ArgumentException">
+    /// A subtype does not derive from <typeparamref name="TBase"/>, a kind or type repeats, or a
+    /// <typeparamref name="TKind"/> member has no subtype.
+    /// </exception>
     public SubtypeRegistry(params (TKind Kind, Type Type)[] subtypes)
     {
         foreach (var (kind, type) in subtypes)
         {
             if (!typeof(TBase).IsAssignableFrom(type))
-                throw new ArgumentException($"'{type.Name}' does not derive from '{typeof(TBase).Name}'.", nameof(subtypes));
+                throw new ArgumentException(
+                    $"'{type.Name}' does not derive from '{typeof(TBase).Name}'.",
+                    nameof(subtypes));
 
             if (type.IsAbstract)
                 throw new ArgumentException($"'{type.Name}' is abstract and cannot be a subtype.", nameof(subtypes));
@@ -46,12 +47,16 @@ public sealed class SubtypeRegistry<TBase, TKind>
 
         var missing = Enum.GetValues<TKind>().Where(kind => !_typesByKind.ContainsKey(kind)).ToArray();
         if (missing.Length > 0)
-            throw new ArgumentException($"'{typeof(TKind).Name}' members without a subtype: {string.Join(", ", missing)}.", nameof(subtypes));
+            throw new ArgumentException(
+                $"'{typeof(TKind).Name}' members without a subtype: {string.Join(", ", missing)}.",
+                nameof(subtypes));
 
-        Subtypes = subtypes.Select(subtype => (subtype.Kind, subtype.Type, Discriminator: ToDiscriminator(subtype.Kind))).ToArray();
+        Subtypes = subtypes
+            .Select(subtype => (subtype.Kind, subtype.Type, Discriminator: ToDiscriminator(subtype.Kind)))
+            .ToArray();
     }
 
-    /// <summary>Every subtype, paired with its discriminator member and the wire token that member serializes to.</summary>
+    /// <summary>Every subtype, paired with its discriminator member and the wire token it serializes to.</summary>
     public IReadOnlyList<(TKind Kind, Type Type, string Discriminator)> Subtypes { get; }
 
     /// <summary>Resolves the concrete type a discriminator member identifies.</summary>
@@ -66,7 +71,10 @@ public sealed class SubtypeRegistry<TBase, TKind>
     // [JsonStringEnumMemberName] override — the enum member stays the single source.
     private static string ToDiscriminator(TKind kind)
     {
-        var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        };
         return JsonSerializer.Serialize(kind, options).Trim('"');
     }
 }

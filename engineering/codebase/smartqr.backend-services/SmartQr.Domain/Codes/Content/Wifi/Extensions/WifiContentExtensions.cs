@@ -4,16 +4,16 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 namespace SmartQr.Domain.Codes.Content.Wifi.Extensions;
 
 /// <summary>Extends <see cref="WifiContentValueObject"/> for payload encoding.</summary>
-/// <remarks>The WIFI scheme is a de-facto convention with no RFC behind it — every literal here matches what scanners already parse.</remarks>
+/// <remarks>Follows the de-facto WIFI convention, which no RFC registers.</remarks>
 public static class WifiContentExtensions
 {
-    /// <summary>Holds the token covering WPA, WPA2 and WPA3 alike — the scheme draws no distinction between them.</summary>
+    /// <summary>Holds the token covering WPA, WPA2 and WPA3 alike.</summary>
     private const string WpaToken = "WPA";
 
     /// <summary>Holds the token for legacy WEP.</summary>
     private const string WepToken = "WEP";
 
-    /// <summary>Holds the token an open network carries — the scheme spells it as a word, not as an empty value.</summary>
+    /// <summary>Holds the token an open network carries — a word, not an empty value.</summary>
     private const string OpenToken = "nopass";
 
     /// <summary>Holds the payload shape — scheme, SSID, then the two conditional segments.</summary>

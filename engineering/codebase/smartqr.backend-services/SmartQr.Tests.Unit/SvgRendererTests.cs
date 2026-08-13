@@ -6,7 +6,7 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Rendering.Svg;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the custom <see cref="SvgRenderer"/> honors the styling subset shipped this iteration (solid colors, transparency, quiet zone, logo) directly off a known matrix.</summary>
+/// <summary>Proves <see cref="SvgRenderer"/> honors solid colors, transparency, quiet zone, and logo.</summary>
 public class SvgRendererTests
 {
     private readonly SvgRenderer _emitter = new();
@@ -56,7 +56,9 @@ public class SvgRendererTests
     public void Logo_emits_centered_image_with_data_url()
     {
         const string dataUrl = "data:image/png;base64,AAAA";
-        var svg = _emitter.Emit(Checker, StyleSpec.Default with { Logo = new LogoSpec { DataUrl = dataUrl, SizeRatio = 0.25 } });
+        var svg = _emitter.Emit(
+            Checker,
+            StyleSpec.Default with { Logo = new LogoSpec { DataUrl = dataUrl, SizeRatio = 0.25 } });
 
         Assert.Contains("<image", svg);
         Assert.Contains($"href=\"{dataUrl}\"", svg);
@@ -73,7 +75,7 @@ public class SvgRendererTests
         Assert.EndsWith("</svg>", svg);
     }
 
-    /// <summary>A deterministic n×n checkerboard matrix (dark where row+col is even) for assertions independent of QR encoding.</summary>
+    /// <summary>A deterministic n×n checkerboard matrix, dark where <c>row + col</c> is even.</summary>
     private static ModuleMatrix BuildChecker(int n)
     {
         var modules = new bool[n, n];

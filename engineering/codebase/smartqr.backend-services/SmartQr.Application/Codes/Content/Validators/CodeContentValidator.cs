@@ -14,7 +14,7 @@ using SmartQr.Domain.Codes.Content;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates the content a rule carries, dispatching to the matching per-type validator.</summary>
-/// <remarks>Register a new content type here and in its own validator; FluentValidation resolves the concrete type at run time.</remarks>
+/// <remarks>Register a new content type here and in its own validator.</remarks>
 public sealed class CodeContentValidator : AbstractValidator<CodeContent>
 {
     /// <summary>Builds the per-type content dispatch.</summary>

@@ -11,7 +11,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Identity.CommandHandlers;
 
-/// <summary>Handles <see cref="GoogleSignInCommand"/> — verifies the Google token, finds or creates the account, and claims the caller's guest codes.</summary>
+/// <summary>Handles <see cref="GoogleSignInCommand"/> — verifies the token, finds or creates the account.</summary>
 public sealed class GoogleSignInCommandHandler(
     IGoogleIdTokenVerifier verifier,
     IUserRepository users,
@@ -27,7 +27,9 @@ public sealed class GoogleSignInCommandHandler(
         {
             var identity = await verifier.VerifyAsync(request.IdToken, ct);
             if (identity is null)
-                return AppResult<GoogleSignInResult.Success>.Fail(AppError.Of(AppErrorType.Unauthorized, "The Google token could not be verified."));
+                return AppResult<GoogleSignInResult.Success>.Fail(AppError.Of(
+                    AppErrorType.Unauthorized,
+                    "The Google token could not be verified."));
 
             var existing = await users.FindByGoogleSubjectAsync(identity.Subject, ct);
 
@@ -68,5 +70,8 @@ public sealed class GoogleSignInCommandHandler(
     }
 
     private static AppResult<GoogleSignInResult.Success> Ok(UserEntity user) =>
-        AppResult<GoogleSignInResult.Success>.Ok(new GoogleSignInResult.Success(new UserSummaryDto(user.Id, user.Name, user.Email)));
+        AppResult<GoogleSignInResult.Success>.Ok(new GoogleSignInResult.Success(new UserSummaryDto(
+            user.Id,
+            user.Name,
+            user.Email)));
 }

@@ -3,7 +3,7 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the <see cref="StyleSpec"/> ↔ <c>StyleJson</c> round-trip and the forgiving fallback (forward-compat with deferred persistence).</summary>
+/// <summary>Proves the <see cref="StyleSpec"/> ↔ <c>StyleJson</c> round-trip and the forgiving fallback.</summary>
 public class StyleSpecJsonTests
 {
     [Theory]

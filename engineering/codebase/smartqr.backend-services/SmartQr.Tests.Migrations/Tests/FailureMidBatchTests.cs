@@ -4,7 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Tests.Migrations.Tests;
 
-/// <summary>Failure mid-batch — #2's invalid Apply.sql rolls back wholesale while #1 stays applied and #3 never runs; fixing and re-running resumes the batch.</summary>
+/// <summary>Failure mid-batch — #2 rolls back, #1 stays applied, #3 never runs; a fixed re-run resumes.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class FailureMidBatchTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {

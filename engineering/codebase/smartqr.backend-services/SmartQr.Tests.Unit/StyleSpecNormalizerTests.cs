@@ -3,7 +3,7 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the pre-emit normalizer rules: quiet-zone floor, logo→H, and the v0.5 stylised-module ECC floor (≥ Q).</summary>
+/// <summary>Proves the pre-emit normalizer rules: quiet-zone floor, logo→H, stylised-module ECC floor (≥ Q).</summary>
 public class StyleSpecNormalizerTests
 {
     [Theory]

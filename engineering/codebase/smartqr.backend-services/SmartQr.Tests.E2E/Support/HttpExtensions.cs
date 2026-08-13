@@ -3,10 +3,10 @@ namespace SmartQr.Tests.E2E.Support;
 // The JSON request/response plumbing (AsJson / PostJsonAsync / PutJsonAsync / PatchJsonAsync /
 // ReadEnvelopeAsync) lives in the SDK testing package — WoW.Two.Sdk.Backend.Beta.Testing.Web.HttpExtensions.
 
-/// <summary>Builders for the JSON request bodies the codes endpoints accept — every rule carries the content it serves.</summary>
+/// <summary>Builders for the JSON request bodies the codes endpoints accept — each rule carries its content.</summary>
 public static class CodeRequests
 {
-    /// <summary>The full style block every create/update body carries — style is <c>required</c>: a code always has one.</summary>
+    /// <summary>The full style block every create/update body carries — style is <c>required</c>.</summary>
     public static object Style() => new
     {
         foregroundColor = "#000000",
@@ -19,7 +19,7 @@ public static class CodeRequests
         finderDotShape = "square",
     };
 
-    /// <summary>A static url create body — one default rule carrying the url content. Static content bakes its payload; the code never reaches the redirect.</summary>
+    /// <summary>A static url create body — one default rule carrying the url content; the payload is baked.</summary>
     public static object StaticUrl(string name, string destination) => new
     {
         name,
@@ -30,7 +30,7 @@ public static class CodeRequests
         style = Style(),
     };
 
-    /// <summary>A dynamic url create body — the given conditional rules plus a default catch-all, each carrying url content.</summary>
+    /// <summary>A dynamic url create body — the given conditional rules plus a url default catch-all.</summary>
     public static object DynamicUrl(string name, string destination, IEnumerable<object>? rules = null) => new
     {
         name,
@@ -41,7 +41,7 @@ public static class CodeRequests
         style = Style(),
     };
 
-    /// <summary>A create/update body carrying one default rule with typed <paramref name="content"/> (e.g. <c>new { type = "wifi", ssid = "…" }</c>).</summary>
+    /// <summary>A create/update body carrying one default rule with typed <paramref name="content"/>.</summary>
     public static object Static(string name, string contentType, object content) => new
     {
         name,

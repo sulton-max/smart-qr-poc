@@ -15,7 +15,7 @@ public sealed record WifiContentValueObject : CodeContent
     /// <summary>Gets the authentication scheme of the network, which decides how a joining device negotiates.</summary>
     public required WifiEncryption Encryption { get; init; }
 
-    /// <summary>Gets whether the network withholds its name from beacon frames, so a device must be told it exists.</summary>
+    /// <summary>Gets whether the network withholds its name from beacon frames.</summary>
     public bool Hidden { get; init; }
 
     /// <inheritdoc />

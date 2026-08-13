@@ -24,7 +24,7 @@ public static class EmailContentExtensions
     /// <summary>Builds the mailto payload.</summary>
     /// <param name="content">The recipient and draft to encode.</param>
     /// <returns>The mailto URI.</returns>
-    /// <remarks>Omits an empty subject or body rather than carrying a blank parameter, which some composers render as a literal space.</remarks>
+    /// <remarks>Omits an empty subject or body rather than carrying a blank parameter.</remarks>
     public static string ToPayload(this EmailContentValueObject content)
     {
         var parameters = new List<string>();

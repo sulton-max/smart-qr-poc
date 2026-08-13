@@ -6,7 +6,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E CRUD and ownership for the codes management API against the real Postgres container behind two hosts.</summary>
+/// <summary>E2E CRUD and ownership for the codes management API against the real Postgres container.</summary>
 [Collection(AppCollection.Name)]
 public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -27,7 +27,8 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         code.ShortUrl.Should().Be($"{AppFixture.RedirectBaseUrl}/{code.Slug}");
         code.Rules.Should().HaveCount(2); // the iOS device rule + the Default catch-all
         code.Rules.Should().Contain(r => r.ConditionValue == "Ios");
-        code.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://example.com"); // the Default catch-all's content
+        // the Default catch-all's content
+        code.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://example.com");
     }
 
     [Fact]
@@ -98,7 +99,11 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
             CodeRequests.DynamicUrl("App download", "https://example.com",
                 [CodeRequests.IosRule("https://apps.apple.com/app/id000000000", 1),
-                 CodeRequests.ConditionalRule("Device", "Android", new { type = "url", url = "https://play.google.com/store" }, 2)])))
+                 CodeRequests.ConditionalRule(
+                     "Device",
+                     "Android",
+                     new { type = "url", url = "https://play.google.com/store" },
+                     2)])))
             .ReadEnvelopeAsync<CodeDtoModel>();
 
         var updated = await (await owner.Client.PutJsonAsync($"/api/codes/{created.Id}",
@@ -111,8 +116,10 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         updated.CreatedAt.Should().Be(created.CreatedAt);
         updated.Name.Should().Be("App download (updated)");
         updated.Rules.Should().HaveCount(2); // the iOS device rule + the Default catch-all
-        updated.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://apps.apple.com/app/id111111111");
-        updated.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://example.com/new"); // the Default catch-all's content
+        updated.Rules.Should()
+            .Contain(r => r.Content != null && r.Content.Url == "https://apps.apple.com/app/id111111111");
+        // the Default catch-all's content
+        updated.Rules.Should().Contain(r => r.Content != null && r.Content.Url == "https://example.com/new");
     }
 
     [Fact]
@@ -137,11 +144,15 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
             CodeRequests.StaticUrl("Toggle me", "https://toggle.example"))).ReadEnvelopeAsync<CodeDtoModel>();
 
-        var disabled = await (await owner.Client.PatchJsonAsync($"/api/codes/{created.Id}/active", new { isActive = false }))
+        var disabled = await (await owner.Client.PatchJsonAsync(
+            $"/api/codes/{created.Id}/active",
+            new { isActive = false }))
             .ReadEnvelopeAsync<CodeDtoModel>();
         disabled.IsActive.Should().BeFalse();
 
-        var enabled = await (await owner.Client.PatchJsonAsync($"/api/codes/{created.Id}/active", new { isActive = true }))
+        var enabled = await (await owner.Client.PatchJsonAsync(
+            $"/api/codes/{created.Id}/active",
+            new { isActive = true }))
             .ReadEnvelopeAsync<CodeDtoModel>();
         enabled.IsActive.Should().BeTrue();
     }
@@ -198,9 +209,14 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var response = await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Static("Cafe WiFi", "wifi", new { type = "wifi", ssid = "Cafe", password = "beans123", encryption = "wpa" }));
+            CodeRequests.Static(
+                "Cafe WiFi",
+                "wifi",
+                new { type = "wifi", ssid = "Cafe", password = "beans123", encryption = "wpa" }));
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK, "static codes carry a non-URL payload baked from typed content");
+        response.StatusCode.Should().Be(
+            HttpStatusCode.OK,
+            "static codes carry a non-URL payload baked from typed content");
         var code = await response.ReadEnvelopeAsync<CodeDtoModel>();
 
         // The typed content lives in the code's single default rule, not a top-level content field.
@@ -218,7 +234,12 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
 
         var created = await (await owner.Client.PostJsonAsync("/api/codes",
-            CodeRequests.Static("Contact", "vCard", new { type = "vCard", firstName = "Ada", email = "ada@example.com" }))).ReadEnvelopeAsync<CodeDtoModel>();
+            CodeRequests.Static("Contact", "vCard", new
+            {
+                type = "vCard",
+                firstName = "Ada",
+                email = "ada@example.com"
+            }))).ReadEnvelopeAsync<CodeDtoModel>();
 
         var fetched = await (await owner.Client.GetAsync($"/api/codes/{created.Id}")).ReadEnvelopeAsync<CodeDtoModel>();
 
@@ -251,7 +272,8 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         var withGradient = await owner.Client.GetStringAsync($"/api/codes/{created.Id}/image?format=svg");
         withGradient.Should().Contain("<linearGradient");
 
-        // Edit to a solid style → the saved image must no longer carry the gradient (style round-trips on update, no clobber-to-default).
+        // Edit to a solid style → the saved image must no longer carry the gradient (style round-trips on update, no
+        // clobber-to-default).
         // The update body carries no mode — it is fixed at create.
         await owner.Client.PutJsonAsync($"/api/codes/{created.Id}", new
         {

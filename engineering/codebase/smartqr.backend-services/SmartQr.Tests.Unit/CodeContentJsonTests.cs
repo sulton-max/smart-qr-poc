@@ -15,19 +15,29 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the polymorphic wire and jsonb contract for <see cref="CodeContent"/> — discriminator, then round-trip.</summary>
+/// <summary>Proves the wire and jsonb contract for <see cref="CodeContent"/> — discriminator, round-trip.</summary>
 public sealed class CodeContentJsonTests
 {
     public static TheoryData<CodeContent, string> Cases() => new()
     {
         { new UrlContent { Url = "https://x.io" }, "url" },
-        { new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }, "mobileApp" },
+
+        {
+            new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" },
+            "mobileApp"
+        },
         { new TextContentValueObject { Text = "hi there" }, "text" },
         { new EmailContentValueObject { To = "a@b.com", Subject = "Hi" }, "email" },
         { new SmsContentValueObject { Phone = "+15550100", Message = "hey" }, "sms" },
         { new PhoneContent { Phone = "+15550100" }, "phone" },
         { new GeoContentValueObject { Latitude = 41.31, Longitude = 69.24 }, "geo" },
-        { new WifiContentValueObject { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa, Hidden = true }, "wifi" },
+        { new WifiContentValueObject
+        {
+            Ssid = "Cafe",
+            Password = "pw",
+            Encryption = WifiEncryption.Wpa,
+            Hidden = true
+        }, "wifi" },
         { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
         { new CalendarContent { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) }, "calendar" },
     };

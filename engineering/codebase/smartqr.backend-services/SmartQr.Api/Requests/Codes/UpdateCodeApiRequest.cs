@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents the update-code request body. Mode is absent by design — it is fixed at create, so an edit can never change what the symbol bakes.</summary>
+/// <summary>Represents the update-code request body — mode is fixed at create, so it is absent here.</summary>
 public sealed record UpdateCodeApiRequest
 {
     /// <summary>Gets the code's display name.</summary>
@@ -13,13 +13,13 @@ public sealed record UpdateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Gets the kind of content every rule carries — the builder's content-type choice. Validated against the rules it ships with.</summary>
+    /// <summary>Gets the kind of content every rule carries — validated against the rules it ships with.</summary>
     public required CodeContentType ContentType { get; init; }
 
     /// <summary>Gets the replacement routing rules (the whole set), each carrying the content it serves.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Gets the style the code renders with — a full replace, not a patch, so the client sends the whole block.</summary>
+    /// <summary>Gets the style the code renders with — a full replace, not a patch.</summary>
     public required StyleApiRequest Style { get; init; }
 }
 

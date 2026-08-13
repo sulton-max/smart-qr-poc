@@ -3,13 +3,13 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents a code's style block — one shape shared by the preview, create, and update requests, so a preview renders byte-identically to what a save produces.</summary>
+/// <summary>Represents a code's style block — one shape shared by the preview, create, and update requests.</summary>
 public sealed record StyleApiRequest
 {
     /// <summary>Gets the foreground (dark module) color as <c>#RRGGBB</c>.</summary>
     public required string ForegroundColor { get; init; }
 
-    /// <summary>Gets the background color as <c>#RRGGBB</c>, ignored when <see cref="TransparentBackground"/> is set.</summary>
+    /// <summary>Gets the <c>#RRGGBB</c> background, ignored when <see cref="TransparentBackground"/> is set.</summary>
     public required string BackgroundColor { get; init; }
 
     /// <summary>Gets whether the background is omitted, rendering on a transparent canvas.</summary>
@@ -43,7 +43,7 @@ public sealed record StyleApiRequest
 /// <summary>Provides mapping for <see cref="StyleApiRequest"/>.</summary>
 public static class StyleApiRequestExtensions
 {
-    /// <summary>Maps the style block to a <see cref="StyleSpec"/> — every field is present on the wire, so there is nothing to default.</summary>
+    /// <summary>Maps the style block to a <see cref="StyleSpec"/>.</summary>
     /// <param name="style">The style block to project.</param>
     public static StyleSpec ToStyleSpec(this StyleApiRequest style) => new()
     {

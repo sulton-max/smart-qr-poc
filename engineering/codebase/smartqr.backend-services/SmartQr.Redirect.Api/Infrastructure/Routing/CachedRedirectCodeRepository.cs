@@ -8,8 +8,8 @@ using SmartQr.Redirect.Api.Settings;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>Fetches the scanned code through an in-memory cache, reading the DB once on a miss and caching for a short TTL.</summary>
-/// <remarks>Caches misses too (short negative TTL) so a flood of unknown slugs cannot hammer the DB. Unwired pending the caching backlog item — <see cref="DbRedirectCodeRepository"/> is the active default.</remarks>
+/// <summary>Fetches the scanned code through an in-memory cache, reading the DB only on a miss.</summary>
+/// <remarks>Unwired pending the caching item — <see cref="DbRedirectCodeRepository"/> is the default.</remarks>
 public sealed class CachedRedirectCodeRepository(
     IServiceScopeFactory scopeFactory,
     IMemoryCache cache,

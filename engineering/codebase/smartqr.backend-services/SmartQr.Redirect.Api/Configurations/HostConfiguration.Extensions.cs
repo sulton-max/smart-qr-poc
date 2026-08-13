@@ -19,14 +19,14 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the full Postgres host floor for <see cref="AppDbContext"/> (used by the cached store and flusher) — connection resolve, shared data source, Dapper factory, audit interceptor, snake_case audited <c>DbContext</c>, and the bespoke migrator over the context's assembly.</summary>
+    /// <summary>Registers the Postgres host floor for <see cref="AppDbContext"/>.</summary>
     private static WebApplicationBuilder AddPersistence(this WebApplicationBuilder builder)
     {
         builder.Services.AddPostgresPersistence<AppDbContext>(builder.Configuration);
         return builder;
     }
 
-    /// <summary>Registers the routing pipeline: code store, evaluator, detectors, and the async scan recorder.</summary>
+    /// <summary>Registers the routing pipeline — code store, evaluator, detectors, and async scan recorder.</summary>
     private static WebApplicationBuilder AddRoutingServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMemoryCache();

@@ -3,11 +3,7 @@ using RenderBarcodeFormat = WoW.Two.Sdk.Backend.Beta.Codes.Models.BarcodeFormat;
 
 namespace SmartQr.Infrastructure.Codes.Core.Extensions;
 
-/// <summary>
-/// Maps the persisted domain symbology enum to the SDK render engine's symbology vocabulary at the render boundary.
-/// The product owns the persisted <see cref="DomainBarcodeFormat"/> (a <c>codes</c> column); the SDK owns the render
-/// <see cref="RenderBarcodeFormat"/>. Members are 1:1 by name — the switch fails to compile if either side diverges.
-/// </summary>
+/// <summary>Maps <see cref="DomainBarcodeFormat"/> to <see cref="RenderBarcodeFormat"/>, 1:1 by name.</summary>
 public static class CodeFormatMappingExtensions
 {
     /// <summary>Converts the persisted domain barcode format to the SDK render barcode format.</summary>

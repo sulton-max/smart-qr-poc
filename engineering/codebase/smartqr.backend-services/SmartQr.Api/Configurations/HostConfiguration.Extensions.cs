@@ -36,14 +36,14 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the full Postgres host floor for <see cref="AppDbContext"/> — connection resolve (env <c>DB_CONNECTION</c> over <c>DatabaseOptions:ConnectionString</c>), shared data source, Dapper factory, audit interceptor, snake_case audited <c>DbContext</c>, and the bespoke migrator over the context's assembly.</summary>
+    /// <summary>Registers the Postgres host floor for <see cref="AppDbContext"/>.</summary>
     private static WebApplicationBuilder AddPersistence(this WebApplicationBuilder builder)
     {
         builder.Services.AddPostgresPersistence<AppDbContext>(builder.Configuration);
         return builder;
     }
 
-    /// <summary>Registers the SDK code-rendering engine (matrix generator, SVG renderer, Svg.Skia rasterizer, renderers — all singletons) plus the product's image service.</summary>
+    /// <summary>Registers the SDK code-rendering engine and the product's image service.</summary>
     private static WebApplicationBuilder AddCodeServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddCodeRendering();
@@ -51,12 +51,13 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the mediator (handler scanning), the FluentValidation pipeline behavior, and application services.</summary>
+    /// <summary>Registers the mediator, the FluentValidation pipeline behavior, and application services.</summary>
     private static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMediator(typeof(SmartQr.Infrastructure.InfrastructureAssembly).Assembly);
 
-        // Validators run in the pipeline before each handler; a failure throws ValidationException (400 via ValidationExceptionFilter).
+        // Validators run in the pipeline before each handler; a failure throws ValidationException (400 via
+        // ValidationExceptionFilter).
         builder.Services.AddMediatorValidationBehavior();
 
         builder.Services.AddScoped<ICodeRepository, CodeRepository>();
@@ -64,7 +65,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the identity seam — read-only current-user view and guest provisioning (SDK Identity modules, on the <c>user-id</c> cookie).</summary>
+    /// <summary>Registers the identity seam — read-only current-user view and guest provisioning.</summary>
     private static WebApplicationBuilder AddIdentity(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
@@ -73,7 +74,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the auth seam — user repository, Google ID-token verifier, and the cookie session scheme.</summary>
+    /// <summary>Registers the auth seam — user repository, Google ID-token verifier, and cookie sessions.</summary>
     private static WebApplicationBuilder AddAuth(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -103,7 +104,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers controllers with the validation exception filter and string-enum JSON serialization.</summary>
+    /// <summary>Registers controllers with the validation exception filter and string-enum serialization.</summary>
     private static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
         builder.Services
@@ -112,7 +113,8 @@ public static partial class HostConfiguration
             .AddJsonStringEnums()
             .AddJsonOptions(options =>
             {
-                // CodeContent and CodeRule polymorphism is enum-driven (no attributes), so the endpoint serializer needs
+                // CodeContent and CodeRule polymorphism is enum-driven (no attributes), so the endpoint serializer
+                // needs
                 // the same resolvers the persistence options use — otherwise the API can't (de)serialize either union.
                 var resolver = options.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver();
                 options.JsonSerializerOptions.TypeInfoResolver = resolver

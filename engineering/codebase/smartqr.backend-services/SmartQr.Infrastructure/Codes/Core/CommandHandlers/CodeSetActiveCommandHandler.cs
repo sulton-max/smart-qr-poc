@@ -26,9 +26,12 @@ public sealed class CodeSetActiveCommandHandler(
             var code = await repository.SetActiveAsync(request.Id, request.UserId, request.IsActive, ct);
 
             if (code is null)
-                return AppResult<CodeSetActiveResult.Success>.Fail(AppError.Of(AppErrorType.NotFound, "Code not found"));
+                return AppResult<CodeSetActiveResult.Success>.Fail(AppError.Of(
+                    AppErrorType.NotFound,
+                    "Code not found"));
 
-            return AppResult<CodeSetActiveResult.Success>.Ok(new CodeSetActiveResult.Success(code.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeSetActiveResult.Success>.Ok(
+            new CodeSetActiveResult.Success(code.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {

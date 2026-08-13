@@ -1,6 +1,6 @@
 namespace SmartQr.Application.Identity.Core.Models;
 
-/// <summary>Outcome of a Google sign-in — find-or-create the account, claim guest codes, then issue the session.</summary>
+/// <summary>Outcome of a Google sign-in — find-or-create the account, claim guest codes, issue the session.</summary>
 public abstract record GoogleSignInResult
 {
     private GoogleSignInResult() { }

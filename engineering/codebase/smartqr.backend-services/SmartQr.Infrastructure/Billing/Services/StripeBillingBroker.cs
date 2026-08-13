@@ -9,7 +9,7 @@ using StripePortalSessionOptions = Stripe.BillingPortal.SessionCreateOptions;
 
 namespace SmartQr.Infrastructure.Billing.Services;
 
-/// <summary>Real <see cref="IBillingBroker"/> over Stripe.net — hosted Checkout and Customer Portal, with the secret key passed per call via <see cref="RequestOptions"/>.</summary>
+/// <summary>Real <see cref="IBillingBroker"/> over Stripe.net — hosted Checkout and Customer Portal.</summary>
 public sealed class StripeBillingBroker(BillingSettings settings) : IBillingBroker
 {
     private RequestOptions Request => new() { ApiKey = settings.SecretKey };
@@ -48,13 +48,17 @@ public sealed class StripeBillingBroker(BillingSettings settings) : IBillingBrok
         return stripeEvent.Type switch
         {
             EventTypes.CheckoutSessionCompleted => FromCheckout((Session)stripeEvent.Data.Object),
-            EventTypes.CustomerSubscriptionUpdated => FromSubscription((Subscription)stripeEvent.Data.Object, BillingWebhookEventType.SubscriptionUpdated),
-            EventTypes.CustomerSubscriptionDeleted => FromSubscription((Subscription)stripeEvent.Data.Object, BillingWebhookEventType.SubscriptionDeleted),
+            EventTypes.CustomerSubscriptionUpdated => FromSubscription(
+                (Subscription)stripeEvent.Data.Object,
+                BillingWebhookEventType.SubscriptionUpdated),
+            EventTypes.CustomerSubscriptionDeleted => FromSubscription(
+                (Subscription)stripeEvent.Data.Object,
+                BillingWebhookEventType.SubscriptionDeleted),
             _ => new BillingWebhookEvent { Type = BillingWebhookEventType.Ignored },
         };
     }
 
-    /// <summary>Flattens a completed Checkout session, expanding the subscription for the price and period end (Checkout webhooks don't inline line items).</summary>
+    /// <summary>Flattens a completed Checkout session, expanding the subscription for price and period end.</summary>
     private BillingWebhookEvent FromCheckout(Session session)
     {
         string? priceId = null;
@@ -80,7 +84,7 @@ public sealed class StripeBillingBroker(BillingSettings settings) : IBillingBrok
         };
     }
 
-    /// <summary>Flattens a <c>customer.subscription.*</c> event — the event object already is the subscription (price and period end on its item).</summary>
+    /// <summary>Flattens a <c>customer.subscription.*</c> event, whose object already is the subscription.</summary>
     private static BillingWebhookEvent FromSubscription(Subscription subscription, BillingWebhookEventType type)
     {
         var item = subscription.Items?.Data?.FirstOrDefault();

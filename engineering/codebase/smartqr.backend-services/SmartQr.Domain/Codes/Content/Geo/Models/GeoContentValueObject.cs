@@ -15,7 +15,7 @@ public sealed record GeoContentValueObject : CodeContent
     public required double Longitude { get; init; }
 
     /// <inheritdoc />
-    /// <remarks>Formats both parts invariantly — a locale spelling the decimal point as a comma would split each number into a coordinate of its own.</remarks>
+    /// <remarks>Formats both parts invariantly.</remarks>
     public override string Encode() => string.Format(
         CultureInfo.InvariantCulture,
         Payload,

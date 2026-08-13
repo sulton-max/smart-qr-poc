@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Content.Sms.Models;
 namespace SmartQr.Domain.Codes.Content.Sms.Extensions;
 
 /// <summary>Extends <see cref="SmsContentValueObject"/> for payload encoding.</summary>
-/// <remarks>SMSTO is a de-facto convention with no RFC behind it — the registered <c>sms:</c> scheme (RFC 5724) is a different format that fewer scanners honour.</remarks>
+/// <remarks>Follows the de-facto SMSTO convention, which no RFC registers.</remarks>
 public static class SmsContentExtensions
 {
     /// <summary>Holds the payload shape carrying a recipient alone.</summary>

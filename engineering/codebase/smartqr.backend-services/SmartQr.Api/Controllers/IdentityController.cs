@@ -27,7 +27,7 @@ public sealed class IdentityController(ICurrentUser currentUser, IGuestSession g
         return Ok(ApiResponse<CurrentUserDto>.Ok(current));
     }
 
-    /// <summary>Builds the signed-in user's summary from the cookie-auth claims — the claims are the source, so no DB read.</summary>
+    /// <summary>Builds the signed-in user's summary from the cookie-auth claims.</summary>
     private UserSummaryDto? ReadUserFromClaims()
     {
         if (!Guid.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))

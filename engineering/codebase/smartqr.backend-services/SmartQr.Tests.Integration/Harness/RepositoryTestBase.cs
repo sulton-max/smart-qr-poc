@@ -2,7 +2,7 @@ using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Tests.Integration.Harness;
 
-/// <summary>xUnit collection that shares one <see cref="SmartQrTestDb"/> across every below-HTTP DB test — repository edge cases and the cached config store (one container or one in-memory DB for the whole suite).</summary>
+/// <summary>xUnit collection sharing one <see cref="SmartQrTestDb"/> across every below-HTTP DB test.</summary>
 [CollectionDefinition(Name)]
 public sealed class RepositoryTestCollection : ICollectionFixture<SmartQrTestDb>
 {
@@ -10,17 +10,17 @@ public sealed class RepositoryTestCollection : ICollectionFixture<SmartQrTestDb>
     public const string Name = "SmartQr repository tests";
 }
 
-/// <summary>Base for below-HTTP tests that touch the database directly (repository branches, the cached config store): shares one <see cref="SmartQrTestDb"/> and resets it to empty before each test for isolation.</summary>
+/// <summary>Base for below-HTTP DB tests — shares <see cref="SmartQrTestDb"/>, emptied before each test.</summary>
 [Collection(RepositoryTestCollection.Name)]
 public abstract class RepositoryTestBase(SmartQrTestDb db) : IAsyncLifetime
 {
     /// <summary>The shared provider-switchable test database (Postgres container or in-memory SQLite).</summary>
     protected SmartQrTestDb Db { get; } = db;
 
-    /// <summary>A new <see cref="AppDbContext"/> on the active test database, with the app's conventions and audit interceptor applied.</summary>
+    /// <summary>A new <see cref="AppDbContext"/> on the active test database, with conventions and audit.</summary>
     protected AppDbContext NewContext() => Db.NewContext();
 
-    /// <summary>Resets the shared database to empty before each test (Postgres: Respawn truncate; SQLite: recreate in-memory).</summary>
+    /// <summary>Resets the shared database to empty before each test.</summary>
     public async Task InitializeAsync() => await Db.ResetAsync();
 
     /// <inheritdoc />

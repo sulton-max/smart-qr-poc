@@ -1,6 +1,6 @@
 namespace SmartQr.Domain.Codes.Content.Calendar.Models;
 
-/// <summary>A calendar event — encodes to an iCalendar <c>VEVENT</c> carrying only the filled fields; dates use the basic (compact) format.</summary>
+/// <summary>A calendar event — encodes to an iCalendar <c>VEVENT</c> carrying only the filled fields.</summary>
 public sealed record CalendarContent : CodeContent
 {
     /// <summary>Event title.</summary>

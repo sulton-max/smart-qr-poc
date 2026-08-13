@@ -8,11 +8,7 @@ public static class SubtypeRegistryJsonExtensions
 {
     private const string DefaultDiscriminatorPropertyName = "type";
 
-    /// <summary>
-    /// Builds a <see cref="DefaultJsonTypeInfoResolver"/> modifier that attaches the registry's subtypes to
-    /// <typeparamref name="TBase"/> as a discriminated union. Subtypes declare no attributes — the registry is the
-    /// single source, so no per-type token can drift from the enum.
-    /// </summary>
+    /// <summary>Builds a <see cref="DefaultJsonTypeInfoResolver"/> modifier binding the subtypes as a union.</summary>
     /// <typeparam name="TBase">The polymorphic base type.</typeparam>
     /// <typeparam name="TKind">The enum discriminating the subtypes.</typeparam>
     /// <param name="registry">The registry to bind.</param>
@@ -28,7 +24,10 @@ public static class SubtypeRegistryJsonExtensions
             if (typeInfo.Type != typeof(TBase))
                 return;
 
-            var polymorphism = new JsonPolymorphismOptions { TypeDiscriminatorPropertyName = discriminatorPropertyName };
+            var polymorphism = new JsonPolymorphismOptions
+        {
+            TypeDiscriminatorPropertyName = discriminatorPropertyName,
+        };
             foreach (var (_, type, discriminator) in registry.Subtypes)
                 polymorphism.DerivedTypes.Add(new JsonDerivedType(type, discriminator));
 

@@ -16,7 +16,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Codes.Core.CommandHandlers;
 
-/// <summary>Handles <see cref="CodeCreateCommand"/> — enforces the plan code cap, allocates a unique slug, persists the code and rules.</summary>
+/// <summary>Handles <see cref="CodeCreateCommand"/> — enforces the plan cap, allocates a unique slug, saves.</summary>
 public sealed class CodeCreateCommandHandler(
     ICodeRepository repository,
     ISubscriptionRepository subscriptions,
@@ -73,7 +73,8 @@ public sealed class CodeCreateCommandHandler(
 
             await repository.AddAsync(entity, ct);
 
-            return AppResult<CodeCreateResult.Success>.Ok(new CodeCreateResult.Success(entity.ToDto(settings.RedirectBaseUrl)));
+            return AppResult<CodeCreateResult.Success>.Ok(
+            new CodeCreateResult.Success(entity.ToDto(settings.RedirectBaseUrl)));
         }
         catch (Exception ex)
         {

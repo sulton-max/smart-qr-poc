@@ -4,8 +4,8 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Application.Codes.Rules.Validators;
 
-/// <summary>Validates a conditional rule — the operand it matches a scan against, its position, and the content it serves.</summary>
-/// <remarks>Delegates the payload: a member added to a <c>*Content</c> type needs its rule added there, not here.</remarks>
+/// <summary>Validates a conditional rule — the operand it matches a scan against, its position, and content.</summary>
+/// <remarks>A member added to a <c>*Content</c> type needs its rule there, not here.</remarks>
 /// <seealso cref="CodeContentValidator"/>
 public sealed class ConditionalRuleValidator : AbstractValidator<ConditionalRule>
 {

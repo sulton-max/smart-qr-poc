@@ -3,10 +3,10 @@ using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 
 namespace SmartQr.Domain.Billing.Entities;
 
-/// <summary>Represents a user's Stripe subscription — the single live row per user that resolves their plan. No row ⇒ treated as Free.</summary>
+/// <summary>Represents a user's Stripe subscription — the row that resolves their plan; no row means Free.</summary>
 public sealed record SubscriptionEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
 {
-    /// <summary>Gets the storage table name for the subscription entity — the single source of truth for hand-written SQL.</summary>
+    /// <summary>Gets the storage table name of the subscription entity.</summary>
     public static string TableName => "subscriptions";
 
     /// <summary>Gets or sets the UUID primary key of the subscription.</summary>
@@ -22,13 +22,13 @@ public sealed record SubscriptionEntity : IKeyedEntity<Guid>, IHasTableName, IAu
     /// <summary>Gets or sets the lifecycle status of the subscription, mirrored from Stripe.</summary>
     public required SubscriptionStatus Status { get; set; }
 
-    /// <summary>Gets or sets the Stripe customer id of the subscription (<c>cus_…</c>) — the source for Customer Portal sessions.</summary>
+    /// <summary>Gets or sets the Stripe customer id of the subscription (<c>cus_…</c>).</summary>
     public required string StripeCustomerId { get; set; }
 
-    /// <summary>Gets or sets the Stripe subscription id of the subscription (<c>sub_…</c>) — the lookup key for subscription webhooks.</summary>
+    /// <summary>Gets or sets the Stripe subscription id of the subscription (<c>sub_…</c>).</summary>
     public required string StripeSubscriptionId { get; set; }
 
-    /// <summary>Gets or sets the end of the current billing period of the subscription (from <c>subscription.current_period_end</c>). Null when unknown.</summary>
+    /// <summary>Gets or sets the end of the current billing period of the subscription. Null when unknown.</summary>
     public DateTimeOffset? CurrentPeriodEnd { get; set; }
 
     /// <summary>Gets or sets the creation timestamp of the subscription.</summary>

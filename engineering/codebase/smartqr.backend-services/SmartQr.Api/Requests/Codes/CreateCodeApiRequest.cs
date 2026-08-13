@@ -14,16 +14,16 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Gets the kind of content every rule carries — the builder's content-type choice. Validated against the rules it ships with.</summary>
+    /// <summary>Gets the kind of content every rule carries — validated against the rules it ships with.</summary>
     public required CodeContentType ContentType { get; init; }
 
-    /// <summary>Gets how the symbol resolves — a baked payload (static) or the redirect short link (dynamic). Fixed for the life of the code.</summary>
+    /// <summary>Gets how the symbol resolves — a baked payload (static) or a redirect short link (dynamic).</summary>
     public required ContentMode Mode { get; init; }
 
-    /// <summary>Gets the routing rules, each carrying the content it serves. At least one is required; every rule must carry the same content type.</summary>
+    /// <summary>Gets the routing rules, each carrying the content it serves — at least one is required.</summary>
     public required IReadOnlyList<CodeRule> Rules { get; init; }
 
-    /// <summary>Gets the style the code renders with — a code always has one, so the client sends the whole block rather than leaning on a server default.</summary>
+    /// <summary>Gets the style the code renders with — the whole block, no server default.</summary>
     public required StyleApiRequest Style { get; init; }
 }
 

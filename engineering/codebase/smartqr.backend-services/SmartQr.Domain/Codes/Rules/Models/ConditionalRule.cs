@@ -12,7 +12,7 @@ public sealed record ConditionalRule : CodeRule
     /// <summary>The signal this rule matches on.</summary>
     public required RuleConditionType Condition { get; init; }
 
-    /// <summary>The operand the condition compares against — interpretation depends on <see cref="Condition"/>.</summary>
+    /// <summary>The operand the condition compares against; <see cref="Condition"/> decides how it reads.</summary>
     public required string ConditionValue { get; init; }
 
     /// <summary>The content served when this rule matches.</summary>

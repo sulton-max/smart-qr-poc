@@ -4,7 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Data.Migrations;
 
 namespace SmartQr.Tests.Migrations.Tests;
 
-/// <summary><c>-- @no-transaction</c> — the Apply runs outside a transaction (needed for CREATE INDEX CONCURRENTLY) and records separately; a re-run is a no-op.</summary>
+/// <summary><c>-- @no-transaction</c> — Apply runs outside a transaction and records; re-run is a no-op.</summary>
 [Collection(MigratorCollection.Name)]
 public sealed class NoTransactionTests(MigratorPostgresFixture fixture) : MigratorTestBase(fixture)
 {

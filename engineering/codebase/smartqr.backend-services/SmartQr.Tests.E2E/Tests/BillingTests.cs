@@ -14,7 +14,7 @@ using BillingWebhookEventType = SmartQr.Application.Billing.Core.Models.BillingW
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E billing — checkout, portal, the <c>/me</c> snapshot, the create-time 402 cap, and the Stripe-webhook lifecycle (subscribe / upgrade / cancel), all over the real two-host stack with a fake Stripe gateway. The full controller → handler → repository path plus the cross-host never-deactivate-on-downgrade guarantee.</summary>
+/// <summary>E2E billing — checkout, portal, <c>/me</c>, the 402 cap, webhooks, no deactivation on downgrade.</summary>
 [Collection(AppCollection.Name)]
 public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -142,7 +142,9 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
         await SeedCodesAsync(owner, 2); // Free cap = 3, count < cap
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Third", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync(
+            "/api/codes",
+            CodeRequests.StaticUrl("Third", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -153,7 +155,9 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         var owner = await CreateGuestClientAsync();
         await SeedCodesAsync(owner, 3); // Free cap = 3, count == cap (no subscription row ⇒ Free)
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Over", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync(
+            "/api/codes",
+            CodeRequests.StaticUrl("Over", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.PaymentRequired); // 402
     }
@@ -165,7 +169,9 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Solo, "sub_solo", "cus_solo"); // cap = 25
         await SeedCodesAsync(owner, 25);
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("Over", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync(
+            "/api/codes",
+            CodeRequests.StaticUrl("Over", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.PaymentRequired); // 402
     }
@@ -177,7 +183,9 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Agency, "sub_ag", "cus_ag"); // cap = int.MaxValue
         await SeedCodesAsync(owner, 30); // well past every bounded tier
 
-        var response = await owner.Client.PostJsonAsync("/api/codes", CodeRequests.StaticUrl("AnotherOne", "https://x.example"));
+        var response = await owner.Client.PostJsonAsync(
+            "/api/codes",
+            CodeRequests.StaticUrl("AnotherOne", "https://x.example"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -313,7 +321,8 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
         await SeedSubscriptionAsync(owner, Plan.Pro, "sub_cancel", "cus_c");
         const string destination = "https://still-works.example";
         // A dynamic code that resolves to the destination on scan: url content encodes to null (redirect types don't
-        // resolve on the hot path yet), so the destination rides a text rule, whose payload encodes to the string verbatim.
+        // resolve on the hot path yet), so the destination rides a text rule, whose payload encodes to the string
+        // verbatim.
         var code = await (await owner.Client.PostJsonAsync("/api/codes", new
         {
             name = "keeper",
@@ -324,7 +333,8 @@ public sealed class BillingTests(AppFixture fixture) : E2EBase(fixture)
             style = CodeRequests.Style(),
         })).ReadEnvelopeAsync<CodeDtoModel>();
 
-        // Sanity: it resolves on the Redirect host while subscribed. Compare as Uri — a bare host canonicalises to a trailing slash.
+        // Sanity: it resolves on the Redirect host while subscribed. Compare as Uri — a bare host canonicalises to a
+        // trailing slash.
         var expected = new Uri(destination);
         var before = await RedirectClient.GetAsync($"/{code.Slug}");
         before.StatusCode.Should().Be(HttpStatusCode.Found); // 302

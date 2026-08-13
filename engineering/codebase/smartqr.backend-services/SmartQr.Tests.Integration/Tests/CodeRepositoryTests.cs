@@ -9,7 +9,7 @@ using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
 
-/// <summary>Integration tests for the persistence path against the provider-switchable test database (Postgres or SQLite).</summary>
+/// <summary>Integration tests for the persistence path against the provider-switchable test database.</summary>
 public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
     private static CodeEntity NewCode(Guid user, string slug, params CodeRule[] rules) => new()
@@ -43,8 +43,20 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule { Order = 2, Condition = RuleConditionType.Device, ConditionValue = "Android", Content = new UrlContent { Url = "https://play.example" } },
-                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new UrlContent { Url = "https://apple.example" } },
+                new ConditionalRule
+                {
+                    Order = 2,
+                    Condition = RuleConditionType.Device,
+                    ConditionValue = "Android",
+                    Content = new UrlContent { Url = "https://play.example" }
+                },
+                new ConditionalRule
+                {
+                    Order = 1,
+                    Condition = RuleConditionType.Device,
+                    ConditionValue = "Ios",
+                    Content = new UrlContent { Url = "https://apple.example" }
+                },
             ],
         };
 
@@ -129,7 +141,13 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new UrlContent { Url = "https://old.example/ios" } },
+                new ConditionalRule
+                {
+                    Order = 1,
+                    Condition = RuleConditionType.Device,
+                    ConditionValue = "Ios",
+                    Content = new UrlContent { Url = "https://old.example/ios" }
+                },
             ],
         };
         await new CodeRepository(NewContext()).AddAsync(code, default);
@@ -148,8 +166,20 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         loaded!.Name = "New";
         loaded.Rules =
         [
-            new ConditionalRule { Order = 1, Condition = RuleConditionType.Country, ConditionValue = "US", Content = new UrlContent { Url = "https://new.example/us" } },
-            new ConditionalRule { Order = 2, Condition = RuleConditionType.Country, ConditionValue = "UK", Content = new UrlContent { Url = "https://new.example/uk" } },
+            new ConditionalRule
+            {
+                Order = 1,
+                Condition = RuleConditionType.Country,
+                ConditionValue = "US",
+                Content = new UrlContent { Url = "https://new.example/us" }
+            },
+            new ConditionalRule
+            {
+                Order = 2,
+                Condition = RuleConditionType.Country,
+                ConditionValue = "UK",
+                Content = new UrlContent { Url = "https://new.example/uk" }
+            },
         ];
         await repo.UpdateAsync(loaded, default);
 
@@ -160,7 +190,9 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Assert.Equal("New", reloaded.Name);
         Assert.Equal(2, reloaded.Rules.Count);
         // The whole rule set was replaced — the old iOS rule's content is gone.
-        Assert.DoesNotContain(reloaded.Rules.OfType<ConditionalRule>(), r => r.Content is UrlContent { Url: "https://old.example/ios" });
+        Assert.DoesNotContain(
+            reloaded.Rules.OfType<ConditionalRule>(),
+            r => r.Content is UrlContent { Url: "https://old.example/ios" });
     }
 
     [Fact]
@@ -202,7 +234,13 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule { Order = 1, Condition = RuleConditionType.Device, ConditionValue = "Ios", Content = new UrlContent { Url = "https://ios.example" } },
+                new ConditionalRule
+                {
+                    Order = 1,
+                    Condition = RuleConditionType.Device,
+                    ConditionValue = "Ios",
+                    Content = new UrlContent { Url = "https://ios.example" }
+                },
             ],
         };
         await new CodeRepository(NewContext()).AddAsync(code, default);
@@ -221,9 +259,15 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
     {
         var user = Guid.NewGuid();
 
-        await new CodeRepository(NewContext()).AddAsync(NamedCode(user, "nm11111", "Spring Menu", "https://restaurant.example"), default);
-        await new CodeRepository(NewContext()).AddAsync(NamedCode(user, "nm22222", "Promo Flyer", "https://menu-deals.example"), default);
-        await new CodeRepository(NewContext()).AddAsync(NamedCode(user, "nm33333", "Business Card", "https://card.example"), default);
+        await new CodeRepository(NewContext()).AddAsync(
+            NamedCode(user, "nm11111", "Spring Menu", "https://restaurant.example"),
+            default);
+        await new CodeRepository(NewContext()).AddAsync(
+            NamedCode(user, "nm22222", "Promo Flyer", "https://menu-deals.example"),
+            default);
+        await new CodeRepository(NewContext()).AddAsync(
+            NamedCode(user, "nm33333", "Business Card", "https://card.example"),
+            default);
 
         // Name-only match: the fallback_url column is retired, so "Promo Flyer" (whose destination contains
         // "menu") no longer matches — the destination now lives in the typed content / rules.

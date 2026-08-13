@@ -5,12 +5,8 @@ using SmartQr.Application.Codes.Rules.Validators;
 
 namespace SmartQr.Application.Codes.Core.Validators;
 
-/// <summary>Validates update-code input — the name, each rule with the content it carries, and the rule set as a whole.</summary>
-/// <remarks>
-/// Near-identical to <see cref="CodeCreateCommandValidator"/> by nature, not by duplication: mode is absent from the
-/// update contract (CM3), so the rule set is built with a null mode and the static-one-rule check cannot run here.
-/// It becomes a transition constraint against the persisted mode once the entity is fetched — do not merge the two.
-/// </remarks>
+/// <summary>Validates update-code input — the name, each rule and its content, and the rule set as a whole.</summary>
+/// <remarks>Do not merge with <see cref="CodeCreateCommandValidator"/>: update carries no mode (CM3).</remarks>
 /// <seealso cref="CodeRuleValidator"/>
 /// <seealso cref="CodeRuleSetValidator"/>
 public sealed class CodeUpdateCommandValidator : AbstractValidator<CodeUpdateCommand>

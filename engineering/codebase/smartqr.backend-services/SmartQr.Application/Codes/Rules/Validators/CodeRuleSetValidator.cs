@@ -7,12 +7,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 namespace SmartQr.Application.Codes.Rules.Validators;
 
 /// <summary>Validates a code's rule set as a whole — the invariants a single rule cannot see.</summary>
-/// <remarks>
-/// Every rule carries an explicit <c>OverridePropertyName</c>. The subject is a projection, not a member of the
-/// command, so FluentValidation has no name to derive and the composed path would otherwise be meaningless
-/// (<c>Rules.Rules</c>). Each name below is a **wire contract** — the frontend maps it onto a form field, so a
-/// failure must name the member the caller can actually change. Locked by <c>CodeValidationPathTests</c>.
-/// </remarks>
+/// <remarks>Give each rule an explicit <c>OverridePropertyName</c>; <c>CodeValidationPathTests</c> locks it.</remarks>
 public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
 {
     /// <summary>Builds the whole-set rules.</summary>
@@ -24,7 +19,8 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
             .OverridePropertyName(nameof(CodeRuleSet.Rules));
 
         RuleFor(set => set.Rules)
-            .Must(rules => Conditional(rules).Select(rule => rule.Order).Distinct().Count() == Conditional(rules).Count())
+            .Must(rules => Conditional(rules).Select(rule => rule.Order).Distinct().Count()
+                           == Conditional(rules).Count())
             .WithMessage("Rule order must be unique.")
             .OverridePropertyName(nameof(CodeRuleSet.Rules));
 
@@ -57,7 +53,8 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
             .OverridePropertyName(nameof(CodeRuleSet.Mode));
     }
 
-    private static List<ConditionalRule> Conditional(IReadOnlyList<CodeRule> rules) => [.. rules.OfType<ConditionalRule>()];
+    private static List<ConditionalRule> Conditional(IReadOnlyList<CodeRule> rules) =>
+        [.. rules.OfType<ConditionalRule>()];
 
     private static IEnumerable<CodeContent> Contents(IReadOnlyList<CodeRule> rules) =>
         rules.Select(rule => rule switch
