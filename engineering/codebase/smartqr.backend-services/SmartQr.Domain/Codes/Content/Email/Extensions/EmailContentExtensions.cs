@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Content.Email.Models;
 namespace SmartQr.Domain.Codes.Content.Email.Extensions;
 
 /// <summary>Extends <see cref="EmailContentValueObject"/> for payload encoding.</summary>
-/// <remarks>The <c>mailto:</c> scheme is registered (RFC 6068), and it carries the draft as query parameters rather than as path segments.</remarks>
+/// <remarks>Follows RFC 6068, which registers the <c>mailto:</c> scheme.</remarks>
 public static class EmailContentExtensions
 {
     /// <summary>Holds the payload shape carrying a recipient alone.</summary>

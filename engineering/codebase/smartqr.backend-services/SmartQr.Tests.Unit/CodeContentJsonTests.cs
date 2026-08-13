@@ -22,11 +22,11 @@ public sealed class CodeContentJsonTests
     {
         { new UrlContent { Url = "https://x.io" }, "url" },
         { new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }, "mobileApp" },
-        { new TextContent { Text = "hi there" }, "text" },
+        { new TextContentValueObject { Text = "hi there" }, "text" },
         { new EmailContentValueObject { To = "a@b.com", Subject = "Hi" }, "email" },
         { new SmsContentValueObject { Phone = "+15550100", Message = "hey" }, "sms" },
         { new PhoneContent { Phone = "+15550100" }, "phone" },
-        { new GeoContent { Latitude = 41.31, Longitude = 69.24 }, "geo" },
+        { new GeoContentValueObject { Latitude = 41.31, Longitude = 69.24 }, "geo" },
         { new WifiContentValueObject { Ssid = "Cafe", Password = "pw", Encryption = WifiEncryption.Wpa, Hidden = true }, "wifi" },
         { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
         { new CalendarContent { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) }, "calendar" },

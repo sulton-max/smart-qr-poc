@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Content.Geo.Models;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates a geographic location.</summary>
-public sealed class GeoContentValidator : AbstractValidator<GeoContent>
+public sealed class GeoContentValidator : AbstractValidator<GeoContentValueObject>
 {
     /// <summary>Builds the geo-content rules.</summary>
     public GeoContentValidator()

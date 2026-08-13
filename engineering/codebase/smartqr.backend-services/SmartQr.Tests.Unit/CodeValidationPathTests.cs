@@ -62,7 +62,7 @@ public class CodeValidationPathTests
     [Fact]
     public void Homogeneity_failure_reports_ContentType_not_Rules()
     {
-        var rule = new DefaultRule { Content = new TextContent { Text = "hi" } };
+        var rule = new DefaultRule { Content = new TextContentValueObject { Text = "hi" } };
         var paths = PathsFor(Command(ContentMode.Static, rule));
 
         Assert.Contains("ContentType", paths);

@@ -31,8 +31,8 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void Text_is_passed_through_untrimmed()
     {
-        Assert.Equal("hi there", new TextContent { Text = "hi there" }.Encode());
-        Assert.True(new TextContent { Text = "hi there" }.IsStatic);
+        Assert.Equal("hi there", new TextContentValueObject { Text = "hi there" }.Encode());
+        Assert.True(new TextContentValueObject { Text = "hi there" }.IsStatic);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void Geo_encodes_to_geo_lat_lng()
     {
-        Assert.Equal("geo:41.31,69.24", new GeoContent { Latitude = 41.31, Longitude = 69.24 }.Encode());
+        Assert.Equal("geo:41.31,69.24", new GeoContentValueObject { Latitude = 41.31, Longitude = 69.24 }.Encode());
     }
 
     [Fact]

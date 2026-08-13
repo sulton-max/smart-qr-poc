@@ -18,11 +18,11 @@ public abstract record CodeContent
     public static readonly SubtypeRegistry<CodeContent, CodeContentType> Subtypes = new(
         (CodeContentType.Url, typeof(Url.Models.UrlContent)),
         (CodeContentType.MobileApp, typeof(MobileApp.Models.MobileAppLinkContent)),
-        (CodeContentType.Text, typeof(Text.Models.TextContent)),
+        (CodeContentType.Text, typeof(Text.Models.TextContentValueObject)),
         (CodeContentType.Email, typeof(Email.Models.EmailContentValueObject)),
         (CodeContentType.Sms, typeof(Sms.Models.SmsContentValueObject)),
         (CodeContentType.Phone, typeof(Phone.Models.PhoneContent)),
-        (CodeContentType.Geo, typeof(Geo.Models.GeoContent)),
+        (CodeContentType.Geo, typeof(Geo.Models.GeoContentValueObject)),
         (CodeContentType.Wifi, typeof(Wifi.Models.WifiContentValueObject)),
         (CodeContentType.VCard, typeof(VCard.Models.VCardContent)),
         (CodeContentType.Calendar, typeof(Calendar.Models.CalendarContent)));
