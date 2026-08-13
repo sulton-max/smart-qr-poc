@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Content.Email.Models;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates a pre-filled email.</summary>
-public sealed class EmailContentValidator : AbstractValidator<EmailContent>
+public sealed class EmailContentValidator : AbstractValidator<EmailContentValueObject>
 {
     /// <summary>Builds the email-content rules.</summary>
     public EmailContentValidator() =>

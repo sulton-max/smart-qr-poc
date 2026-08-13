@@ -23,7 +23,7 @@ public sealed class CodeContentJsonTests
         { new UrlContent { Url = "https://x.io" }, "url" },
         { new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" }, "mobileApp" },
         { new TextContent { Text = "hi there" }, "text" },
-        { new EmailContent { To = "a@b.com", Subject = "Hi" }, "email" },
+        { new EmailContentValueObject { To = "a@b.com", Subject = "Hi" }, "email" },
         { new SmsContentValueObject { Phone = "+15550100", Message = "hey" }, "sms" },
         { new PhoneContent { Phone = "+15550100" }, "phone" },
         { new GeoContent { Latitude = 41.31, Longitude = 69.24 }, "geo" },

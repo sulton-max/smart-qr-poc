@@ -46,10 +46,10 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void Email_encodes_to_mailto_with_form_encoded_params()
     {
-        Assert.Equal("mailto:a@b.com", new EmailContent { To = "a@b.com" }.Encode());
+        Assert.Equal("mailto:a@b.com", new EmailContentValueObject { To = "a@b.com" }.Encode());
         Assert.Equal(
             "mailto:a@b.com?subject=Hi+%26+bye&body=line+one",
-            new EmailContent { To = "a@b.com", Subject = "Hi & bye", Body = "line one" }.Encode());
+            new EmailContentValueObject { To = "a@b.com", Subject = "Hi & bye", Body = "line one" }.Encode());
     }
 
     [Fact]
