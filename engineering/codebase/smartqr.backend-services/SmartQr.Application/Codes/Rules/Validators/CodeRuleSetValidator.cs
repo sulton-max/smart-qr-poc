@@ -26,13 +26,13 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
 
         // Two catch-alls would make resolution ambiguous; the second could never be reached.
         RuleFor(set => set.Rules)
-            .Must(rules => rules.Count(rule => rule is DefaultRuleValueObject or DefaultPointerRule) <= 1)
+            .Must(rules => rules.Count(rule => rule is DefaultRuleValueObject or DefaultPointerRuleValueObject) <= 1)
             .WithMessage("A code carries at most one default rule.")
             .OverridePropertyName(nameof(CodeRuleSet.Rules));
 
         // A pointer delegates to a conditional rule; anything else would leave the scan unresolved.
         RuleFor(set => set.Rules)
-            .Must(rules => rules.OfType<DefaultPointerRule>().All(pointer =>
+            .Must(rules => rules.OfType<DefaultPointerRuleValueObject>().All(pointer =>
                 Conditional(rules).Any(rule => rule.Order == pointer.TargetOrder)))
             .WithMessage("The default rule must point at an existing rule.")
             .OverridePropertyName(nameof(CodeRuleSet.Rules));

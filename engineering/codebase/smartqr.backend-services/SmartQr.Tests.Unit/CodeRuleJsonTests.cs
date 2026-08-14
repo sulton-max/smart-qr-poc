@@ -27,7 +27,7 @@ public sealed class CodeRuleJsonTests
             new DefaultRuleValueObject { Content = new UrlContentValueObject { Url = "https://fallback.example.com" } },
             "default"
         },
-        { new DefaultPointerRule { TargetOrder = 2 }, "defaultPointer" },
+        { new DefaultPointerRuleValueObject { TargetOrder = 2 }, "defaultPointer" },
     };
 
     [Theory]
@@ -70,7 +70,7 @@ public sealed class CodeRuleJsonTests
                     Encryption = WifiEncryption.Wpa
                 },
             },
-            new DefaultPointerRule { TargetOrder = 1 },
+            new DefaultPointerRuleValueObject { TargetOrder = 1 },
         ];
 
         var restored = CodeRuleJson.Deserialize(CodeRuleJson.Serialize(rules));

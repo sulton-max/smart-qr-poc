@@ -11,5 +11,5 @@ public abstract record CodeRule
     public static readonly SubtypeRegistry<CodeRule, CodeRuleType> Subtypes = new(
         (CodeRuleType.Conditional, typeof(ConditionalRuleValueObject)),
         (CodeRuleType.Default, typeof(DefaultRuleValueObject)),
-        (CodeRuleType.DefaultPointer, typeof(DefaultPointerRule)));
+        (CodeRuleType.DefaultPointer, typeof(DefaultPointerRuleValueObject)));
 }

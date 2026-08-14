@@ -100,7 +100,7 @@ public class CodeValidationPathTests
     [Fact]
     public void Dangling_pointer_target_reports_Rules()
     {
-        var rule = new DefaultPointerRule { TargetOrder = 9 };
+        var rule = new DefaultPointerRuleValueObject { TargetOrder = 9 };
         var paths = PathsFor(Command(ContentMode.Dynamic, Conditional(1, "https://a.io"), rule));
 
         Assert.Contains("Rules", paths);
