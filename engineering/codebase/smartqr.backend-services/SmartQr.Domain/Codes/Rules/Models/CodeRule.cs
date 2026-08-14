@@ -10,6 +10,6 @@ public abstract record CodeRule
     /// <summary>The closed set of rule variants — the single source for the wire discriminator.</summary>
     public static readonly SubtypeRegistry<CodeRule, CodeRuleType> Subtypes = new(
         (CodeRuleType.Conditional, typeof(ConditionalRuleValueObject)),
-        (CodeRuleType.Default, typeof(DefaultRule)),
+        (CodeRuleType.Default, typeof(DefaultRuleValueObject)),
         (CodeRuleType.DefaultPointer, typeof(DefaultPointerRule)));
 }

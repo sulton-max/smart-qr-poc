@@ -25,9 +25,9 @@ public sealed class RoutingService : IRoutingService
         }
 
         // No conditional rule matched — the catch-all serves the scan, or the code deliberately does not resolve.
-        return code.Rules.FirstOrDefault(rule => rule is DefaultRule or DefaultPointerRule) switch
+        return code.Rules.FirstOrDefault(rule => rule is DefaultRuleValueObject or DefaultPointerRule) switch
         {
-            DefaultRule fallback => Resolve(fallback.Content, null),
+            DefaultRuleValueObject fallback => Resolve(fallback.Content, null),
             DefaultPointerRule pointer => ResolvePointer(code, pointer),
             _ => new RoutingResult.NotFound(),
         };

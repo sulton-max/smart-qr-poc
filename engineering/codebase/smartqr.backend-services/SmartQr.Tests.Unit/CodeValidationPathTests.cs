@@ -34,7 +34,8 @@ public class CodeValidationPathTests
         Content = new UrlContentValueObject { Url = url },
     };
 
-    private static DefaultRule Fallback(string url) => new() { Content = new UrlContentValueObject { Url = url } };
+    private static DefaultRuleValueObject Fallback(string url) =>
+        new() { Content = new UrlContentValueObject { Url = url } };
 
     private string[] PathsFor(CodeCreateCommand command) =>
         [.. _validator.Validate(command).Errors.Select(failure => failure.PropertyName)];
@@ -59,7 +60,7 @@ public class CodeValidationPathTests
     [Fact]
     public void Homogeneity_failure_reports_ContentType_not_Rules()
     {
-        var rule = new DefaultRule { Content = new TextContentValueObject { Text = "hi" } };
+        var rule = new DefaultRuleValueObject { Content = new TextContentValueObject { Text = "hi" } };
         var paths = PathsFor(Command(ContentMode.Static, rule));
 
         Assert.Contains("ContentType", paths);

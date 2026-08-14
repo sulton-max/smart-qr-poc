@@ -291,6 +291,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         ContentType = CodeContentType.Url,
         IsActive = true,
         // The destination now lives in the typed content of a catch-all rule, not a fallback_url column.
-        Rules = [new DefaultRule { Content = new UrlContentValueObject { Url = destination } }],
+        Rules = [new DefaultRuleValueObject { Content = new UrlContentValueObject { Url = destination } }],
     };
 }

@@ -44,7 +44,7 @@ public class RoutingServiceTests
     };
 
     // The catch-all is a rule role, not a condition — it carries its own content and is never order-matched.
-    private static DefaultRule Fallback(string destination) => new()
+    private static DefaultRuleValueObject Fallback(string destination) => new()
     {
         Content = new PhoneContentValueObject { Phone = destination },
     };

@@ -90,7 +90,7 @@ public sealed class CodeImageServiceTests
         BarcodeFormat = DomainBarcodeFormat.QrCode,
         StyleJson = "{}",
         Mode = mode,
-        Rules = [new DefaultRule { Content = content }],
+        Rules = [new DefaultRuleValueObject { Content = content }],
     };
 
     /// <summary>Decodes a PNG QR back to its text with ZXing, or null when undecodable.</summary>

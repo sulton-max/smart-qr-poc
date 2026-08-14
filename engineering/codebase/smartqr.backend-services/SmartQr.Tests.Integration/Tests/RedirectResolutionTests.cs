@@ -54,7 +54,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     Content = new PhoneContentValueObject { Phone = "+15551111" }
                 },
                 // The catch-all is a trailing Default rule — it replaces the retired fallback_url column.
-                new DefaultRule { Content = new PhoneContentValueObject { Phone = "+15559999" } },
+                new DefaultRuleValueObject { Content = new PhoneContentValueObject { Phone = "+15559999" } },
             ],
         });
         await ctx.SaveChangesAsync();
@@ -131,7 +131,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     ContentType = CodeContentType.Phone,
                     IsActive = true,
                     // A single-destination code carries its destination as a Default catch-all rule.
-                    Rules = [new DefaultRule { Content = new PhoneContentValueObject { Phone = "+15550000" } }],
+                    Rules =
+                    [
+                        new DefaultRuleValueObject { Content = new PhoneContentValueObject { Phone = "+15550000" } },
+                    ],
                 });
             }
 

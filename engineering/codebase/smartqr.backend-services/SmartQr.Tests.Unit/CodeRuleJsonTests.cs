@@ -23,7 +23,10 @@ public sealed class CodeRuleJsonTests
     public static TheoryData<CodeRule, string> Cases() => new()
     {
         { Conditional(), "conditional" },
-        { new DefaultRule { Content = new UrlContentValueObject { Url = "https://fallback.example.com" } }, "default" },
+        {
+            new DefaultRuleValueObject { Content = new UrlContentValueObject { Url = "https://fallback.example.com" } },
+            "default"
+        },
         { new DefaultPointerRule { TargetOrder = 2 }, "defaultPointer" },
     };
 
@@ -78,7 +81,7 @@ public sealed class CodeRuleJsonTests
     [Fact]
     public void Nested_content_keeps_its_own_discriminator()
     {
-        var rule = new DefaultRule { Content = new WifiContentValueObject
+        var rule = new DefaultRuleValueObject { Content = new WifiContentValueObject
         {
             Ssid = "Cafe",
             Encryption = WifiEncryption.Wpa

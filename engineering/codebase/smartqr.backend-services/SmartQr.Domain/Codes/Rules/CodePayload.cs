@@ -20,7 +20,7 @@ public static class CodePayload
             ? rules[0] switch
             {
                 ConditionalRuleValueObject rule => rule.Content,
-                DefaultRule rule => rule.Content,
+                DefaultRuleValueObject rule => rule.Content,
                 _ => null,
             }
             : null;

@@ -7,7 +7,7 @@ namespace SmartQr.Application.Codes.Rules.Validators;
 /// <summary>Validates the catch-all rule — it carries only the content it serves, since it is never matched.</summary>
 /// <remarks>A member added to a <c>*Content</c> type needs its rule there, not here.</remarks>
 /// <seealso cref="CodeContentValidator"/>
-public sealed class DefaultRuleValidator : AbstractValidator<DefaultRule>
+public sealed class DefaultRuleValidator : AbstractValidator<DefaultRuleValueObject>
 {
     /// <summary>Builds the catch-all rule's rules.</summary>
     public DefaultRuleValidator() =>

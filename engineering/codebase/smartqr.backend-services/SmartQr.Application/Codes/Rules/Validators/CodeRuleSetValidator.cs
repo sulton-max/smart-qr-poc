@@ -26,7 +26,7 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
 
         // Two catch-alls would make resolution ambiguous; the second could never be reached.
         RuleFor(set => set.Rules)
-            .Must(rules => rules.Count(rule => rule is DefaultRule or DefaultPointerRule) <= 1)
+            .Must(rules => rules.Count(rule => rule is DefaultRuleValueObject or DefaultPointerRule) <= 1)
             .WithMessage("A code carries at most one default rule.")
             .OverridePropertyName(nameof(CodeRuleSet.Rules));
 
@@ -61,7 +61,7 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
         rules.Select(rule => rule switch
         {
             ConditionalRuleValueObject conditional => conditional.Content,
-            DefaultRule fallback => fallback.Content,
+            DefaultRuleValueObject fallback => fallback.Content,
             _ => null,
         })
         .OfType<CodeContentValueObject>();
