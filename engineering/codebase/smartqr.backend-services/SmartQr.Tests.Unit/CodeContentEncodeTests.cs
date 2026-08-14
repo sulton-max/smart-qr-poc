@@ -111,7 +111,7 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void VCard_emits_vcard_3_with_only_filled_fields_ical_escaped()
     {
-        var output = new VCardContent
+        var output = new VCardContentValueObject
         {
             FirstName = "Ada",
             LastName = "Lovelace",

@@ -18,7 +18,7 @@ public abstract record CodeContent
         (CodeContentType.Phone, typeof(Phone.Models.PhoneContentValueObject)),
         (CodeContentType.Geo, typeof(Geo.Models.GeoContentValueObject)),
         (CodeContentType.Wifi, typeof(Wifi.Models.WifiContentValueObject)),
-        (CodeContentType.VCard, typeof(VCard.Models.VCardContent)),
+        (CodeContentType.VCard, typeof(VCard.Models.VCardContentValueObject)),
         (CodeContentType.Calendar, typeof(Calendar.Models.CalendarContent)));
 
     /// <summary>True when the code bakes its payload into the symbol rather than a redirect short link.</summary>

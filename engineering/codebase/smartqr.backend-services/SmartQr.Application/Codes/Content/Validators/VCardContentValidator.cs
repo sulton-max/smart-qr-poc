@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Content.VCard.Models;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates a contact card.</summary>
-public sealed class VCardContentValidator : AbstractValidator<VCardContent>
+public sealed class VCardContentValidator : AbstractValidator<VCardContentValueObject>
 {
     /// <summary>Builds the vCard-content rules.</summary>
     public VCardContentValidator()

@@ -42,7 +42,7 @@ public sealed class CodeContentJsonTests
             Encryption = WifiEncryption.Wpa,
             Hidden = true
         }, "wifi" },
-        { new VCardContent { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
+        { new VCardContentValueObject { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
         { new CalendarContent { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) }, "calendar" },
     };
 
