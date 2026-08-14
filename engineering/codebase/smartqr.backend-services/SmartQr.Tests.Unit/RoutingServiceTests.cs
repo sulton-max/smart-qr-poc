@@ -35,7 +35,7 @@ public class RoutingServiceTests
         NowUtc = DateTimeOffset.UnixEpoch,
     };
 
-    private static ConditionalRule DeviceRule(int order, string value, string destination) => new()
+    private static ConditionalRuleValueObject DeviceRule(int order, string value, string destination) => new()
     {
         Order = order,
         Condition = RuleConditionType.Device,

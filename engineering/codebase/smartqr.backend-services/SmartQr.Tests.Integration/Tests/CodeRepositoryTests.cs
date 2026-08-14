@@ -43,14 +43,14 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule
+                new ConditionalRuleValueObject
                 {
                     Order = 2,
                     Condition = RuleConditionType.Device,
                     ConditionValue = "Android",
                     Content = new UrlContentValueObject { Url = "https://play.example" }
                 },
-                new ConditionalRule
+                new ConditionalRuleValueObject
                 {
                     Order = 1,
                     Condition = RuleConditionType.Device,
@@ -141,7 +141,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule
+                new ConditionalRuleValueObject
                 {
                     Order = 1,
                     Condition = RuleConditionType.Device,
@@ -166,14 +166,14 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         loaded!.Name = "New";
         loaded.Rules =
         [
-            new ConditionalRule
+            new ConditionalRuleValueObject
             {
                 Order = 1,
                 Condition = RuleConditionType.Country,
                 ConditionValue = "US",
                 Content = new UrlContentValueObject { Url = "https://new.example/us" }
             },
-            new ConditionalRule
+            new ConditionalRuleValueObject
             {
                 Order = 2,
                 Condition = RuleConditionType.Country,
@@ -191,7 +191,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         Assert.Equal(2, reloaded.Rules.Count);
         // The whole rule set was replaced — the old iOS rule's content is gone.
         Assert.DoesNotContain(
-            reloaded.Rules.OfType<ConditionalRule>(),
+            reloaded.Rules.OfType<ConditionalRuleValueObject>(),
             r => r.Content is UrlContentValueObject { Url: "https://old.example/ios" });
     }
 
@@ -234,7 +234,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule
+                new ConditionalRuleValueObject
                 {
                     Order = 1,
                     Condition = RuleConditionType.Device,

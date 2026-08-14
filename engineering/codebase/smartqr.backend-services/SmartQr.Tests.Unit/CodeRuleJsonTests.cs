@@ -12,7 +12,7 @@ namespace SmartQr.Tests.Unit;
 /// <remarks><see cref="CodeContentJsonTests"/> covers the inner union alone; this covers both bound together.</remarks>
 public sealed class CodeRuleJsonTests
 {
-    private static ConditionalRule Conditional() => new()
+    private static ConditionalRuleValueObject Conditional() => new()
     {
         Order = 2,
         Condition = RuleConditionType.Device,
@@ -55,7 +55,7 @@ public sealed class CodeRuleJsonTests
         List<CodeRule> rules =
         [
             Conditional(),
-            new ConditionalRule
+            new ConditionalRuleValueObject
             {
                 Order = 1,
                 Condition = RuleConditionType.Country,

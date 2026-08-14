@@ -17,7 +17,7 @@ public sealed class RoutingService : IRoutingService
         if (!code.IsActive)
             return new RoutingResult.NotFound();
 
-        var conditional = code.Rules.OfType<ConditionalRule>().OrderBy(rule => rule.Order);
+        var conditional = code.Rules.OfType<ConditionalRuleValueObject>().OrderBy(rule => rule.Order);
         foreach (var rule in conditional)
         {
             if (Matches(rule, context))
@@ -37,7 +37,7 @@ public sealed class RoutingService : IRoutingService
     private static RoutingResult ResolvePointer(CodeEntity code, DefaultPointerRule pointer)
     {
         var target = code.Rules
-            .OfType<ConditionalRule>()
+            .OfType<ConditionalRuleValueObject>()
             .FirstOrDefault(rule => rule.Order == pointer.TargetOrder);
 
         return target is null
@@ -55,7 +55,7 @@ public sealed class RoutingService : IRoutingService
             : new RoutingResult.Redirect(destination, matchedRuleOrder);
     }
 
-    private static bool Matches(ConditionalRule rule, ScanContext ctx) => rule.Condition switch
+    private static bool Matches(ConditionalRuleValueObject rule, ScanContext ctx) => rule.Condition switch
     {
         RuleConditionType.Device => string.Equals(
             rule.ConditionValue,

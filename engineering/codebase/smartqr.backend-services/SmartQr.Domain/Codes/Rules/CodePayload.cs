@@ -19,7 +19,7 @@ public static class CodePayload
         var content = rules.Count > 0
             ? rules[0] switch
             {
-                ConditionalRule rule => rule.Content,
+                ConditionalRuleValueObject rule => rule.Content,
                 DefaultRule rule => rule.Content,
                 _ => null,
             }

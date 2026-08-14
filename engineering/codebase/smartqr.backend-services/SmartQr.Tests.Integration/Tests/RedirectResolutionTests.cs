@@ -46,7 +46,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
             IsActive = true,
             Rules =
             [
-                new ConditionalRule
+                new ConditionalRuleValueObject
                 {
                     Order = 1,
                     Condition = RuleConditionType.Device,

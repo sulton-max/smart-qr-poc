@@ -54,13 +54,13 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
             .OverridePropertyName(nameof(CodeRuleSet.Mode));
     }
 
-    private static List<ConditionalRule> Conditional(IReadOnlyList<CodeRule> rules) =>
-        [.. rules.OfType<ConditionalRule>()];
+    private static List<ConditionalRuleValueObject> Conditional(IReadOnlyList<CodeRule> rules) =>
+        [.. rules.OfType<ConditionalRuleValueObject>()];
 
     private static IEnumerable<CodeContentValueObject> Contents(IReadOnlyList<CodeRule> rules) =>
         rules.Select(rule => rule switch
         {
-            ConditionalRule conditional => conditional.Content,
+            ConditionalRuleValueObject conditional => conditional.Content,
             DefaultRule fallback => fallback.Content,
             _ => null,
         })

@@ -26,7 +26,7 @@ public class CodeValidationPathTests
         Style = StyleSpec.Default,
     };
 
-    private static ConditionalRule Conditional(int order, string url) => new()
+    private static ConditionalRuleValueObject Conditional(int order, string url) => new()
     {
         Order = order,
         Condition = RuleConditionType.Device,
