@@ -20,7 +20,7 @@ public sealed class CodeContentJsonTests
 {
     public static TheoryData<CodeContent, string> Cases() => new()
     {
-        { new UrlContent { Url = "https://x.io" }, "url" },
+        { new UrlContentValueObject { Url = "https://x.io" }, "url" },
 
         {
             new MobileAppLinkContentValueObject

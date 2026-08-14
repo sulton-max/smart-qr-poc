@@ -31,10 +31,10 @@ public class CodeValidationPathTests
         Order = order,
         Condition = RuleConditionType.Device,
         ConditionValue = "Ios",
-        Content = new UrlContent { Url = url },
+        Content = new UrlContentValueObject { Url = url },
     };
 
-    private static DefaultRule Fallback(string url) => new() { Content = new UrlContent { Url = url } };
+    private static DefaultRule Fallback(string url) => new() { Content = new UrlContentValueObject { Url = url } };
 
     private string[] PathsFor(CodeCreateCommand command) =>
         [.. _validator.Validate(command).Errors.Select(failure => failure.PropertyName)];

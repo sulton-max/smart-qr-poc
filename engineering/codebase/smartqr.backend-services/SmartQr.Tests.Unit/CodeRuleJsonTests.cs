@@ -17,13 +17,13 @@ public sealed class CodeRuleJsonTests
         Order = 2,
         Condition = RuleConditionType.Device,
         ConditionValue = "Ios",
-        Content = new UrlContent { Url = "https://ios.example.com" },
+        Content = new UrlContentValueObject { Url = "https://ios.example.com" },
     };
 
     public static TheoryData<CodeRule, string> Cases() => new()
     {
         { Conditional(), "conditional" },
-        { new DefaultRule { Content = new UrlContent { Url = "https://fallback.example.com" } }, "default" },
+        { new DefaultRule { Content = new UrlContentValueObject { Url = "https://fallback.example.com" } }, "default" },
         { new DefaultPointerRule { TargetOrder = 2 }, "defaultPointer" },
     };
 

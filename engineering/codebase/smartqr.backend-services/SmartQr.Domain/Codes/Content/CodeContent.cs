@@ -10,7 +10,7 @@ public abstract record CodeContent
 {
     /// <summary>The closed set of content variants — the single source for the wire discriminator.</summary>
     public static readonly SubtypeRegistry<CodeContent, CodeContentType> Subtypes = new(
-        (CodeContentType.Url, typeof(Url.Models.UrlContent)),
+        (CodeContentType.Url, typeof(Url.Models.UrlContentValueObject)),
         (CodeContentType.MobileApp, typeof(MobileApp.Models.MobileAppLinkContentValueObject)),
         (CodeContentType.Text, typeof(Text.Models.TextContentValueObject)),
         (CodeContentType.Email, typeof(Email.Models.EmailContentValueObject)),

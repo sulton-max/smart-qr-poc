@@ -48,14 +48,14 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     Order = 2,
                     Condition = RuleConditionType.Device,
                     ConditionValue = "Android",
-                    Content = new UrlContent { Url = "https://play.example" }
+                    Content = new UrlContentValueObject { Url = "https://play.example" }
                 },
                 new ConditionalRule
                 {
                     Order = 1,
                     Condition = RuleConditionType.Device,
                     ConditionValue = "Ios",
-                    Content = new UrlContent { Url = "https://apple.example" }
+                    Content = new UrlContentValueObject { Url = "https://apple.example" }
                 },
             ],
         };
@@ -146,7 +146,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     Order = 1,
                     Condition = RuleConditionType.Device,
                     ConditionValue = "Ios",
-                    Content = new UrlContent { Url = "https://old.example/ios" }
+                    Content = new UrlContentValueObject { Url = "https://old.example/ios" }
                 },
             ],
         };
@@ -171,14 +171,14 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
                 Order = 1,
                 Condition = RuleConditionType.Country,
                 ConditionValue = "US",
-                Content = new UrlContent { Url = "https://new.example/us" }
+                Content = new UrlContentValueObject { Url = "https://new.example/us" }
             },
             new ConditionalRule
             {
                 Order = 2,
                 Condition = RuleConditionType.Country,
                 ConditionValue = "UK",
-                Content = new UrlContent { Url = "https://new.example/uk" }
+                Content = new UrlContentValueObject { Url = "https://new.example/uk" }
             },
         ];
         await repo.UpdateAsync(loaded, default);
@@ -192,7 +192,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         // The whole rule set was replaced — the old iOS rule's content is gone.
         Assert.DoesNotContain(
             reloaded.Rules.OfType<ConditionalRule>(),
-            r => r.Content is UrlContent { Url: "https://old.example/ios" });
+            r => r.Content is UrlContentValueObject { Url: "https://old.example/ios" });
     }
 
     [Fact]
@@ -239,7 +239,7 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     Order = 1,
                     Condition = RuleConditionType.Device,
                     ConditionValue = "Ios",
-                    Content = new UrlContent { Url = "https://ios.example" }
+                    Content = new UrlContentValueObject { Url = "https://ios.example" }
                 },
             ],
         };
@@ -291,6 +291,6 @@ public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
         ContentType = CodeContentType.Url,
         IsActive = true,
         // The destination now lives in the typed content of a catch-all rule, not a fallback_url column.
-        Rules = [new DefaultRule { Content = new UrlContent { Url = destination } }],
+        Rules = [new DefaultRule { Content = new UrlContentValueObject { Url = destination } }],
     };
 }

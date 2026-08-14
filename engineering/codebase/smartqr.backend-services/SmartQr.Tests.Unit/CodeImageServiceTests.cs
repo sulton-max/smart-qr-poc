@@ -56,7 +56,7 @@ public sealed class CodeImageServiceTests
         // payload.
         var code = Code(
             slug: "abc1234",
-            content: new UrlContent { Url = "https://example.com" },
+            content: new UrlContentValueObject { Url = "https://example.com" },
             mode: ContentMode.Dynamic);
 
         var png = _service.Render(code, ImageFormat.Png);
@@ -71,7 +71,7 @@ public sealed class CodeImageServiceTests
         // the fields.
         var code = Code(
             slug: "xyz9999",
-            content: new UrlContent { Url = "https://example.com" },
+            content: new UrlContentValueObject { Url = "https://example.com" },
             mode: ContentMode.Dynamic);
 
         Assert.Equal($"{RedirectBase}/xyz9999", Decode(_service.Render(code, ImageFormat.Png).Content));
