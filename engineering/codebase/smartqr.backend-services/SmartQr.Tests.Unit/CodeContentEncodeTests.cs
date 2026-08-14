@@ -46,7 +46,7 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void Phone_and_sms_encode_to_tel_and_smsto()
     {
-        Assert.Equal("tel:+15550100", new PhoneContent { Phone = "+15550100" }.Encode());
+        Assert.Equal("tel:+15550100", new PhoneContentValueObject { Phone = "+15550100" }.Encode());
         Assert.Equal("SMSTO:+15550100", new SmsContentValueObject { Phone = "+15550100" }.Encode());
         Assert.Equal(
             "SMSTO:+15550100:hey",

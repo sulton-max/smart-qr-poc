@@ -14,7 +14,7 @@ using SmartQr.Tests.Integration.Harness;
 namespace SmartQr.Tests.Integration;
 
 /// <summary>The redirect data path — seeded code → cached store → evaluator → destination.</summary>
-/// <remarks>Rules carry <see cref="PhoneContent"/> — url content encodes to null, so nothing resolves.</remarks>
+/// <remarks>Carry <see cref="PhoneContentValueObject"/> in a rule — url content encodes to null.</remarks>
 public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
     /// <summary>Builds the redirect routing services over the shared test database.</summary>
@@ -51,10 +51,10 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     Order = 1,
                     Condition = RuleConditionType.Device,
                     ConditionValue = "Ios",
-                    Content = new PhoneContent { Phone = "+15551111" }
+                    Content = new PhoneContentValueObject { Phone = "+15551111" }
                 },
                 // The catch-all is a trailing Default rule — it replaces the retired fallback_url column.
-                new DefaultRule { Content = new PhoneContent { Phone = "+15559999" } },
+                new DefaultRule { Content = new PhoneContentValueObject { Phone = "+15559999" } },
             ],
         });
         await ctx.SaveChangesAsync();
@@ -131,7 +131,7 @@ public class RedirectResolutionTests(SmartQrTestDb db) : RepositoryTestBase(db)
                     ContentType = CodeContentType.Phone,
                     IsActive = true,
                     // A single-destination code carries its destination as a Default catch-all rule.
-                    Rules = [new DefaultRule { Content = new PhoneContent { Phone = "+15550000" } }],
+                    Rules = [new DefaultRule { Content = new PhoneContentValueObject { Phone = "+15550000" } }],
                 });
             }
 

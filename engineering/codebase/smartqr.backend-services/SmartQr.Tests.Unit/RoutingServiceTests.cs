@@ -9,7 +9,7 @@ using SmartQr.Redirect.Api.Infrastructure.Routing;
 namespace SmartQr.Tests.Unit;
 
 /// <summary>Proves the routing engine — first-match-wins, the optional catch-all, and active gating.</summary>
-/// <remarks>Carry <see cref="PhoneContent"/> in a rule to exercise a Redirect — url content encodes to null.</remarks>
+/// <remarks>Carry <see cref="PhoneContentValueObject"/> in a rule to exercise a Redirect.</remarks>
 public class RoutingServiceTests
 {
     private readonly RoutingService _routingService = new();
@@ -40,13 +40,13 @@ public class RoutingServiceTests
         Order = order,
         Condition = RuleConditionType.Device,
         ConditionValue = value,
-        Content = new PhoneContent { Phone = destination },
+        Content = new PhoneContentValueObject { Phone = destination },
     };
 
     // The catch-all is a rule role, not a condition — it carries its own content and is never order-matched.
     private static DefaultRule Fallback(string destination) => new()
     {
-        Content = new PhoneContent { Phone = destination },
+        Content = new PhoneContentValueObject { Phone = destination },
     };
 
     [Fact]
