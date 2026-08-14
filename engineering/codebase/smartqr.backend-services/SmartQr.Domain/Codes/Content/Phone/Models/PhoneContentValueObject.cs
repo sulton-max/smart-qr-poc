@@ -1,7 +1,7 @@
 namespace SmartQr.Domain.Codes.Content.Phone.Models;
 
 /// <summary>Represents a telephone number to dial.</summary>
-public sealed record PhoneContentValueObject : CodeContent
+public sealed record PhoneContentValueObject : CodeContentValueObject
 {
     /// <summary>Holds the payload shape — the scheme, then the number.</summary>
     private const string Payload = "tel:{0}";

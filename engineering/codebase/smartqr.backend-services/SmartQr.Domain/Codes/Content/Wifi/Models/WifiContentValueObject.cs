@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Content.Wifi.Extensions;
 namespace SmartQr.Domain.Codes.Content.Wifi.Models;
 
 /// <summary>Represents the credentials of a Wi-Fi network.</summary>
-public sealed record WifiContentValueObject : CodeContent
+public sealed record WifiContentValueObject : CodeContentValueObject
 {
     /// <summary>Gets the name of the network.</summary>
     public required string Ssid { get; init; }

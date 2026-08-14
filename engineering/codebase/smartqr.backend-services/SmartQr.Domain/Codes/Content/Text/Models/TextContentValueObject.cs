@@ -1,7 +1,7 @@
 namespace SmartQr.Domain.Codes.Content.Text.Models;
 
 /// <summary>Represents free-form text.</summary>
-public sealed record TextContentValueObject : CodeContent
+public sealed record TextContentValueObject : CodeContentValueObject
 {
     /// <summary>Gets the literal text to encode.</summary>
     public required string Text { get; init; }

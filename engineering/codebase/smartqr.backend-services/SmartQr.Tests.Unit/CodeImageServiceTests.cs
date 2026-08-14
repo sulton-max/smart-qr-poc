@@ -79,7 +79,7 @@ public sealed class CodeImageServiceTests
 
     // A static code bakes rule[0]'s content into the symbol; a dynamic code encodes the redirect short link instead.
     private static CodeEntity Code(
-        CodeContent content,
+        CodeContentValueObject content,
         string slug = "slug0001",
         ContentMode mode = ContentMode.Static) => new()
     {

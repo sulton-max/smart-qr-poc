@@ -40,7 +40,8 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
         // A code is "a WiFi code" — every rule carries the same kind of content. Names ContentType: that is the
         // member the caller picked, and the rules were seeded from it.
         RuleFor(set => set)
-            .Must(set => Contents(set.Rules).All(content => CodeContent.Subtypes.KindOf(content) == set.ContentType))
+            .Must(set => Contents(set.Rules)
+                .All(content => CodeContentValueObject.Subtypes.KindOf(content) == set.ContentType))
             .WithMessage("Every rule must carry the code's content type.")
             .OverridePropertyName(nameof(CodeRuleSet.ContentType));
 
@@ -56,12 +57,12 @@ public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
     private static List<ConditionalRule> Conditional(IReadOnlyList<CodeRule> rules) =>
         [.. rules.OfType<ConditionalRule>()];
 
-    private static IEnumerable<CodeContent> Contents(IReadOnlyList<CodeRule> rules) =>
+    private static IEnumerable<CodeContentValueObject> Contents(IReadOnlyList<CodeRule> rules) =>
         rules.Select(rule => rule switch
         {
             ConditionalRule conditional => conditional.Content,
             DefaultRule fallback => fallback.Content,
             _ => null,
         })
-        .OfType<CodeContent>();
+        .OfType<CodeContentValueObject>();
 }

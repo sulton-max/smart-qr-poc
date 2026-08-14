@@ -6,5 +6,5 @@ namespace SmartQr.Domain.Codes.Rules.Models;
 public sealed record DefaultRule : CodeRule
 {
     /// <summary>The content served when no conditional rule matches.</summary>
-    public required CodeContent Content { get; init; }
+    public required CodeContentValueObject Content { get; init; }
 }

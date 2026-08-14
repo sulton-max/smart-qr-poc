@@ -3,7 +3,7 @@ using System.Globalization;
 namespace SmartQr.Domain.Codes.Content.Geo.Models;
 
 /// <summary>Represents a point on the globe.</summary>
-public sealed record GeoContentValueObject : CodeContent
+public sealed record GeoContentValueObject : CodeContentValueObject
 {
     /// <summary>Holds the payload shape — the scheme, then the pair a comma separates.</summary>
     private const string Payload = "geo:{0},{1}";

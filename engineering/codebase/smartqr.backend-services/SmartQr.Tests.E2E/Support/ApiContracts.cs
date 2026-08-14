@@ -65,7 +65,7 @@ public sealed record RuleDtoModel
     public ContentDtoModel? Content { get; init; }
 }
 
-/// <summary>Wire shape of <c>CodeContent</c> — <c>type</c> plus its fields; <c>payload</c> never returned.</summary>
+/// <summary>Wire shape of the content — <c>type</c> plus its fields, never <c>payload</c>.</summary>
 public sealed record ContentDtoModel
 {
     public string Type { get; init; } = "";

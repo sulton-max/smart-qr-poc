@@ -15,7 +15,7 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves payload-encoding parity for every polymorphic <see cref="CodeContent"/> type.</summary>
+/// <summary>Proves payload-encoding parity for every polymorphic <see cref="CodeContentValueObject"/> type.</summary>
 public sealed class CodeContentEncodeTests
 {
     [Fact]

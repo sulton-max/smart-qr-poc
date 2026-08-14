@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Content.Email.Extensions;
 namespace SmartQr.Domain.Codes.Content.Email.Models;
 
 /// <summary>Represents the recipient and prefilled draft of an email.</summary>
-public sealed record EmailContentValueObject : CodeContent
+public sealed record EmailContentValueObject : CodeContentValueObject
 {
     /// <summary>Gets the recipient address.</summary>
     public required string To { get; init; }

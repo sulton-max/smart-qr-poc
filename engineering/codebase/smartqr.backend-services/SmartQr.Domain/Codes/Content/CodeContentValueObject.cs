@@ -4,12 +4,12 @@ using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Domain.Codes.Content;
 
-/// <summary>The typed content a code carries — the domain model, wire DTO and stored shape in one.</summary>
+/// <summary>Represents the typed content a code carries.</summary>
 /// <remarks>Keep <see cref="Subtypes"/> in lockstep with the frontend union.</remarks>
-public abstract record CodeContent
+public abstract record CodeContentValueObject
 {
-    /// <summary>The closed set of content variants — the single source for the wire discriminator.</summary>
-    public static readonly SubtypeRegistry<CodeContent, CodeContentType> Subtypes = new(
+    /// <summary>Gets the closed set of content variants, each bound to its wire discriminator.</summary>
+    public static readonly SubtypeRegistry<CodeContentValueObject, CodeContentType> Subtypes = new(
         (CodeContentType.Url, typeof(Url.Models.UrlContentValueObject)),
         (CodeContentType.MobileApp, typeof(MobileApp.Models.MobileAppLinkContentValueObject)),
         (CodeContentType.Text, typeof(Text.Models.TextContentValueObject)),
@@ -21,10 +21,10 @@ public abstract record CodeContent
         (CodeContentType.VCard, typeof(VCard.Models.VCardContentValueObject)),
         (CodeContentType.Calendar, typeof(Calendar.Models.CalendarContentValueObject)));
 
-    /// <summary>True when the code bakes its payload into the symbol rather than a redirect short link.</summary>
+    /// <summary>Gets whether the symbol bakes the payload rather than a redirect short link.</summary>
     [JsonIgnore]
     public bool IsStatic => Encode() is not null;
 
-    /// <summary>The baked QR payload for a static content type; null for a dynamic (redirect-backed) type.</summary>
+    /// <summary>Encodes the payload, or returns null when the symbol carries a short link instead.</summary>
     public abstract string? Encode();
 }

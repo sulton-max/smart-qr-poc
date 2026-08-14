@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Content.VCard.Extensions;
 namespace SmartQr.Domain.Codes.Content.VCard.Models;
 
 /// <summary>Represents a contact card.</summary>
-public sealed record VCardContentValueObject : CodeContent
+public sealed record VCardContentValueObject : CodeContentValueObject
 {
     /// <summary>Gets the given name.</summary>
     public required string FirstName { get; init; }

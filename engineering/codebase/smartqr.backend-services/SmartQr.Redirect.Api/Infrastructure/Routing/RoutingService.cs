@@ -46,7 +46,7 @@ public sealed class RoutingService : IRoutingService
     }
 
     // Only content that encodes to a URL can be redirected to; anything else needs the resolve page (not built yet).
-    private static RoutingResult Resolve(CodeContent content, int? matchedRuleOrder)
+    private static RoutingResult Resolve(CodeContentValueObject content, int? matchedRuleOrder)
     {
         var destination = content.Encode();
 

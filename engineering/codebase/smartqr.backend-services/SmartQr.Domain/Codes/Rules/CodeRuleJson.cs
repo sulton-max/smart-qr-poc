@@ -11,7 +11,7 @@ public static class CodeRuleJson
     /// <summary>The shared serializer options — jsonb defaults plus the rule and content subtype bindings.</summary>
     public static readonly JsonSerializerOptions Options = JsonbOptions.Create(
         CodeRule.Subtypes.ToJsonModifier(),
-        CodeContent.Subtypes.ToJsonModifier());
+        CodeContentValueObject.Subtypes.ToJsonModifier());
 
     /// <summary>Serializes a code's rules to their jsonb document form.</summary>
     public static string Serialize(IReadOnlyList<CodeRule> rules) => JsonSerializer.Serialize(rules, Options);

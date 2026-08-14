@@ -16,5 +16,5 @@ public sealed record ConditionalRule : CodeRule
     public required string ConditionValue { get; init; }
 
     /// <summary>The content served when this rule matches.</summary>
-    public required CodeContent Content { get; init; }
+    public required CodeContentValueObject Content { get; init; }
 }

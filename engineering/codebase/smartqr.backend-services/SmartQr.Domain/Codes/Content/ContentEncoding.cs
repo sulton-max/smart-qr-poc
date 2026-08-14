@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace SmartQr.Domain.Codes.Content;
 
-/// <summary>Shared payload-encoding primitives for the static <see cref="CodeContent"/> types.</summary>
+/// <summary>Shared payload-encoding primitives for the static <see cref="CodeContentValueObject"/> types.</summary>
 /// <remarks>Keep in lockstep with the frontend's <c>contentTypes.ts</c>.</remarks>
 public static partial class ContentEncoding
 {

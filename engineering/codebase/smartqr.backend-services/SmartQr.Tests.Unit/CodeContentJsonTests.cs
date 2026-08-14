@@ -15,10 +15,10 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the wire and jsonb contract for <see cref="CodeContent"/> — discriminator, round-trip.</summary>
+/// <summary>Proves the wire and jsonb contract — discriminator, round-trip.</summary>
 public sealed class CodeContentJsonTests
 {
-    public static TheoryData<CodeContent, string> Cases() => new()
+    public static TheoryData<CodeContentValueObject, string> Cases() => new()
     {
         { new UrlContentValueObject { Url = "https://x.io" }, "url" },
 
@@ -51,7 +51,7 @@ public sealed class CodeContentJsonTests
 
     [Theory]
     [MemberData(nameof(Cases))]
-    public void Serializes_with_the_camelCase_type_discriminator(CodeContent content, string discriminator)
+    public void Serializes_with_the_camelCase_type_discriminator(CodeContentValueObject content, string discriminator)
     {
         var json = CodeContentJson.Serialize(content);
 
@@ -61,7 +61,7 @@ public sealed class CodeContentJsonTests
 
     [Theory]
     [MemberData(nameof(Cases))]
-    public void Round_trips_through_serialize_then_deserialize(CodeContent content, string discriminator)
+    public void Round_trips_through_serialize_then_deserialize(CodeContentValueObject content, string discriminator)
     {
         _ = discriminator;
         var restored = CodeContentJson.Deserialize(CodeContentJson.Serialize(content));

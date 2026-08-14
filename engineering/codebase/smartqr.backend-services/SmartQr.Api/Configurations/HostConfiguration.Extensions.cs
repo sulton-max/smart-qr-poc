@@ -113,12 +113,12 @@ public static partial class HostConfiguration
             .AddJsonStringEnums()
             .AddJsonOptions(options =>
             {
-                // CodeContent and CodeRule polymorphism is enum-driven (no attributes), so the endpoint serializer
+                // Content and rule polymorphism is enum-driven (no attributes), so the endpoint serializer
                 // needs
                 // the same resolvers the persistence options use — otherwise the API can't (de)serialize either union.
                 var resolver = options.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver();
                 options.JsonSerializerOptions.TypeInfoResolver = resolver
-                    .WithAddedModifier(CodeContent.Subtypes.ToJsonModifier())
+                    .WithAddedModifier(CodeContentValueObject.Subtypes.ToJsonModifier())
                     .WithAddedModifier(CodeRule.Subtypes.ToJsonModifier());
                 options.JsonSerializerOptions.AllowOutOfOrderMetadataProperties = true;
             });

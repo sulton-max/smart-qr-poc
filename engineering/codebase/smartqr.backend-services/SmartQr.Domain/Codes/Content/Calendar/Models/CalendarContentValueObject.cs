@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Content.Calendar.Extensions;
 namespace SmartQr.Domain.Codes.Content.Calendar.Models;
 
 /// <summary>Represents a calendar event.</summary>
-public sealed record CalendarContentValueObject : CodeContent
+public sealed record CalendarContentValueObject : CodeContentValueObject
 {
     /// <summary>Gets the event title.</summary>
     public required string Title { get; init; }
