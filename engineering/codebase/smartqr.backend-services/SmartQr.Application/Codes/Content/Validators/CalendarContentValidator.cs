@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Content.Calendar.Models;
 namespace SmartQr.Application.Codes.Content.Validators;
 
 /// <summary>Validates a calendar event.</summary>
-public sealed class CalendarContentValidator : AbstractValidator<CalendarContent>
+public sealed class CalendarContentValidator : AbstractValidator<CalendarContentValueObject>
 {
     /// <summary>Builds the calendar-content rules.</summary>
     public CalendarContentValidator()

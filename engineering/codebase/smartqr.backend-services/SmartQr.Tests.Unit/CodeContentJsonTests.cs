@@ -43,7 +43,10 @@ public sealed class CodeContentJsonTests
             Hidden = true
         }, "wifi" },
         { new VCardContentValueObject { FirstName = "Ada", LastName = "Lovelace" }, "vCard" },
-        { new CalendarContent { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) }, "calendar" },
+        {
+            new CalendarContentValueObject { Title = "Launch", Start = new DateTime(2026, 7, 1, 18, 30, 0) },
+            "calendar"
+        },
     };
 
     [Theory]

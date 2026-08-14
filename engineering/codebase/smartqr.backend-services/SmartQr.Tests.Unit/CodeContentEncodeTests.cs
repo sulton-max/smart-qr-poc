@@ -132,7 +132,7 @@ public sealed class CodeContentEncodeTests
     [Fact]
     public void Calendar_emits_vevent_with_basic_format_dates()
     {
-        var output = new CalendarContent
+        var output = new CalendarContentValueObject
         {
             Title = "Launch",
             Start = new DateTime(2026, 7, 1, 18, 30, 0),
