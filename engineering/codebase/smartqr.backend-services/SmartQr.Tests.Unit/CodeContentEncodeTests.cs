@@ -24,12 +24,12 @@ public sealed class CodeContentEncodeTests
         // url / mobileApp carry the redirect short link, not a baked payload → Encode() is null, IsStatic false.
         Assert.Null(new UrlContent { Url = "https://x.io" }.Encode());
         Assert.False(new UrlContent { Url = "https://x.io" }.IsStatic);
-        Assert.Null(new MobileAppLinkContent
+        Assert.Null(new MobileAppLinkContentValueObject
         {
             Store = MobileAppStoreType.AppStore,
             Url = "https://apps.apple.com/a"
         }.Encode());
-        Assert.False(new MobileAppLinkContent
+        Assert.False(new MobileAppLinkContentValueObject
         {
             Store = MobileAppStoreType.AppStore,
             Url = "https://apps.apple.com/a"

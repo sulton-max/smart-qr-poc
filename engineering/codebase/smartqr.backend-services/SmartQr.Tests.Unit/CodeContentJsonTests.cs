@@ -23,7 +23,7 @@ public sealed class CodeContentJsonTests
         { new UrlContent { Url = "https://x.io" }, "url" },
 
         {
-            new MobileAppLinkContent { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" },
+            new MobileAppLinkContentValueObject { Store = MobileAppStoreType.AppStore, Url = "https://apps.apple.com/a" },
             "mobileApp"
         },
         { new TextContentValueObject { Text = "hi there" }, "text" },
