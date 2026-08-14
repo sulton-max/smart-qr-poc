@@ -2,8 +2,7 @@ using SmartQr.Domain.Codes.Content.Sms.Models;
 
 namespace SmartQr.Domain.Codes.Content.Sms.Extensions;
 
-/// <summary>Extends <see cref="SmsContentValueObject"/> for payload encoding.</summary>
-/// <remarks>Follows the de-facto SMSTO convention, which no RFC registers.</remarks>
+/// <summary>Extends <see cref="SmsContentValueObject"/> to the SMSTO payload, which no RFC registers.</summary>
 public static class SmsContentExtensions
 {
     /// <summary>Holds the payload shape carrying a recipient alone.</summary>

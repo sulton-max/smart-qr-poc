@@ -3,8 +3,7 @@ using SmartQr.Domain.Codes.Content.Wifi.Models;
 
 namespace SmartQr.Domain.Codes.Content.Wifi.Extensions;
 
-/// <summary>Extends <see cref="WifiContentValueObject"/> for payload encoding.</summary>
-/// <remarks>Follows the de-facto WIFI convention, which no RFC registers.</remarks>
+/// <summary>Extends <see cref="WifiContentValueObject"/> to the WIFI payload, which no RFC registers.</summary>
 public static class WifiContentExtensions
 {
     /// <summary>Holds the token covering WPA, WPA2 and WPA3 alike.</summary>
