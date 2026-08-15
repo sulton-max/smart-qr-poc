@@ -52,5 +52,5 @@ public sealed record CodeEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
 
     /// <summary>Gets or sets the routing rules of the code, each carrying the content it serves. Never empty.</summary>
     /// <remarks>Conditional rules match in order; at most one default rule serves the rest.</remarks>
-    public List<CodeRule> Rules { get; set; } = [];
+    public List<CodeRuleValueObject> Rules { get; set; } = [];
 }

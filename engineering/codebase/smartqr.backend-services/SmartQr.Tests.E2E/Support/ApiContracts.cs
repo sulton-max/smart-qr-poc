@@ -54,7 +54,7 @@ public sealed record CodeDtoModel
     public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];
 }
 
-/// <summary>Wire shape of <c>CodeRule</c> — the <c>type</c> discriminator plus that role's fields.</summary>
+/// <summary>Wire shape of <c>CodeRuleValueObject</c> — the <c>type</c> discriminator plus that role's fields.</summary>
 public sealed record RuleDtoModel
 {
     public string Type { get; init; } = "";

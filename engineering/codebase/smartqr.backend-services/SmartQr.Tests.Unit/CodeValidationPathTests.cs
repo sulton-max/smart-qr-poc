@@ -16,7 +16,7 @@ public class CodeValidationPathTests
 {
     private readonly CodeCreateCommandValidator _validator = new();
 
-    private static CodeCreateCommand Command(ContentMode mode, params CodeRule[] rules) => new()
+    private static CodeCreateCommand Command(ContentMode mode, params CodeRuleValueObject[] rules) => new()
     {
         UserId = Guid.NewGuid(),
         Name = "Test",

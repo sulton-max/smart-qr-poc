@@ -12,7 +12,7 @@ public sealed record PreviewCodeApiRequest
     public required ContentMode Mode { get; init; }
 
     /// <summary>Gets the routing rules whose content the preview bakes.</summary>
-    public required IReadOnlyList<CodeRule> Rules { get; init; }
+    public required IReadOnlyList<CodeRuleValueObject> Rules { get; init; }
 
     /// <summary>Gets the symbology to render — <c>QrCode</c> is styled, any other format a plain barcode.</summary>
     public BarcodeFormat? BarcodeFormat { get; init; }

@@ -8,7 +8,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the wire and jsonb contract for <see cref="CodeRule"/> — outer union and nested content.</summary>
+/// <summary>Proves the wire and jsonb contract — outer union and nested content.</summary>
 /// <remarks><see cref="CodeContentJsonTests"/> covers the inner union alone; this covers both bound together.</remarks>
 public sealed class CodeRuleJsonTests
 {
@@ -20,7 +20,7 @@ public sealed class CodeRuleJsonTests
         Content = new UrlContentValueObject { Url = "https://ios.example.com" },
     };
 
-    public static TheoryData<CodeRule, string> Cases() => new()
+    public static TheoryData<CodeRuleValueObject, string> Cases() => new()
     {
         { Conditional(), "conditional" },
         {
@@ -32,7 +32,7 @@ public sealed class CodeRuleJsonTests
 
     [Theory]
     [MemberData(nameof(Cases))]
-    public void Serializes_with_the_camelCase_type_discriminator(CodeRule rule, string discriminator)
+    public void Serializes_with_the_camelCase_type_discriminator(CodeRuleValueObject rule, string discriminator)
     {
         var json = CodeRuleJson.Serialize([rule]);
 
@@ -42,7 +42,7 @@ public sealed class CodeRuleJsonTests
 
     [Theory]
     [MemberData(nameof(Cases))]
-    public void Round_trips_each_role_back_to_its_concrete_type(CodeRule rule, string discriminator)
+    public void Round_trips_each_role_back_to_its_concrete_type(CodeRuleValueObject rule, string discriminator)
     {
         _ = discriminator;
 
@@ -55,7 +55,7 @@ public sealed class CodeRuleJsonTests
     [Fact]
     public void Round_trips_a_whole_rule_set_in_order()
     {
-        List<CodeRule> rules =
+        List<CodeRuleValueObject> rules =
         [
             Conditional(),
             new ConditionalRuleValueObject

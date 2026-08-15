@@ -14,7 +14,7 @@ public class RoutingServiceTests
 {
     private readonly RoutingService _routingService = new();
 
-    private static CodeEntity Code(params CodeRule[] rules) => new()
+    private static CodeEntity Code(params CodeRuleValueObject[] rules) => new()
     {
         Id = Guid.NewGuid(),
         Slug = "abc1234",

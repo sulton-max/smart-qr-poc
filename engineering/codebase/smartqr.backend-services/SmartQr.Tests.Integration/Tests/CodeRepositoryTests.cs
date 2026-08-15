@@ -12,7 +12,7 @@ namespace SmartQr.Tests.Integration;
 /// <summary>Integration tests for the persistence path against the provider-switchable test database.</summary>
 public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
-    private static CodeEntity NewCode(Guid user, string slug, params CodeRule[] rules) => new()
+    private static CodeEntity NewCode(Guid user, string slug, params CodeRuleValueObject[] rules) => new()
     {
         Id = Guid.NewGuid(),
         Slug = slug,

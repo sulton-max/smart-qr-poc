@@ -119,7 +119,7 @@ public static partial class HostConfiguration
                 var resolver = options.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver();
                 options.JsonSerializerOptions.TypeInfoResolver = resolver
                     .WithAddedModifier(CodeContentValueObject.Subtypes.ToJsonModifier())
-                    .WithAddedModifier(CodeRule.Subtypes.ToJsonModifier());
+                    .WithAddedModifier(CodeRuleValueObject.Subtypes.ToJsonModifier());
                 options.JsonSerializerOptions.AllowOutOfOrderMetadataProperties = true;
             });
         return builder;

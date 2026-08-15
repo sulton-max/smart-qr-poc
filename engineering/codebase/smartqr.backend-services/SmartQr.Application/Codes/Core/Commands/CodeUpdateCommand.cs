@@ -30,7 +30,7 @@ public sealed record CodeUpdateCommand
     public required CodeContentType ContentType { get; init; }
 
     /// <summary>Replacement ordered routing rules (the whole set).</summary>
-    public required IReadOnlyList<CodeRule> Rules { get; init; }
+    public required IReadOnlyList<CodeRuleValueObject> Rules { get; init; }
 
     /// <summary>The style the code renders with — a full replace, so it overwrites the saved style.</summary>
     public required StyleSpec Style { get; init; }

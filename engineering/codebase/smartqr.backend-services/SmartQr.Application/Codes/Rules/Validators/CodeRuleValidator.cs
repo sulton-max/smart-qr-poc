@@ -5,7 +5,7 @@ namespace SmartQr.Application.Codes.Rules.Validators;
 
 /// <summary>Validates one rule, dispatching to the validator for its role.</summary>
 /// <remarks>Register a new rule role here and in its own validator.</remarks>
-public sealed class CodeRuleValidator : AbstractValidator<CodeRule>
+public sealed class CodeRuleValidator : AbstractValidator<CodeRuleValueObject>
 {
     /// <summary>Builds the per-role rule dispatch.</summary>
     public CodeRuleValidator() =>

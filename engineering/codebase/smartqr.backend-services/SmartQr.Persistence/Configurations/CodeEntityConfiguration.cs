@@ -32,12 +32,12 @@ public class CodeEntityConfiguration : IEntityTypeConfiguration<CodeEntity>
         // The rules — each carrying the content it serves — persist as one jsonb document rather than a table:
         // they are only ever read with their code, and a relational shape would need a nullable column per
         // variant-specific member. Serialized through the same options the wire uses (CodeRuleJson).
-        var rulesConverter = new ValueConverter<List<CodeRule>, string>(
+        var rulesConverter = new ValueConverter<List<CodeRuleValueObject>, string>(
             rules => CodeRuleJson.Serialize(rules),
             json => CodeRuleJson.Deserialize(json));
 
         // Records give structural equality; the comparer lets EF change-track the reference-typed jsonb graph.
-        var rulesComparer = new ValueComparer<List<CodeRule>>(
+        var rulesComparer = new ValueComparer<List<CodeRuleValueObject>>(
             (left, right) => left!.SequenceEqual(right!),
             rules => rules.Aggregate(0, (hash, rule) => HashCode.Combine(hash, rule.GetHashCode())),
             rules => rules.ToList());

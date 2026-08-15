@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Core.Enums;
 namespace SmartQr.Domain.Codes.Rules.Models;
 
 /// <summary>Represents a rule matched against a scan signal.</summary>
-public sealed record ConditionalRuleValueObject : CodeRule
+public sealed record ConditionalRuleValueObject : CodeRuleValueObject
 {
     /// <summary>Gets the 1-based evaluation order, which also identifies the rule within its code.</summary>
     public required int Order { get; init; }

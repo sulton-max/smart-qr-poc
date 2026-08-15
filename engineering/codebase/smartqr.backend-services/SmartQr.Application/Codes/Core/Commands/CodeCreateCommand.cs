@@ -28,7 +28,7 @@ public sealed record CodeCreateCommand
     /// <summary>How the symbol resolves; fixed for the life of the code.</summary>
     public required ContentMode Mode { get; init; }
 
-    public required IReadOnlyList<CodeRule> Rules { get; init; }
+    public required IReadOnlyList<CodeRuleValueObject> Rules { get; init; }
 
     /// <summary>The style the code renders with.</summary>
     public required StyleSpec Style { get; init; }

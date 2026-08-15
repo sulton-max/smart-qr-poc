@@ -11,10 +11,10 @@ public static class CodePayload
     /// <param name="rules">The code's rules, each carrying the content it serves.</param>
     /// <param name="shortUrl">The short link a dynamic code encodes.</param>
     /// <remarks>Pass exactly one rule for a static code.</remarks>
-    public static string Resolve(ContentMode mode, IReadOnlyList<CodeRule> rules, string shortUrl) =>
+    public static string Resolve(ContentMode mode, IReadOnlyList<CodeRuleValueObject> rules, string shortUrl) =>
         mode is ContentMode.Dynamic ? shortUrl : Baked(rules);
 
-    private static string Baked(IReadOnlyList<CodeRule> rules)
+    private static string Baked(IReadOnlyList<CodeRuleValueObject> rules)
     {
         var content = rules.Count > 0
             ? rules[0] switch

@@ -21,7 +21,7 @@ public sealed record CreateCodeApiRequest
     public required ContentMode Mode { get; init; }
 
     /// <summary>Gets the routing rules, each carrying the content it serves — at least one is required.</summary>
-    public required IReadOnlyList<CodeRule> Rules { get; init; }
+    public required IReadOnlyList<CodeRuleValueObject> Rules { get; init; }
 
     /// <summary>Gets the style the code renders with — the whole block, no server default.</summary>
     public required StyleApiRequest Style { get; init; }

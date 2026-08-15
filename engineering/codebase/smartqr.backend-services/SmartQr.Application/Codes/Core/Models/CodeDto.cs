@@ -39,7 +39,7 @@ public sealed record CodeDto
     public DateTimeOffset CreatedAt { get; init; }
 
     /// <summary>The routing rules, each carrying the content it serves.</summary>
-    public IReadOnlyList<CodeRule> Rules { get; init; } = [];
+    public IReadOnlyList<CodeRuleValueObject> Rules { get; init; } = [];
 
     /// <summary>The persisted visual style, or the render default when none was saved.</summary>
     public required StyleSpec Style { get; init; }

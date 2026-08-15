@@ -6,7 +6,7 @@ using SmartQr.Application.Codes.Rules.Validators;
 namespace SmartQr.Application.Codes.Core.Validators;
 
 /// <summary>Validates create-code input — the name, each rule and its content, and the rule set as a whole.</summary>
-/// <remarks>A new <see cref="CodeRule"/> or <see cref="CodeRuleSet"/> member gets its rule there, not here.</remarks>
+/// <remarks>A new rule or rule-set member gets its rule there, not here.</remarks>
 /// <seealso cref="CodeRuleValidator"/>
 /// <seealso cref="CodeRuleSetValidator"/>
 public sealed class CodeCreateCommandValidator : AbstractValidator<CodeCreateCommand>
