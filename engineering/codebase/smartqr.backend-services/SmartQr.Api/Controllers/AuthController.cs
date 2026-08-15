@@ -12,7 +12,7 @@ using WoW.Two.Sdk.Backend.Beta.Web.Contracts;
 
 namespace SmartQr.Api.Controllers;
 
-/// <summary>Handles authentication — Google sign-in and sign-out.</summary>
+/// <summary>Manages authentication sessions.</summary>
 [ApiController]
 [Route("api/auth")]
 public sealed class AuthController(
@@ -42,7 +42,7 @@ public sealed class AuthController(
             fail => Task.FromResult<IActionResult>(this.ToProblem(fail.Error)));
     }
 
-    /// <summary>Signs out — clears the session and guest cookies, returning the caller to anonymous.</summary>
+    /// <summary>Signs out, clearing the session and guest cookies.</summary>
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout()
@@ -52,7 +52,7 @@ public sealed class AuthController(
         return NoContent();
     }
 
-    /// <summary>Issues the session cookie by signing the resolved account into the cookie scheme.</summary>
+    /// <summary>Issues the session cookie for the signed-in account.</summary>
     private Task SignInAsync(UserSummaryDto user)
     {
         Claim[] claims =

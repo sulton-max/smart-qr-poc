@@ -3,25 +3,25 @@ using SmartQr.Application.Billing.Core.Services;
 
 namespace SmartQr.Tests.E2E.Harness;
 
-/// <summary>In-memory <see cref="IBillingBroker"/> — canned URLs, a staged webhook event, captured calls.</summary>
+/// <summary>Provides an in-memory billing broker with staged responses.</summary>
 public sealed class FakeBillingBroker : IBillingBroker
 {
-    /// <summary>URL returned by <see cref="CreateCheckoutSessionAsync"/>.</summary>
+    /// <summary>Gets the checkout URL the broker returns.</summary>
     public string CheckoutUrl { get; init; } = "https://checkout.stripe.com/c/pay/cs_test_fake";
 
-    /// <summary>URL returned by <see cref="CreatePortalSessionAsync"/>.</summary>
+    /// <summary>Gets the portal URL the broker returns.</summary>
     public string PortalUrl { get; init; } = "https://billing.stripe.com/p/session/test_fake";
 
-    /// <summary>The event <see cref="ParseWebhookEvent"/> returns; null yields an <c>Ignored</c> event.</summary>
+    /// <summary>Gets or sets the staged webhook event; null yields an <c>Ignored</c> event.</summary>
     public BillingWebhookEvent? NextEvent { get; set; }
 
-    /// <summary>When set, <see cref="ParseWebhookEvent"/> throws this to simulate a failed signature check.</summary>
+    /// <summary>Gets or sets the exception thrown to simulate a failed signature check.</summary>
     public Exception? SignatureError { get; set; }
 
-    /// <summary>The arguments captured from the last <see cref="CreateCheckoutSessionAsync"/> call.</summary>
+    /// <summary>Gets the arguments captured from the last checkout call.</summary>
     public (Guid UserId, string PriceId, string SuccessUrl, string CancelUrl)? LastCheckout { get; private set; }
 
-    /// <summary>The Stripe customer id captured from the last <see cref="CreatePortalSessionAsync"/> call.</summary>
+    /// <summary>Gets the Stripe customer id captured from the last portal call.</summary>
     public string? LastPortalCustomerId { get; private set; }
 
     /// <inheritdoc />
@@ -52,7 +52,7 @@ public sealed class FakeBillingBroker : IBillingBroker
         return NextEvent ?? new BillingWebhookEvent { Type = BillingWebhookEventType.Ignored };
     }
 
-    /// <summary>Clears staged state and captured calls between tests.</summary>
+    /// <summary>Clears the staged state and captured calls.</summary>
     public void Reset()
     {
         NextEvent = null;

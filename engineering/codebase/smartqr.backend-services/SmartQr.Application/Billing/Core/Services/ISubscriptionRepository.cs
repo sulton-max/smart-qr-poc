@@ -2,10 +2,10 @@ using SmartQr.Domain.Billing.Entities;
 
 namespace SmartQr.Application.Billing.Core.Services;
 
-/// <summary>Persistence operations for subscriptions — the single live row per user.</summary>
+/// <summary>Defines the contract for reading and persisting subscriptions.</summary>
 public interface ISubscriptionRepository
 {
-    /// <summary>Loads the user's subscription, or null when there is no row (⇒ Free).</summary>
+    /// <summary>Loads the user's subscription, or null when there is none.</summary>
     Task<SubscriptionEntity?> GetByUserAsync(Guid userId, CancellationToken ct);
 
     /// <summary>Loads a subscription by its Stripe subscription id (<c>sub_…</c>), or null.</summary>

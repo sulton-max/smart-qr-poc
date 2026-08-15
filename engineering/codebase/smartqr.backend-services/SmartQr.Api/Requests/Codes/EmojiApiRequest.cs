@@ -1,6 +1,6 @@
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents the center-emoji block of a style — an emoji mark, not an uploaded image.</summary>
+/// <summary>Represents the center-emoji block of a style.</summary>
 public sealed record EmojiApiRequest
 {
     /// <summary>Gets the emoji glyph(s) rendered at the center.</summary>

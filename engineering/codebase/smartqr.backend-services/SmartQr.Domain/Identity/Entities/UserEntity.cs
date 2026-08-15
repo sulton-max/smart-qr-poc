@@ -2,16 +2,16 @@ using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 
 namespace SmartQr.Domain.Identity.Entities;
 
-/// <summary>Represents a registered account layered over the guest-first identity.</summary>
+/// <summary>Represents a registered account.</summary>
 public sealed record UserEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
 {
     /// <summary>Gets the storage table name of the user entity.</summary>
     public static string TableName => "users";
 
-    /// <summary>Gets or sets the UUID primary key of the user — the ownership key codes reference.</summary>
+    /// <summary>Gets or sets the UUID primary key of the user.</summary>
     public required Guid Id { get; set; }
 
-    /// <summary>Gets or sets Google's stable subject of the user (the <c>sub</c> claim). Unique.</summary>
+    /// <summary>Gets or sets Google's stable subject of the user (the <c>sub</c> claim).</summary>
     public required string GoogleSubject { get; set; }
 
     /// <summary>Gets or sets the primary email address of the user from the verified Google identity.</summary>

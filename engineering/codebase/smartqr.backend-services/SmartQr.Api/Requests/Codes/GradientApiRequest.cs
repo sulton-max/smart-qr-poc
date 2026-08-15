@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents the foreground-gradient block of a style — replaces the solid foreground when set.</summary>
+/// <summary>Represents the foreground-gradient block of a style.</summary>
 /// <remarks>Keep the discriminator values in lockstep with the frontend gradient union.</remarks>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(LinearGradientApiRequest), "linear")]

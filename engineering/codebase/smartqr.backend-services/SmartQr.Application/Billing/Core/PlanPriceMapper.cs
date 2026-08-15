@@ -3,10 +3,10 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Application.Billing.Core;
 
-/// <summary>Maps a paid <see cref="Plan"/> to its Stripe price id and back, off <c>Billing:Prices</c>.</summary>
+/// <summary>Maps a paid plan to its Stripe price id and back.</summary>
 public static class PlanPriceMapper
 {
-    /// <summary>Stripe price id for a paid plan; null for <see cref="Plan.Free"/> or an unconfigured plan.</summary>
+    /// <summary>Gets the Stripe price id for a paid plan; null for Free or an unconfigured plan.</summary>
     public static string? PriceIdFor(BillingSettings billing, Plan plan) => plan switch
     {
         Plan.Solo => NullIfEmpty(billing.Prices.Solo),
@@ -15,7 +15,7 @@ public static class PlanPriceMapper
         _ => null,
     };
 
-    /// <summary>Resolves a price id to its <see cref="Plan"/>, or <see cref="Plan.Free"/> when unmatched.</summary>
+    /// <summary>Resolves a price id to its plan, or Free when unmatched.</summary>
     public static Plan PlanFor(BillingSettings billing, string? priceId)
     {
         if (string.IsNullOrWhiteSpace(priceId))

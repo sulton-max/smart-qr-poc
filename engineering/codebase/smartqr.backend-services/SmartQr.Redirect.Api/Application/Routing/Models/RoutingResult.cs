@@ -1,13 +1,13 @@
 namespace SmartQr.Redirect.Api.Application.Routing.Models;
 
-/// <summary>The evaluator's decision for a scan — a redirect to a destination, or nothing to resolve to.</summary>
+/// <summary>Represents the outcome of routing a scan.</summary>
 public abstract record RoutingResult
 {
     private RoutingResult() { }
 
-    /// <summary>The scan resolves — send a 302 to <see cref="Destination"/>.</summary>
+    /// <summary>The scan resolves to a destination.</summary>
     public sealed record Redirect(string Destination, int? MatchedRuleOrder) : RoutingResult;
 
-    /// <summary>The scan does not resolve — unknown slug, inactive code, or no matching rule (404).</summary>
+    /// <summary>The scan does not resolve to a destination.</summary>
     public sealed record NotFound : RoutingResult;
 }

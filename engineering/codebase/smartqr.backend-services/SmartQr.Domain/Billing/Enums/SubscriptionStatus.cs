@@ -12,7 +12,7 @@ public enum SubscriptionStatus
     /// <summary>Represents a subscription whose latest invoice failed payment.</summary>
     PastDue,
 
-    /// <summary>Represents a canceled subscription (row kept; codes are never deleted on downgrade).</summary>
+    /// <summary>Represents a canceled subscription.</summary>
     Canceled,
 
     /// <summary>Represents a subscription whose initial payment failed and is not yet active.</summary>

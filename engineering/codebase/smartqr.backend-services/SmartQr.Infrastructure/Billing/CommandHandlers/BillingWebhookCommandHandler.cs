@@ -12,7 +12,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>Handles <see cref="BillingWebhookCommand"/> — verifies the signature, upserts the subscription.</summary>
+/// <summary>Handles <see cref="BillingWebhookCommand"/>.</summary>
 public sealed class BillingWebhookCommandHandler(
     ISubscriptionRepository subscriptions,
     IBillingBroker gateway,
@@ -67,7 +67,7 @@ public sealed class BillingWebhookCommandHandler(
         }
     }
 
-    /// <summary>Upserts the subscription row from a completed Checkout session (the row's first appearance).</summary>
+    /// <summary>Upserts the subscription row from a completed Checkout session.</summary>
     private async Task UpsertFromCheckoutAsync(BillingWebhookEvent e, CancellationToken ct)
     {
         if (e.UserId is not { } userId)
@@ -90,7 +90,7 @@ public sealed class BillingWebhookCommandHandler(
         }, ct);
     }
 
-    /// <summary>Refreshes the row for a subscription id — <paramref name="status"/>, plan, and period end.</summary>
+    /// <summary>Refreshes the row for a subscription id.</summary>
     private async Task RefreshFromSubscriptionAsync(
         BillingWebhookEvent e,
         SubscriptionStatus status,

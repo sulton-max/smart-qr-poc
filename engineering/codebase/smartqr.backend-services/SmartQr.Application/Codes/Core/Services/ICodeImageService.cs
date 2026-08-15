@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Application.Codes.Core.Services;
 
-/// <summary>Renders the printable image for a code (encoding its short URL).</summary>
+/// <summary>Defines the contract for rendering a code's printable image.</summary>
 public interface ICodeImageService
 {
     /// <summary>Renders the code's image in the requested format.</summary>

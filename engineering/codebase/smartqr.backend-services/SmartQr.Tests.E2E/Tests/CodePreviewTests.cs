@@ -6,12 +6,12 @@ using SmartQr.Tests.E2E.Harness;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E for the stateless preview endpoint — styled SVG rendered live, no persistence, anonymous.</summary>
+/// <summary>E2E for the preview endpoint — styled SVG rendered live, no persistence, anonymous.</summary>
 /// <remarks>The <c>style</c> block is <c>required</c> in full — override only the fields under test.</remarks>
 [Collection(AppCollection.Name)]
 public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
 {
-    /// <summary>The full default style block — solid black on white, ECC Q, quiet zone 4, square, no logo.</summary>
+    /// <summary>Builds the full default style block.</summary>
     private static Dictionary<string, object?> DefaultStyle() => new()
     {
         ["foregroundColor"] = "#000000",
@@ -34,10 +34,10 @@ public sealed class CodePreviewTests(AppFixture fixture) : E2EBase(fixture)
         return style;
     }
 
-    /// <summary>A static preview rule set of one default rule carrying <paramref name="content"/>.</summary>
+    /// <summary>Builds a preview rule set of one default rule carrying <paramref name="content"/>.</summary>
     private static object[] Rules(object content) => [new { type = "default", content }];
 
-    /// <summary>A static preview rule set that bakes <paramref name="text"/> verbatim into the payload.</summary>
+    /// <summary>Builds a preview rule set carrying <paramref name="text"/> as text content.</summary>
     private static object[] TextRules(string text) => [new { type = "default", content = new { type = "text", text } }];
 
     [Fact]

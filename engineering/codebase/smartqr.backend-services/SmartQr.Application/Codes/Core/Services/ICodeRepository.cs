@@ -2,7 +2,7 @@ using SmartQr.Domain.Codes.Core.Entities;
 
 namespace SmartQr.Application.Codes.Core.Services;
 
-/// <summary>Persistence operations for codes and their rules.</summary>
+/// <summary>Defines the contract for reading and persisting codes with their rules.</summary>
 public interface ICodeRepository
 {
     /// <summary>Inserts a code (with its rules) and returns it.</summary>
@@ -14,10 +14,7 @@ public interface ICodeRepository
     /// <summary>Loads a code (including rules) by id, or null when it isn't <paramref name="userId"/>'s.</summary>
     Task<CodeEntity?> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken ct);
 
-    /// <summary>
-    /// Lists a user's codes (including rules), newest first; <paramref name="q"/> filters case-insensitively to
-    /// codes whose name contains the term.
-    /// </summary>
+    /// <summary>Lists a user's codes and rules, newest first; <paramref name="q"/> matches a name substring.</summary>
     Task<IReadOnlyList<CodeEntity>> ListByUserAsync(Guid userId, string? q, CancellationToken ct);
 
     /// <summary>Saves edits and replaces the whole rule set; keeps slug, scan count, and creation timestamp.</summary>
@@ -32,7 +29,7 @@ public interface ICodeRepository
     /// <summary>Returns whether a slug is already taken.</summary>
     Task<bool> SlugExistsAsync(string slug, CancellationToken ct);
 
-    /// <summary>Counts how many codes a user currently owns — drives the per-plan create-time cap.</summary>
+    /// <summary>Counts how many codes a user currently owns.</summary>
     Task<int> CountByUserAsync(Guid userId, CancellationToken ct);
 
     /// <summary>Reassigns every code owned by <paramref name="fromUserId"/> to <paramref name="toUserId"/>.</summary>

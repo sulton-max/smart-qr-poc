@@ -7,7 +7,7 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>Provides rule evaluation for a scan — first match wins, then the optional catch-all.</summary>
+/// <summary>Provides rule evaluation for a scan.</summary>
 /// <remarks>Resolve the scan context (device, geo, language) before evaluating.</remarks>
 public sealed class RoutingService : IRoutingService
 {

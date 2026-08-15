@@ -4,10 +4,10 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace SmartQr.Common.Domain.Serialization.Json;
 
-/// <summary>Builds the serializer options a jsonb column is read and written with.</summary>
+/// <summary>Creates the serializer options a jsonb column is read and written with.</summary>
 public static class JsonbOptions
 {
-    /// <summary>Creates options matching the wire shape — Web defaults plus camelCase string enums.</summary>
+    /// <summary>Creates the options matching the wire shape.</summary>
     /// <param name="unionModifiers">Subtype bindings for the polymorphic bases the document contains.</param>
     public static JsonSerializerOptions Create(params Action<JsonTypeInfo>[] unionModifiers)
     {

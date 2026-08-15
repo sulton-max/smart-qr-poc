@@ -3,7 +3,7 @@ using SmartQr.Application.Codes.Core.Services;
 
 namespace SmartQr.Infrastructure.Codes.Core.Services;
 
-/// <summary>Cryptographically-random base62 slug generator (7 chars ≈ 3.5 trillion combinations).</summary>
+/// <summary>Provides cryptographically random base62 slugs.</summary>
 public sealed class SlugGenerator : ISlugGenerator
 {
     private const string Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

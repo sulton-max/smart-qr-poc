@@ -4,13 +4,13 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Application.Identity.Core.Commands;
 
-/// <summary>Signs in with a Google ID token — verifies it, finds or creates the account, claims guest codes.</summary>
+/// <summary>Represents a command to sign in with a Google ID token.</summary>
 public sealed record GoogleSignInCommand
     : ICommand<AppResult<GoogleSignInResult.Success>>
 {
-    /// <summary>The Google ID token (JWT credential) issued to the client by Google Sign-In.</summary>
+    /// <summary>Gets the Google ID token issued to the client by Google Sign-In.</summary>
     public required string IdToken { get; init; }
 
-    /// <summary>The caller's current guest id; its codes are claimed into the account on sign-in.</summary>
+    /// <summary>Gets the caller's current guest id, whose codes are claimed into the account.</summary>
     public Guid? GuestId { get; init; }
 }

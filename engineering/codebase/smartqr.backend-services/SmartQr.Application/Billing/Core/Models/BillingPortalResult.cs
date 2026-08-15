@@ -1,10 +1,10 @@
 namespace SmartQr.Application.Billing.Core.Models;
 
-/// <summary>Outcome of opening a Customer Portal session.</summary>
+/// <summary>Represents the outcome of opening a Customer Portal session.</summary>
 public abstract record BillingPortalResult
 {
     private BillingPortalResult() { }
 
-    /// <summary>Session created — carries the hosted URL.</summary>
+    /// <summary>Session created successfully.</summary>
     public sealed record Success(PortalSessionDto Session) : BillingPortalResult;
 }

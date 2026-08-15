@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Application.Codes.Rules.Validators;
 
-/// <summary>Validates the pointer catch-all — it carries only the order of the rule whose content it reuses.</summary>
+/// <summary>Validates the pointer catch-all rule.</summary>
 /// <remarks>Target existence is checked in <see cref="CodeRuleSetValidator"/>, not here.</remarks>
 public sealed class DefaultPointerRuleValidator : AbstractValidator<DefaultPointerRuleValueObject>
 {

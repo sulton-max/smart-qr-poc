@@ -7,7 +7,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>The wedge — a code created or edited on the Api host resolves on the Redirect host's next scan.</summary>
+/// <summary>A code created or edited on the Api host resolves on the Redirect host's next scan.</summary>
 /// <remarks>Destinations ride <c>text</c> rules — <c>url</c> content encodes to null and would 404 on scan.</remarks>
 [Collection(AppCollection.Name)]
 public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
@@ -21,7 +21,7 @@ public sealed class RedirectWedgeTests(AppFixture fixture) : E2EBase(fixture)
     private const string IosDestination = "https://apps.apple.com/app/id000000000";
     private const string FallbackUrl = "https://example.com";
 
-    /// <summary>A dynamic code: iOS scanners get <paramref name="iosDestination"/>, others the fallback.</summary>
+    /// <summary>Builds a dynamic code: iOS gets <paramref name="iosDestination"/>, others the fallback.</summary>
     private static object AppCode(string name, string fallback, string iosDestination) => new
     {
         name,

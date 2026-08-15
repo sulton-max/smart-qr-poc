@@ -6,7 +6,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Application.Codes.Rules.Validators;
 
-/// <summary>Validates a code's rule set as a whole — the invariants a single rule cannot see.</summary>
+/// <summary>Validates a code's rule set as a whole.</summary>
 /// <remarks>Give each rule an explicit <c>OverridePropertyName</c>; <c>CodeValidationPathTests</c> locks it.</remarks>
 public sealed class CodeRuleSetValidator : AbstractValidator<CodeRuleSet>
 {

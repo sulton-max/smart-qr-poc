@@ -4,13 +4,13 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Application.Codes.Core.Queries;
 
-/// <summary>Lists all codes owned by a user/workspace, newest first.</summary>
+/// <summary>Represents a query to list a user's codes, newest first.</summary>
 public sealed record CodeListQuery
     : IQuery<AppResult<CodeListResult.Success>>
 {
-    /// <summary>Id of the user whose codes to list.</summary>
+    /// <summary>Gets the id of the user whose codes are listed.</summary>
     public required Guid UserId { get; init; }
 
-    /// <summary>Case-insensitive filter — matches codes whose name contains the term; absent lists them all.</summary>
+    /// <summary>Gets the case-insensitive name filter, matched as a substring; absent lists every code.</summary>
     public string? Q { get; init; }
 }

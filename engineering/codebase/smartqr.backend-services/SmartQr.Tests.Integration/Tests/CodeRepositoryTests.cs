@@ -9,7 +9,7 @@ using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
 
-/// <summary>Integration tests for the persistence path against the provider-switchable test database.</summary>
+/// <summary>Integration tests for the code persistence path.</summary>
 public class CodeRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
     private static CodeEntity NewCode(Guid user, string slug, params CodeRuleValueObject[] rules) => new()

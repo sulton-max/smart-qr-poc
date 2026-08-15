@@ -10,7 +10,7 @@ using BarcodeFormat = WoW.Two.Sdk.Backend.Beta.Codes.Models.BarcodeFormat;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>Proves the generation library produces valid SVG/PNG for QR and barcodes (no DB, no host).</summary>
+/// <summary>Proves the generation library produces valid SVG and PNG for QR and barcodes.</summary>
 public class CodeRenderingTests
 {
     private readonly CodeRenderer _renderer = new(

@@ -1,6 +1,6 @@
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents one color stop of a <see cref="GradientApiRequest"/>.</summary>
+/// <summary>Represents one color stop of a gradient.</summary>
 public sealed record GradientStopApiRequest
 {
     /// <summary>Gets the stop color as <c>#RRGGBB</c>.</summary>

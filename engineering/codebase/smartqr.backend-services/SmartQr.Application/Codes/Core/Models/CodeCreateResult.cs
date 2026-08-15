@@ -1,6 +1,6 @@
 namespace SmartQr.Application.Codes.Core.Models;
 
-/// <summary>Outcome of creating a code.</summary>
+/// <summary>Represents the outcome of creating a code.</summary>
 public abstract record CodeCreateResult
 {
     private CodeCreateResult() { }

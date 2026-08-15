@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SmartQr.Common.Domain.Serialization;
 
-/// <summary>The closed set of subtypes of a polymorphic base, each bound to a discriminator enum member.</summary>
+/// <summary>Represents the closed set of a polymorphic base's subtypes, each bound to a discriminator.</summary>
 /// <remarks>Declare once as a static member of the base; bind with a <c>To{Format}</c> extension.</remarks>
 /// <typeparam name="TBase">The polymorphic base type.</typeparam>
 /// <typeparam name="TKind">The enum discriminating the subtypes.</typeparam>
@@ -56,7 +56,7 @@ public sealed class SubtypeRegistry<TBase, TKind>
             .ToArray();
     }
 
-    /// <summary>Every subtype, paired with its discriminator member and the wire token it serializes to.</summary>
+    /// <summary>Gets every subtype, paired with its discriminator and the wire token it serializes to.</summary>
     public IReadOnlyList<(TKind Kind, Type Type, string Discriminator)> Subtypes { get; }
 
     /// <summary>Resolves the concrete type a discriminator member identifies.</summary>

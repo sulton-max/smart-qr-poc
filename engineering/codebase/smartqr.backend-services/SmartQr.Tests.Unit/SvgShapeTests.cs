@@ -13,7 +13,7 @@ public class SvgShapeTests
     private readonly QrMatrixGenerator _matrixSource = new();
     private const string Payload = "https://smartqr.app/abc1234";
 
-    /// <summary>A real QR matrix (≥ 21×21) so the three finder regions exist and are detected.</summary>
+    /// <summary>Builds a real QR matrix (≥ 21×21) so the three finder regions exist.</summary>
     private ModuleMatrix RealQr() => _matrixSource.Generate(Payload, EccLevel.Q);
 
     // ── Byte-parity fast path ───────────────────────────────────────────────────────────────────────
@@ -182,7 +182,7 @@ public class SvgShapeTests
         return positions;
     }
 
-    /// <summary>The <c>d</c> attribute of the FIRST foreground <c>&lt;path&gt;</c> — the data body.</summary>
+    /// <summary>Gets the data body, the <c>d</c> attribute of the first foreground <c>&lt;path&gt;</c>.</summary>
     private static string DataPathBody(string svg)
     {
         var pathStart = svg.IndexOf("<path", StringComparison.Ordinal);
@@ -212,7 +212,7 @@ public class SvgShapeTests
         return new ModuleMatrix(m);
     }
 
-    /// <summary>An all-light n×n matrix with one vertical dark run, placed away from the finder corners.</summary>
+    /// <summary>Builds an all-light n×n matrix with one vertical dark run, away from the finder corners.</summary>
     private static ModuleMatrix SingleColumnRun(int size, int col, int startRow, int length)
     {
         var m = new bool[size, size];
@@ -221,7 +221,7 @@ public class SvgShapeTests
         return new ModuleMatrix(m);
     }
 
-    /// <summary>An all-light n×n matrix with one horizontal dark run, placed away from the finder corners.</summary>
+    /// <summary>Builds an all-light n×n matrix with one horizontal dark run, away from the finder corners.</summary>
     private static ModuleMatrix SingleRowRun(int size, int row, int startCol, int length)
     {
         var m = new bool[size, size];

@@ -8,7 +8,7 @@ namespace SmartQr.Domain.Codes.Rules;
 /// <summary>(De)serializes a code's rule list to and from its <c>rules</c> jsonb document.</summary>
 public static class CodeRuleJson
 {
-    /// <summary>The shared serializer options — jsonb defaults plus the rule and content subtype bindings.</summary>
+    /// <summary>Holds the serializer options for a code's rule document.</summary>
     public static readonly JsonSerializerOptions Options = JsonbOptions.Create(
         CodeRuleValueObject.Subtypes.ToJsonModifier(),
         CodeContentValueObject.Subtypes.ToJsonModifier());

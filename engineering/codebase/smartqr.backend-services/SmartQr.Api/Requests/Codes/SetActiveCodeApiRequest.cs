@@ -9,10 +9,10 @@ public sealed record SetActiveCodeApiRequest
     public required bool IsActive { get; init; }
 }
 
-/// <summary>Provides mapping for <see cref="SetActiveCodeApiRequest"/>.</summary>
+/// <summary>Extends <see cref="SetActiveCodeApiRequest"/> for command mapping.</summary>
 public static class SetActiveCodeApiRequestExtensions
 {
-    /// <summary>Maps the request to its <see cref="CodeSetActiveCommand"/>.</summary>
+    /// <summary>Maps the request to its set-active command.</summary>
     public static CodeSetActiveCommand ToCommand(this SetActiveCodeApiRequest request, Guid id, Guid userId)
     {
         var command = new CodeSetActiveCommand

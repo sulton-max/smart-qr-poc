@@ -8,7 +8,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Codes.Core.CommandHandlers;
 
-/// <summary>Handles <see cref="CodeDeleteCommand"/> — owner-scoped hard delete (rules cascade).</summary>
+/// <summary>Handles <see cref="CodeDeleteCommand"/>.</summary>
 public sealed class CodeDeleteCommandHandler(
     ICodeRepository repository,
     ILogger<CodeDeleteCommandHandler> logger)

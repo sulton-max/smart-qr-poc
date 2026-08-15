@@ -21,7 +21,7 @@ public sealed record ScanEventEntity : IKeyedEntity<Guid>, IHasTableName
     /// <summary>Gets or sets the resolved device class of the scan event.</summary>
     public DeviceType Device { get; set; }
 
-    /// <summary>Gets or sets the ISO country code of the scan event from IP geo (null until geo is wired).</summary>
+    /// <summary>Gets or sets the ISO country code of the scan event from IP geo.</summary>
     public string? CountryCode { get; set; }
 
     /// <summary>Gets or sets the coarse OS string of the scan event, parsed from the User-Agent.</summary>
@@ -30,12 +30,12 @@ public sealed record ScanEventEntity : IKeyedEntity<Guid>, IHasTableName
     /// <summary>Gets or sets the HTTP referrer of the scan event, when present.</summary>
     public string? Referrer { get; set; }
 
-    /// <summary>Gets or sets a salted hash of the scan's User-Agent — raw UA and IP are never stored.</summary>
+    /// <summary>Gets or sets a salted hash of the scan's User-Agent.</summary>
     public string? UserAgentHash { get; set; }
 
-    /// <summary>Gets or sets the id of the routing rule that matched the scan event, if any.</summary>
+    /// <summary>Gets or sets the order of the routing rule that matched the scan event, if any.</summary>
     public int? MatchedRuleOrder { get; set; }
 
-    /// <summary>Gets or sets the destination of the scan event the scan was sent to.</summary>
+    /// <summary>Gets or sets the destination URL the scan was sent to.</summary>
     public required string DestinationUrl { get; set; }
 }

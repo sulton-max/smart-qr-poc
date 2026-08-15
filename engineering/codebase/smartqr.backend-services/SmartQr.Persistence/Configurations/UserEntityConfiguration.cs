@@ -4,7 +4,7 @@ using SmartQr.Domain.Identity.Entities;
 
 namespace SmartQr.Persistence.Configurations;
 
-/// <summary>Configures the users table mapping. EF maps over the hand-authored SQL (schema-first).</summary>
+/// <summary>Configures the users table mapping.</summary>
 public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)

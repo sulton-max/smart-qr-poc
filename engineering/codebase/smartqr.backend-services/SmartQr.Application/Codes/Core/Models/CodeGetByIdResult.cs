@@ -1,6 +1,6 @@
 namespace SmartQr.Application.Codes.Core.Models;
 
-/// <summary>Outcome of fetching a single code.</summary>
+/// <summary>Represents the outcome of fetching a single code.</summary>
 public abstract record CodeGetByIdResult
 {
     private CodeGetByIdResult() { }

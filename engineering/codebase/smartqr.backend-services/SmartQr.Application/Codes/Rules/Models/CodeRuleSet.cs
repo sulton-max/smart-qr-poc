@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Application.Codes.Rules.Models;
 
-/// <summary>A code's rules plus the two fields its whole-set invariants are checked against.</summary>
+/// <summary>Represents a code's rules with the fields its whole-set invariants are checked against.</summary>
 /// <param name="Mode">How the code's symbol resolves; absent on update, where mode is immutable.</param>
 /// <param name="ContentType">The kind of content every rule must carry.</param>
 /// <param name="Rules">The rules being validated.</param>

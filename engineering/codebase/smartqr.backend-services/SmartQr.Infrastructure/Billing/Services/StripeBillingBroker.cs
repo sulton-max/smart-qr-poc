@@ -9,7 +9,7 @@ using StripePortalSessionOptions = Stripe.BillingPortal.SessionCreateOptions;
 
 namespace SmartQr.Infrastructure.Billing.Services;
 
-/// <summary>Real <see cref="IBillingBroker"/> over Stripe.net — hosted Checkout and Customer Portal.</summary>
+/// <summary>Wraps the Stripe API for checkout, portal, and webhook handling.</summary>
 public sealed class StripeBillingBroker(BillingSettings settings) : IBillingBroker
 {
     private RequestOptions Request => new() { ApiKey = settings.SecretKey };
@@ -84,7 +84,7 @@ public sealed class StripeBillingBroker(BillingSettings settings) : IBillingBrok
         };
     }
 
-    /// <summary>Flattens a <c>customer.subscription.*</c> event, whose object already is the subscription.</summary>
+    /// <summary>Flattens a <c>customer.subscription.*</c> event.</summary>
     private static BillingWebhookEvent FromSubscription(Subscription subscription, BillingWebhookEventType type)
     {
         var item = subscription.Items?.Data?.FirstOrDefault();

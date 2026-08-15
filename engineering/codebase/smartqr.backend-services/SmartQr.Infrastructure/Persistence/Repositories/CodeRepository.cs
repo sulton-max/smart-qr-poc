@@ -5,7 +5,7 @@ using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Infrastructure.Persistence.Repositories;
 
-/// <summary>EF Core implementation of <see cref="ICodeRepository"/>.</summary>
+/// <summary>Fetches and persists codes via EF Core.</summary>
 public sealed class CodeRepository(AppDbContext db) : ICodeRepository
 {
     /// <inheritdoc />

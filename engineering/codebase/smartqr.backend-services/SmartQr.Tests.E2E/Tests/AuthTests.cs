@@ -6,7 +6,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E auth — Google sign-in (find-or-create), guest-code claim, cross-device ownership, sign-out.</summary>
+/// <summary>E2E auth — Google sign-in, guest-code claim, cross-device ownership, sign-out.</summary>
 [Collection(AppCollection.Name)]
 public sealed class AuthTests(AppFixture fixture) : E2EBase(fixture)
 {

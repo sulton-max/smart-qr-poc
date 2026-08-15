@@ -4,7 +4,7 @@ using SmartQr.Domain.Codes.Core.Entities;
 
 namespace SmartQr.Persistence.Configurations;
 
-/// <summary>Configures the scan_events table mapping (append-only analytics).</summary>
+/// <summary>Configures the scan_events table mapping.</summary>
 public class ScanEventEntityConfiguration : IEntityTypeConfiguration<ScanEventEntity>
 {
     public void Configure(EntityTypeBuilder<ScanEventEntity> builder)

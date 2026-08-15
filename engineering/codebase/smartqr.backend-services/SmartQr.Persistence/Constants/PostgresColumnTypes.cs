@@ -1,8 +1,8 @@
 namespace SmartQr.Persistence.Constants;
 
-/// <summary>Column type name constants used in entity configuration.</summary>
+/// <summary>Contains the Postgres column type names.</summary>
 public static class PostgresColumnTypes
 {
-    /// <summary>Binary JSON — indexed, queryable, decomposed storage.</summary>
+    /// <summary>Holds the Postgres binary-JSON column type name.</summary>
     public const string Jsonb = "jsonb";
 }

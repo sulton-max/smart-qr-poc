@@ -5,7 +5,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Data.EntityFrameworkCore;
 
 namespace SmartQr.Tests.Integration.Harness;
 
-/// <summary>The provider-switchable EF test database — a Postgres container (default) or in-memory SQLite.</summary>
+/// <summary>Provides the provider-switchable EF test database.</summary>
 /// <remarks>Shared as an <c>ICollectionFixture</c> — call <c>ResetAsync()</c> first in each test.</remarks>
 public sealed class SmartQrTestDb : RelationalTestDb<AppDbContext>
 {

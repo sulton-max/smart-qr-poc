@@ -6,7 +6,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Web;
 
 namespace SmartQr.Tests.E2E.Tests;
 
-/// <summary>E2E CRUD and ownership for the codes management API against the real Postgres container.</summary>
+/// <summary>E2E CRUD and ownership for the codes management API.</summary>
 [Collection(AppCollection.Name)]
 public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
 {
@@ -288,7 +288,7 @@ public sealed class CodesCrudTests(AppFixture fixture) : E2EBase(fixture)
         solid.Should().NotContain("<linearGradient");
     }
 
-    /// <summary>A full style block; <paramref name="gradient"/> toggles a linear foreground gradient.</summary>
+    /// <summary>Builds a full style block; <paramref name="gradient"/> toggles a linear foreground gradient.</summary>
     private static object Style(bool gradient) => new
     {
         foregroundColor = "#000000",

@@ -1,6 +1,6 @@
 namespace SmartQr.Application.Codes.Core.Models;
 
-/// <summary>Outcome of enabling or disabling a code.</summary>
+/// <summary>Represents the outcome of enabling or disabling a code.</summary>
 public abstract record CodeSetActiveResult
 {
     private CodeSetActiveResult() { }

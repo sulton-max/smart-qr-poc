@@ -3,10 +3,10 @@ using RenderBarcodeFormat = WoW.Two.Sdk.Backend.Beta.Codes.Models.BarcodeFormat;
 
 namespace SmartQr.Infrastructure.Codes.Core.Extensions;
 
-/// <summary>Maps <see cref="DomainBarcodeFormat"/> to <see cref="RenderBarcodeFormat"/>, 1:1 by name.</summary>
+/// <summary>Extends <see cref="DomainBarcodeFormat"/> for SDK render mapping.</summary>
 public static class CodeFormatMappingExtensions
 {
-    /// <summary>Converts the persisted domain barcode format to the SDK render barcode format.</summary>
+    /// <summary>Converts the domain barcode format to the SDK render format.</summary>
     public static RenderBarcodeFormat ToRender(this DomainBarcodeFormat format) => format switch
     {
         DomainBarcodeFormat.QrCode => RenderBarcodeFormat.QrCode,

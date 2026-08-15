@@ -9,7 +9,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>Handles <see cref="BillingPortalCommand"/> — opens a Customer Portal session for the caller.</summary>
+/// <summary>Handles <see cref="BillingPortalCommand"/>.</summary>
 public sealed class BillingPortalCommandHandler(
     ISubscriptionRepository subscriptions,
     IBillingBroker gateway,

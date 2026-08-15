@@ -4,7 +4,7 @@ using SmartQr.Domain.Billing.Entities;
 
 namespace SmartQr.Persistence.Configurations;
 
-/// <summary>Configures the subscriptions table mapping. EF maps over the hand-authored SQL (schema-first).</summary>
+/// <summary>Configures the subscriptions table mapping.</summary>
 public class SubscriptionEntityConfiguration : IEntityTypeConfiguration<SubscriptionEntity>
 {
     public void Configure(EntityTypeBuilder<SubscriptionEntity> builder)

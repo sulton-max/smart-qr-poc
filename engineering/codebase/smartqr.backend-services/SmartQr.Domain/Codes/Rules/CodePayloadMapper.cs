@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Rules.Models;
 
 namespace SmartQr.Domain.Codes.Rules;
 
-/// <summary>Resolves what a code's symbol carries — the one place the static / dynamic split is decided.</summary>
+/// <summary>Resolves what a code's symbol carries.</summary>
 public static class CodePayloadMapper
 {
     /// <summary>Resolves the payload: baked content when static, the short link when dynamic.</summary>

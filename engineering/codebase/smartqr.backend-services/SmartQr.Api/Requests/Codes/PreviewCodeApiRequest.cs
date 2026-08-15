@@ -5,29 +5,29 @@ using WoW.Two.Sdk.Backend.Beta.Codes.Models.Style;
 
 namespace SmartQr.Api.Requests.Codes;
 
-/// <summary>Represents the stateless preview request body, rendered live with no persistence.</summary>
+/// <summary>Represents the preview request body.</summary>
 public sealed record PreviewCodeApiRequest
 {
-    /// <summary>Gets how the symbol resolves — static bakes the rule's content, dynamic a sample short link.</summary>
+    /// <summary>Gets how the previewed symbol resolves.</summary>
     public required ContentMode Mode { get; init; }
 
-    /// <summary>Gets the routing rules whose content the preview bakes.</summary>
+    /// <summary>Gets the routing rules, each carrying the content it serves.</summary>
     public required IReadOnlyList<CodeRuleValueObject> Rules { get; init; }
 
-    /// <summary>Gets the symbology to render — <c>QrCode</c> is styled, any other format a plain barcode.</summary>
+    /// <summary>Gets the symbology to render.</summary>
     public BarcodeFormat? BarcodeFormat { get; init; }
 
-    /// <summary>Gets the style to render with — the same whole block a save takes.</summary>
+    /// <summary>Gets the style to render with.</summary>
     public required StyleApiRequest Style { get; init; }
 
-    /// <summary>Gets the supplied <see cref="BarcodeFormat"/>, defaulting to QR when absent.</summary>
+    /// <summary>Gets the supplied symbology, defaulting to QR when absent.</summary>
     public BarcodeFormat ResolveSymbology() => BarcodeFormat ?? SmartQr.Domain.Codes.Core.Enums.BarcodeFormat.QrCode;
 }
 
-/// <summary>Provides mapping for <see cref="PreviewCodeApiRequest"/>.</summary>
+/// <summary>Extends <see cref="PreviewCodeApiRequest"/> for style-spec mapping.</summary>
 public static class PreviewCodeApiRequestExtensions
 {
-    /// <summary>Maps the style block to a <see cref="StyleSpec"/>.</summary>
+    /// <summary>Maps the style block to its style spec.</summary>
     /// <param name="request">The preview request whose style block is projected.</param>
     public static StyleSpec ToStyleSpec(this PreviewCodeApiRequest request) => request.Style.ToStyleSpec();
 }

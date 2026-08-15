@@ -1,8 +1,8 @@
 namespace SmartQr.Application.Billing.Core.Models;
 
-/// <summary>The caller's current usage against their plan limits.</summary>
+/// <summary>Represents the caller's current usage.</summary>
 public sealed record UsageDto
 {
-    /// <summary>How many codes the caller currently owns.</summary>
+    /// <summary>Gets how many codes the caller currently owns.</summary>
     public required int CodeCount { get; init; }
 }

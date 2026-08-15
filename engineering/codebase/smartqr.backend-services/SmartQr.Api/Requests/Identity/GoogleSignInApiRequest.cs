@@ -5,14 +5,14 @@ namespace SmartQr.Api.Requests.Identity;
 /// <summary>Represents the Google sign-in request body.</summary>
 public sealed record GoogleSignInApiRequest
 {
-    /// <summary>Gets the Google ID token (JWT credential) returned to the client by Google Sign-In.</summary>
+    /// <summary>Gets the client's Google ID token (a JWT credential).</summary>
     public required string IdToken { get; init; }
 }
 
-/// <summary>Provides mapping for <see cref="GoogleSignInApiRequest"/>.</summary>
+/// <summary>Extends <see cref="GoogleSignInApiRequest"/> for command mapping.</summary>
 public static class GoogleSignInApiRequestExtensions
 {
-    /// <summary>Maps the request to its <see cref="GoogleSignInCommand"/>, carrying the caller's guest id.</summary>
+    /// <summary>Maps the request to its sign-in command, carrying the caller's guest id.</summary>
     public static GoogleSignInCommand ToCommand(this GoogleSignInApiRequest request, Guid? guestId) =>
         new() { IdToken = request.IdToken, GuestId = guestId };
 }

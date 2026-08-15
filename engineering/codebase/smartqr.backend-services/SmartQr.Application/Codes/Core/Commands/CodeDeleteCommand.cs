@@ -4,13 +4,13 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Application.Codes.Core.Commands;
 
-/// <summary>Hard-deletes a code (its rules cascade). Owner-scoped.</summary>
+/// <summary>Represents a command to hard-delete a code and its rules.</summary>
 public sealed record CodeDeleteCommand
     : ICommand<AppResult<CodeDeleteResult.Success>>
 {
-    /// <summary>Id of the code to delete.</summary>
+    /// <summary>Gets the id of the code to delete.</summary>
     public required Guid Id { get; init; }
 
-    /// <summary>The user the code must belong to — scopes the delete so callers remove only their own codes.</summary>
+    /// <summary>Gets the user the code must belong to.</summary>
     public required Guid UserId { get; init; }
 }

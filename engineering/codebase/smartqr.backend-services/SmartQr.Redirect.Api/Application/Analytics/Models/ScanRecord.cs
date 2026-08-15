@@ -2,33 +2,33 @@ using SmartQr.Domain.Codes.Core.Enums;
 
 namespace SmartQr.Redirect.Api.Application.Analytics.Models;
 
-/// <summary>An in-flight scan to be persisted asynchronously (off the redirect hot path).</summary>
+/// <summary>Represents a single scan to record.</summary>
 public sealed record ScanRecord
 {
-    /// <summary>Scanned code id.</summary>
+    /// <summary>Gets the id of the code that was scanned.</summary>
     public required Guid CodeId { get; init; }
 
-    /// <summary>Resolution time (UTC).</summary>
+    /// <summary>Gets the moment the scan was resolved.</summary>
     public required DateTimeOffset ScannedAt { get; init; }
 
-    /// <summary>Device class.</summary>
+    /// <summary>Gets the resolved device class of the scan.</summary>
     public DeviceType Device { get; init; }
 
-    /// <summary>ISO country code (if resolved).</summary>
+    /// <summary>Gets the ISO country code of the scan, or null when unresolved.</summary>
     public string? CountryCode { get; init; }
 
-    /// <summary>Coarse OS string.</summary>
+    /// <summary>Gets the coarse OS string of the scan, parsed from the User-Agent.</summary>
     public string? Os { get; init; }
 
-    /// <summary>HTTP referrer.</summary>
+    /// <summary>Gets the HTTP referrer of the scan, when present.</summary>
     public string? Referrer { get; init; }
 
-    /// <summary>Salted hash of the User-Agent (privacy: raw UA/IP not stored).</summary>
+    /// <summary>Gets a salted hash of the scan's User-Agent.</summary>
     public string? UserAgentHash { get; init; }
 
-    /// <summary>Matched rule id (null = fell back).</summary>
+    /// <summary>Gets the order of the routing rule that matched the scan, or null when none did.</summary>
     public int? MatchedRuleOrder { get; init; }
 
-    /// <summary>Destination the scan was sent to.</summary>
+    /// <summary>Gets the destination URL the scan was sent to.</summary>
     public required string DestinationUrl { get; init; }
 }

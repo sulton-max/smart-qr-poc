@@ -30,36 +30,36 @@ namespace SmartQr.Tests.E2E.Harness;
 /// <summary>Boots the Api and Redirect hosts over a shared Postgres container, Respawn-reset between tests.</summary>
 public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
 {
-    /// <summary>Name of the identity cookie the Api host sets on guest provisioning.</summary>
+    /// <summary>Holds the name of the identity cookie the Api host sets on guest provisioning.</summary>
     public const string UserIdCookieName = "user-id";
 
-    /// <summary>Name of the session cookie the Api host sets on Google sign-in.</summary>
+    /// <summary>Holds the name of the session cookie the Api host sets on Google sign-in.</summary>
     public const string AuthCookieName = "sqr-auth";
 
-    /// <summary>Stable redirect base for each code's <c>shortUrl</c>, set via <c>REDIRECT_BASE_URL</c>.</summary>
+    /// <summary>Holds the redirect base for each code's <c>shortUrl</c>, set via <c>REDIRECT_BASE_URL</c>.</summary>
     public const string RedirectBaseUrl = "https://redirect.smartqr.test";
 
-    /// <summary>Fake Stripe price id wired into the Api host for the Solo plan.</summary>
+    /// <summary>Holds the fake Stripe price id for the Solo plan.</summary>
     public const string PriceSolo = "price_solo";
 
-    /// <summary>Fake Stripe price id wired into the Api host for the Pro plan.</summary>
+    /// <summary>Holds the fake Stripe price id for the Pro plan.</summary>
     public const string PricePro = "price_pro";
 
-    /// <summary>Fake Stripe price id wired into the Api host for the Agency plan.</summary>
+    /// <summary>Holds the fake Stripe price id for the Agency plan.</summary>
     public const string PriceAgency = "price_agency";
 
     private readonly PostgresFixture _postgres;
 
-    /// <summary>The fake Stripe broker wired into the Api host — no network; tests stage its responses.</summary>
+    /// <summary>Gets the fake Stripe broker wired into the Api host.</summary>
     public FakeBillingBroker Gateway { get; } = new();
 
-    /// <summary>The shared Postgres fixture (container and Respawn).</summary>
+    /// <summary>Gets the shared Postgres fixture.</summary>
     public PostgresFixture Postgres => _postgres;
 
-    /// <summary>The management Api host.</summary>
+    /// <summary>Gets the management Api host.</summary>
     public WebApiTestHost<ApiProgram> ApiHost { get; }
 
-    /// <summary>The redirect (hot-path) host.</summary>
+    /// <summary>Gets the redirect (hot-path) host.</summary>
     public WebApiTestHost<RedirectProgram> RedirectHost { get; }
 
     /// <summary>Registers the shared container and both hosts.</summary>
@@ -113,17 +113,18 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
         });
     }
 
-    /// <summary>A fresh anonymous client against the Api host (no identity cookie).</summary>
+    /// <summary>Creates a fresh anonymous client against the Api host.</summary>
     public HttpClient CreateApiClient() => ApiHost.CreateClient();
 
-    /// <summary>A fresh client against the Redirect host. Redirects are NOT followed so 302s can be asserted.</summary>
+    /// <summary>Creates a fresh client against the Redirect host that does not follow redirects.</summary>
     public HttpClient CreateRedirectClient() => RedirectHost.CreateClient(
         new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
     {
         AllowAutoRedirect = false,
     });
 
-    /// <summary>A new <see cref="AppDbContext"/> on the shared container — seeds rows the API can't create.</summary>
+    /// <summary>Creates a new database context on the shared container.</summary>
+    /// <remarks>Use it to seed rows the API cannot create.</remarks>
     public AppDbContext NewDbContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -151,7 +152,7 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
         Environment.SetEnvironmentVariable("REDIS_CONNECTION", null); // ensure DbRedirectConfigRepository path
     }
 
-    /// <summary>Snapshots the post-migration schema for Respawn, after both hosts have applied migrations.</summary>
+    /// <summary>Snapshots the post-migration schema for Respawn.</summary>
     protected override ValueTask InitializeStateAsync(CancellationToken cancellationToken = default) =>
         _postgres.InitializeRespawnerAsync(cancellationToken);
 
@@ -193,42 +194,42 @@ public sealed class AppFixture : MultiHostFixture, IAsyncLifetime
         return null;
     }
 
-    /// <summary>Starts the topology for xUnit — container up, hosts built and migrated, Respawn snapshotted.</summary>
+    /// <summary>Starts the topology for xUnit.</summary>
     Task IAsyncLifetime.InitializeAsync() => StartAsync().AsTask();
 
-    /// <summary>Disposes the hosts then the container for xUnit's <see cref="IAsyncLifetime"/> contract.</summary>
+    /// <summary>Disposes the hosts, then the container.</summary>
     Task IAsyncLifetime.DisposeAsync() => DisposeAsync().AsTask();
 }
 
-/// <summary>An authenticated guest: the <see cref="HttpClient"/> carrying the identity cookie plus its id.</summary>
+/// <summary>Represents a provisioned guest and the Api client carrying its cookie.</summary>
 /// <param name="Client">Api client carrying the <c>user-id</c> cookie.</param>
 /// <param name="UserId">The provisioned guest id (string form of the cookie value).</param>
 public sealed record GuestClient(HttpClient Client, string UserId);
 
-/// <summary>xUnit collection that shares one <see cref="AppFixture"/> across the whole E2E run.</summary>
+/// <summary>Defines the xUnit collection that shares one fixture across the E2E run.</summary>
 [CollectionDefinition(AppCollection.Name)]
 public sealed class AppCollection : ICollectionFixture<AppFixture>
 {
-    /// <summary>The collection name — every E2E test class joins it to share the container and run serially.</summary>
+    /// <summary>Holds the collection name every E2E test class joins.</summary>
     public const string Name = "smart-qr-e2e";
 }
 
-/// <summary>Base for E2E tests — wires the shared fixture, resets the DB per test, exposes fresh clients.</summary>
+/// <summary>Provides the shared fixture and per-test database reset for E2E tests.</summary>
 public abstract class E2EBase(AppFixture fixture) : IAsyncLifetime
 {
-    /// <summary>The shared app fixture (container and two hosts).</summary>
+    /// <summary>Gets the shared app fixture.</summary>
     protected AppFixture Fixture { get; } = fixture;
 
-    /// <summary>An anonymous Api client (no identity cookie).</summary>
+    /// <summary>Gets an Api client with no identity cookie.</summary>
     protected HttpClient AnonymousClient => Fixture.CreateApiClient();
 
-    /// <summary>A redirect client that does NOT auto-follow 302s.</summary>
+    /// <summary>Gets a redirect client that does not auto-follow 302s.</summary>
     protected HttpClient RedirectClient => Fixture.CreateRedirectClient();
 
     /// <summary>Provisions a guest and returns a client carrying its cookie.</summary>
     protected Task<GuestClient> CreateGuestClientAsync() => Fixture.CreateGuestClientAsync();
 
-    /// <summary>Resets the DB and clears the staged webhook event and captured calls on the fake gateway.</summary>
+    /// <summary>Resets the database and the fake gateway.</summary>
     public async Task InitializeAsync()
     {
         await Fixture.ResetAsync();

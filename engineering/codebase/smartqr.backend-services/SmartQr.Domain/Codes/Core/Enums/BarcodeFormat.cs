@@ -1,21 +1,21 @@
 namespace SmartQr.Domain.Codes.Core.Enums;
 
-/// <summary>Defines the concrete symbology used to render a code — QR by default.</summary>
+/// <summary>Defines the symbology used to render a code.</summary>
 public enum BarcodeFormat
 {
-    /// <summary>Represents a QR code — 2D, the default.</summary>
+    /// <summary>Represents a QR code — 2D.</summary>
     QrCode,
 
-    /// <summary>Represents a Data Matrix — 2D, industrial / pharma / small-part marking, GS1.</summary>
+    /// <summary>Represents a Data Matrix — 2D.</summary>
     DataMatrix,
 
-    /// <summary>Represents a PDF417 — 2D stacked, IDs / tickets / boarding passes.</summary>
+    /// <summary>Represents a PDF417 — 2D stacked.</summary>
     Pdf417,
 
-    /// <summary>Represents an Aztec code — 2D, transport tickets (robust at low resolution, no quiet zone).</summary>
+    /// <summary>Represents an Aztec code — 2D.</summary>
     Aztec,
 
-    /// <summary>Represents a Code 128 — 1D, logistics / asset labels.</summary>
+    /// <summary>Represents a Code 128 — 1D.</summary>
     Code128,
 
     /// <summary>Represents an EAN-13 — 1D retail product barcode.</summary>

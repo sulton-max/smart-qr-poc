@@ -10,7 +10,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Codes.Core.CommandHandlers;
 
-/// <summary>Handles <see cref="CodeSetActiveCommand"/> — owner-scoped enable/disable of a code.</summary>
+/// <summary>Handles <see cref="CodeSetActiveCommand"/>.</summary>
 public sealed class CodeSetActiveCommandHandler(
     ICodeRepository repository,
     ApiSettings settings,

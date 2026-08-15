@@ -7,10 +7,10 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Endpoints;
 
-/// <summary>Provides the redirect hot path — <c>GET /{slug}</c> resolves a code and returns a 302.</summary>
+/// <summary>Extends the web application for redirect routing.</summary>
 public static class RedirectEndpoints
 {
-    /// <summary>Maps the slug redirect endpoint.</summary>
+    /// <summary>Maps <c>GET /{slug}</c> to the redirect handler.</summary>
     public static void MapRedirect(this WebApplication app) => app.MapGet("/{slug}", HandleAsync);
 
     private static async Task<IResult> HandleAsync(

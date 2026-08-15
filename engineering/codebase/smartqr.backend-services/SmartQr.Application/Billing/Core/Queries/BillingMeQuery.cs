@@ -4,10 +4,10 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Application.Billing.Core.Queries;
 
-/// <summary>Reads the caller's billing snapshot — plan, status, limits, and live code usage.</summary>
+/// <summary>Represents a query to read the caller's billing snapshot.</summary>
 public sealed record BillingMeQuery
     : IQuery<AppResult<BillingMeResult.Success>>
 {
-    /// <summary>The id of the user whose snapshot is read.</summary>
+    /// <summary>Gets the id of the user whose snapshot is read.</summary>
     public required Guid UserId { get; init; }
 }

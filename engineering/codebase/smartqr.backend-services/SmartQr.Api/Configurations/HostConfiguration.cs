@@ -3,10 +3,10 @@ using WoW.Two.Sdk.Backend.Beta.Meta;
 
 namespace SmartQr.Api.Configurations;
 
-/// <summary> Provides host configuration extensions </summary>
+/// <summary>Extends the host builder and the web application for startup wiring.</summary>
 public static partial class HostConfiguration
 {
-    /// <summary>Configures the application builder (services).</summary>
+    /// <summary>Configures the application builder's services.</summary>
     /// <param name="builder">The web application builder to configure.</param>
     /// <returns>The same <paramref name="builder"/> for chaining.</returns>
     public static WebApplicationBuilder Configure(this WebApplicationBuilder builder)
@@ -38,7 +38,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Runs startup tasks, then configures middleware and endpoints.</summary>
+    /// <summary>Configures the middleware pipeline and endpoints after startup tasks run.</summary>
     /// <param name="app">The built web application to configure.</param>
     /// <returns>The same <paramref name="app"/> for chaining.</returns>
     public static WebApplication Configure(this WebApplication app)

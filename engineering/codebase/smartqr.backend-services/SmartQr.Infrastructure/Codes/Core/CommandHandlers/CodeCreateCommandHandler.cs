@@ -16,7 +16,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Codes.Core.CommandHandlers;
 
-/// <summary>Handles <see cref="CodeCreateCommand"/> — enforces the plan cap, allocates a unique slug, saves.</summary>
+/// <summary>Handles <see cref="CodeCreateCommand"/>.</summary>
 public sealed class CodeCreateCommandHandler(
     ICodeRepository repository,
     ISubscriptionRepository subscriptions,

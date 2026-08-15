@@ -6,7 +6,7 @@ using WoW.Two.Sdk.Backend.Beta.Web.ExceptionHandling;
 
 namespace SmartQr.Api;
 
-/// <summary>Renders an <see cref="AppError"/> failure arm as an RFC 9457 ProblemDetails response.</summary>
+/// <summary>Extends <see cref="ControllerBase"/> for RFC 9457 problem-details rendering.</summary>
 internal static class ControllerProblemExtensions
 {
     /// <summary>Builds the RFC 9457 ProblemDetails result for <paramref name="error"/>.</summary>

@@ -6,24 +6,24 @@ namespace SmartQr.Tests.E2E.Support;
 // production types, so only the wire contract is asserted. The JSON options + success envelope live in
 // the SDK testing package (WoW.Two.Sdk.Backend.Beta.Testing.Web: TestJson, ApiEnvelope<T>).
 
-/// <summary>Wire shape of <c>MeResponse</c>.</summary>
+/// <summary>Represents the wire shape of <c>MeResponse</c>.</summary>
 public sealed record MeResponseDto
 {
-    /// <summary>The caller's identity kind (Anonymous / Guest / User).</summary>
+    /// <summary>Gets the caller's identity kind (Anonymous, Guest, or User).</summary>
     public string Kind { get; init; } = "";
 }
 
-/// <summary>Wire shape of <c>CurrentUserDto</c> including the registered-user profile.</summary>
+/// <summary>Represents the wire shape of <c>CurrentUserDto</c>, including the user profile.</summary>
 public sealed record MeWithUserDto
 {
-    /// <summary>The caller's identity kind (Anonymous / Guest / User).</summary>
+    /// <summary>Gets the caller's identity kind (Anonymous, Guest, or User).</summary>
     public string Kind { get; init; } = "";
 
-    /// <summary>The signed-in account profile; null for guest / anonymous.</summary>
+    /// <summary>Gets the signed-in account profile; null for guest or anonymous.</summary>
     public UserSummaryDtoModel? User { get; init; }
 }
 
-/// <summary>Wire shape of <c>UserSummaryDto</c>.</summary>
+/// <summary>Represents the wire shape of <c>UserSummaryDto</c>.</summary>
 public sealed record UserSummaryDtoModel
 {
     public Guid Id { get; init; }
@@ -31,7 +31,7 @@ public sealed record UserSummaryDtoModel
     public string Email { get; init; } = "";
 }
 
-/// <summary>Wire shape of <c>CodeDto</c> — rules carry the content; slug and short URL are null when static.</summary>
+/// <summary>Represents the wire shape of <c>CodeDto</c>.</summary>
 public sealed record CodeDtoModel
 {
     public Guid Id { get; init; }
@@ -40,21 +40,21 @@ public sealed record CodeDtoModel
     public string Name { get; init; } = "";
     public string BarcodeFormat { get; init; } = "";
 
-    /// <summary>How the symbol resolves — <c>static</c> (baked payload) or <c>dynamic</c> (short link).</summary>
+    /// <summary>Gets how the symbol resolves, either <c>static</c> or <c>dynamic</c>.</summary>
     public string Mode { get; init; } = "";
 
-    /// <summary>The kind of content every rule of this code carries (e.g. <c>url</c>, <c>wifi</c>).</summary>
+    /// <summary>Gets the kind of content every rule of this code carries (e.g. <c>url</c>, <c>wifi</c>).</summary>
     public string ContentType { get; init; } = "";
 
     public bool IsActive { get; init; }
     public long ScanCount { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
 
-    /// <summary>The polymorphic routing rules, each carrying the content it serves.</summary>
+    /// <summary>Gets the routing rules, each carrying the content it serves.</summary>
     public IReadOnlyList<RuleDtoModel> Rules { get; init; } = [];
 }
 
-/// <summary>Wire shape of <c>CodeRuleValueObject</c> — the <c>type</c> discriminator plus that role's fields.</summary>
+/// <summary>Represents the wire shape of <c>CodeRuleValueObject</c>.</summary>
 public sealed record RuleDtoModel
 {
     public string Type { get; init; } = "";
@@ -65,7 +65,7 @@ public sealed record RuleDtoModel
     public ContentDtoModel? Content { get; init; }
 }
 
-/// <summary>Wire shape of the content — <c>type</c> plus its fields, never <c>payload</c>.</summary>
+/// <summary>Represents the wire shape of the content.</summary>
 public sealed record ContentDtoModel
 {
     public string Type { get; init; } = "";
@@ -77,35 +77,36 @@ public sealed record ContentDtoModel
     public string? Email { get; init; }
 }
 
-/// <summary>Wire shape of <c>BillingStatusDto</c> — <c>Plan</c> is the enum name (string-enum JSON).</summary>
+/// <summary>Represents the wire shape of <c>BillingStatusDto</c>.</summary>
 public sealed record BillingStatusDtoModel
 {
-    /// <summary>The caller's plan name (e.g. <c>Free</c>, <c>Pro</c>).</summary>
+    /// <summary>Gets the caller's plan name (e.g. <c>Free</c>, <c>Pro</c>).</summary>
     public string Plan { get; init; } = "";
 
-    /// <summary>The subscription status, lower-cased to mirror Stripe (e.g. <c>active</c>, <c>canceled</c>).</summary>
+    /// <summary>Gets the subscription status (e.g. <c>active</c>, <c>canceled</c>).</summary>
     public string Status { get; init; } = "";
 
-    /// <summary>The plan's limits.</summary>
+    /// <summary>Gets the plan's limits.</summary>
     public LimitsDtoModel Limits { get; init; } = new();
 
-    /// <summary>The caller's current usage.</summary>
+    /// <summary>Gets the caller's current usage.</summary>
     public UsageDtoModel Usage { get; init; } = new();
 }
 
-/// <summary>Wire shape of <c>LimitsDto</c> — <c>MaxCodes</c> is <c>-1</c> for unlimited (Agency).</summary>
+/// <summary>Represents the wire shape of <c>LimitsDto</c>.</summary>
 public sealed record LimitsDtoModel
 {
+    /// <summary>Gets the maximum code count, or <c>-1</c> when unlimited.</summary>
     public int MaxCodes { get; init; }
 }
 
-/// <summary>Wire shape of <c>UsageDto</c>.</summary>
+/// <summary>Represents the wire shape of <c>UsageDto</c>.</summary>
 public sealed record UsageDtoModel
 {
     public int CodeCount { get; init; }
 }
 
-/// <summary>Wire shape of the Checkout / Portal session DTOs — both carry a single <c>url</c>.</summary>
+/// <summary>Represents the wire shape of the checkout and portal session DTOs.</summary>
 public sealed record SessionUrlDtoModel
 {
     public string Url { get; init; } = "";

@@ -2,22 +2,22 @@ using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Tests.Integration.Harness;
 
-/// <summary>xUnit collection sharing one <see cref="SmartQrTestDb"/> across every below-HTTP DB test.</summary>
+/// <summary>Defines the xUnit collection sharing one test database across the repository tests.</summary>
 [CollectionDefinition(Name)]
 public sealed class RepositoryTestCollection : ICollectionFixture<SmartQrTestDb>
 {
-    /// <summary>The shared collection name applied to <see cref="RepositoryTestBase"/>.</summary>
+    /// <summary>Holds the collection name every repository test class joins.</summary>
     public const string Name = "SmartQr repository tests";
 }
 
-/// <summary>Base for below-HTTP DB tests — shares <see cref="SmartQrTestDb"/>, emptied before each test.</summary>
+/// <summary>Provides repository tests with a shared database emptied before each test.</summary>
 [Collection(RepositoryTestCollection.Name)]
 public abstract class RepositoryTestBase(SmartQrTestDb db) : IAsyncLifetime
 {
-    /// <summary>The shared provider-switchable test database (Postgres container or in-memory SQLite).</summary>
+    /// <summary>Gets the shared provider-switchable test database.</summary>
     protected SmartQrTestDb Db { get; } = db;
 
-    /// <summary>A new <see cref="AppDbContext"/> on the active test database, with conventions and audit.</summary>
+    /// <summary>Creates a context on the active test database.</summary>
     protected AppDbContext NewContext() => Db.NewContext();
 
     /// <summary>Resets the shared database to empty before each test.</summary>

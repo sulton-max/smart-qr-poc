@@ -9,7 +9,6 @@ using SmartQr.Redirect.Api.Settings;
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
 /// <summary>Fetches the scanned code through an in-memory cache, reading the DB only on a miss.</summary>
-/// <remarks>Unwired pending the caching item — <see cref="DbRedirectCodeRepository"/> is the default.</remarks>
 public sealed class CachedRedirectCodeRepository(
     IServiceScopeFactory scopeFactory,
     IMemoryCache cache,

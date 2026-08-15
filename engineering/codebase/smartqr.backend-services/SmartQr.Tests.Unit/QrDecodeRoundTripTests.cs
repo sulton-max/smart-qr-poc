@@ -10,7 +10,7 @@ using ZXing.Common;
 
 namespace SmartQr.Tests.Unit;
 
-/// <summary>The scannability gate: a styled QR must still <b>decode</b> back to its payload.</summary>
+/// <summary>Proves a styled QR still decodes back to its payload.</summary>
 public sealed class QrDecodeRoundTripTests
 {
     private readonly QrCodeRenderer _renderer = new(

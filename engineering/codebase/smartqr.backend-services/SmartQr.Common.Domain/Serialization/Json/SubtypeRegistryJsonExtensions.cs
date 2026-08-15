@@ -3,7 +3,7 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace SmartQr.Common.Domain.Serialization.Json;
 
-/// <summary>Binds a <see cref="SubtypeRegistry{TBase,TKind}"/> to System.Text.Json.</summary>
+/// <summary>Extends <see cref="SubtypeRegistry{TBase,TKind}"/> for System.Text.Json binding.</summary>
 public static class SubtypeRegistryJsonExtensions
 {
     private const string DefaultDiscriminatorPropertyName = "type";

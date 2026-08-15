@@ -8,7 +8,7 @@ using SmartQr.Redirect.Api.Application.Analytics.Models;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Analytics;
 
-/// <summary>Drains queued scans and batch-writes them (plus scan-count bumps) to the DB, off the hot path.</summary>
+/// <summary>Runs the background flush that batch-writes queued scans.</summary>
 public sealed class ScanFlushBackgroundService(
     ChannelScanRecorder recorder,
     IServiceScopeFactory scopeFactory,

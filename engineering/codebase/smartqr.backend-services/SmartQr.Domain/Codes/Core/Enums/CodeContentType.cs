@@ -1,35 +1,35 @@
 namespace SmartQr.Domain.Codes.Core.Enums;
 
-/// <summary>Defines the kind of content a code encodes — the destination or payload it carries.</summary>
+/// <summary>Defines the kind of content a code encodes.</summary>
 public enum CodeContentType
 {
-    /// <summary>Represents a plain URL fronting a dynamic redirect.</summary>
+    /// <summary>Represents a destination URL.</summary>
     Url,
 
-    /// <summary>Represents a mobile app link that routes each scanner to the right app store.</summary>
+    /// <summary>Represents an app-store link.</summary>
     MobileApp,
 
-    /// <summary>Represents free-form text baked directly into the symbol.</summary>
+    /// <summary>Represents free-form text.</summary>
     Text,
 
-    /// <summary>Represents a pre-filled email (recipient, subject, body).</summary>
+    /// <summary>Represents the recipient and prefilled draft of an email.</summary>
     Email,
 
-    /// <summary>Represents a pre-filled SMS (recipient and message).</summary>
+    /// <summary>Represents the recipient and body of an SMS.</summary>
     Sms,
 
-    /// <summary>Represents a phone number dialed on scan.</summary>
+    /// <summary>Represents a telephone number to dial.</summary>
     Phone,
 
-    /// <summary>Represents a geographic location (latitude / longitude).</summary>
+    /// <summary>Represents a point on the globe.</summary>
     Geo,
 
-    /// <summary>Represents Wi-Fi network credentials for one-tap join.</summary>
+    /// <summary>Represents the credentials of a Wi-Fi network.</summary>
     Wifi,
 
-    /// <summary>Represents a contact card (vCard).</summary>
+    /// <summary>Represents a contact card.</summary>
     VCard,
 
-    /// <summary>Represents a calendar event (iCalendar VEVENT).</summary>
+    /// <summary>Represents a calendar event.</summary>
     Calendar,
 }

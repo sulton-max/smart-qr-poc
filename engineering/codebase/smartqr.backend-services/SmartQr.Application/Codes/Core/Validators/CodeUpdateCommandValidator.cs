@@ -5,7 +5,7 @@ using SmartQr.Application.Codes.Rules.Validators;
 
 namespace SmartQr.Application.Codes.Core.Validators;
 
-/// <summary>Validates update-code input — the name, each rule and its content, and the rule set as a whole.</summary>
+/// <summary>Validates update-code input.</summary>
 /// <remarks>Do not merge with <see cref="CodeCreateCommandValidator"/>: update carries no mode (CM3).</remarks>
 /// <seealso cref="CodeRuleValidator"/>
 /// <seealso cref="CodeRuleSetValidator"/>

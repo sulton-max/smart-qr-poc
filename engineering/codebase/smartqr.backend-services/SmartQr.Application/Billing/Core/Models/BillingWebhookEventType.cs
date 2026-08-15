@@ -1,17 +1,17 @@
 namespace SmartQr.Application.Billing.Core.Models;
 
-/// <summary>The Stripe webhook event kinds this app reacts to. Any other event maps to <see cref="Ignored"/>.</summary>
+/// <summary>Defines the Stripe webhook event kinds the app reacts to.</summary>
 public enum BillingWebhookEventType
 {
-    /// <summary>An event we don't handle — acknowledged with 200 and otherwise ignored.</summary>
+    /// <summary>Represents an event outside the handled set.</summary>
     Ignored,
 
-    /// <summary><c>checkout.session.completed</c> — a Checkout flow finished; upsert the subscription row.</summary>
+    /// <summary>Represents the <c>checkout.session.completed</c> event — a Checkout flow finished.</summary>
     CheckoutSessionCompleted,
 
-    /// <summary><c>customer.subscription.updated</c> — refresh status / plan / current-period-end.</summary>
+    /// <summary>Represents the <c>customer.subscription.updated</c> event — the subscription changed.</summary>
     SubscriptionUpdated,
 
-    /// <summary><c>customer.subscription.deleted</c> — mark the row canceled (never deletes codes).</summary>
+    /// <summary>Represents the <c>customer.subscription.deleted</c> event — the subscription ended.</summary>
     SubscriptionDeleted,
 }

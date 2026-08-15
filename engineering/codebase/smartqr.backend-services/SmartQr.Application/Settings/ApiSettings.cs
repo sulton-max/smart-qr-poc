@@ -2,10 +2,10 @@ using WoW.Two.Sdk.Backend.Beta.Foundation.Configuration;
 
 namespace SmartQr.Application.Settings;
 
-/// <summary>Settings for the management API service.</summary>
+/// <summary>Configuration for the management API service.</summary>
 public class ApiSettings
 {
-    /// <summary>Base URL of the redirect service — used to build the short URL encoded into each code.</summary>
+    /// <summary>Gets or sets the base URL of the redirect service.</summary>
     [EnvironmentVariable("REDIRECT_BASE_URL")]
     public string RedirectBaseUrl { get; set; } = "https://localhost:7022";
 }

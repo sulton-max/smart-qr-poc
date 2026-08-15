@@ -11,7 +11,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 
 namespace SmartQr.Infrastructure.Billing.CommandHandlers;
 
-/// <summary>Handles <see cref="BillingCheckoutCommand"/> — resolves the price id, opens a Checkout session.</summary>
+/// <summary>Handles <see cref="BillingCheckoutCommand"/>.</summary>
 public sealed class BillingCheckoutCommandHandler(
     IBillingBroker gateway,
     BillingSettings settings,

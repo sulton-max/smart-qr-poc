@@ -3,7 +3,7 @@ using WoW.Two.Sdk.Backend.Beta.Data.Abstractions;
 
 namespace SmartQr.Domain.Billing.Entities;
 
-/// <summary>Represents a user's Stripe subscription — the row that resolves their plan; no row means Free.</summary>
+/// <summary>Represents a user's Stripe subscription.</summary>
 public sealed record SubscriptionEntity : IKeyedEntity<Guid>, IHasTableName, IAuditable
 {
     /// <summary>Gets the storage table name of the subscription entity.</summary>
@@ -12,14 +12,14 @@ public sealed record SubscriptionEntity : IKeyedEntity<Guid>, IHasTableName, IAu
     /// <summary>Gets or sets the UUID primary key of the subscription.</summary>
     public required Guid Id { get; set; }
 
-    /// <summary>Gets or sets the id of the user who owns this subscription. Unique — one live row per user.</summary>
-    /// <remarks>Maps to the Stripe Checkout <c>client_reference_id</c>.</remarks>
+    // Carried through Stripe Checkout as client_reference_id.
+    /// <summary>Gets or sets the id of the user who owns this subscription.</summary>
     public required Guid UserId { get; set; }
 
-    /// <summary>Gets or sets the subscription tier of the subscription — drives the code-count cap.</summary>
+    /// <summary>Gets or sets the subscription tier of the subscription.</summary>
     public required Plan Plan { get; set; }
 
-    /// <summary>Gets or sets the lifecycle status of the subscription, mirrored from Stripe.</summary>
+    /// <summary>Gets or sets the lifecycle status of the subscription.</summary>
     public required SubscriptionStatus Status { get; set; }
 
     /// <summary>Gets or sets the Stripe customer id of the subscription (<c>cus_…</c>).</summary>

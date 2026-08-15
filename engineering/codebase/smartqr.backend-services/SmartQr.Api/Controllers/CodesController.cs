@@ -31,7 +31,7 @@ public sealed class CodesController(
     private const string SlugPlaceholder = "preview";
 
 
-    /// <summary>Renders an unsaved SVG preview from the supplied style — the exact bytes an export produces.</summary>
+    /// <summary>Renders an unsaved SVG preview from the supplied style.</summary>
     /// <remarks>Anonymous-or-guest allowed: it is a pure render with no ownership.</remarks>
     [HttpPost("preview")]
     [Produces("image/svg+xml")]

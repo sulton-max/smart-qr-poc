@@ -12,7 +12,7 @@ namespace SmartQr.Redirect.Api.Configurations;
 
 public static partial class HostConfiguration
 {
-    /// <summary>Loads and registers settings (redirect).</summary>
+    /// <summary>Loads and registers the redirect settings.</summary>
     private static WebApplicationBuilder AddSettings(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton(ConfigurationLoader.Load<RedirectSettings>(builder.Configuration));
@@ -26,7 +26,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the routing pipeline — code store, evaluator, detectors, and async scan recorder.</summary>
+    /// <summary>Registers the routing pipeline.</summary>
     private static WebApplicationBuilder AddRoutingServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMemoryCache();

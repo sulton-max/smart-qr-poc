@@ -11,26 +11,27 @@ public sealed record CreateCodeApiRequest
     /// <summary>Gets the code's display name.</summary>
     public required string Name { get; init; }
 
-    /// <summary>Gets the rendering symbology.</summary>
+    /// <summary>Gets the code's rendering symbology.</summary>
     public BarcodeFormat BarcodeFormat { get; init; } = BarcodeFormat.QrCode;
 
-    /// <summary>Gets the kind of content every rule carries — validated against the rules it ships with.</summary>
+    /// <summary>Gets the kind of content every rule carries.</summary>
     public required CodeContentType ContentType { get; init; }
 
-    /// <summary>Gets how the symbol resolves — a baked payload (static) or a redirect short link (dynamic).</summary>
+    /// <summary>Gets how the code's symbol resolves.</summary>
     public required ContentMode Mode { get; init; }
 
-    /// <summary>Gets the routing rules, each carrying the content it serves — at least one is required.</summary>
+    /// <summary>Gets the routing rules, each carrying the content it serves.</summary>
     public required IReadOnlyList<CodeRuleValueObject> Rules { get; init; }
 
-    /// <summary>Gets the style the code renders with — the whole block, no server default.</summary>
+    /// <summary>Gets the style the code renders with.</summary>
+    /// <remarks>Send the whole block; the server applies no default.</remarks>
     public required StyleApiRequest Style { get; init; }
 }
 
-/// <summary>Provides mapping for <see cref="CreateCodeApiRequest"/>.</summary>
+/// <summary>Extends <see cref="CreateCodeApiRequest"/> for command mapping.</summary>
 public static class CreateCodeApiRequestExtensions
 {
-    /// <summary>Maps the request to its <see cref="CodeCreateCommand"/>.</summary>
+    /// <summary>Maps the request to its create command.</summary>
     public static CodeCreateCommand ToCommand(this CreateCodeApiRequest request, Guid userId)
     {
         var command = new CodeCreateCommand

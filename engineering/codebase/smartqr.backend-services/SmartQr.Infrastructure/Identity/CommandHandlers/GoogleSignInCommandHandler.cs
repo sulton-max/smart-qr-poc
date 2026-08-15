@@ -11,7 +11,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Identity.CommandHandlers;
 
-/// <summary>Handles <see cref="GoogleSignInCommand"/> — verifies the token, finds or creates the account.</summary>
+/// <summary>Handles <see cref="GoogleSignInCommand"/>.</summary>
 public sealed class GoogleSignInCommandHandler(
     IGoogleIdTokenVerifier verifier,
     IUserRepository users,

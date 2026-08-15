@@ -12,7 +12,7 @@ using WoW.Two.Sdk.Backend.Beta.Mediator.Result;
 
 namespace SmartQr.Infrastructure.Codes.Core.CommandHandlers;
 
-/// <summary>Handles <see cref="CodeUpdateCommand"/> — owner-scoped load, applies edits, replaces all rules.</summary>
+/// <summary>Handles <see cref="CodeUpdateCommand"/>.</summary>
 public sealed class CodeUpdateCommandHandler(
     ICodeRepository repository,
     ApiSettings settings,

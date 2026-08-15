@@ -75,7 +75,7 @@ public class SvgRendererTests
         Assert.EndsWith("</svg>", svg);
     }
 
-    /// <summary>A deterministic n×n checkerboard matrix, dark where <c>row + col</c> is even.</summary>
+    /// <summary>Builds a deterministic n×n checkerboard matrix, dark where <c>row + col</c> is even.</summary>
     private static ModuleMatrix BuildChecker(int n)
     {
         var modules = new bool[n, n];

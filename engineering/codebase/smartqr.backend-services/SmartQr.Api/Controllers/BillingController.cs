@@ -51,7 +51,7 @@ public sealed class BillingController(ISender sender, ICurrentUser currentUser) 
             fail => this.ToProblem(fail.Error));
     }
 
-    /// <summary>Handles a Stripe webhook event.</summary>
+    /// <summary>Receives a Stripe webhook event.</summary>
     /// <remarks>Not owner-scoped or enveloped; a bad signature returns 400 so Stripe retries.</remarks>
     [HttpPost("webhook")]
     [ProducesResponseType(StatusCodes.Status200OK)]

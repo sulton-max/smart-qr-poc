@@ -1,6 +1,6 @@
 namespace SmartQr.Application.Codes.Core.Models;
 
-/// <summary>Outcome of listing a owner's codes.</summary>
+/// <summary>Represents the outcome of listing an owner's codes.</summary>
 public abstract record CodeListResult
 {
     private CodeListResult() { }

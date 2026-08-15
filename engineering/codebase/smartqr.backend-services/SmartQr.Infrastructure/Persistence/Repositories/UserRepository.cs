@@ -5,7 +5,7 @@ using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Infrastructure.Persistence.Repositories;
 
-/// <summary>EF Core implementation of <see cref="IUserRepository"/>.</summary>
+/// <summary>Fetches and persists users via EF Core.</summary>
 public sealed class UserRepository(AppDbContext db) : IUserRepository
 {
     /// <inheritdoc />

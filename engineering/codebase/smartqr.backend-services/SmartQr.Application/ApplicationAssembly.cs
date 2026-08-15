@@ -1,4 +1,4 @@
 namespace SmartQr.Application;
 
-/// <summary>Anchors the <c>SmartQr.Application</c> assembly for FluentValidation validator scanning.</summary>
+/// <summary>Represents the <c>SmartQr.Application</c> assembly as an anchor for reflection scanning.</summary>
 public sealed class ApplicationAssembly;

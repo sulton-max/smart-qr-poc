@@ -6,7 +6,7 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
-/// <summary>Fetches the scanned code and its rules straight from Postgres, no-tracking, once per scan.</summary>
+/// <summary>Fetches the scanned code and its rules from Postgres.</summary>
 /// <remarks>Front it with <see cref="CachedRedirectCodeRepository"/> when the caching item lands.</remarks>
 public sealed class DbRedirectCodeRepository(IServiceScopeFactory scopeFactory) : IRedirectCodeRepository
 {

@@ -27,7 +27,7 @@ namespace SmartQr.Api.Configurations;
 
 public static partial class HostConfiguration
 {
-    /// <summary>Loads and registers settings (API).</summary>
+    /// <summary>Loads and registers the application settings.</summary>
     private static WebApplicationBuilder AddSettings(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton(ConfigurationLoader.Load<ApiSettings>(builder.Configuration));
@@ -43,7 +43,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the SDK code-rendering engine and the product's image service.</summary>
+    /// <summary>Registers the code-rendering engine and the image service.</summary>
     private static WebApplicationBuilder AddCodeServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddCodeRendering();
@@ -51,7 +51,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the mediator, the FluentValidation pipeline behavior, and application services.</summary>
+    /// <summary>Registers the mediator pipeline and the application services.</summary>
     private static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddMediator(typeof(SmartQr.Infrastructure.InfrastructureAssembly).Assembly);
@@ -65,7 +65,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the identity seam — read-only current-user view and guest provisioning.</summary>
+    /// <summary>Registers the current-user view and guest provisioning.</summary>
     private static WebApplicationBuilder AddIdentity(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
@@ -74,7 +74,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the auth seam — user repository, Google ID-token verifier, and cookie sessions.</summary>
+    /// <summary>Registers cookie authentication and Google ID-token verification.</summary>
     private static WebApplicationBuilder AddAuth(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -96,7 +96,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers the billing seam — subscription repository and swappable Stripe broker.</summary>
+    /// <summary>Registers the subscription repository and the Stripe broker.</summary>
     private static WebApplicationBuilder AddBilling(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
@@ -104,7 +104,7 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Registers controllers with the validation exception filter and string-enum serialization.</summary>
+    /// <summary>Registers the controllers with validation filtering and string-enum JSON.</summary>
     private static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
         builder.Services

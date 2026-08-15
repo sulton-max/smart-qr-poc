@@ -2,7 +2,7 @@ using WoW.Two.Sdk.Backend.Beta.Identity.CurrentUser;
 
 namespace SmartQr.Application.Identity.Core.Models;
 
-/// <summary>The calling principal — its kind and, for a registered account, a minimal profile.</summary>
+/// <summary>Represents the calling principal.</summary>
 /// <param name="Kind">How the caller is identified.</param>
 /// <param name="User">Populated only for <see cref="UserKind.User"/>; <c>null</c> for guest/anonymous.</param>
 public sealed record CurrentUserDto(UserKind Kind, UserSummaryDto? User);

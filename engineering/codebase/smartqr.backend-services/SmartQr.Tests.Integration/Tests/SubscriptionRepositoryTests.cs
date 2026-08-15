@@ -5,7 +5,7 @@ using SmartQr.Tests.Integration.Harness;
 
 namespace SmartQr.Tests.Integration;
 
-/// <summary>Integration tests for the subscription persistence path against the test database.</summary>
+/// <summary>Integration tests for the subscription persistence path.</summary>
 public class SubscriptionRepositoryTests(SmartQrTestDb db) : RepositoryTestBase(db)
 {
     private static SubscriptionEntity NewSub(

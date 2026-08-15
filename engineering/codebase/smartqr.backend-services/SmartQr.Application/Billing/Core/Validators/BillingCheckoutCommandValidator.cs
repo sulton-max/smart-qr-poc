@@ -3,7 +3,7 @@ using SmartQr.Application.Billing.Core.Commands;
 
 namespace SmartQr.Application.Billing.Core.Validators;
 
-/// <summary>Validates checkout input shape — the requested plan must be a defined enum value.</summary>
+/// <summary>Validates checkout input.</summary>
 public sealed class BillingCheckoutCommandValidator : AbstractValidator<BillingCheckoutCommand>
 {
     /// <summary>Builds the checkout rules.</summary>

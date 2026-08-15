@@ -4,10 +4,10 @@ using SmartQr.Domain.Codes.Content.Url.Models;
 
 namespace SmartQr.Application.Codes.Content.Validators;
 
-/// <summary>Validates url content — the destination the redirect sends a scanner to.</summary>
+/// <summary>Validates URL content.</summary>
 public sealed class UrlContentValidator : AbstractValidator<UrlContentValueObject>
 {
-    /// <summary>Builds the url-content rules.</summary>
+    /// <summary>Builds the URL-content rules.</summary>
     public UrlContentValidator() =>
         RuleFor(content => content.Url)
             .Cascade(CascadeMode.Stop)

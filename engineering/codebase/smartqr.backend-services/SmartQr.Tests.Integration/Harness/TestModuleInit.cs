@@ -4,7 +4,7 @@ using WoW.Two.Sdk.Backend.Beta.Testing.Data.EntityFrameworkCore;
 
 namespace SmartQr.Tests.Integration.Harness;
 
-/// <summary>Selects the test-DB provider for this integration suite — Postgres by default, matching CI.</summary>
+/// <summary>Selects the test-DB provider for this integration suite.</summary>
 /// <remarks>Flip the line below to in-memory SQLite for a container-free local loop.</remarks>
 internal static class TestModuleInit
 {

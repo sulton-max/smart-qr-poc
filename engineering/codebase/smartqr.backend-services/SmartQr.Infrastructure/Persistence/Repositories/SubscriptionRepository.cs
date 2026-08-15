@@ -5,7 +5,7 @@ using SmartQr.Persistence.DataContexts;
 
 namespace SmartQr.Infrastructure.Persistence.Repositories;
 
-/// <summary>EF Core implementation of <see cref="ISubscriptionRepository"/>.</summary>
+/// <summary>Fetches and persists subscriptions via EF Core.</summary>
 public sealed class SubscriptionRepository(AppDbContext db) : ISubscriptionRepository
 {
     /// <inheritdoc />

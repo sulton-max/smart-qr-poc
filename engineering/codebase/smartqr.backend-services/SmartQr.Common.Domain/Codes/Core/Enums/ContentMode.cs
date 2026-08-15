@@ -1,11 +1,11 @@
 namespace SmartQr.Common.Domain.Codes.Core.Enums;
 
-/// <summary>Defines how a code's symbol resolves — chosen at create, immutable afterwards.</summary>
+/// <summary>Defines how a code's symbol resolves.</summary>
 public enum ContentMode
 {
-    /// <summary>Represents a symbol carrying the payload itself — it works offline and cannot be edited.</summary>
+    /// <summary>Represents a symbol carrying the payload itself.</summary>
     Static,
 
-    /// <summary>Represents a symbol carrying the short link; the destination stays editable after printing.</summary>
+    /// <summary>Represents a symbol carrying the short link.</summary>
     Dynamic,
 }

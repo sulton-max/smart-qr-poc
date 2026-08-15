@@ -2,13 +2,13 @@ using SmartQr.Domain.Identity.Entities;
 
 namespace SmartQr.Application.Identity.Core.Services;
 
-/// <summary>Persistence operations for registered user accounts.</summary>
+/// <summary>Defines the contract for reading and persisting user accounts.</summary>
 public interface IUserRepository
 {
-    /// <summary>Loads the account for a Google subject, or null when none is registered yet.</summary>
+    /// <summary>Loads the account for a Google subject, or null when none is registered.</summary>
     Task<UserEntity?> FindByGoogleSubjectAsync(string googleSubject, CancellationToken ct);
 
-    /// <summary>Loads the account with the given id, or null — tells whether a guest id is free to reuse.</summary>
+    /// <summary>Loads the account with the given id, or null.</summary>
     Task<UserEntity?> FindByIdAsync(Guid id, CancellationToken ct);
 
     /// <summary>Inserts a new account and returns it.</summary>
