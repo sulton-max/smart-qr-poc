@@ -18,8 +18,8 @@ public static class RedirectEndpoints
         HttpContext http,
         IRedirectCodeRepository store,
         IRoutingService routingService,
-        IDeviceMapper deviceResolver,
-        IGeoResolver geoResolver,
+        IDeviceMapper deviceMapper,
+        IGeoBroker geoBroker,
         IScanRecorder recorder,
         CancellationToken ct)
     {
@@ -33,8 +33,8 @@ public static class RedirectEndpoints
         var context = new ScanContext
         {
             Slug = slug,
-            Device = deviceResolver.Resolve(userAgent),
-            CountryCode = geoResolver.ResolveCountry(ip),
+            Device = deviceMapper.Resolve(userAgent),
+            CountryCode = geoBroker.ResolveCountry(ip),
             Language = ParsePrimaryLanguage(http.Request.Headers.AcceptLanguage.ToString()),
             NowUtc = DateTimeOffset.UtcNow,
             Referrer = NullIfEmpty(http.Request.Headers.Referer.ToString()),

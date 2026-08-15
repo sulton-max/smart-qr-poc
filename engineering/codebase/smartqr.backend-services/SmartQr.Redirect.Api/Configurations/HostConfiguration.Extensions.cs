@@ -32,7 +32,7 @@ public static partial class HostConfiguration
         builder.Services.AddMemoryCache();
         builder.Services.AddSingleton<IRoutingService, RoutingService>();
         builder.Services.AddSingleton<IDeviceMapper, UserAgentDeviceMapper>();
-        builder.Services.AddSingleton<IGeoResolver, NoopGeoResolver>();
+        builder.Services.AddSingleton<IGeoBroker, NoopGeoBroker>();
 
         // Hot code store: read the code (with its rules) from the DB per scan — an edit takes effect on the next
         // scan with no invalidation. Front it with a cache (CachedRedirectCodeRepository) when the caching item lands.

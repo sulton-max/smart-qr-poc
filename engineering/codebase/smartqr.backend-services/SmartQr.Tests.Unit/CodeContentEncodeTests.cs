@@ -155,6 +155,6 @@ public sealed class CodeContentEncodeTests
     public void ToICalDate_formats_datetime_to_ical_basic_form(string input, string expected)
     {
         var value = DateTime.Parse(input, CultureInfo.InvariantCulture, DateTimeStyles.None);
-        Assert.Equal(expected, ContentEncoding.ToICalDate(value));
+        Assert.Equal(expected, ContentEncodingExtensions.ToICalDate(value));
     }
 }

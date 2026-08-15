@@ -6,7 +6,7 @@ namespace SmartQr.Domain.Codes.Content;
 
 /// <summary>Shared payload-encoding primitives for the static <see cref="CodeContentValueObject"/> types.</summary>
 /// <remarks>Keep in lockstep with the frontend's <c>contentTypes.ts</c>.</remarks>
-public static partial class ContentEncoding
+public static partial class ContentEncodingExtensions
 {
     /// <summary>Trims a value and null-normalizes it to empty — mirrors the frontend's <c>t()</c> helper.</summary>
     public static string Clean(string? value) => (value ?? string.Empty).Trim();

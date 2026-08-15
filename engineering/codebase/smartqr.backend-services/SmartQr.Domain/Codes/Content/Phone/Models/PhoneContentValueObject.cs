@@ -10,5 +10,5 @@ public sealed record PhoneContentValueObject : CodeContentValueObject
     public required string Phone { get; init; }
 
     /// <inheritdoc />
-    public override string Encode() => string.Format(Payload, ContentEncoding.Clean(Phone));
+    public override string Encode() => string.Format(Payload, ContentEncodingExtensions.Clean(Phone));
 }

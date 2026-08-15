@@ -42,12 +42,12 @@ public static class WifiContentExtensions
     {
         var password = content.Encryption is WifiEncryption.None
             ? string.Empty
-            : string.Format(PasswordSegment, ContentEncoding.EscapeWifi(content.Password));
+            : string.Format(PasswordSegment, ContentEncodingExtensions.EscapeWifi(content.Password));
 
         return string.Format(
             Payload,
             content.Encryption.ToPayloadToken(),
-            ContentEncoding.EscapeWifi(content.Ssid),
+            ContentEncodingExtensions.EscapeWifi(content.Ssid),
             password,
             content.Hidden ? HiddenSegment : string.Empty);
     }

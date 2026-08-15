@@ -28,15 +28,15 @@ public static class EmailContentExtensions
     {
         var parameters = new List<string>();
 
-        var subject = ContentEncoding.Clean(content.Subject);
+        var subject = ContentEncodingExtensions.Clean(content.Subject);
         if (subject.Length > 0)
-            parameters.Add(string.Format(SubjectParameter, ContentEncoding.FormUrlEncode(subject)));
+            parameters.Add(string.Format(SubjectParameter, ContentEncodingExtensions.FormUrlEncode(subject)));
 
-        var body = ContentEncoding.Clean(content.Body);
+        var body = ContentEncodingExtensions.Clean(content.Body);
         if (body.Length > 0)
-            parameters.Add(string.Format(BodyParameter, ContentEncoding.FormUrlEncode(body)));
+            parameters.Add(string.Format(BodyParameter, ContentEncodingExtensions.FormUrlEncode(body)));
 
-        var recipient = ContentEncoding.Clean(content.To);
+        var recipient = ContentEncodingExtensions.Clean(content.To);
         var query = string.Join(ParameterSeparator, parameters);
 
         return query.Length > 0

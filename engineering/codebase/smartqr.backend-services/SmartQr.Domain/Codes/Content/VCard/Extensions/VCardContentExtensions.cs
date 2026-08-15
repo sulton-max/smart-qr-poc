@@ -53,16 +53,19 @@ public static class VCardContentExtensions
     /// <remarks>Leave a field blank to omit its property — an empty one shows as a blank row.</remarks>
     public static string ToPayload(this VCardContentValueObject content)
     {
-        var first = ContentEncoding.Clean(content.FirstName);
-        var last = ContentEncoding.Clean(content.LastName);
+        var first = ContentEncodingExtensions.Clean(content.FirstName);
+        var last = ContentEncodingExtensions.Clean(content.LastName);
         var formatted = string.Join(NameSeparator, new[] { first, last }.Where(part => part.Length > 0));
 
         var lines = new List<string>
         {
             Begin,
             Version,
-            string.Format(StructuredName, ContentEncoding.EscapeICal(last), ContentEncoding.EscapeICal(first)),
-            string.Format(FormattedName, ContentEncoding.EscapeICal(formatted)),
+            string.Format(
+                StructuredName,
+                ContentEncodingExtensions.EscapeICal(last),
+                ContentEncodingExtensions.EscapeICal(first)),
+            string.Format(FormattedName, ContentEncodingExtensions.EscapeICal(formatted)),
         };
 
         AppendProperty(lines, OrganisationPrefix, content.Org);
@@ -71,9 +74,9 @@ public static class VCardContentExtensions
         AppendProperty(lines, EmailPrefix, content.Email);
         AppendProperty(lines, UrlPrefix, content.Url);
 
-        var address = ContentEncoding.Clean(content.Address);
+        var address = ContentEncodingExtensions.Clean(content.Address);
         if (address.Length > 0)
-            lines.Add(string.Format(StructuredAddress, ContentEncoding.EscapeICal(address)));
+            lines.Add(string.Format(StructuredAddress, ContentEncodingExtensions.EscapeICal(address)));
 
         AppendProperty(lines, NotePrefix, content.Note);
         lines.Add(End);
@@ -87,8 +90,8 @@ public static class VCardContentExtensions
     /// <param name="value">The value to escape and append.</param>
     private static void AppendProperty(List<string> lines, string prefix, string? value)
     {
-        var cleaned = ContentEncoding.Clean(value);
+        var cleaned = ContentEncodingExtensions.Clean(value);
         if (cleaned.Length > 0)
-            lines.Add($"{prefix}{ContentEncoding.EscapeICal(cleaned)}");
+            lines.Add($"{prefix}{ContentEncodingExtensions.EscapeICal(cleaned)}");
     }
 }

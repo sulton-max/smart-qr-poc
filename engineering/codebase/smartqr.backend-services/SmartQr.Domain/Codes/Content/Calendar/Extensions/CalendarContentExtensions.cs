@@ -37,22 +37,22 @@ public static class CalendarContentExtensions
     {
         var lines = new List<string> { Begin };
 
-        var title = ContentEncoding.Clean(content.Title);
+        var title = ContentEncodingExtensions.Clean(content.Title);
         if (title.Length > 0)
-            lines.Add(string.Format(Summary, ContentEncoding.EscapeICal(title)));
+            lines.Add(string.Format(Summary, ContentEncodingExtensions.EscapeICal(title)));
 
-        lines.Add(string.Format(StartDate, ContentEncoding.ToICalDate(content.Start)));
+        lines.Add(string.Format(StartDate, ContentEncodingExtensions.ToICalDate(content.Start)));
 
         if (content.End is { } end)
-            lines.Add(string.Format(EndDate, ContentEncoding.ToICalDate(end)));
+            lines.Add(string.Format(EndDate, ContentEncodingExtensions.ToICalDate(end)));
 
-        var location = ContentEncoding.Clean(content.Location);
+        var location = ContentEncodingExtensions.Clean(content.Location);
         if (location.Length > 0)
-            lines.Add(string.Format(Location, ContentEncoding.EscapeICal(location)));
+            lines.Add(string.Format(Location, ContentEncodingExtensions.EscapeICal(location)));
 
-        var description = ContentEncoding.Clean(content.Description);
+        var description = ContentEncodingExtensions.Clean(content.Description);
         if (description.Length > 0)
-            lines.Add(string.Format(Description, ContentEncoding.EscapeICal(description)));
+            lines.Add(string.Format(Description, ContentEncodingExtensions.EscapeICal(description)));
 
         lines.Add(End);
 

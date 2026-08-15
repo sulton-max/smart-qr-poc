@@ -17,8 +17,8 @@ public static class SmsContentExtensions
     /// <remarks>Trims both parts — neither a number nor a body carries meaningful surrounding space.</remarks>
     public static string ToPayload(this SmsContentValueObject content)
     {
-        var recipient = ContentEncoding.Clean(content.Phone);
-        var body = ContentEncoding.Clean(content.Message);
+        var recipient = ContentEncodingExtensions.Clean(content.Phone);
+        var body = ContentEncodingExtensions.Clean(content.Message);
 
         return body.Length > 0
             ? string.Format(PayloadWithMessage, recipient, body)
