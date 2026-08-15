@@ -26,7 +26,7 @@ public sealed class BillingCheckoutCommandHandler(
         if (request.Plan == Plan.Free)
             return Failure("The Free plan has no checkout — pick a paid plan.", AppErrorType.Validation);
 
-        var priceId = PlanPriceMap.PriceIdFor(settings, request.Plan);
+        var priceId = PlanPriceMapper.PriceIdFor(settings, request.Plan);
         if (priceId is null)
             return Failure($"No price configured for plan '{request.Plan}'.", AppErrorType.Validation);
 

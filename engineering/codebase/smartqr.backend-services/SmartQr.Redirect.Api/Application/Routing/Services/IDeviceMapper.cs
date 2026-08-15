@@ -3,7 +3,7 @@ using SmartQr.Domain.Codes.Core.Enums;
 namespace SmartQr.Redirect.Api.Application.Routing.Services;
 
 /// <summary>Resolves a device class from the request User-Agent (no external calls).</summary>
-public interface IDeviceResolver
+public interface IDeviceMapper
 {
     /// <summary>Resolves the device class. Returns <see cref="DeviceType.Unknown"/> when undetermined.</summary>
     DeviceType Resolve(string? userAgent);

@@ -31,7 +31,7 @@ public static partial class HostConfiguration
     {
         builder.Services.AddMemoryCache();
         builder.Services.AddSingleton<IRoutingService, RoutingService>();
-        builder.Services.AddSingleton<IDeviceResolver, UserAgentDeviceResolver>();
+        builder.Services.AddSingleton<IDeviceMapper, UserAgentDeviceMapper>();
         builder.Services.AddSingleton<IGeoResolver, NoopGeoResolver>();
 
         // Hot code store: read the code (with its rules) from the DB per scan — an edit takes effect on the next

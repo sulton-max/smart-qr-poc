@@ -36,7 +36,7 @@ public sealed class BillingMeQueryHandler(
             {
                 Plan = plan,
                 Status = status,
-                Limits = new LimitsDto { MaxCodes = PlanLimits.MaxCodesForApi(plan) },
+                Limits = new LimitsDto { MaxCodes = PlanLimitsConstants.MaxCodesForApi(plan) },
                 Usage = new UsageDto { CodeCount = codeCount },
             };
 

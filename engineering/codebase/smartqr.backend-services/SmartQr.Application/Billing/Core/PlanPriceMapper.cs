@@ -4,7 +4,7 @@ using BillingSettings = SmartQr.Application.Settings.BillingSettings;
 namespace SmartQr.Application.Billing.Core;
 
 /// <summary>Maps a paid <see cref="Plan"/> to its Stripe price id and back, off <c>Billing:Prices</c>.</summary>
-public static class PlanPriceMap
+public static class PlanPriceMapper
 {
     /// <summary>Stripe price id for a paid plan; null for <see cref="Plan.Free"/> or an unconfigured plan.</summary>
     public static string? PriceIdFor(BillingSettings billing, Plan plan) => plan switch

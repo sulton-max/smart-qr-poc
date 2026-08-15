@@ -76,7 +76,7 @@ public sealed class BillingWebhookCommandHandler(
             return;
         }
 
-        var plan = PlanPriceMap.PlanFor(settings, e.PriceId);
+        var plan = PlanPriceMapper.PlanFor(settings, e.PriceId);
 
         await subscriptions.UpsertByUserAsync(new SubscriptionEntity
         {
@@ -116,7 +116,7 @@ public sealed class BillingWebhookCommandHandler(
         {
             Id = existing.Id,
             UserId = existing.UserId,
-            Plan = e.PriceId is null ? existing.Plan : PlanPriceMap.PlanFor(settings, e.PriceId),
+            Plan = e.PriceId is null ? existing.Plan : PlanPriceMapper.PlanFor(settings, e.PriceId),
             Status = status,
             StripeCustomerId = e.StripeCustomerId ?? existing.StripeCustomerId,
             StripeSubscriptionId = e.StripeSubscriptionId,

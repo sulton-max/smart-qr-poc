@@ -37,7 +37,7 @@ public sealed class CodeCreateCommandHandler(
             // a plain count vs cap. The redirect hot path stays plan-agnostic (never-deactivate-on-downgrade).
             var subscription = await subscriptions.GetByUserAsync(request.UserId, ct);
             var plan = subscription?.Plan ?? Plan.Free;
-            var cap = PlanLimits.MaxCodes(plan);
+            var cap = PlanLimitsConstants.MaxCodes(plan);
 
             if (await repository.CountByUserAsync(request.UserId, ct) >= cap)
                 return AppResult<CodeCreateResult.Success>.Fail(AppError.Of(

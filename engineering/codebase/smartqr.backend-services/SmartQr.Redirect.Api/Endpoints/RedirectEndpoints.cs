@@ -18,7 +18,7 @@ public static class RedirectEndpoints
         HttpContext http,
         IRedirectCodeRepository store,
         IRoutingService routingService,
-        IDeviceResolver deviceResolver,
+        IDeviceMapper deviceResolver,
         IGeoResolver geoResolver,
         IScanRecorder recorder,
         CancellationToken ct)

@@ -18,7 +18,7 @@ public sealed class CodeImageService(ICodeRenderer renderer, ApiSettings setting
     public RenderedCode Render(CodeEntity code, ImageFormat format)
     {
         var shortUrl = $"{settings.RedirectBaseUrl.TrimEnd('/')}/{code.Slug}";
-        var payload = CodePayload.Resolve(code.Mode, code.Rules, shortUrl);
+        var payload = CodePayloadMapper.Resolve(code.Mode, code.Rules, shortUrl);
 
         // Read the persisted style off the entity, falling back to the default for an empty StyleJson.
         var style = StyleSpecJson.Deserialize(code.StyleJson);

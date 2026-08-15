@@ -43,7 +43,7 @@ public sealed class CodesController(
         // sample slug of the real length, which renders an identically sized symbol.
         var rendered = renderer.Render(new CodeRenderRequest
         {
-            Payload = CodePayload.Resolve(
+            Payload = CodePayloadMapper.Resolve(
                 request.Mode,
                 request.Rules,
                 $"{settings.RedirectBaseUrl.TrimEnd('/')}/{SlugPlaceholder}"),

@@ -4,7 +4,7 @@ using SmartQr.Redirect.Api.Application.Routing.Services;
 namespace SmartQr.Redirect.Api.Infrastructure.Routing;
 
 /// <summary>Lightweight substring-based User-Agent classifier (no external dependency).</summary>
-public sealed class UserAgentDeviceResolver : IDeviceResolver
+public sealed class UserAgentDeviceMapper : IDeviceMapper
 {
     /// <inheritdoc />
     public DeviceType Resolve(string? userAgent)
